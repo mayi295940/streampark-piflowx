@@ -1,0 +1,55 @@
+package org.apache.streampark.console.flow.component.process.vo;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.streampark.console.flow.base.util.DateUtils;
+import org.apache.streampark.console.flow.common.Eunm.ProcessState;
+import org.apache.streampark.console.flow.common.Eunm.RunModeType;
+import org.apache.streampark.console.flow.component.mxGraph.vo.MxGraphModelVo;
+
+@Setter
+@Getter
+public class ProcessVo implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
+  private String id;
+  private Date crtDttm;
+  private String name;
+  private String driverMemory;
+  private String executorNumber;
+  private String executorMemory;
+  private String executorCores;
+  private String description;
+  private String flowId;
+  private String appId;
+  private String parentProcessId;
+  private String processId;
+  private ProcessState state;
+  private Date startTime;
+  private Date endTime;
+  private String progress;
+  private RunModeType runModeType;
+  private String pageId;
+  private String viewXml;
+  private ProcessGroupVo processGroupVo;
+  private MxGraphModelVo mxGraphModelVo;
+  private List<ProcessStopVo> processStopVoList = new ArrayList<ProcessStopVo>();
+  private List<ProcessPathVo> processPathVoList = new ArrayList<ProcessPathVo>();
+
+  public String getCrtDttmStr() {
+    return DateUtils.dateTimesToStr(this.crtDttm);
+  }
+
+  public String getStartTimeStr() {
+    return DateUtils.dateTimesToStr(this.startTime);
+  }
+
+  public String getEndTimeStr() {
+    return DateUtils.dateTimesToStr(this.endTime);
+  }
+}

@@ -17,32 +17,7 @@
 
 package org.apache.streampark.console.core.runner;
 
-import org.apache.streampark.common.conf.CommonConfig;
-import org.apache.streampark.common.conf.ConfigKeys;
-import org.apache.streampark.common.conf.InternalConfigHolder;
-import org.apache.streampark.common.conf.InternalOption;
-import org.apache.streampark.common.conf.Workspace;
-import org.apache.streampark.common.enums.StorageType;
-import org.apache.streampark.common.fs.FsOperator;
-import org.apache.streampark.common.util.SystemPropertyUtils;
-import org.apache.streampark.common.util.Utils;
-import org.apache.streampark.common.zio.ZIOExt;
-import org.apache.streampark.console.base.util.WebUtils;
-import org.apache.streampark.console.core.entity.FlinkEnv;
-import org.apache.streampark.console.core.service.SettingService;
-import org.apache.streampark.flink.kubernetes.v2.fs.EmbeddedFileServer;
-
-import org.apache.commons.lang3.StringUtils;
-
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
+import static org.apache.streampark.common.enums.StorageType.LFS;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -50,12 +25,29 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static org.apache.streampark.common.enums.StorageType.LFS;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.streampark.common.conf.InternalConfigHolder;
+import org.apache.streampark.common.conf.InternalOption;
+import org.apache.streampark.common.conf.Workspace;
+import org.apache.streampark.common.enums.StorageType;
+import org.apache.streampark.common.fs.FsOperator;
+import org.apache.streampark.common.util.SystemPropertyUtils;
+import org.apache.streampark.common.util.Utils;
+import org.apache.streampark.console.base.util.WebUtils;
+import org.apache.streampark.console.core.entity.FlinkEnv;
+import org.apache.streampark.console.core.service.SettingService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 @Order(1)
 @Slf4j
@@ -78,32 +70,32 @@ public class EnvInitializer implements ApplicationRunner {
   @SneakyThrows
   @Override
   public void run(ApplicationArguments args) throws Exception {
-    Optional<String> profile =
-        Arrays.stream(context.getEnvironment().getActiveProfiles()).findFirst();
-    if ("test".equals(profile.orElse(null))) {
-      return;
-    }
-
-    String appHome = WebUtils.getAppHome();
-    if (StringUtils.isBlank(appHome)) {
-      throw new ExceptionInInitializerError(
-          String.format(
-              "[StreamPark] System initialization check failed,"
-                  + " The system initialization check failed. If started local for development and debugging,"
-                  + " please ensure the -D%s parameter is clearly specified,"
-                  + " more detail: https://streampark.apache.org/docs/user-guide/deployment",
-              ConfigKeys.KEY_APP_HOME()));
-    }
-
-    // init InternalConfig
-    initInternalConfig(context.getEnvironment());
-    // overwrite system variable HADOOP_USER_NAME
-    String hadoopUserName = InternalConfigHolder.get(CommonConfig.STREAMPARK_HADOOP_USER_NAME());
-    overrideSystemProp(ConfigKeys.KEY_HADOOP_USER_NAME(), hadoopUserName);
-    // initialize local file system resources
-    storageInitialize(LFS);
-    // Launch the embedded http file server.
-    ZIOExt.unsafeRun(EmbeddedFileServer.launch());
+//    Optional<String> profile =
+//        Arrays.stream(context.getEnvironment().getActiveProfiles()).findFirst();
+//    if ("test".equals(profile.orElse(null))) {
+//      return;
+//    }
+//
+//    String appHome = WebUtils.getAppHome();
+//    if (StringUtils.isBlank(appHome)) {
+//      throw new ExceptionInInitializerError(
+//          String.format(
+//              "[StreamPark] System initialization check failed,"
+//                  + " The system initialization check failed. If started local for development and debugging,"
+//                  + " please ensure the -D%s parameter is clearly specified,"
+//                  + " more detail: https://streampark.apache.org/docs/user-guide/deployment",
+//              ConfigKeys.KEY_APP_HOME()));
+//    }
+//
+//    // init InternalConfig
+//    initInternalConfig(context.getEnvironment());
+//    // overwrite system variable HADOOP_USER_NAME
+//    String hadoopUserName = InternalConfigHolder.get(CommonConfig.STREAMPARK_HADOOP_USER_NAME());
+//    overrideSystemProp(ConfigKeys.KEY_HADOOP_USER_NAME(), hadoopUserName);
+//    // initialize local file system resources
+//    storageInitialize(LFS);
+//    // Launch the embedded http file server.
+//    ZIOExt.unsafeRun(EmbeddedFileServer.launch());
   }
 
   private void initInternalConfig(Environment springEnv) {

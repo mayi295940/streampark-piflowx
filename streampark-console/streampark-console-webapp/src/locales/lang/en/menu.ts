@@ -42,4 +42,8 @@ export default {
     yarnQueue: 'Yarn Queue',
     flinkGateway: 'FLink Gateway',
   },
+  flow: {
+    flow: 'Flow',
+    group: 'Group',
+  },
 };

@@ -22,6 +22,7 @@
     :class="[getLevelClass, theme]"
   >
     <SvgIcon v-if="item.path === '/spark'" name="spark" size="25" class="mr-2" />
+    <SvgIcon v-if="item.path === '/flow'" name="resource" size="25" class="mr-2" />
     <div v-if="collapsedShowTitle && getIsCollapseParent" class="mt-1 collapse-title">
       {{ getI18nName }}
     </div>
@@ -44,6 +45,7 @@
         <SvgIcon v-if="item.path === '/flink'" name="flink3" size="25" />
         <SvgIcon v-if="item.path === '/setting'" name="settings" size="25" />
         <SvgIcon v-if="item.path === '/resource'" name="resource" size="25" />
+        <SvgIcon v-if="item.path === '/flow'" name="resource" size="25" />
       </span>
       <div v-if="collapsedShowTitle && getIsCollapseParent" class="mt-2 collapse-title">
         {{ getI18nName }}

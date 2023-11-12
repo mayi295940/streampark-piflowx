@@ -20,7 +20,10 @@ package org.apache.streampark.console;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  *
@@ -42,6 +45,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * </pre>
  */
 @Slf4j
+@PropertySources({
+    @PropertySource(value = "classpath:apiConfig.properties", encoding = "utf-8")
+})
+@EnableTransactionManagement
 @SpringBootApplication
 @EnableScheduling
 public class StreamParkConsoleBootstrap {

@@ -126,8 +126,8 @@
   const enableLDAP = ref(false);
 
   const formData = reactive<LoginForm>({
-    account: '',
-    password: '',
+    account: 'admin',
+    password: 'streampark',
   });
 
   const loginText = computed(() => {

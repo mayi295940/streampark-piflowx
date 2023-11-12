@@ -27,6 +27,7 @@ export const EXCEPTION_COMPONENT = () => import('/@/views/base/exception/Excepti
  */
 export const LAYOUT = () => import('/@/layouts/default/index.vue');
 
+
 /**
  * @description: parent-layout
  */
@@ -38,11 +39,13 @@ export const getParentLayout = (_name?: string) => {
       });
     });
 };
+
 const projectPath = '/flink/project';
 const settingPath = '/setting';
 const variablePath = '/flink/variable';
-
 const applicationPath = '/flink/app';
+const flowPath = '/flow';
+
 export const menuMap = {
   [`${projectPath}/add`]: projectPath,
   [`${projectPath}/edit`]: projectPath,
@@ -54,4 +57,5 @@ export const menuMap = {
   [`${settingPath}/add_cluster`]: `${settingPath}/flinkCluster`,
   [`${settingPath}/edit_cluster`]: `${settingPath}/flinkCluster`,
   [`${variablePath}/depend_apps`]: variablePath,
+  [`${flowPath}/drawingBoard`]: flowPath,
 };

@@ -17,11 +17,6 @@
 
 package org.apache.streampark.console.base.config;
 
-import org.apache.streampark.console.base.mybatis.interceptor.PostgreSQLPrepareInterceptor;
-import org.apache.streampark.console.base.mybatis.interceptor.PostgreSQLQueryInterceptor;
-
-import org.apache.ibatis.type.JdbcType;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusPropertiesCustomizer;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
@@ -29,6 +24,11 @@ import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.toolkit.GlobalConfigUtils;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.github.pagehelper.PageHelper;
+import java.util.Properties;
+import org.apache.ibatis.type.JdbcType;
+import org.apache.streampark.console.base.mybatis.interceptor.PostgreSQLPrepareInterceptor;
+import org.apache.streampark.console.base.mybatis.interceptor.PostgreSQLQueryInterceptor;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -36,7 +36,7 @@ import org.springframework.context.annotation.Configuration;
 
 /** for MyBatis Configure management. */
 @Configuration
-@MapperScan(value = {"org.apache.streampark.console.*.mapper"})
+@MapperScan(value = {"org.apache.streampark.console.**.mapper"})
 public class MybatisConfig {
 
   @Bean
@@ -88,5 +88,16 @@ public class MybatisConfig {
       globalConfig.setBanner(false);
       properties.setGlobalConfig(globalConfig);
     };
+  }
+
+  @Bean
+  public PageHelper pageHelper() {
+    PageHelper pageHelper = new PageHelper();
+    Properties p = new Properties();
+    p.setProperty("offsetAsPageNum", "true");
+    p.setProperty("rowBoundsWithoutCount", "true");
+    p.setProperty("reasonable", "true");
+    pageHelper.setProperties(p);
+    return pageHelper;
   }
 }

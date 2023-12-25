@@ -1,36 +1,39 @@
 package org.apache.streampark.console.flow.component.mxGraph.mapper;
 
-import org.apache.ibatis.annotations.*;
-import org.apache.ibatis.mapping.FetchType;
 import org.apache.streampark.console.flow.component.mxGraph.entity.MxGraphModel;
 import org.apache.streampark.console.flow.component.mxGraph.mapper.provider.MxGraphModelProvider;
+import org.apache.ibatis.annotations.InsertProvider;
+import org.apache.ibatis.annotations.Many;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
+import org.apache.ibatis.mapping.FetchType;
 
 @Mapper
 public interface MxGraphModelMapper {
 
   /**
-   * add mxGraphModel
+   * add mxGraph Model
    *
-   * @param mxGraphModel
-   * @return
+   * @param mxGraphModel mxGraph Model
    */
   @InsertProvider(type = MxGraphModelProvider.class, method = "addMxGraphModel")
-  public int addMxGraphModel(MxGraphModel mxGraphModel);
+  int addMxGraphModel(MxGraphModel mxGraphModel);
 
   /**
-   * Modify mxgraphmodel
+   * Modify mxgraph model
    *
-   * @param mxGraphModel
-   * @return
+   * @param mxGraphModel mxGraph Model
    */
   @UpdateProvider(type = MxGraphModelProvider.class, method = "updateMxGraphModel")
-  public int updateMxGraphModel(MxGraphModel mxGraphModel);
+  int updateMxGraphModel(MxGraphModel mxGraphModel);
 
   /**
-   * Query mxgraphmodel according to ID
+   * Query mxgraph model according to ID
    *
-   * @param id
-   * @return
+   * @param id id
    */
   @SelectProvider(type = MxGraphModelProvider.class, method = "getMxGraphModelById")
   @Results({
@@ -57,13 +60,12 @@ public interface MxGraphModelMapper {
                 select = "cn.cnic.component.mxGraph.mapper.MxCellMapper.getMeCellByMxGraphId",
                 fetchType = FetchType.LAZY))
   })
-  public MxGraphModel getMxGraphModelById(String id);
+  MxGraphModel getMxGraphModelById(String id);
 
   /**
    * Query mxGraphModel according to flowId
    *
-   * @param flowId
-   * @return
+   * @param flowId flowId
    */
   @SelectProvider(type = MxGraphModelProvider.class, method = "getMxGraphModelByFlowId")
   @Results({
@@ -90,13 +92,12 @@ public interface MxGraphModelMapper {
                 select = "cn.cnic.component.mxGraph.mapper.MxCellMapper.getMeCellByMxGraphId",
                 fetchType = FetchType.LAZY))
   })
-  public MxGraphModel getMxGraphModelByFlowId(String flowId);
+  MxGraphModel getMxGraphModelByFlowId(String flowId);
 
   /**
    * Query mxGraphModel according to flowGroupId
    *
-   * @param flowGroupId
-   * @return
+   * @param flowGroupId flowGroupId
    */
   @SelectProvider(type = MxGraphModelProvider.class, method = "getMxGraphModelByFlowGroupId")
   @Results({
@@ -123,12 +124,12 @@ public interface MxGraphModelMapper {
                 select = "cn.cnic.component.mxGraph.mapper.MxCellMapper.getMeCellByMxGraphId",
                 fetchType = FetchType.LAZY))
   })
-  public MxGraphModel getMxGraphModelByFlowGroupId(String flowGroupId);
+  MxGraphModel getMxGraphModelByFlowGroupId(String flowGroupId);
+
   /**
    * Query mxGraphModel according to flowGroupId
    *
-   * @param processId
-   * @return
+   * @param processId processId
    */
   @SelectProvider(type = MxGraphModelProvider.class, method = "getMxGraphModelByProcessId")
   @Results({
@@ -155,13 +156,12 @@ public interface MxGraphModelMapper {
                 select = "cn.cnic.component.mxGraph.mapper.MxCellMapper.getMeCellByMxGraphId",
                 fetchType = FetchType.LAZY))
   })
-  public MxGraphModel getMxGraphModelByProcessId(String processId);
+  MxGraphModel getMxGraphModelByProcessId(String processId);
 
   /**
    * Query mxGraphModel according to processGroupId
    *
-   * @param processGroupId
-   * @return
+   * @param processGroupId processGroupId
    */
   @SelectProvider(type = MxGraphModelProvider.class, method = "getMxGraphModelByProcessGroupId")
   @Results({
@@ -188,9 +188,17 @@ public interface MxGraphModelMapper {
                 select = "cn.cnic.component.mxGraph.mapper.MxCellMapper.getMeCellByMxGraphId",
                 fetchType = FetchType.LAZY))
   })
-  public MxGraphModel getMxGraphModelByProcessGroupId(String processGroupId);
+  MxGraphModel getMxGraphModelByProcessGroupId(String processGroupId);
 
-  @UpdateProvider(type = MxGraphModelProvider.class, method = "updateEnableFlagByFlowId")
-  public int updateEnableFlagByFlowId(
-      @Param("username") String username, @Param("flowId") String flowId);
+  /**
+   * delete 'MxGraphModel' by 'flowId'
+   *
+   * @param username username
+   * @param flowId flowId
+   */
+  @UpdateProvider(
+      type = MxGraphModelProvider.class,
+      method = "deleteMxGraphModelEnableFlagByFlowId")
+  int deleteMxGraphModelEnableFlagByFlowId(String username, String flowId);
+
 }

@@ -1,7 +1,7 @@
 package org.apache.streampark.console.flow.component.stopsComponent.utils;
 
+import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentGroup;
 import java.util.Date;
-import org.apache.streampark.console.flow.component.stopsComponent.model.StopsComponentGroup;
 
 public class StopsComponentGroupUtils {
 

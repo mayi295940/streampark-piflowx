@@ -1,16 +1,22 @@
 package org.apache.streampark.console.flow.component.process.mapper.provider;
 
+import org.apache.streampark.console.flow.base.utils.DateUtils;
+import org.apache.streampark.console.flow.base.utils.SqlUtils;
+import org.apache.streampark.console.flow.common.Eunm.ProcessState;
+import org.apache.streampark.console.flow.component.process.entity.ProcessGroup;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
-import org.apache.streampark.console.flow.base.util.DateUtils;
-import org.apache.streampark.console.flow.base.util.SqlUtils;
-import org.apache.streampark.console.flow.common.Eunm.ProcessState;
-import org.apache.streampark.console.flow.component.process.entity.ProcessGroup;
 
 public class ProcessGroupMapperProvider {
 
+  private String id;
+  private String lastUpdateDttmStr;
+  private String lastUpdateUser;
+  private int enableFlag;
+  private long version;
   private String name;
   private String description;
   private String pageId;
@@ -31,6 +37,20 @@ public class ProcessGroupMapperProvider {
     if (null == processGroup || StringUtils.isBlank(processGroup.getLastUpdateUser())) {
       return false;
     }
+
+    // Mandatory Field
+    String lastUpdateUser = processGroup.getLastUpdateUser();
+    Boolean enableFlag = processGroup.getEnableFlag();
+    Long version = processGroup.getVersion();
+    Date lastUpdateDttm = processGroup.getLastUpdateDttm();
+    this.id = SqlUtils.preventSQLInjection(processGroup.getId());
+    this.lastUpdateUser = SqlUtils.preventSQLInjection(lastUpdateUser);
+    this.enableFlag = ((null != enableFlag && enableFlag) ? 1 : 0);
+    this.version = (null != version ? version : 0L);
+    String lastUpdateDttmStr =
+        DateUtils.dateTimesToStr(null != lastUpdateDttm ? lastUpdateDttm : new Date());
+    this.lastUpdateDttmStr = SqlUtils.preventSQLInjection(lastUpdateDttmStr);
+
     // Selection field
     this.name = SqlUtils.preventSQLInjection(processGroup.getName());
     this.description = SqlUtils.preventSQLInjection(processGroup.getDescription());
@@ -39,17 +59,18 @@ public class ProcessGroupMapperProvider {
     this.appId = SqlUtils.preventSQLInjection(processGroup.getAppId());
     this.parentProcessId = SqlUtils.preventSQLInjection(processGroup.getParentProcessId());
     this.processId = SqlUtils.preventSQLInjection(processGroup.getProcessId());
-    String state = (null == processGroup.getState() ? null : processGroup.getState().name());
-    this.stateStr = SqlUtils.preventSQLInjection(state);
+    this.stateStr =
+        SqlUtils.preventSQLInjection(
+            null != processGroup.getState() ? processGroup.getState().name() : null);
     String startTime =
         (null != processGroup.getStartTime()
             ? DateUtils.dateTimesToStr(processGroup.getStartTime())
             : null);
-    this.startTimeStr = SqlUtils.preventSQLInjection(startTime);
     String endTime =
         (null != processGroup.getEndTime()
             ? DateUtils.dateTimesToStr(processGroup.getEndTime())
             : null);
+    this.startTimeStr = SqlUtils.preventSQLInjection(startTime);
     this.endTimeStr = SqlUtils.preventSQLInjection(endTime);
     this.progress = SqlUtils.preventSQLInjection(processGroup.getProgress());
     this.runModeType =
@@ -62,13 +83,18 @@ public class ProcessGroupMapperProvider {
                 : null);
     this.processGroupId =
         SqlUtils.preventSQLInjection(
-            null == processGroup.getProcessGroup() ? null : processGroup.getProcessGroup().getId());
+            null != processGroup.getProcessGroup() ? processGroup.getProcessGroup().getId() : null);
     this.viewXml = SqlUtils.preventSQLInjection(processGroup.getViewXml());
 
     return true;
   }
 
   private void resetProcessGroup() {
+    this.id = null;
+    this.lastUpdateDttmStr = null;
+    this.lastUpdateUser = null;
+    this.enableFlag = 1;
+    this.version = 0L;
     this.name = null;
     this.description = null;
     this.pageId = null;
@@ -133,6 +159,51 @@ public class ProcessGroupMapperProvider {
       return strBuf.toString() + ";";
     }
     return "SELECT 0";
+  }
+
+  /**
+   * update updateProcessGroup
+   *
+   * @param processGroup
+   * @return
+   */
+  public String updateProcessGroup(ProcessGroup processGroup) {
+    String sqlStr = "SELECT 0";
+    if (this.preventSQLInjectionProcessGroup(processGroup)) {
+      SQL sql = new SQL();
+      sql.UPDATE("flow_process_group");
+
+      // Process the required fields first
+      sql.SET("last_update_dttm = " + this.lastUpdateDttmStr);
+      sql.SET("last_update_user = " + this.lastUpdateUser);
+      sql.SET("version = " + (this.version + 1));
+
+      // handle other fields
+      sql.SET("enable_flag=" + enableFlag);
+      sql.SET("name=" + this.name);
+      sql.SET("description=" + this.description);
+      sql.SET("page_id=" + this.pageId);
+      sql.SET("flow_id=" + this.flowId);
+      sql.SET("app_id=" + this.appId);
+      sql.SET("parent_process_id=" + this.parentProcessId);
+      sql.SET("process_id=" + this.processId);
+      sql.SET("state=" + this.stateStr);
+      sql.SET("start_time=" + this.startTimeStr);
+      sql.SET("end_time=" + this.endTimeStr);
+      sql.SET("progress=" + this.progress);
+      sql.SET("run_mode_type=" + this.runModeType);
+      sql.SET("process_parent_type=" + this.processParentType);
+      sql.SET("fk_flow_process_group_id=" + this.processGroupId);
+      sql.SET("view_xml=" + this.viewXml);
+
+      sql.WHERE("version = " + this.version);
+      sql.WHERE("id = " + this.id);
+      if (StringUtils.isNotBlank(this.id)) {
+        sqlStr = sql.toString();
+      }
+    }
+    this.resetProcessGroup();
+    return sqlStr;
   }
 
   /**
@@ -362,5 +433,28 @@ public class ProcessGroupMapperProvider {
       sqlStr = sql.toString();
     }
     return sqlStr;
+  }
+
+  public String getProcessGroupNamesAndPageIdsByPageIds(String fid, List<String> pageIds) {
+    if (StringUtils.isBlank(fid) || null == pageIds || pageIds.size() <= 0) {
+      return "SELECT 0";
+    }
+    StringBuffer sql = new StringBuffer();
+    sql.append("SELECT re.name AS name,re.page_id AS pageId FROM ( ");
+    sql.append(
+        "SELECT name,page_id FROM flow_process_group WHERE enable_flag=1 AND fk_flow_process_group_id="
+            + SqlUtils.preventSQLInjection(fid)
+            + " AND page_id IN ("
+            + SqlUtils.strListToStr(pageIds)
+            + ") ");
+    sql.append("UNION ALL ");
+    sql.append(
+        "SELECT name,page_id FROM flow_process WHERE enable_flag=1 AND fk_flow_process_group_id="
+            + SqlUtils.preventSQLInjection(fid)
+            + " AND page_id IN ("
+            + SqlUtils.strListToStr(pageIds)
+            + ") ");
+    sql.append(") AS re ");
+    return sql.toString();
   }
 }

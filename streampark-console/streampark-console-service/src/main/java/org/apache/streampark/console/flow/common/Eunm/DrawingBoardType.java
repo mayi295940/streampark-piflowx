@@ -1,7 +1,7 @@
 package org.apache.streampark.console.flow.common.Eunm;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.streampark.console.flow.base.TextureEnumSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonSerialize(using = TextureEnumSerializer.class)
 public enum DrawingBoardType {

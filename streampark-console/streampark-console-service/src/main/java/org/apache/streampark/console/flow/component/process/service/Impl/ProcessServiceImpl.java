@@ -3,395 +3,370 @@ package org.apache.streampark.console.flow.component.process.service.Impl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import java.math.BigDecimal;
-import java.util.*;
-import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Service;
-import org.apache.streampark.console.flow.base.util.DateUtils;
-import org.apache.streampark.console.flow.base.util.HdfsUtils;
-import org.apache.streampark.console.flow.base.util.HttpUtils;
-import org.apache.streampark.console.flow.base.util.JsonUtils;
-import org.apache.streampark.console.flow.base.util.LoggerUtil;
-import org.apache.streampark.console.flow.base.util.MxGraphUtils;
-import org.apache.streampark.console.flow.base.util.PageHelperUtils;
-import org.apache.streampark.console.flow.base.util.ReturnMapUtils;
-import org.apache.streampark.console.flow.base.vo.UserVo;
+import org.apache.streampark.console.flow.base.utils.DateUtils;
+import org.apache.streampark.console.flow.base.utils.HdfsUtils;
+import org.apache.streampark.console.flow.base.utils.LoggerUtil;
+import org.apache.streampark.console.flow.base.utils.PageHelperUtils;
+import org.apache.streampark.console.flow.base.utils.ReturnMapUtils;
+import org.apache.streampark.console.flow.base.utils.UUIDUtils;
 import org.apache.streampark.console.flow.common.Eunm.ProcessState;
 import org.apache.streampark.console.flow.common.Eunm.RunModeType;
 import org.apache.streampark.console.flow.common.Eunm.StopState;
+import org.apache.streampark.console.flow.common.constant.MessageConfig;
+import org.apache.streampark.console.flow.component.flow.domain.FlowDomain;
 import org.apache.streampark.console.flow.component.flow.entity.Flow;
-import org.apache.streampark.console.flow.component.flow.jpa.domain.FlowDomain;
 import org.apache.streampark.console.flow.component.mxGraph.utils.MxCellUtils;
+import org.apache.streampark.console.flow.component.mxGraph.utils.MxGraphUtils;
 import org.apache.streampark.console.flow.component.mxGraph.vo.MxCellVo;
 import org.apache.streampark.console.flow.component.mxGraph.vo.MxGraphModelVo;
-import org.apache.streampark.console.flow.component.process.domain.ProcessDomainU;
+import org.apache.streampark.console.flow.component.process.domain.ProcessDomain;
 import org.apache.streampark.console.flow.component.process.entity.Process;
 import org.apache.streampark.console.flow.component.process.entity.ProcessGroup;
 import org.apache.streampark.console.flow.component.process.entity.ProcessStop;
-import org.apache.streampark.console.flow.component.process.jpa.domain.ProcessDomain;
-import org.apache.streampark.console.flow.component.process.mapper.ProcessMapper;
-import org.apache.streampark.console.flow.component.process.mapper.ProcessStopMapper;
 import org.apache.streampark.console.flow.component.process.service.IProcessService;
 import org.apache.streampark.console.flow.component.process.utils.ProcessUtils;
 import org.apache.streampark.console.flow.component.process.vo.DebugDataRequest;
 import org.apache.streampark.console.flow.component.process.vo.DebugDataResponse;
 import org.apache.streampark.console.flow.component.process.vo.ProcessGroupVo;
+import org.apache.streampark.console.flow.component.process.vo.ProcessStopVo;
 import org.apache.streampark.console.flow.component.process.vo.ProcessVo;
+import org.apache.streampark.console.flow.component.stopsComponent.domain.StopsComponentDomain;
+import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponent;
 import org.apache.streampark.console.flow.third.service.IFlow;
 import org.apache.streampark.console.flow.third.vo.flow.ThirdFlowInfoStopVo;
 import org.apache.streampark.console.flow.third.vo.flow.ThirdFlowInfoStopsVo;
 import org.apache.streampark.console.flow.third.vo.flow.ThirdFlowInfoVo;
 import org.apache.streampark.console.flow.third.vo.flow.ThirdProgressVo;
+import org.slf4j.Logger;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ProcessServiceImpl implements IProcessService {
 
-  Logger logger = LoggerUtil.getLogger();
+  private final Logger logger = LoggerUtil.getLogger();
 
-  @Resource private ProcessMapper processMapper;
+  private final ProcessDomain processDomain;
+  private final StopsComponentDomain stopsComponentDomain;
+  private final FlowDomain flowDomain;
+  private final IFlow flowImpl;
 
-  @Resource private ProcessDomainU processDomainU;
+  @Autowired
+  public ProcessServiceImpl(
+      ProcessDomain processDomain,
+      StopsComponentDomain stopsComponentDomain,
+      FlowDomain flowDomain,
+      IFlow flowImpl) {
+    this.processDomain = processDomain;
+    this.stopsComponentDomain = stopsComponentDomain;
+    this.flowDomain = flowDomain;
+    this.flowImpl = flowImpl;
+  }
 
-  @Resource private ProcessStopMapper processStopMapper;
-
-  @Resource private FlowDomain flowDomain;
-
-  @Resource private IFlow flowImpl;
-
-  @Resource private ProcessDomain processDomain;
-
-  /**
-   * Query processVoList (the query contains its child table)
-   *
-   * @return
-   */
+  /** Query processVoList (the query contains its child table) */
   @Override
   public List<ProcessVo> getProcessAllVoList() {
-    List<ProcessVo> processVoList = null;
-    List<Process> processList = processMapper.getProcessList();
-    if (null != processList && processList.size() > 0) {
-      processVoList = new ArrayList<>();
-      for (Process process : processList) {
-        if (null != process) {
-          ProcessVo processVo = ProcessUtils.processPoToVo(process);
-          processVo.setCrtDttm(process.getCrtDttm());
-          processVoList.add(processVo);
-        }
+    List<Process> processList = processDomain.getProcessList();
+    if (null == processList || processList.size() <= 0) {
+      return null;
+    }
+    List<ProcessVo> processVoList = new ArrayList<>();
+    for (Process process : processList) {
+      if (null == process) {
+        continue;
       }
+      ProcessVo processVo = ProcessUtils.processPoToVo(process);
+      processVo.setCrtDttm(process.getCrtDttm());
+      processVoList.add(processVo);
     }
     return processVoList;
   }
 
-  /**
-   * Query processVoList (only query process table)
-   *
-   * @return
-   */
+  /** Query processVoList (only query process table) */
   @Override
   public List<ProcessVo> getProcessVoList() {
-    List<ProcessVo> processVoList = null;
-    List<Process> processList = processMapper.getProcessList();
-    if (null != processList && processList.size() > 0) {
-      processVoList = new ArrayList<>();
-      for (Process process : processList) {
-        if (null != process) {
-          ProcessVo processVo = new ProcessVo();
-          BeanUtils.copyProperties(process, processVo);
-          processVo.setCrtDttm(process.getCrtDttm());
-          processVoList.add(processVo);
-        }
+    List<Process> processList = processDomain.getProcessList();
+    if (null == processList || processList.size() <= 0) {
+      return null;
+    }
+    List<ProcessVo> processVoList = new ArrayList<>();
+    for (Process process : processList) {
+      if (null == process) {
+        continue;
       }
+      ProcessVo processVo = new ProcessVo();
+      BeanUtils.copyProperties(process, processVo);
+      processVo.setCrtDttm(process.getCrtDttm());
+      processVoList.add(processVo);
     }
     return processVoList;
   }
 
-  /**
-   * Query processVo based on id (query contains its child table)
-   *
-   * @param id
-   * @return
-   */
+  /** Query processVo based on id (query contains its child table) */
   @Override
   public ProcessVo getProcessAllVoById(String username, boolean isAdmin, String id) {
-    ProcessVo processVo = null;
-    if (StringUtils.isNotBlank(id)) {
-      Process processById = processMapper.getProcessById(username, isAdmin, id);
-      processVo = ProcessUtils.processPoToVo(processById);
-      ProcessGroup processGroup = processById.getProcessGroup();
-      if (null != processGroup) {
-        ProcessGroupVo processGroupVo = new ProcessGroupVo();
-        processGroupVo.setId(processGroup.getId());
-        processVo.setProcessGroupVo(processGroupVo);
-      }
+    if (StringUtils.isBlank(id)) {
+      return null;
+    }
+    Process processById = processDomain.getProcessById(username, isAdmin, id);
+    ProcessVo processVo = ProcessUtils.processPoToVo(processById);
+    ProcessGroup processGroup = processById.getProcessGroup();
+    if (null != processGroup) {
+      ProcessGroupVo processGroupVo = new ProcessGroupVo();
+      processGroupVo.setId(processGroup.getId());
+      processVo.setProcessGroupVo(processGroupVo);
     }
     return processVo;
   }
 
-  /**
-   * Query processVo based on id (only query process table)
-   *
-   * @param id
-   * @return
-   */
+  /** Query processVo based on id (only query process table) */
   @Override
   public String getProcessVoById(String username, boolean isAdmin, String id) {
     // Determine if current user obtained are empty
     if (StringUtils.isBlank(username)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("user Illegality");
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
     }
     if (StringUtils.isBlank(id)) {
       return ReturnMapUtils.setFailedMsgRtnJsonStr("Parameter passed in incorrectly");
     }
-    ProcessVo processVo = null;
-    Process processById = processMapper.getProcessById(username, isAdmin, id);
-    if (null != processById) {
-      processVo = new ProcessVo();
-      BeanUtils.copyProperties(processById, processVo);
-      processVo.setCrtDttm(processById.getCrtDttm());
+    Process processById = processDomain.getProcessById(username, isAdmin, id);
+    if (null == processById) {
+      return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("processVo", null);
     }
+    ProcessVo processVo = new ProcessVo();
+    BeanUtils.copyProperties(processById, processVo);
+    processVo.setCrtDttm(processById.getCrtDttm());
     return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("processVo", processVo);
   }
 
-  /**
-   * Query process based on id
-   *
-   * @param id
-   * @return
-   */
+  /** Query process based on id */
   @Override
   public ProcessVo getProcessById(String username, boolean isAdmin, String id) {
-    ProcessVo processVo = null;
-    Process processById = processMapper.getProcessById(username, isAdmin, id);
-    if (null != processById) {
-      processVo = ProcessUtils.processPoToVo(processById);
+    Process processById = processDomain.getProcessById(username, isAdmin, id);
+    if (null == processById) {
+      return null;
     }
-    return processVo;
+    return ProcessUtils.processPoToVo(processById);
   }
 
-  /**
-   * Query process according to Appid
-   *
-   * @param appId
-   * @return
-   */
+  /** Query process according to App id */
   @Override
   public ProcessVo getProcessVoByAppId(String appId) {
-    ProcessVo processVo = null;
-    if (StringUtils.isNotBlank(appId)) {
-      Process processById = processMapper.getProcessByAppId(appId);
-      if (null != processById) {
-        processVo = ProcessUtils.processPoToVo(processById);
-      }
+    if (StringUtils.isBlank(appId)) {
+      return null;
     }
-    return processVo;
+    Process processById = processDomain.getProcessByAppId(appId);
+    if (null == processById) {
+      return null;
+    }
+    return ProcessUtils.processPoToVo(processById);
   }
 
-  /**
-   * Query appInfo on a third-party interface based on appID and save
-   *
-   * @param appID
-   * @return
-   */
+  /** Query appInfo on a third-party interface based on appID and save */
   @Override
-  public ProcessVo getAppInfoByThirdAndSave(String appID) {
+  public ProcessVo getAppInfoByThirdAndSave(String appID) throws Exception {
+    Process processById = processDomain.getProcessByAppId(appID);
+    if (null == processById) {
+      return new ProcessVo();
+    }
     ProcessVo processVo = new ProcessVo();
-    Process processById = processMapper.getProcessByAppId(appID);
-    if (null != processById) {
-      // If the status is STARTED, the interface is removed. Otherwise, it indicates that the
-      // startup is complete and returns directly.
-      ProcessState state = processById.getState();
-      if (ProcessState.STARTED == state || null == processById.getStartTime()) {
-        ThirdFlowInfoVo thirdFlowInfoVo = flowImpl.getFlowInfo(appID);
-        if (null != thirdFlowInfoVo) {
-          processById.getProcessStopList();
-          // Determine if the progress returned by the interface is empty
-          if (StringUtils.isNotBlank(thirdFlowInfoVo.getProgress())) {
-            double progressNums = Double.parseDouble(thirdFlowInfoVo.getProgress());
-            Double progressNumsDb = null;
-            String percentage = processById.getProgress();
-            if (StringUtils.isNotBlank(percentage)) {
-              progressNumsDb = Double.parseDouble(percentage);
-            }
-            boolean isUpdateProcess = false;
-            // Determine the status, if the status is STARTED, determine whether the return progress
-            // is greater than the database progress, if it is greater than the save
-            // Save the database directly if the state is not STARTED
-            if ("STARTED".equals(thirdFlowInfoVo.getState())) {
-              // Save if the database progress is empty
-              if (null == progressNumsDb) {
-                isUpdateProcess = true;
-              } else if (progressNums > progressNumsDb) {
-                // Save if the return progress is greater than the database progress
-                isUpdateProcess = true;
-              }
-            } else {
-              isUpdateProcess = true;
-            }
-            if (isUpdateProcess) {
-              // Modify flow information
-              processById.setLastUpdateUser("update");
-              processById.setLastUpdateDttm(new Date());
-              processById.setProgress(progressNums + "");
-              processById.setState(ProcessState.selectGender(thirdFlowInfoVo.getState()));
-              // processById.setProcessId(thirdFlowInfoVo.getPid());
-              processById.setProcessId(thirdFlowInfoVo.getId());
-              processById.setName(thirdFlowInfoVo.getName());
-              processById.setStartTime(DateUtils.strCstToDate(thirdFlowInfoVo.getStartTime()));
-              processById.setEndTime(DateUtils.strCstToDate(thirdFlowInfoVo.getEndTime()));
-              processDomainU.updateProcess(processById);
-              // Modify the stops information
-              List<ThirdFlowInfoStopsVo> stops = thirdFlowInfoVo.getStops();
-              if (null != stops && stops.size() > 0) {
-                List<ProcessStop> processStopListNew = new ArrayList<>();
-                processVo.setId(processById.getId());
-                for (ThirdFlowInfoStopsVo thirdFlowInfoStopsVo : stops) {
-                  if (null == thirdFlowInfoStopsVo) {
-                    continue;
-                  }
-                  ThirdFlowInfoStopVo thirdFlowInfoStopVo = thirdFlowInfoStopsVo.getStop();
-                  if (null == thirdFlowInfoStopVo) {
-                    continue;
-                  }
-                  ProcessStop processStopByNameAndPid =
-                      processStopMapper.getProcessStopByNameAndPid(
-                          processById.getId(), thirdFlowInfoStopVo.getName());
-                  processStopByNameAndPid.setName(thirdFlowInfoStopVo.getName());
-                  processStopByNameAndPid.setState(
-                      StopState.selectGender(thirdFlowInfoStopVo.getState()));
-                  processStopByNameAndPid.setStartTime(
-                      DateUtils.strCstToDate(thirdFlowInfoStopVo.getStartTime()));
-                  processStopByNameAndPid.setEndTime(
-                      DateUtils.strCstToDate(thirdFlowInfoStopVo.getEndTime()));
-                  int updateProcessStop =
-                      processStopMapper.updateProcessStop(processStopByNameAndPid);
-                  if (updateProcessStop > 0) {
-                    processStopListNew.add(processStopByNameAndPid);
-                  }
-                }
-                processById.setProcessStopList(processStopListNew);
-              }
-              processById = processMapper.getProcessByAppId(appID);
-            }
-          }
-        }
-      }
+    // If the status is STARTED, the interface is removed. Otherwise,
+    // it indicates that the startup is complete and returns directly.
+    ProcessState state = processById.getState();
+    if (ProcessState.STARTED != state && null != processById.getStartTime()) {
       processVo = ProcessUtils.processPoToVo(processById);
+      return processVo;
     }
-
-    return processVo;
-  }
-
-  /**
-   * Query appInfo according to appID
-   *
-   * @param appID
-   * @return
-   */
-  @Override
-  public String getAppInfoByAppId(String appID) {
-    Map<String, Object> rtnMap = new HashMap<String, Object>();
-    rtnMap.put("code", 500);
-    if (StringUtils.isNotBlank(appID)) {
-      // 查询appinfo
-      // ProcessVo processVoThird = this.getAppInfoByThirdAndSave(appID);
-      Process processById = processMapper.getProcessByAppId(appID);
-      ProcessVo processVo = ProcessUtils.processPoToVo(processById);
-      if (null != processVo) {
-        rtnMap.put("code", 200);
-        rtnMap.put(
-            "progress", (null != processVo.getProgress() ? processVo.getProgress() : "0.00"));
-        rtnMap.put(
-            "state", (null != processVo.getState() ? processVo.getState().name() : "NO_STATE"));
-        rtnMap.put("processVo", processVo);
+    ThirdFlowInfoVo thirdFlowInfoVo = flowImpl.getFlowInfo(appID);
+    if (null == thirdFlowInfoVo) {
+      processVo = ProcessUtils.processPoToVo(processById);
+      return processVo;
+    }
+    processById.getProcessStopList();
+    // Determine if the progress returned by the interface is empty
+    if (StringUtils.isBlank(thirdFlowInfoVo.getProgress())) {
+      processVo = ProcessUtils.processPoToVo(processById);
+      return processVo;
+    }
+    double progressNums = Double.parseDouble(thirdFlowInfoVo.getProgress());
+    Double progressNumsDb = null;
+    String percentage = processById.getProgress();
+    if (StringUtils.isNotBlank(percentage)) {
+      progressNumsDb = Double.parseDouble(percentage);
+    }
+    boolean isUpdateProcess = false;
+    // Determine the status, if the status is STARTED,
+    // determine whether the return progress is greater than the database progress,
+    // if it is greater than the save
+    // Save the database directly if the state is not STARTED
+    if ("STARTED".equals(thirdFlowInfoVo.getState())) {
+      // Save if the database progress is empty
+      if (null == progressNumsDb) {
+        isUpdateProcess = true;
+      } else if (progressNums > progressNumsDb) {
+        // Save if the return progress is greater than the database progress
+        isUpdateProcess = true;
       }
     } else {
-      rtnMap.put("errorMsg", "appID is null");
+      isUpdateProcess = true;
     }
-    return JsonUtils.toJsonNoException(rtnMap);
+    if (!isUpdateProcess) {
+      processVo = ProcessUtils.processPoToVo(processById);
+    }
+    // Modify flow information
+    processById.setLastUpdateUser("update");
+    processById.setLastUpdateDttm(new Date());
+    processById.setProgress(String.valueOf(progressNums));
+    processById.setState(ProcessState.selectGender(thirdFlowInfoVo.getState()));
+    // processById.setProcessId(thirdFlowInfoVo.getPid());
+    processById.setProcessId(thirdFlowInfoVo.getId());
+    processById.setName(thirdFlowInfoVo.getName());
+    processById.setStartTime(DateUtils.strCstToDate(thirdFlowInfoVo.getStartTime()));
+    processById.setEndTime(DateUtils.strCstToDate(thirdFlowInfoVo.getEndTime()));
+    processDomain.updateProcess(processById);
+    // Modify the stops information
+    List<ThirdFlowInfoStopsVo> stops = thirdFlowInfoVo.getStops();
+    if (null != stops && stops.size() > 0) {
+      List<ProcessStop> processStopListNew = new ArrayList<>();
+      processVo.setId(processById.getId());
+      for (ThirdFlowInfoStopsVo thirdFlowInfoStopsVo : stops) {
+        if (null == thirdFlowInfoStopsVo) {
+          continue;
+        }
+        ThirdFlowInfoStopVo thirdFlowInfoStopVo = thirdFlowInfoStopsVo.getStop();
+        if (null == thirdFlowInfoStopVo) {
+          continue;
+        }
+        ProcessStop processStopByNameAndPid =
+            processDomain.getProcessStopByNameAndPid(
+                processById.getId(), thirdFlowInfoStopVo.getName());
+        processStopByNameAndPid.setName(thirdFlowInfoStopVo.getName());
+        processStopByNameAndPid.setState(StopState.selectGender(thirdFlowInfoStopVo.getState()));
+        processStopByNameAndPid.setStartTime(
+            DateUtils.strCstToDate(thirdFlowInfoStopVo.getStartTime()));
+        processStopByNameAndPid.setEndTime(
+            DateUtils.strCstToDate(thirdFlowInfoStopVo.getEndTime()));
+        int updateProcessStop = processDomain.updateProcessStop(processStopByNameAndPid);
+        if (updateProcessStop > 0) {
+          processStopListNew.add(processStopByNameAndPid);
+        }
+      }
+      processById.setProcessStopList(processStopListNew);
+    }
+    processById = processDomain.getProcessByAppId(appID);
+    processVo = ProcessUtils.processPoToVo(processById);
+    return processVo;
   }
 
-  /**
-   * Query progress and save on third-party interface according to appID
-   *
-   * @param appIDs
-   * @return
-   */
+  /** Query appInfo according to appID */
   @Override
-  public String getProgressByThirdAndSave(String[] appIDs) {
-    Map<String, Object> rtnMap = new HashMap<String, Object>();
-    rtnMap.put("code", 500);
-    List<ProcessVo> processVoList = null;
-    if (null != appIDs && appIDs.length > 0) {
-      List<Process> processListByAppIDs = processMapper.getProcessListByAppIDs(appIDs);
-      if (null != processListByAppIDs && processListByAppIDs.size() > 0) {
-        processVoList = new ArrayList<>();
-        for (Process process : processListByAppIDs) {
-          if (null != process) {
-            ProcessVo processVo = null;
-            // If the status is STARTED, the interface is removed. Otherwise, it indicates that the
-            // startup is complete and returns directly.
-            ProcessState state = process.getState();
-            if (ProcessState.STARTED == state) {
-              ThirdProgressVo flowProgress = flowImpl.getFlowProgress(process.getAppId());
-              if (null != flowProgress) {
-                double progressNumsDb = 0.00;
-                String percentage = process.getProgress();
-                if (StringUtils.isNotBlank(percentage)) {
-                  progressNumsDb = Float.parseFloat(percentage);
-                }
-                double progressNums = progressNumsDb;
-                if (!"NaN".equals(flowProgress.getProgress())) {
-                  progressNums = Double.parseDouble(flowProgress.getProgress());
-                  BigDecimal formatBD = new BigDecimal(progressNums);
-                  progressNums = formatBD.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-                }
-                boolean isUpdateProcess = false;
-                // Determine the status, if the status is STARTED, determine whether the return
-                // progress is greater than the database progress, if it is greater than the save
-                // Save the database directly if the state is not STARTED
-                if ("STARTED".equals(flowProgress.getState())) {
-                  // Save if the return progress is greater than the database progress
-                  if (progressNums > progressNumsDb) {
-                    isUpdateProcess = true;
-                  }
-                } else {
-                  isUpdateProcess = true;
-                }
-                if (isUpdateProcess) {
-                  // Modify flow information
-                  process.setLastUpdateUser("update");
-                  process.setLastUpdateDttm(new Date());
-                  process.setProgress(progressNums + "");
-                  process.setState(ProcessState.selectGender(flowProgress.getState()));
-                  process.setName(flowProgress.getName());
-                  processDomainU.updateProcess(process);
-                }
-              }
-              processVo = ProcessUtils.processPoToVo(process);
-            } else if (null == process.getStartTime()) {
-              processVo = this.getAppInfoByThirdAndSave(process.getAppId());
+  public String getAppInfoByAppId(String appID) {
+    if (StringUtils.isBlank(appID)) {
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_IS_NULL_MSG("appID"));
+    }
+    // 查询app info
+    // ProcessVo processVoThird = this.getAppInfoByThirdAndSave(appID);
+    Process processById = processDomain.getProcessByAppId(appID);
+    if (processById == null) {
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_MSG());
+    }
+    ProcessVo processVo = ProcessUtils.processPoToVo(processById);
+    if (null == processVo) {
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.CONVERSION_FAILED_MSG());
+    }
+    Map<String, Object> rtnMap = ReturnMapUtils.setSucceededCustomParam("processVo", processVo);
+    rtnMap.put("progress", (null != processVo.getProgress() ? processVo.getProgress() : "0.00"));
+    rtnMap.put("state", (null != processVo.getState() ? processVo.getState().name() : "NO_STATE"));
+    return ReturnMapUtils.toJson(rtnMap);
+  }
+
+  /** Query progress and save on third-party interface according to appID */
+  @Override
+  public String getProgressByThirdAndSave(String[] appIDs) throws Exception {
+    if (null == appIDs || appIDs.length == 0) {
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_ERROR_MSG());
+    }
+    List<Process> processListByAppIDs = processDomain.getProcessListByAppIDs(appIDs);
+    if (null == processListByAppIDs || processListByAppIDs.size() <= 0) {
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_MSG());
+    }
+    List<ProcessVo> processVoList = new ArrayList<>();
+    for (Process process : processListByAppIDs) {
+      if (null == process) {
+        continue;
+      }
+      ProcessVo processVo = null;
+      // If the status is STARTED, the interface is removed. Otherwise,
+      // it indicates that the startup is complete and returns directly.
+      ProcessState state = process.getState();
+      if (ProcessState.STARTED == state) {
+        ThirdProgressVo flowProgress = flowImpl.getFlowProgress(process.getAppId());
+        if (null != flowProgress) {
+          double progressNumsDb = 0.00;
+          String percentage = process.getProgress();
+          if (StringUtils.isNotBlank(percentage)) {
+            progressNumsDb = Float.parseFloat(percentage);
+          }
+          double progressNums = progressNumsDb;
+          if (!"NaN".equals(flowProgress.getProgress())) {
+            progressNums = Double.parseDouble(flowProgress.getProgress());
+            BigDecimal formatBD = new BigDecimal(progressNums);
+            progressNums = formatBD.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+          }
+          boolean isUpdateProcess = false;
+          // Determine the status, if the status is STARTED,
+          // determine whether the return progress is greater than the database progress,
+          // if it is greater than the save
+          // Save the database directly if the state is not STARTED
+          if ("STARTED".equals(flowProgress.getState())) {
+            // Save if the return progress is greater than the database progress
+            if (progressNums > progressNumsDb) {
+              isUpdateProcess = true;
             }
-            if (null != processVo) {
-              processVoList.add(processVo);
-            }
+          } else {
+            isUpdateProcess = true;
+          }
+          if (isUpdateProcess) {
+            // Modify flow information
+            process.setLastUpdateUser("update");
+            process.setLastUpdateDttm(new Date());
+            process.setProgress(progressNums + "");
+            process.setState(ProcessState.selectGender(flowProgress.getState()));
+            process.setName(flowProgress.getName());
+            processDomain.updateProcess(process);
           }
         }
+        processVo = ProcessUtils.processPoToVo(process);
+      } else if (null == process.getStartTime()) {
+        processVo = this.getAppInfoByThirdAndSave(process.getAppId());
+      }
+      if (null != processVo) {
+        processVoList.add(processVo);
       }
     }
-    if (null != processVoList && processVoList.size() > 0) {
-      rtnMap.put("code", 200);
-      for (ProcessVo processVo : processVoList) {
-        if (null != processVo) {
-          rtnMap.put(processVo.getAppId(), processVo);
-        }
+    if (null == processVoList || processVoList.size() == 0) {
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ERROR_MSG());
+    }
+    Map<String, Object> rtnMap = ReturnMapUtils.setSucceededMsg(MessageConfig.SUCCEEDED_MSG());
+    for (ProcessVo processVo : processVoList) {
+      if (null != processVo) {
+        rtnMap.put(processVo.getAppId(), processVo);
       }
     }
-    return JsonUtils.toJsonNoException(rtnMap);
+    return ReturnMapUtils.toJson(rtnMap);
   }
 
   /**
@@ -403,13 +378,13 @@ public class ProcessServiceImpl implements IProcessService {
   @Override
   public String getProgressByAppIds(String[] appIDs) {
     if (null == appIDs || appIDs.length <= 0) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("appId is null");
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_ERROR_MSG());
     }
-    List<Process> processListByAppIDs = processMapper.getProcessListByAppIDs(appIDs);
+    List<Process> processListByAppIDs = processDomain.getProcessListByAppIDs(appIDs);
     if (CollectionUtils.isEmpty(processListByAppIDs)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("data is null ");
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_MSG());
     }
-    Map<String, Object> rtnMap = ReturnMapUtils.setSucceededMsg(ReturnMapUtils.SUCCEEDED_MSG);
+    Map<String, Object> rtnMap = ReturnMapUtils.setSucceededMsg(MessageConfig.SUCCEEDED_MSG());
     for (Process process : processListByAppIDs) {
       ProcessVo processVo = ProcessUtils.processPoToVo(process);
       if (null == processVo) {
@@ -417,7 +392,7 @@ public class ProcessServiceImpl implements IProcessService {
       }
       rtnMap.put(processVo.getAppId(), processVo);
     }
-    return JsonUtils.toJsonNoException(rtnMap);
+    return ReturnMapUtils.toJson(rtnMap);
   }
 
   /**
@@ -425,16 +400,17 @@ public class ProcessServiceImpl implements IProcessService {
    *
    * @param processVo
    * @return
+   * @throws Exception
    */
   @Override
-  public int updateProcess(String username, boolean isAdmin, ProcessVo processVo) {
+  public int updateProcess(String username, boolean isAdmin, ProcessVo processVo) throws Exception {
     if (StringUtils.isBlank(username)) {
       return 0;
     }
     if (null == processVo) {
       return 0;
     }
-    Process processById = processMapper.getProcessById(username, isAdmin, processVo.getId());
+    Process processById = processDomain.getProcessById(username, isAdmin, processVo.getId());
     if (null == processById) {
       return 0;
     }
@@ -447,17 +423,20 @@ public class ProcessServiceImpl implements IProcessService {
     processById.setEndTime(processVo.getEndTime());
     processById.setProcessId(processVo.getProcessId());
     processById.setName(processVo.getName());
-    return processDomainU.updateProcess(processById);
+    return processDomain.updateProcess(processById);
   }
 
   /**
-   * Generate Process and save according to flowId
+   * Generate Process from flowId and save it
    *
+   * @param isAdmin
+   * @param username
    * @param flowId
    * @return
    */
   @Override
-  public ProcessVo flowToProcessAndSave(String username, String flowId) {
+  public ProcessVo flowToProcessAndSave(boolean isAdmin, String username, String flowId)
+      throws Exception {
     // Determine if the flowId is empty
     if (StringUtils.isBlank(flowId)) {
       logger.warn("The parameter'flowId'is empty and the conversion fails");
@@ -475,14 +454,16 @@ public class ProcessServiceImpl implements IProcessService {
       logger.warn("Conversion failed");
       return null;
     }
-    process = processDomain.saveOrUpdate(process);
-    if (null != process) {
-      ProcessVo processVo = ProcessUtils.processPoToVo(process);
-      return processVo;
-    } else {
+    process.setId(UUIDUtils.getUUID32());
+    int addProcess = processDomain.addProcess(process);
+    if (addProcess <= 0) {
       logger.warn("Save failed, transform failed");
       return null;
     }
+    String processId = process.getId();
+    process = processDomain.getProcessById(username, isAdmin, processId);
+    ProcessVo processVo = ProcessUtils.processPoToVo(process);
+    return processVo;
   }
 
   /**
@@ -492,27 +473,23 @@ public class ProcessServiceImpl implements IProcessService {
    * @return
    */
   @Override
-  public String delProcess(String username, String processId) {
+  public String delProcess(boolean isAdmin, String username, String processId) {
     if (StringUtils.isBlank(username)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("illegal user");
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
     }
     if (StringUtils.isBlank(processId)) {
       return ReturnMapUtils.setFailedMsgRtnJsonStr("processID is null");
     }
-    // Query Process by 'ProcessId'
-    Process processById = processDomain.getProcessById(processId);
-    if (null == processById) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(
-          "No process with ID of'" + processId + "'was queried");
-    }
-    if (processById.getState() == ProcessState.STARTED) {
+    ProcessState processStateById = processDomain.getProcessStateById(processId);
+    if (processStateById == ProcessState.STARTED) {
       return ReturnMapUtils.setFailedMsgRtnJsonStr("Status is STARTED, cannot be deleted");
     }
-    processById.setEnableFlag(false);
-    processById.setLastUpdateDttm(new Date());
-    processById.setLastUpdateUser(username);
-    processDomain.saveOrUpdate(processById);
-    return ReturnMapUtils.setSucceededMsgRtnJsonStr("Successfully Deleted");
+    boolean updateProcessEnableFlag =
+        processDomain.updateProcessEnableFlag(username, isAdmin, processId);
+    if (updateProcessEnableFlag) {
+      return ReturnMapUtils.setSucceededMsgRtnJsonStr("Successfully Deleted");
+    }
+    return ReturnMapUtils.setFailedMsgRtnJsonStr("Failed Deleted");
   }
 
   /**
@@ -526,9 +503,9 @@ public class ProcessServiceImpl implements IProcessService {
     if (StringUtils.isBlank(flowId)) {
       return ReturnMapUtils.setFailedMsgRtnJsonStr("FlowId is null");
     }
-    List<Process> processList = processMapper.getRunningProcessList(flowId);
+    List<Process> processList = processDomain.getRunningProcessList(flowId);
     if (CollectionUtils.isEmpty(processList)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("No data");
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_MSG());
     }
     List<ProcessVo> processVoList = new ArrayList<ProcessVo>();
     for (Process process : processList) {
@@ -551,15 +528,13 @@ public class ProcessServiceImpl implements IProcessService {
   @Override
   public String getProcessVoListPage(
       String username, boolean isAdmin, Integer offset, Integer limit, String param) {
-    Map<String, Object> rtnMap = new HashMap<>();
     if (null == offset || null == limit) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("param is null");
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_ERROR_MSG());
     }
     Page<Process> page = PageHelper.startPage(offset, limit);
-    processMapper.getProcessListByParam(username, isAdmin, param);
-    rtnMap = PageHelperUtils.setLayTableParam(page, rtnMap);
-    rtnMap.put(ReturnMapUtils.KEY_CODE, ReturnMapUtils.SUCCEEDED_CODE);
-    return JsonUtils.toJsonNoException(rtnMap);
+    processDomain.getProcessListByParam(username, isAdmin, param);
+    Map<String, Object> rtnMap = ReturnMapUtils.setSucceededMsg(MessageConfig.SUCCEEDED_MSG());
+    return PageHelperUtils.setLayTableParamRtnStr(page, rtnMap);
   }
 
   /**
@@ -574,27 +549,31 @@ public class ProcessServiceImpl implements IProcessService {
   public String getProcessGroupVoListPage(
       String username, boolean isAdmin, Integer offset, Integer limit, String param) {
     if (null == offset || null == limit) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(ReturnMapUtils.ERROR_MSG);
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ERROR_MSG());
     }
     Page<Process> page = PageHelper.startPage(offset, limit);
-    processMapper.getProcessGroupListByParam(username, isAdmin, param);
-    Map<String, Object> rtnMap = ReturnMapUtils.setSucceededMsg(ReturnMapUtils.SUCCEEDED_MSG);
-    rtnMap = PageHelperUtils.setLayTableParam(page, rtnMap);
-    return JsonUtils.toJsonNoException(rtnMap);
+    processDomain.getProcessGroupListByParam(username, isAdmin, param);
+    Map<String, Object> rtnMap = ReturnMapUtils.setSucceededMsg(MessageConfig.SUCCEEDED_MSG());
+    return PageHelperUtils.setLayTableParamRtnStr(page, rtnMap);
   }
 
   /**
    * Start processes
    *
+   * @param isAdmin
    * @param username
    * @param processId
    * @param checkpoint
+   * @param runMode
    * @return
+   * @throws Exception
    */
   @Override
-  public String startProcess(String username, String processId, String checkpoint, String runMode) {
+  public String startProcess(
+      boolean isAdmin, String username, String processId, String checkpoint, String runMode)
+      throws Exception {
     if (StringUtils.isBlank(username)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("illegal user");
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
     }
     RunModeType runModeType = RunModeType.RUN;
     if (StringUtils.isNotBlank(runMode)) {
@@ -606,26 +585,29 @@ public class ProcessServiceImpl implements IProcessService {
     if (StringUtils.isBlank(processId)) {
       return null;
     }
-    Process process = processDomain.getProcessById(processId);
+    Process process = processDomain.getProcessById(username, isAdmin, processId);
     if (null == process) {
       return ReturnMapUtils.setFailedMsgRtnJsonStr("No data by process Id:'" + processId + "'");
     }
     Process processCopy = ProcessUtils.copyProcess(process, username, runModeType, false);
-    if (null != processCopy) {
-      processCopy = processDomain.saveOrUpdate(processCopy);
+    if (null == processCopy) {
+      return ReturnMapUtils.setFailedMsgRtnJsonStr("start failed, copy failed");
     }
+    processCopy.setId(UUIDUtils.getUUID32());
+    processDomain.addProcess(processCopy);
+    String processCopyId = processCopy.getId();
     Map<String, Object> stringObjectMap = flowImpl.startFlow(processCopy, checkpoint, runModeType);
-    processCopy.setLastUpdateUser(username);
-    processCopy.setLastUpdateDttm(new Date());
     if (200 == (Integer) stringObjectMap.get("code")) {
+      processCopy = processDomain.getProcessById(username, isAdmin, processCopyId);
+      processCopy.setLastUpdateUser(username);
+      processCopy.setLastUpdateDttm(new Date());
       processCopy.setAppId((String) stringObjectMap.get("appId"));
       processCopy.setProcessId((String) stringObjectMap.get("appId"));
       processCopy.setState(ProcessState.STARTED);
       processDomain.saveOrUpdate(processCopy);
-      return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("processId", processCopy.getId());
+      return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("processId", processCopyId);
     } else {
-      processCopy.setEnableFlag(false);
-      processDomain.saveOrUpdate(processCopy);
+      processDomain.updateProcessEnableFlag(username, isAdmin, processCopy.getId());
       return ReturnMapUtils.setFailedMsgRtnJsonStr("Calling interface failed, startup failed");
     }
   }
@@ -638,45 +620,30 @@ public class ProcessServiceImpl implements IProcessService {
    */
   @Override
   public String stopProcess(String username, boolean isAdmin, String processId) {
-    Map<String, Object> rtnMap = new HashMap<>();
-    rtnMap.put("code", 500);
-    if (StringUtils.isNotBlank(processId)) {
-      // Query Process by 'ProcessId'
-      Process process = processMapper.getProcessById(username, isAdmin, processId);
-      // Determine whether it is empty, and determine whether the save is successful.
-      if (null != process) {
-        String appId = process.getAppId();
-        if (null != appId) {
-          if (ProcessState.STARTED == process.getState()) {
-            String stopFlow = flowImpl.stopFlow(appId);
-            if (StringUtils.isNotBlank(stopFlow) && !stopFlow.contains("Exception")) {
-              rtnMap.put("code", 200);
-              rtnMap.put("errorMsg", "Stop successful, return status is " + stopFlow);
-            } else {
-              logger.warn("Interface return value is null." + stopFlow);
-              rtnMap.put("errorMsg", "Interface return value is " + stopFlow);
-            }
-          } else {
-            logger.warn(
-                "The status of the process is " + process.getState() + " and cannot be stopped.");
-            rtnMap.put(
-                "errorMsg",
-                "The status of the process is " + process.getState() + " and cannot be stopped.");
-          }
-        } else {
-          logger.warn("The 'appId' of the 'process' is empty.");
-          rtnMap.put("errorMsg", "The 'appId' of the 'process' is empty.");
-        }
-      } else {
-        logger.warn("No process ID is '" + processId + "' process");
-        rtnMap.put("errorMsg", " No process ID is '" + processId + "' process");
-      }
-    } else {
-      logger.warn("processId is null");
-      rtnMap.put("errorMsg", "processId is null");
+    if (StringUtils.isBlank(processId)) {
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_IS_NULL_MSG("processId"));
     }
-
-    return JsonUtils.toJsonNoException(rtnMap);
+    // Query Process by 'ProcessId'
+    Process process = processDomain.getProcessById(username, isAdmin, processId);
+    // Determine whether it is empty, and determine whether the save is successful.
+    if (null == process) {
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_BY_ID_XXX_MSG(processId));
+    }
+    String appId = process.getAppId();
+    if (StringUtils.isBlank(appId)) {
+      return ReturnMapUtils.setFailedMsgRtnJsonStr("The 'appId' of the 'process' is empty.");
+    }
+    if (ProcessState.STARTED != process.getState()) {
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(
+          "The status of the process is " + process.getState() + " and cannot be stopped.");
+    }
+    String stopFlow = flowImpl.stopFlow(appId);
+    if (StringUtils.isBlank(stopFlow) || stopFlow.contains("Exception")) {
+      logger.warn("Interface return value is null." + stopFlow);
+      return ReturnMapUtils.setFailedMsgRtnJsonStr("Interface return value is " + stopFlow);
+    }
+    return ReturnMapUtils.setSucceededMsgRtnJsonStr(
+        "Stop successful, return status is " + stopFlow);
   }
 
   /**
@@ -688,14 +655,14 @@ public class ProcessServiceImpl implements IProcessService {
   @Override
   public String getDebugData(DebugDataRequest debugDataRequest) {
     if (null == debugDataRequest) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("param is null");
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_ERROR_MSG());
     }
     // (all parameters have values, and isanyempty returns false)
     if (StringUtils.isAnyBlank(
         debugDataRequest.getAppID(),
         debugDataRequest.getStopName(),
         debugDataRequest.getPortName())) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("param is null");
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_ERROR_MSG());
     }
     String debugData =
         flowImpl.getDebugData(
@@ -703,7 +670,7 @@ public class ProcessServiceImpl implements IProcessService {
             debugDataRequest.getStopName(),
             debugDataRequest.getPortName());
     if (StringUtils.isBlank(debugData)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("Interface call failed");
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.INTERFACE_CALL_ERROR_MSG());
     }
     JSONObject obj = JSONObject.fromObject(debugData);
     String schema = (String) obj.get("schema");
@@ -741,15 +708,15 @@ public class ProcessServiceImpl implements IProcessService {
   public String getVisualizationData(
       String appID, String stopName, String visualizationType, boolean isSoft) {
     if (null == appID || null == stopName || null == visualizationType) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("param is null");
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_ERROR_MSG());
     }
     // (all parameters have values, and isanyempty returns false)
     if (StringUtils.isAnyBlank(appID, stopName, visualizationType)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("param is null");
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_ERROR_MSG());
     }
     String visualizationData = flowImpl.getVisualizationData(appID, stopName, visualizationType);
     if (StringUtils.isBlank(visualizationData)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("Interface call failed");
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.INTERFACE_CALL_ERROR_MSG());
     }
     if (isSoft) {
       visualizationData = visualizationDataSort(visualizationData, visualizationType);
@@ -770,7 +737,7 @@ public class ProcessServiceImpl implements IProcessService {
     ProcessVo processVo = null;
     if (StringUtils.isNotBlank(processGroupId) && StringUtils.isNotBlank(pageId)) {
       Process processByPageId =
-          processMapper.getProcessByPageId(username, isAdmin, processGroupId, pageId);
+          processDomain.getProcessByPageId(username, isAdmin, processGroupId, pageId);
       processVo = ProcessUtils.processPoToVo(processByPageId);
     }
     return processVo;
@@ -785,7 +752,7 @@ public class ProcessServiceImpl implements IProcessService {
   @Override
   public String getCheckpoints(String parentProcessId, String pID) {
     if (StringUtils.isAllBlank(parentProcessId, pID)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("param is null");
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_ERROR_MSG());
     }
     String checkpoints = null;
     if (StringUtils.isNotBlank(parentProcessId) && !"null".equals(parentProcessId)) {
@@ -814,17 +781,16 @@ public class ProcessServiceImpl implements IProcessService {
       return ReturnMapUtils.setFailedMsgRtnJsonStr("appId is null");
     }
     String amContainerLogs = flowImpl.getFlowLog(appId);
-    Map<String, Object> rtnMap = new HashMap<>();
+    Map<String, Object> rtnMap = ReturnMapUtils.setSucceededMsg(MessageConfig.SUCCEEDED_MSG());
     if (StringUtils.isNotBlank(amContainerLogs)) {
-      rtnMap.put("code", 200);
       rtnMap.put("stdoutLog", amContainerLogs + "/stdout/?start=0");
       rtnMap.put("stderrLog", amContainerLogs + "/stderr/?start=0");
     } else {
       rtnMap.put("code", 200);
-      rtnMap.put("stdoutLog", "Interface call failed");
-      rtnMap.put("stderrLog", "Interface call failed");
+      rtnMap.put("stdoutLog", MessageConfig.INTERFACE_CALL_ERROR_MSG());
+      rtnMap.put("stderrLog", MessageConfig.INTERFACE_CALL_ERROR_MSG());
     }
-    return JsonUtils.toJsonNoException(rtnMap);
+    return ReturnMapUtils.toJson(rtnMap);
   }
 
   /**
@@ -840,21 +806,21 @@ public class ProcessServiceImpl implements IProcessService {
   public String drawingBoardData(
       String username, boolean isAdmin, String loadId, String parentAccessPath) {
     if (StringUtils.isBlank(username)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("illegal user");
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
     }
     if (StringUtils.isBlank(loadId)) {
       return ReturnMapUtils.setFailedMsgRtnJsonStr("param 'load' is null");
     }
 
-    Process process = processMapper.getProcessById(username, isAdmin, loadId);
+    Process process = processDomain.getProcessById(username, isAdmin, loadId);
     if (null == process) {
       return ReturnMapUtils.setFailedMsgRtnJsonStr("No data with ID : " + loadId);
     }
-    Map<String, Object> rtnMap = ReturnMapUtils.setSucceededMsg(ReturnMapUtils.SUCCEEDED_MSG);
-    // set current user
-    UserVo currentUser = new UserVo();
-    currentUser.setUsername(username);
-    rtnMap.put("currentUser", currentUser);
+    Map<String, Object> rtnMap = ReturnMapUtils.setSucceededMsg(MessageConfig.SUCCEEDED_MSG());
+    // todo set current user
+    //    UserVo currentUser = new UserVo();
+    //    currentUser.setUsername(username);
+    //    rtnMap.put("currentUser", currentUser);
     // set parentAccessPath
     rtnMap.put("parentAccessPath", parentAccessPath);
     rtnMap.put("load", loadId);
@@ -926,7 +892,33 @@ public class ProcessServiceImpl implements IProcessService {
     String loadXml = MxGraphUtils.mxGraphModelVoToMxGraphXml(mxGraphModelVo);
     rtnMap.put("xmlDate", loadXml);
 
-    return JsonUtils.toJsonNoException(rtnMap);
+    return ReturnMapUtils.toJson(rtnMap);
+  }
+
+  /**
+   * Query processStop based on processId and pageId
+   *
+   * @param processId
+   * @param pageId
+   * @return
+   */
+  @Override
+  public String getProcessStopVoByPageId(String processId, String pageId) {
+    if (StringUtils.isAnyEmpty(processId, pageId)) {
+      return ReturnMapUtils.setFailedMsgRtnJsonStr("Parameter passed in incorrectly");
+    }
+    ProcessStop processStopByPageId =
+        processDomain.getProcessStopByPageIdAndPageId(processId, pageId);
+    if (null == processStopByPageId) {
+      return ReturnMapUtils.setFailedMsgRtnJsonStr("process stop data is null");
+    }
+    ProcessStopVo processStopVo = ProcessUtils.processStopPoToVo(processStopByPageId);
+    StopsComponent stopsComponentByBundle =
+        stopsComponentDomain.getStopsComponentByBundle(processStopByPageId.getBundle());
+    if (null != stopsComponentByBundle) {
+      processStopVo.setVisualizationType(stopsComponentByBundle.getVisualizationType());
+    }
+    return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("processStopVo", processStopVo);
   }
 
   @SuppressWarnings("rawtypes")
@@ -989,14 +981,5 @@ public class ProcessServiceImpl implements IProcessService {
       obj.getJSONArray("series").getJSONObject(i).put("data", sort_data.getJSONArray(i + ""));
     }
     return obj.toString();
-  }
-
-  public static void main(String[] args) {
-    Map<String, String> map = new HashMap<String, String>();
-    map.put("appID", "application_1613819551288_0150");
-    map.put("stopName", "LineChart");
-    map.put("visualizationType", "LINECHART");
-    String url = "http://10.0.90.155:8002/flow/visualizationData";
-    HttpUtils.doGet(url, map, 5 * 1000);
   }
 }

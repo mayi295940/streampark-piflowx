@@ -1,55 +1,54 @@
 package org.apache.streampark.console.flow.component.stopsComponent.mapper;
 
-import java.util.List;
-import org.apache.ibatis.annotations.*;
+import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsHub;
 import org.apache.streampark.console.flow.component.stopsComponent.mapper.provider.StopsHubMapperProvider;
-import org.apache.streampark.console.flow.component.stopsComponent.model.StopsHub;
+import java.util.List;
+import org.apache.ibatis.annotations.InsertProvider;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 
 @Mapper
 public interface StopsHubMapper {
+
   /**
    * add StopsHub
    *
-   * @param stopsHub
-   * @return
+   * @param stopsHub stopsHub
    */
-  // @Insert({"insert into
-  // stops_hub(id,crt_dttm,crt_user,enable_flag,last_update_dttm,last_update_user,version,jar_name,jar_url,status) values (#{id},#{crtDttm},#{crtUser},#{enableFlag},#{lastUpdateDttm},#{lastUpdateUser},#{version}, #{jarName}, #{jarUrl},#{status})"})
   @InsertProvider(type = StopsHubMapperProvider.class, method = "addStopsHub")
-  public int addStopHub(StopsHub stopsHub);
+  int addStopHub(StopsHub stopsHub);
 
   /**
    * update StopsHub
    *
-   * @param stopsHub
-   * @return
+   * @param stopsHub stopsHub
    */
   @UpdateProvider(type = StopsHubMapperProvider.class, method = "updateStopsHub")
-  public int updateStopHub(StopsHub stopsHub);
+  int updateStopHub(StopsHub stopsHub);
 
-  /**
-   * query all StopsHub
-   *
-   * @return
-   */
+  /** query all StopsHub */
   @SelectProvider(type = StopsHubMapperProvider.class, method = "getStopsHubList")
-  public List<StopsHub> getStopsHubList(
-      @Param("username") String username, @Param("isAdmin") boolean isAdmin);
+  List<StopsHub> getStopsHubList(String username, boolean isAdmin);
 
   @SelectProvider(type = StopsHubMapperProvider.class, method = "getStopsHubListByName")
-  public List<StopsHub> getStopsHubByName(
-      @Param("username") String username, @Param("isAdmin") boolean isAdmin, String jarName);
+  List<StopsHub> getStopsHubByName(String username, boolean isAdmin, String jarName);
 
   @SelectProvider(type = StopsHubMapperProvider.class, method = "getStopsHubById")
-  public StopsHub getStopsHubById(
-      @Param("username") String username, @Param("isAdmin") boolean isAdmin, String id);
+  StopsHub getStopsHubById(String username, boolean isAdmin, String id);
 
   @UpdateProvider(type = StopsHubMapperProvider.class, method = "updateEnableFlagById")
-  public int deleteStopsHubById(@Param("username") String username, @Param("id") String id);
+  int deleteStopsHubById(String username, String id);
 
   @SelectProvider(type = StopsHubMapperProvider.class, method = "getStopsHubListParam")
-  public List<StopsHub> getStopsHubListParam(
-      @Param("username") String username,
-      @Param("isAdmin") boolean isAdmin,
-      @Param("param") String param);
+  List<StopsHub> getStopsHubListParam(String username, boolean isAdmin, String param);
+
+  @SelectProvider(type = StopsHubMapperProvider.class, method = "getAllStopsHub")
+  List<StopsHub> getAllStopsHub();
+
+  @UpdateProvider(type = StopsHubMapperProvider.class, method = "updateStopHubType")
+  int updateStopHubType(StopsHub scalaStopsHub);
+
+  @SelectProvider(type = StopsHubMapperProvider.class, method = "getStopsHubByJarName")
+  List<StopsHub> getStopsHubByJarName(String username, boolean isAdmin, String jarName);
 }

@@ -1,17 +1,12 @@
 package org.apache.streampark.console.flow.component.process.service.Impl;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.springframework.stereotype.Service;
-import org.apache.streampark.console.flow.base.util.JsonUtils;
-import org.apache.streampark.console.flow.base.util.LoggerUtil;
-import org.apache.streampark.console.flow.base.util.ReturnMapUtils;
+import org.apache.streampark.console.flow.base.utils.ReturnMapUtils;
 import org.apache.streampark.console.flow.common.Eunm.PortType;
 import org.apache.streampark.console.flow.common.Eunm.RunModeType;
+import org.apache.streampark.console.flow.common.constant.MessageConfig;
 import org.apache.streampark.console.flow.component.process.entity.Process;
 import org.apache.streampark.console.flow.component.process.entity.ProcessPath;
 import org.apache.streampark.console.flow.component.process.entity.ProcessStop;
@@ -20,25 +15,27 @@ import org.apache.streampark.console.flow.component.process.mapper.ProcessPathMa
 import org.apache.streampark.console.flow.component.process.mapper.ProcessStopMapper;
 import org.apache.streampark.console.flow.component.process.service.IProcessPathService;
 import org.apache.streampark.console.flow.component.process.vo.ProcessPathVo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ProcessPathServiceImpl implements IProcessPathService {
 
-  Logger logger = LoggerUtil.getLogger();
+  private final ProcessMapper processMapper;
+  private final ProcessPathMapper processPathMapper;
+  private final ProcessStopMapper processStopMapper;
 
-  @Resource private ProcessMapper processMapper;
+  @Autowired
+  public ProcessPathServiceImpl(
+      ProcessMapper processMapper,
+      ProcessPathMapper processPathMapper,
+      ProcessStopMapper processStopMapper) {
+    this.processMapper = processMapper;
+    this.processPathMapper = processPathMapper;
+    this.processStopMapper = processStopMapper;
+  }
 
-  @Resource private ProcessPathMapper processPathMapper;
-
-  @Resource private ProcessStopMapper processStopMapper;
-
-  /**
-   * Query processPath based on processId and pageId
-   *
-   * @param processId
-   * @param pageId
-   * @return
-   */
+  /** Query processPath based on processId and pageId */
   @Override
   public String getProcessPathVoByPageId(String processId, String pageId) {
     if (StringUtils.isAnyEmpty(processId, pageId)) {
@@ -48,7 +45,7 @@ public class ProcessPathServiceImpl implements IProcessPathService {
     ProcessPath processPathByPageId =
         processPathMapper.getProcessPathByPageIdAndPid(processId, pageId);
     if (null == processPathByPageId) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("No Data");
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_MSG());
     }
     // get from PageId and to PageId
     String[] pageIds = new String[2];
@@ -66,7 +63,7 @@ public class ProcessPathServiceImpl implements IProcessPathService {
     // Find from ProcessStop and to ProcessStop
     List<ProcessStop> processStopByPageIds =
         processStopMapper.getProcessStopByPageIdAndPageIds(processId, pageIds);
-    if (null == processStopByPageIds || processStopByPageIds.size() <= 0) {
+    if (null == processStopByPageIds || processStopByPageIds.size() == 0) {
       return null;
     }
     ProcessPathVo processPathVo = new ProcessPathVo();
@@ -92,30 +89,20 @@ public class ProcessPathServiceImpl implements IProcessPathService {
 
     // Find Process RunModeType
     RunModeType runModeType = processMapper.getProcessRunModeTypeById(processId);
-    Map<String, Object> rtnMap = new HashMap<>();
-    rtnMap.put(ReturnMapUtils.KEY_CODE, ReturnMapUtils.SUCCEEDED_CODE);
+    Map<String, Object> rtnMap = ReturnMapUtils.setSucceededMsg(MessageConfig.SUCCEEDED_MSG());
     if (null != runModeType) {
       rtnMap.put("runModeType", runModeType);
     }
-    rtnMap.put("processPathVo", processPathVo);
-
-    return JsonUtils.toJsonNoException(rtnMap);
+    return ReturnMapUtils.appendValuesToJson(rtnMap, "processPathVo", processPathVo);
   }
 
-  /**
-   * Query processGroupPath based on processId and pageId
-   *
-   * @param processGroupId
-   * @param pageId
-   * @return
-   */
+  /** Query processGroupPath based on processId and pageId */
   @Override
   public ProcessPathVo getProcessGroupPathVoByPageId(String processGroupId, String pageId) {
     ProcessPathVo processStopVo = null;
     ProcessPath processPathByPageIdAndProcessGroupId =
         processPathMapper.getProcessPathByPageIdAndProcessGroupId(processGroupId, pageId);
     if (null != processPathByPageIdAndProcessGroupId) {
-      processPathByPageIdAndProcessGroupId.getPageId();
       String[] pageIds = new String[2];
       String pathTo = processPathByPageIdAndProcessGroupId.getTo();
       String pathFrom = processPathByPageIdAndProcessGroupId.getFrom();

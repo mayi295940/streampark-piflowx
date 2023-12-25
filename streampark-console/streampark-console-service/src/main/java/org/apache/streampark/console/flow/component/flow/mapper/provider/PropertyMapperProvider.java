@@ -1,13 +1,13 @@
 package org.apache.streampark.console.flow.component.flow.mapper.provider;
 
+import org.apache.streampark.console.flow.base.utils.DateUtils;
+import org.apache.streampark.console.flow.base.utils.SqlUtils;
+import org.apache.streampark.console.flow.component.flow.entity.Property;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
-import org.apache.streampark.console.flow.base.util.DateUtils;
-import org.apache.streampark.console.flow.base.util.SqlUtils;
-import org.apache.streampark.console.flow.component.flow.entity.Property;
 
 public class PropertyMapperProvider {
 
@@ -256,10 +256,11 @@ public class PropertyMapperProvider {
   /**
    * remove
    *
-   * @param id
+   * @param username
+   * @param stopId
    * @return
    */
-  public String updateEnableFlagByStopId(String username, String id) {
+  public String updateStopPropertyEnableFlagByStopId(String username, String stopId) {
     if (StringUtils.isBlank(username)) {
       return "SELECT 0";
     }
@@ -274,7 +275,7 @@ public class PropertyMapperProvider {
     sql.SET(
         "last_update_dttm = " + SqlUtils.preventSQLInjection(DateUtils.dateTimesToStr(new Date())));
     sql.WHERE("enable_flag = 1");
-    sql.WHERE("ID = " + SqlUtils.preventSQLInjection(id));
+    sql.WHERE("fk_stops_id = " + SqlUtils.preventSQLInjection(stopId));
 
     return sql.toString();
   }

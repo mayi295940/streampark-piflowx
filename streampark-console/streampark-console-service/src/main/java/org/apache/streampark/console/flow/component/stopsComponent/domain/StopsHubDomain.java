@@ -1,15 +1,13 @@
 package org.apache.streampark.console.flow.component.stopsComponent.domain;
 
+import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsHub;
+import org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsHubMapper;
 import java.util.List;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.apache.streampark.console.flow.base.util.LoggerUtil;
-import org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsHubMapper;
-import org.apache.streampark.console.flow.component.stopsComponent.model.StopsHub;
 
 @Component
 @Transactional(
@@ -19,9 +17,12 @@ import org.apache.streampark.console.flow.component.stopsComponent.model.StopsHu
     rollbackFor = Exception.class)
 public class StopsHubDomain {
 
-  Logger logger = LoggerUtil.getLogger();
+  private final StopsHubMapper stopsHubMapper;
 
-  @Autowired private StopsHubMapper stopsHubMapper;
+  @Autowired
+  public StopsHubDomain(StopsHubMapper stopsHubMapper) {
+    this.stopsHubMapper = stopsHubMapper;
+  }
 
   /**
    * add StopsHub
@@ -66,5 +67,9 @@ public class StopsHubDomain {
 
   public List<StopsHub> getStopsHubListParam(String username, boolean isAdmin, String param) {
     return stopsHubMapper.getStopsHubListParam(username, isAdmin, param);
+  }
+
+  public List<StopsHub> getStopsHubByJarName(String username, boolean isAdmin, String jarName) {
+    return stopsHubMapper.getStopsHubByJarName(username, isAdmin, jarName);
   }
 }

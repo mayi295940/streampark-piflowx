@@ -4,8 +4,8 @@ import java.util.Date;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
-import org.apache.streampark.console.flow.base.util.DateUtils;
-import org.apache.streampark.console.flow.base.util.SqlUtils;
+import org.apache.streampark.console.flow.base.utils.DateUtils;
+import org.apache.streampark.console.flow.base.utils.SqlUtils;
 import org.apache.streampark.console.flow.common.Eunm.ProcessParentType;
 import org.apache.streampark.console.flow.common.Eunm.ProcessState;
 import org.apache.streampark.console.flow.component.process.entity.Process;
@@ -18,6 +18,7 @@ public class ProcessMapperProvider {
   private int enableFlag;
   private long version;
   private String name;
+  private String engineType;
   private String driverMemory;
   private String executorNumber;
   private String executorMemory;
@@ -97,6 +98,7 @@ public class ProcessMapperProvider {
     this.enableFlag = 1;
     this.version = 0L;
     this.name = null;
+    this.engineType = null;
     this.driverMemory = null;
     this.executorNumber = null;
     this.executorMemory = null;
@@ -121,64 +123,87 @@ public class ProcessMapperProvider {
   /**
    * addProcess
    *
-   * @param process
-   * @return
+   * @param process process
    */
   public String addProcess(Process process) {
     String sqlStr = "SELECT 0";
     if (this.preventSQLInjectionProcess(process)) {
-      StringBuffer strBuf = new StringBuffer();
-      strBuf.append("INSERT INTO flow_process ");
-      strBuf.append("( ");
-      strBuf.append(SqlUtils.baseFieldName() + ", ");
-      strBuf.append("name, ");
-      strBuf.append("driver_memory, ");
-      strBuf.append("executor_number, ");
-      strBuf.append("executor_memory, ");
-      strBuf.append("executor_cores, ");
-      strBuf.append("description, ");
-      strBuf.append("app_id, ");
-      strBuf.append("page_id, ");
-      strBuf.append("process_id, ");
-      strBuf.append("state, ");
-      strBuf.append("start_time, ");
-      strBuf.append("end_time, ");
-      strBuf.append("progress, ");
-      strBuf.append("flow_id, ");
-      strBuf.append("run_mode_type, ");
-      strBuf.append("parent_process_id, ");
-      strBuf.append("process_parent_type, ");
-      strBuf.append("fk_group_schedule_id, ");
-      strBuf.append("fk_flow_process_group_id, ");
-      strBuf.append("view_xml ");
-      strBuf.append(") ");
-
-      strBuf.append("VALUES ");
-      strBuf.append("(");
-      strBuf.append(SqlUtils.baseFieldValues(process) + ", ");
-      strBuf.append(name + ", ");
-      strBuf.append(driverMemory + ", ");
-      strBuf.append(executorNumber + ", ");
-      strBuf.append(executorMemory + ", ");
-      strBuf.append(executorCores + ", ");
-      strBuf.append(description + ", ");
-      strBuf.append(appId + ", ");
-      strBuf.append(pageId + ", ");
-      strBuf.append(processId + ", ");
-      strBuf.append(stateName + ", ");
-      strBuf.append(startTimeStr + ", ");
-      strBuf.append(endTimeStr + ", ");
-      strBuf.append(progress + ", ");
-      strBuf.append(flowId + ", ");
-      strBuf.append(runModeTypeStr + ", ");
-      strBuf.append(parentProcessId + ", ");
-      strBuf.append(processParentType + ", ");
-      strBuf.append(schedule_id + ", ");
-      strBuf.append(processGroup_id + ", ");
-      strBuf.append(viewXml + " ");
-      strBuf.append(") ");
+      String strBuf =
+          "INSERT INTO flow_process "
+              + "( "
+              + SqlUtils.baseFieldName()
+              + ", "
+              + "name, "
+              + "engine_type, "
+              + "driver_memory, "
+              + "executor_number, "
+              + "executor_memory, "
+              + "executor_cores, "
+              + "description, "
+              + "app_id, "
+              + "page_id, "
+              + "process_id, "
+              + "state, "
+              + "start_time, "
+              + "end_time, "
+              + "progress, "
+              + "flow_id, "
+              + "run_mode_type, "
+              + "parent_process_id, "
+              + "process_parent_type, "
+              + "fk_group_schedule_id, "
+              + "fk_flow_process_group_id, "
+              + "view_xml "
+              + ") "
+              + "VALUES "
+              + "("
+              + SqlUtils.baseFieldValues(process)
+              + ", "
+              + name
+              + ", "
+              + engineType
+              + ", "
+              + driverMemory
+              + ", "
+              + executorNumber
+              + ", "
+              + executorMemory
+              + ", "
+              + executorCores
+              + ", "
+              + description
+              + ", "
+              + appId
+              + ", "
+              + pageId
+              + ", "
+              + processId
+              + ", "
+              + stateName
+              + ", "
+              + startTimeStr
+              + ", "
+              + endTimeStr
+              + ", "
+              + progress
+              + ", "
+              + flowId
+              + ", "
+              + runModeTypeStr
+              + ", "
+              + parentProcessId
+              + ", "
+              + processParentType
+              + ", "
+              + schedule_id
+              + ", "
+              + processGroup_id
+              + ", "
+              + viewXml
+              + " "
+              + ") ";
       this.reset();
-      return strBuf.toString() + ";";
+      return strBuf + ";";
     }
     this.reset();
     return sqlStr;
@@ -187,8 +212,7 @@ public class ProcessMapperProvider {
   /**
    * update process
    *
-   * @param process
-   * @return
+   * @param process process
    */
   public String updateProcess(Process process) {
     String sqlStr = "SELECT 0";
@@ -230,19 +254,18 @@ public class ProcessMapperProvider {
   /**
    * Query process by process ID
    *
-   * @param id
-   * @return
+   * @param id process ID
    */
   public String getProcessById(String username, boolean isAdmin, String id) {
     String sqlStr = "SELECT 0";
     if (StringUtils.isNotBlank(id)) {
-      StringBuffer strBuf = new StringBuffer();
+      StringBuilder strBuf = new StringBuilder();
       strBuf.append("select * ");
       strBuf.append("from flow_process ");
       strBuf.append("where enable_flag = 1 ");
-      strBuf.append("and id= " + SqlUtils.preventSQLInjection(id));
+      strBuf.append("and id= ").append(SqlUtils.preventSQLInjection(id));
       if (!isAdmin) {
-        strBuf.append("and crt_user = " + SqlUtils.preventSQLInjection(username));
+        strBuf.append("and crt_user = ").append(SqlUtils.preventSQLInjection(username));
       }
       sqlStr = strBuf.toString();
     }
@@ -252,28 +275,22 @@ public class ProcessMapperProvider {
   /**
    * Query process by processGroup ID
    *
-   * @param processGroupId
-   * @return
+   * @param processGroupId processGroup ID
    */
   public String getProcessByProcessGroupId(String processGroupId) {
     String sqlStr = "SELECT 0";
     if (StringUtils.isNotBlank(processGroupId)) {
-      StringBuffer strBuf = new StringBuffer();
-      strBuf.append("select * ");
-      strBuf.append("from flow_process ");
-      strBuf.append("where enable_flag = 1 ");
-      strBuf.append(
-          "and fk_flow_process_group_id= " + SqlUtils.preventSQLInjection(processGroupId));
-      sqlStr = strBuf.toString();
+      sqlStr =
+          "select * "
+              + "from flow_process "
+              + "where enable_flag = 1 "
+              + "and fk_flow_process_group_id= "
+              + SqlUtils.preventSQLInjection(processGroupId);
     }
     return sqlStr;
   }
 
-  /**
-   * Query process list(processList)
-   *
-   * @return
-   */
+  /** Query process list(processList) */
   public String getProcessList() {
     SQL sql = new SQL();
     sql.SELECT("*");
@@ -287,76 +304,88 @@ public class ProcessMapperProvider {
   /**
    * Query process list according to param(processList)
    *
-   * @param param
-   * @return
+   * @param param param
    */
   public String getProcessListByParam(String username, boolean isAdmin, String param) {
-    StringBuffer strBuf = new StringBuffer();
+    StringBuilder strBuf = new StringBuilder();
     strBuf.append("SELECT * ");
     strBuf.append("FROM flow_process ");
     strBuf.append("WHERE ");
     strBuf.append("enable_flag = 1 ");
     strBuf.append("AND app_id IS NOT NULL ");
-    strBuf.append(
-        "AND process_parent_type = "
-            + SqlUtils.addSqlStrAndReplace(ProcessParentType.PROCESS.name()));
+    strBuf
+        .append("AND process_parent_type = ")
+        .append(SqlUtils.addSqlStrAndReplace(ProcessParentType.PROCESS.name()));
     strBuf.append("AND fk_flow_process_group_id IS NULL ");
     if (StringUtils.isNotBlank(param)) {
       strBuf.append("and ( ");
-      strBuf.append("app_id LIKE CONCAT('%'," + SqlUtils.preventSQLInjection(param) + ",'%') ");
-      strBuf.append("OR name LIKE CONCAT('%'," + SqlUtils.preventSQLInjection(param) + ",'%') ");
-      strBuf.append("OR state LIKE CONCAT('%'," + SqlUtils.preventSQLInjection(param) + ",'%') ");
-      strBuf.append(
-          "OR description LIKE CONCAT('%'," + SqlUtils.preventSQLInjection(param) + ",'%') ");
+      strBuf
+          .append("app_id LIKE CONCAT('%',")
+          .append(SqlUtils.preventSQLInjection(param))
+          .append(",'%') ");
+      strBuf
+          .append("OR name LIKE CONCAT('%',")
+          .append(SqlUtils.preventSQLInjection(param))
+          .append(",'%') ");
+      strBuf
+          .append("OR state LIKE CONCAT('%',")
+          .append(SqlUtils.preventSQLInjection(param))
+          .append(",'%') ");
+      strBuf
+          .append("OR description LIKE CONCAT('%',")
+          .append(SqlUtils.preventSQLInjection(param))
+          .append(",'%') ");
       strBuf.append(") ");
     }
     if (!isAdmin) {
-      strBuf.append("AND crt_user = " + SqlUtils.preventSQLInjection(username));
+      strBuf.append("AND crt_user = ").append(SqlUtils.preventSQLInjection(username));
     }
     strBuf.append("ORDER BY crt_dttm DESC,last_update_dttm DESC ");
 
     return strBuf.toString();
   }
 
-  /**
-   * Query processGroup list according to param(processList)
-   *
-   * @param param
-   * @return
-   */
+  /** Query processGroup list according to param(processList) */
   public String getProcessGroupListByParam(String username, boolean isAdmin, String param) {
-    StringBuffer strBuf = new StringBuffer();
+    StringBuilder strBuf = new StringBuilder();
     strBuf.append("select * ");
     strBuf.append("from flow_process ");
     strBuf.append("where ");
     strBuf.append("enable_flag = 1 ");
     strBuf.append("and app_id is not null ");
-    strBuf.append(
-        "and process_parent_type = "
-            + SqlUtils.addSqlStrAndReplace(ProcessParentType.GROUP.name()));
+    strBuf
+        .append("and process_parent_type = ")
+        .append(SqlUtils.addSqlStrAndReplace(ProcessParentType.GROUP.name()));
     strBuf.append("and fk_flow_process_group_id is null ");
     if (StringUtils.isNotBlank(param)) {
       strBuf.append("and ( ");
-      strBuf.append("app_id like CONCAT('%'," + SqlUtils.preventSQLInjection(param) + ",'%') ");
-      strBuf.append("or name like CONCAT('%'," + SqlUtils.preventSQLInjection(param) + ",'%') ");
-      strBuf.append("or state like CONCAT('%'," + SqlUtils.preventSQLInjection(param) + ",'%') ");
-      strBuf.append(
-          "or description like CONCAT('%'," + SqlUtils.preventSQLInjection(param) + ",'%') ");
+      strBuf
+          .append("app_id like CONCAT('%',")
+          .append(SqlUtils.preventSQLInjection(param))
+          .append(",'%') ");
+      strBuf
+          .append("or name like CONCAT('%',")
+          .append(SqlUtils.preventSQLInjection(param))
+          .append(",'%') ");
+      strBuf
+          .append("or state like CONCAT('%',")
+          .append(SqlUtils.preventSQLInjection(param))
+          .append(",'%') ");
+      strBuf
+          .append("or description like CONCAT('%',")
+          .append(SqlUtils.preventSQLInjection(param))
+          .append(",'%') ");
       strBuf.append(") ");
     }
     if (!isAdmin) {
-      strBuf.append("and crt_user = " + SqlUtils.preventSQLInjection(username));
+      strBuf.append("and crt_user = ").append(SqlUtils.preventSQLInjection(username));
     }
     strBuf.append("order by crt_dttm desc,last_update_dttm desc ");
 
     return strBuf.toString();
   }
 
-  /**
-   * Query the running process list according to flowId(processList)
-   *
-   * @return
-   */
+  /** Query the running process list according to flowId(processList) */
   public String getRunningProcessList(String flowId) {
     SQL sql = new SQL();
     sql.SELECT("*");
@@ -372,8 +401,7 @@ public class ProcessMapperProvider {
   /**
    * Query process according to process appId
    *
-   * @param appID
-   * @return
+   * @param appID appID
    */
   public String getProcessByAppId(String appID) {
     String sqlStr = "SELECT 0";
@@ -391,8 +419,7 @@ public class ProcessMapperProvider {
   /**
    * Query process id according to process appId
    *
-   * @param appID
-   * @return
+   * @param appID appID
    */
   public String getProcessIdByAppId(String appID) {
     String sqlStr = "SELECT 0";
@@ -410,8 +437,7 @@ public class ProcessMapperProvider {
   /**
    * Query process according to process appId
    *
-   * @param appID
-   * @return
+   * @param appID appID
    */
   public String getProcessNoGroupByAppId(String appID) {
     String sqlStr = "SELECT 0";
@@ -427,12 +453,7 @@ public class ProcessMapperProvider {
     return sqlStr;
   }
 
-  /**
-   * Query process list according to the process AppId array
-   *
-   * @param map
-   * @return
-   */
+  /** Query process list according to the process AppId array */
   public String getProcessListByAppIDs(Map<String, String[]> map) {
     String sqlStr = "SELECT 0";
     String[] appIDs = map.get("appIDs");
@@ -457,88 +478,84 @@ public class ProcessMapperProvider {
   /**
    * Tombstone
    *
-   * @param id
-   * @return
+   * @param id id
    */
   public String updateEnableFlag(String id, String username) {
     String sqlStr = "SELECT 0";
     if (!StringUtils.isAnyEmpty(id, username)) {
-      StringBuffer sqlStrBuf = new StringBuffer();
-      sqlStrBuf.append("update flow_process ");
-      sqlStrBuf.append("set ");
-      sqlStrBuf.append(
-          "last_update_dttm = "
+      sqlStr =
+          "update flow_process "
+              + "set "
+              + "last_update_dttm = "
               + SqlUtils.preventSQLInjection(DateUtils.dateTimesToStr(new Date()))
-              + ", ");
-      sqlStrBuf.append("last_update_user = " + SqlUtils.preventSQLInjection(username) + ", ");
-      sqlStrBuf.append("version=(version+1), ");
-      sqlStrBuf.append("enable_flag = 0 ");
-      sqlStrBuf.append("where enable_flag = 1 ");
-      sqlStrBuf.append("and id = " + SqlUtils.preventSQLInjection(id));
-
-      sqlStr = sqlStrBuf.toString();
+              + ", "
+              + "last_update_user = "
+              + SqlUtils.preventSQLInjection(username)
+              + ", "
+              + "version=(version+1), "
+              + "enable_flag = 0 "
+              + "where enable_flag = 1 "
+              + "and id = "
+              + SqlUtils.preventSQLInjection(id);
     }
     return sqlStr;
   }
 
-  /**
-   * Query tasks that need to be synchronized
-   *
-   * @return
-   */
+  /** Query tasks that need to be synchronized */
   public String getRunningProcess() {
-    StringBuffer sqlStrBuf = new StringBuffer();
-    sqlStrBuf.append("select app_id from flow_process ");
-    sqlStrBuf.append("where ");
-    sqlStrBuf.append("enable_flag=1 ");
-    sqlStrBuf.append("and ");
-    sqlStrBuf.append("app_id is not null ");
-    sqlStrBuf.append("and ");
-    sqlStrBuf.append("( ");
-    sqlStrBuf.append("( ");
-    sqlStrBuf.append("state!=" + SqlUtils.preventSQLInjection(ProcessState.COMPLETED.name()) + " ");
-    sqlStrBuf.append("and ");
-    sqlStrBuf.append("state!=" + SqlUtils.preventSQLInjection(ProcessState.FAILED.name()) + "  ");
-    sqlStrBuf.append("and ");
-    sqlStrBuf.append("state!=" + SqlUtils.preventSQLInjection(ProcessState.KILLED.name()) + " ");
-    sqlStrBuf.append(") ");
-    sqlStrBuf.append("or ");
-    sqlStrBuf.append("state is null ");
-    sqlStrBuf.append(") ");
-    return sqlStrBuf.toString();
+    return "select app_id from flow_process "
+        + "where "
+        + "enable_flag=1 "
+        + "and "
+        + "app_id is not null "
+        + "and "
+        + "( "
+        + "( "
+        + "state!="
+        + SqlUtils.preventSQLInjection(ProcessState.COMPLETED.name())
+        + " "
+        + "and "
+        + "state!="
+        + SqlUtils.preventSQLInjection(ProcessState.FAILED.name())
+        + "  "
+        + "and "
+        + "state!="
+        + SqlUtils.preventSQLInjection(ProcessState.KILLED.name())
+        + " "
+        + ") "
+        + "or "
+        + "state is null "
+        + ") ";
   }
 
   /**
    * Query process by processGroup ID
    *
-   * @param processGroupId
-   * @return
+   * @param processGroupId processGroupId
    */
   public String getProcessByPageId(
       String username, boolean isAdmin, String processGroupId, String pageId) {
     String sqlStr = "SELECT 0";
     if (StringUtils.isNotBlank(processGroupId) && StringUtils.isNotBlank(pageId)) {
-      StringBuffer strBuf = new StringBuffer();
+      StringBuilder strBuf = new StringBuilder();
       strBuf.append("select * ");
       strBuf.append("from flow_process ");
       strBuf.append("where enable_flag = 1 ");
-      strBuf.append("and page_id= " + pageId + " ");
-      strBuf.append(
-          "and fk_flow_process_group_id= " + SqlUtils.preventSQLInjection(processGroupId));
+      strBuf.append("and page_id= ").append(pageId).append(" ");
+      strBuf
+          .append("and fk_flow_process_group_id= ")
+          .append(SqlUtils.preventSQLInjection(processGroupId));
+
       if (!isAdmin) {
-        strBuf.append("and crt_user = " + SqlUtils.preventSQLInjection(username));
+        strBuf.append("and crt_user = ").append(SqlUtils.preventSQLInjection(username));
       }
+
       sqlStr = strBuf.toString();
     }
     return sqlStr;
   }
 
-  /**
-   * Query based on pid and pageIds
-   *
-   * @param map
-   * @return
-   */
+  /** Query based on pid and pageIds */
   @SuppressWarnings("rawtypes")
   public String getProcessByPageIds(Map map) {
     String processId = (String) map.get("processGroupId");
@@ -561,5 +578,57 @@ public class ProcessMapperProvider {
       }
     }
     return sqlStr;
+  }
+
+  public String getGlobalParamsIdsByProcessId(String processId) {
+    if (StringUtils.isBlank(processId)) {
+      return "SELECT 0";
+    }
+    return ("SELECT global_params_id FROM `association_global_params_flow` WHERE process_id= "
+        + SqlUtils.preventSQLInjection(processId));
+  }
+
+  public String linkGlobalParams(String processId, String[] globalParamsIds) {
+    if (StringUtils.isBlank(processId) || globalParamsIds.length == 0) {
+      return "SELECT 0";
+    }
+    StringBuilder strBuf = new StringBuilder();
+    strBuf.append("INSERT INTO `association_global_params_flow` ");
+    strBuf.append("( ");
+    strBuf.append("`process_id`, ");
+    strBuf.append("`global_params_id` ");
+    strBuf.append(") ");
+    strBuf.append("values ");
+    for (int i = 0; i < globalParamsIds.length; i++) {
+      strBuf.append("( ");
+      strBuf.append(SqlUtils.preventSQLInjection(processId)).append(", ");
+      strBuf.append(SqlUtils.preventSQLInjection(globalParamsIds[i]));
+      strBuf.append(") ");
+      if ((i + 1) < globalParamsIds.length) {
+        strBuf.append(", ");
+      }
+    }
+    return strBuf.toString();
+  }
+
+  public String unlinkGlobalParams(String processId, String[] globalParamsIds) {
+    if (StringUtils.isBlank(processId) || globalParamsIds.length == 0) {
+      return "SELECT 0";
+    }
+    StringBuilder strBuf = new StringBuilder();
+    strBuf.append("DELETE FROM `association_global_params_flow` ");
+    strBuf.append("WHERE ");
+    strBuf.append(" `process_id`= ").append(SqlUtils.preventSQLInjection(processId));
+    strBuf.append(" AND ");
+    strBuf.append(" `global_params_id` in ");
+    strBuf.append("( ");
+    for (int i = 0; i < globalParamsIds.length; i++) {
+      strBuf.append(SqlUtils.preventSQLInjection(globalParamsIds[i]));
+      if ((i + 1) < globalParamsIds.length) {
+        strBuf.append(", ");
+      }
+    }
+    strBuf.append(") ");
+    return strBuf.toString();
   }
 }

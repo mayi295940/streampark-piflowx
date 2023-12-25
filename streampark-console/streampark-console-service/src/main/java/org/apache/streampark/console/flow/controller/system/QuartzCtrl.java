@@ -1,18 +1,28 @@
 package org.apache.streampark.console.flow.controller.system;
 
+import org.apache.streampark.console.flow.base.utils.SessionUserUtil;
+import org.apache.streampark.console.flow.component.system.service.ILogHelperService;
+import org.apache.streampark.console.flow.component.system.service.ISysScheduleService;
+import org.apache.streampark.console.flow.component.system.vo.SysScheduleVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.apache.streampark.console.flow.base.util.SessionUserUtil;
-import org.apache.streampark.console.flow.component.system.service.ISysScheduleService;
-import org.apache.streampark.console.flow.component.system.vo.SysScheduleVo;
 
 @Controller
 @RequestMapping("/sysSchedule")
 public class QuartzCtrl {
 
-  @Autowired private ISysScheduleService sysScheduleServiceImpl;
+  private final ISysScheduleService sysScheduleServiceImpl;
+  private final ILogHelperService logHelperServiceImpl;
+
+  @Autowired
+  public QuartzCtrl(
+      ISysScheduleService sysScheduleServiceImpl, ILogHelperService logHelperServiceImpl) {
+    this.sysScheduleServiceImpl = sysScheduleServiceImpl;
+    this.logHelperServiceImpl = logHelperServiceImpl;
+  }
 
   @RequestMapping("/getScheduleListPage")
   @ResponseBody
@@ -22,7 +32,7 @@ public class QuartzCtrl {
     return sysScheduleServiceImpl.getScheduleListPage(username, isAdmin, page, limit, param);
   }
 
-  @RequestMapping("/getScheduleById")
+  @RequestMapping(value = "/getScheduleById", method = RequestMethod.GET)
   @ResponseBody
   public String getScheduleById(String scheduleId) {
     String username = SessionUserUtil.getCurrentUsername();
@@ -30,47 +40,52 @@ public class QuartzCtrl {
     return sysScheduleServiceImpl.getScheduleById(username, isAdmin, scheduleId);
   }
 
-  @RequestMapping("/createTask")
+  @RequestMapping(value = "/createTask", method = RequestMethod.GET)
   @ResponseBody
   public String createTask(SysScheduleVo sysScheduleVo) {
     String username = SessionUserUtil.getCurrentUsername();
     boolean isAdmin = SessionUserUtil.isAdmin();
+    logHelperServiceImpl.logAuthSucceed("create task", username);
     return sysScheduleServiceImpl.createJob(username, isAdmin, sysScheduleVo);
   }
 
-  @RequestMapping("/runOnceTask")
+  @RequestMapping(value = "/runOnceTask", method = RequestMethod.POST)
   @ResponseBody
   public String runOnceTask(String sysScheduleId) {
     String username = SessionUserUtil.getCurrentUsername();
     boolean isAdmin = SessionUserUtil.isAdmin();
+    logHelperServiceImpl.logAuthSucceed("run task " + sysScheduleId, username);
     return sysScheduleServiceImpl.runOnce(username, isAdmin, sysScheduleId);
   }
 
-  @RequestMapping("/startTask")
+  @RequestMapping(value = "/startTask", method = RequestMethod.POST)
   @ResponseBody
   public String startTask(String sysScheduleId) {
     String username = SessionUserUtil.getCurrentUsername();
     boolean isAdmin = SessionUserUtil.isAdmin();
+    logHelperServiceImpl.logAuthSucceed("start task " + sysScheduleId, username);
     return sysScheduleServiceImpl.startJob(username, isAdmin, sysScheduleId);
   }
 
-  @RequestMapping("/stopTask")
+  @RequestMapping(value = "/stopTask", method = RequestMethod.POST)
   @ResponseBody
   public String stopTask(String sysScheduleId) {
     String username = SessionUserUtil.getCurrentUsername();
     boolean isAdmin = SessionUserUtil.isAdmin();
+    logHelperServiceImpl.logAuthSucceed("stop task " + sysScheduleId, username);
     return sysScheduleServiceImpl.stopJob(username, isAdmin, sysScheduleId);
   }
 
-  @RequestMapping("/pauseTask")
+  @RequestMapping(value = "/pauseTask", method = RequestMethod.POST)
   @ResponseBody
   public String pauseTask(String sysScheduleId) {
     String username = SessionUserUtil.getCurrentUsername();
     boolean isAdmin = SessionUserUtil.isAdmin();
+    logHelperServiceImpl.logAuthSucceed("pause task " + sysScheduleId, username);
     return sysScheduleServiceImpl.pauseJob(username, isAdmin, sysScheduleId);
   }
 
-  @RequestMapping("/resumeTask")
+  @RequestMapping(value = "/resumeTask", method = RequestMethod.POST)
   @ResponseBody
   public String resumeTask(String sysScheduleId) {
     String username = SessionUserUtil.getCurrentUsername();
@@ -78,7 +93,7 @@ public class QuartzCtrl {
     return sysScheduleServiceImpl.resume(username, isAdmin, sysScheduleId);
   }
 
-  @RequestMapping("/updateTask")
+  @RequestMapping(value = "/updateTask", method = RequestMethod.GET)
   @ResponseBody
   public String updateTask(SysScheduleVo sysScheduleVo) {
     String username = SessionUserUtil.getCurrentUsername();
@@ -86,7 +101,7 @@ public class QuartzCtrl {
     return sysScheduleServiceImpl.update(username, isAdmin, sysScheduleVo);
   }
 
-  @RequestMapping("/deleteTask")
+  @RequestMapping(value = "/deleteTask", method = RequestMethod.GET)
   @ResponseBody
   public String deleteTask(String sysScheduleId) {
     String username = SessionUserUtil.getCurrentUsername();

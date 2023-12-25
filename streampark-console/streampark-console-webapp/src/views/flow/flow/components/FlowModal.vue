@@ -56,6 +56,10 @@
     { label: generatedLabelIcon('user', t('flow.flow.flow_columns.name')), field: 'name' },
     {
       label: generatedLabelIcon(`clock-circle`, t('common.createTime')),
+      field: 'engineType',
+    },
+    {
+      label: generatedLabelIcon(`clock-circle`, t('common.createTime')),
       field: 'createTime',
     },
     {

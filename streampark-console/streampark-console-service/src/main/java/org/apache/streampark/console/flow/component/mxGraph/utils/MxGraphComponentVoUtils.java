@@ -1,8 +1,8 @@
 package org.apache.streampark.console.flow.component.mxGraph.utils;
 
+import org.apache.streampark.console.flow.component.mxGraph.vo.MxGraphComponentVo;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.streampark.console.flow.component.mxGraph.vo.MxGraphComponentVo;
 
 public class MxGraphComponentVoUtils {
 

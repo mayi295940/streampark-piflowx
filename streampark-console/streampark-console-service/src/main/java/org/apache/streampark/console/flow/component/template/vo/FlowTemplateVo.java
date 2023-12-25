@@ -1,9 +1,9 @@
 package org.apache.streampark.console.flow.component.template.vo;
 
+import org.apache.streampark.console.flow.component.flow.vo.FlowVo;
 import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.streampark.console.flow.component.flow.vo.FlowVo;
 
 @Getter
 @Setter

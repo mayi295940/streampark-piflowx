@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.BeanUtils;
-import org.apache.streampark.console.flow.base.util.UUIDUtils;
+import org.apache.streampark.console.flow.base.utils.UUIDUtils;
 import org.apache.streampark.console.flow.component.flow.entity.CustomizedProperty;
 import org.apache.streampark.console.flow.component.flow.entity.Flow;
 import org.apache.streampark.console.flow.component.flow.entity.Paths;
@@ -17,6 +16,7 @@ import org.apache.streampark.console.flow.component.flow.vo.StopsVo;
 import org.apache.streampark.console.flow.component.mxGraph.entity.MxCell;
 import org.apache.streampark.console.flow.component.mxGraph.entity.MxGeometry;
 import org.apache.streampark.console.flow.component.mxGraph.entity.MxGraphModel;
+import org.springframework.beans.BeanUtils;
 
 public class FlowUtil {
 
@@ -36,12 +36,7 @@ public class FlowUtil {
     return flow;
   }
 
-  /**
-   * stopsList Po To Vo
-   *
-   * @param flowList
-   * @return
-   */
+  /** stopsList Po To Vo */
   public static List<FlowVo> flowListPoToVo(List<Flow> flowList) {
     List<FlowVo> flowVoList = null;
     if (null != flowList && flowList.size() > 0) {
@@ -56,12 +51,7 @@ public class FlowUtil {
     return flowVoList;
   }
 
-  /**
-   * stop Po To Vo
-   *
-   * @param flow
-   * @return
-   */
+  /** stop Po To Vo */
   public static FlowVo flowPoToVo(Flow flow) {
     FlowVo flowVo = null;
     if (null != flow) {
@@ -198,7 +188,7 @@ public class FlowUtil {
           stopsNew.setLastUpdateUser(username);
           // copy Stops new
           stopsNew.setName(stops.getName());
-          stopsNew.setBundel(stops.getBundel());
+          stopsNew.setBundle(stops.getBundle());
           stopsNew.setGroups(stops.getGroups());
           stopsNew.setOwner(stops.getOwner());
           stopsNew.setDescription(stops.getDescription());

@@ -1,17 +1,15 @@
 package org.apache.streampark.console.flow.component.mxGraph.mapper.provider;
 
+import org.apache.streampark.console.flow.base.utils.DateUtils;
+import org.apache.streampark.console.flow.base.utils.SqlUtils;
+import org.apache.streampark.console.flow.component.mxGraph.entity.MxCell;
 import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
-import org.apache.streampark.console.flow.base.util.DateUtils;
-import org.apache.streampark.console.flow.base.util.SqlUtils;
-import org.apache.streampark.console.flow.component.mxGraph.entity.MxCell;
 
 public class MxCellMapperProvider {
 
   private String id;
-  private String crtUser;
-  private String crtDttmStr;
   private String lastUpdateDttmStr;
   private String lastUpdateUser;
   private int enableFlag;
@@ -26,47 +24,42 @@ public class MxCellMapperProvider {
   private String vertex;
   private String mxGraphModelId;
 
-  private void preventSQLInjectionMxCell(MxCell mxCell) {
-    if (null != mxCell && StringUtils.isNotBlank(mxCell.getLastUpdateUser())) {
-      // Mandatory Field
-      String id = mxCell.getId();
-      String crtUser = mxCell.getCrtUser();
-      String lastUpdateUser = mxCell.getLastUpdateUser();
-      Boolean enableFlag = mxCell.getEnableFlag();
-      Long version = mxCell.getVersion();
-      Date crtDttm = mxCell.getCrtDttm();
-      Date lastUpdateDttm = mxCell.getLastUpdateDttm();
-      this.id = SqlUtils.preventSQLInjection(id);
-      this.crtUser = (null != crtUser ? SqlUtils.preventSQLInjection(crtUser) : null);
-      this.lastUpdateUser = SqlUtils.preventSQLInjection(lastUpdateUser);
-      this.enableFlag = ((null != enableFlag && enableFlag) ? 1 : 0);
-      this.version = (null != version ? version : 0L);
-      String crtDttmStr = DateUtils.dateTimesToStr(crtDttm);
-      String lastUpdateDttmStr =
-          DateUtils.dateTimesToStr(null != lastUpdateDttm ? lastUpdateDttm : new Date());
-      this.crtDttmStr = (null != crtDttm ? SqlUtils.preventSQLInjection(crtDttmStr) : null);
-      this.lastUpdateDttmStr = SqlUtils.preventSQLInjection(lastUpdateDttmStr);
-
-      // Selection field
-      this.pageId = SqlUtils.preventSQLInjection(mxCell.getPageId());
-      this.parent = SqlUtils.preventSQLInjection(mxCell.getParent());
-      this.style = SqlUtils.preventSQLInjection(mxCell.getStyle());
-      this.edge = SqlUtils.preventSQLInjection(mxCell.getEdge());
-      this.source = SqlUtils.preventSQLInjection(mxCell.getSource());
-      this.value = SqlUtils.preventSQLInjection(mxCell.getValue());
-      this.target = SqlUtils.preventSQLInjection(mxCell.getTarget());
-      this.vertex = SqlUtils.preventSQLInjection(mxCell.getVertex());
-      String mxGraphModelIdStr =
-          (null != mxCell.getMxGraphModel() ? mxCell.getMxGraphModel().getId() : null);
-      this.mxGraphModelId =
-          (null != mxGraphModelIdStr ? SqlUtils.preventSQLInjection(mxGraphModelIdStr) : null);
+  private boolean preventSQLInjectionMxCell(MxCell mxCell) {
+    if (null == mxCell || StringUtils.isBlank(mxCell.getLastUpdateUser())) {
+      return false;
     }
+    // Mandatory Field
+    String id = mxCell.getId();
+    String lastUpdateUser = mxCell.getLastUpdateUser();
+    Boolean enableFlag = mxCell.getEnableFlag();
+    Long version = mxCell.getVersion();
+    Date lastUpdateDttm = mxCell.getLastUpdateDttm();
+    String lastUpdateDttmStr =
+        DateUtils.dateTimesToStr(null != lastUpdateDttm ? lastUpdateDttm : new Date());
+    this.id = SqlUtils.preventSQLInjection(id);
+    this.lastUpdateUser = SqlUtils.preventSQLInjection(lastUpdateUser);
+    this.enableFlag = ((null != enableFlag && enableFlag) ? 1 : 0);
+    this.version = (null != version ? version : 0L);
+    this.lastUpdateDttmStr = SqlUtils.preventSQLInjection(lastUpdateDttmStr);
+
+    // Selection field
+    this.pageId = SqlUtils.preventSQLInjection(mxCell.getPageId());
+    this.parent = SqlUtils.preventSQLInjection(mxCell.getParent());
+    this.style = SqlUtils.preventSQLInjection(mxCell.getStyle());
+    this.edge = SqlUtils.preventSQLInjection(mxCell.getEdge());
+    this.source = SqlUtils.preventSQLInjection(mxCell.getSource());
+    this.value = SqlUtils.preventSQLInjection(mxCell.getValue());
+    this.target = SqlUtils.preventSQLInjection(mxCell.getTarget());
+    this.vertex = SqlUtils.preventSQLInjection(mxCell.getVertex());
+    String mxGraphModelIdStr =
+        (null != mxCell.getMxGraphModel() ? mxCell.getMxGraphModel().getId() : null);
+    this.mxGraphModelId =
+        (null != mxGraphModelIdStr ? SqlUtils.preventSQLInjection(mxGraphModelIdStr) : null);
+    return true;
   }
 
   private void reset() {
     this.id = null;
-    this.crtUser = null;
-    this.crtDttmStr = null;
     this.lastUpdateDttmStr = null;
     this.lastUpdateUser = null;
     this.enableFlag = 1;
@@ -89,40 +82,36 @@ public class MxCellMapperProvider {
    */
   public String addMxCell(MxCell mxCell) {
     String sqlStr = "";
-    this.preventSQLInjectionMxCell(mxCell);
-    if (null != lastUpdateUser) {
-      SQL NewSQL = new SQL();
-
-      // INSERT_INTO brackets is table name
-      NewSQL.INSERT_INTO("mx_cell");
-      // The first string in the value is the field name corresponding to the table in the database.
-
-      if (null == crtUser) {
-        crtUser = SqlUtils.addSqlStr("-1");
-      }
-      if (null == crtDttmStr) {
-        String nowTimeStr = DateUtils.dateTimesToStr(new Date());
-        crtDttmStr = SqlUtils.addSqlStr(nowTimeStr);
-      }
-      NewSQL.VALUES("id", id);
-      NewSQL.VALUES("crt_dttm", crtDttmStr);
-      NewSQL.VALUES("crt_user", crtUser);
-      NewSQL.VALUES("last_update_dttm", lastUpdateDttmStr);
-      NewSQL.VALUES("last_update_user", lastUpdateUser);
-      NewSQL.VALUES("version", version + "");
-      NewSQL.VALUES("enable_flag", enableFlag + "");
-
-      // handle other fields
-      NewSQL.VALUES("mx_pageid", pageId);
-      NewSQL.VALUES("mx_parent", parent);
-      NewSQL.VALUES("mx_style", style);
-      NewSQL.VALUES("mx_edge", edge);
-      NewSQL.VALUES("mx_source", source);
-      NewSQL.VALUES("mx_target", target);
-      NewSQL.VALUES("mx_value", value);
-      NewSQL.VALUES("mx_vertex", vertex);
-      NewSQL.VALUES("fk_mx_graph_id", mxGraphModelId);
-      sqlStr = NewSQL.toString();
+    boolean flag = this.preventSQLInjectionMxCell(mxCell);
+    if (flag) {
+      StringBuffer stringBuffer = new StringBuffer();
+      stringBuffer.append("INSERT INTO mx_cell");
+      stringBuffer.append("(");
+      stringBuffer.append(SqlUtils.baseFieldName() + ",");
+      stringBuffer.append("mx_pageid, ");
+      stringBuffer.append("mx_parent, ");
+      stringBuffer.append("mx_style, ");
+      stringBuffer.append("mx_edge, ");
+      stringBuffer.append("mx_source, ");
+      stringBuffer.append("mx_target,");
+      stringBuffer.append("mx_value, ");
+      stringBuffer.append("mx_vertex, ");
+      stringBuffer.append("fk_mx_graph_id ");
+      stringBuffer.append(") ");
+      stringBuffer.append("VALUES");
+      stringBuffer.append("(");
+      stringBuffer.append(SqlUtils.baseFieldValues(mxCell) + ",");
+      stringBuffer.append(pageId + ", ");
+      stringBuffer.append(parent + ", ");
+      stringBuffer.append(style + ", ");
+      stringBuffer.append(edge + ", ");
+      stringBuffer.append(source + ", ");
+      stringBuffer.append(target + ", ");
+      stringBuffer.append(value + ", ");
+      stringBuffer.append(vertex + ", ");
+      stringBuffer.append(mxGraphModelId + " ");
+      stringBuffer.append(")");
+      sqlStr = stringBuffer.toString();
     }
     this.reset();
     return sqlStr;
@@ -136,8 +125,8 @@ public class MxCellMapperProvider {
    */
   public String updateMxCell(MxCell mxCell) {
     String sqlStr = "";
-    this.preventSQLInjectionMxCell(mxCell);
-    if (null != lastUpdateUser) {
+    boolean flag = this.preventSQLInjectionMxCell(mxCell);
+    if (flag) {
       SQL newSQL = new SQL();
       // UPDATE parentheses for the database table name
       newSQL.UPDATE("mx_cell");
@@ -249,6 +238,30 @@ public class MxCellMapperProvider {
     sql.SET("last_update_dttm = " + SqlUtils.addSqlStr(DateUtils.dateTimesToStr(new Date())));
     sql.WHERE("enable_flag = 1");
     sql.WHERE("id = " + SqlUtils.preventSQLInjection(id));
+
+    return sql.toString();
+  }
+
+  /**
+   * Delete 'MxCell' by 'mxGraphModelId'
+   *
+   * @param mxGraphModelId
+   * @return
+   */
+  public String deleteMxCellByFlowId(String username, String mxGraphModelId) {
+    if (StringUtils.isBlank(username)) {
+      return "SELECT 0";
+    }
+    if (StringUtils.isBlank(mxGraphModelId)) {
+      return "SELECT 0";
+    }
+    SQL sql = new SQL();
+    sql.UPDATE("mx_cell");
+    sql.SET("enable_flag = 0");
+    sql.SET("last_update_user = " + SqlUtils.preventSQLInjection(username));
+    sql.SET("last_update_dttm = " + SqlUtils.addSqlStr(DateUtils.dateTimesToStr(new Date())));
+    sql.WHERE("enable_flag = 1");
+    sql.WHERE("fk_mx_graph_id = " + SqlUtils.preventSQLInjection(mxGraphModelId));
 
     return sql.toString();
   }

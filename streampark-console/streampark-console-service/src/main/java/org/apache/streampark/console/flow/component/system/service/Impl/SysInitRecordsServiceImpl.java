@@ -1,138 +1,163 @@
 package org.apache.streampark.console.flow.component.system.service.Impl;
 
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.apache.streampark.console.flow.base.util.JsonUtils;
-import org.apache.streampark.console.flow.base.util.LoggerUtil;
-import org.apache.streampark.console.flow.base.util.ReturnMapUtils;
-import org.apache.streampark.console.flow.base.util.UUIDUtils;
+import org.apache.streampark.console.flow.base.utils.DecimalFormatUtils;
+import org.apache.streampark.console.flow.base.utils.LoggerUtil;
+import org.apache.streampark.console.flow.base.utils.ReturnMapUtils;
+import org.apache.streampark.console.flow.base.utils.ThreadPoolExecutorUtils;
+import org.apache.streampark.console.flow.base.utils.UUIDUtils;
+import org.apache.streampark.console.flow.common.Eunm.ComponentFileType;
+import org.apache.streampark.console.flow.common.constant.Constants;
+import org.apache.streampark.console.flow.common.constant.MessageConfig;
 import org.apache.streampark.console.flow.common.constant.SysParamsCache;
+import org.apache.streampark.console.flow.component.flow.domain.StopsDomain;
 import org.apache.streampark.console.flow.component.flow.entity.Property;
 import org.apache.streampark.console.flow.component.flow.entity.Stops;
-import org.apache.streampark.console.flow.component.flow.mapper.PropertyMapper;
-import org.apache.streampark.console.flow.component.flow.mapper.StopsMapper;
 import org.apache.streampark.console.flow.component.flow.utils.PropertyUtils;
 import org.apache.streampark.console.flow.component.stopsComponent.domain.StopsComponentDomain;
-import org.apache.streampark.console.flow.component.stopsComponent.domain.StopsComponentGroupDomain;
-import org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsComponentGroupMapper;
-import org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsComponentMapper;
-import org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsComponentPropertyMapper;
-import org.apache.streampark.console.flow.component.stopsComponent.model.StopsComponent;
-import org.apache.streampark.console.flow.component.stopsComponent.model.StopsComponentGroup;
-import org.apache.streampark.console.flow.component.stopsComponent.model.StopsComponentProperty;
+import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponent;
+import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentGroup;
+import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentProperty;
 import org.apache.streampark.console.flow.component.stopsComponent.utils.StopsComponentGroupUtils;
 import org.apache.streampark.console.flow.component.stopsComponent.utils.StopsComponentUtils;
+import org.apache.streampark.console.flow.component.system.domain.SysInitRecordsDomain;
 import org.apache.streampark.console.flow.component.system.entity.SysInitRecords;
-import org.apache.streampark.console.flow.component.system.jpa.domain.SysInitRecordsDomain;
 import org.apache.streampark.console.flow.component.system.service.ISysInitRecordsService;
 import org.apache.streampark.console.flow.third.service.IStop;
 import org.apache.streampark.console.flow.third.vo.stop.ThirdStopsComponentVo;
+import org.slf4j.Logger;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class SysInitRecordsServiceImpl implements ISysInitRecordsService {
 
-  Logger logger = LoggerUtil.getLogger();
-  @Resource private SysInitRecordsDomain sysInitRecordsDomain;
+  /** Introducing logs, note that they are all packaged under "org.slf4j" */
+  private final Logger logger = LoggerUtil.getLogger();
 
-  @Resource private IStop stopImpl;
+  private final SysInitRecordsDomain sysInitRecordsDomain;
+  private final StopsComponentDomain stopsComponentDomain;
+  private final StopsDomain stopsDomain;
+  private final IStop stopImpl;
 
-  @Resource private StopsComponentGroupMapper stopsComponentGroupMapper;
-
-  @Resource private StopsComponentMapper stopsComponentMapper;
-
-  @Resource private StopsComponentPropertyMapper stopsComponentPropertyMapper;
-
-  @Resource private StopsMapper stopsMapper;
-
-  @Resource private PropertyMapper propertyMapper;
-
-  @Resource private StopsComponentGroupDomain stopsComponentGroupDomain;
-
-  @Resource private StopsComponentDomain stopsComponentDomain;
-
-  public boolean isInBootPage() {
-    // Determine if the boot flag is true
-    if (!SysParamsCache.IS_BOOT_COMPLETE) {
-      // Query is boot record
-      SysInitRecords sysInitRecordsLastNew = sysInitRecordsDomain.getSysInitRecordsLastNew(1);
-      if (null == sysInitRecordsLastNew || !sysInitRecordsLastNew.getIsSucceed()) {
-        return true;
-      }
-    }
-    return false;
+  @Autowired
+  public SysInitRecordsServiceImpl(
+      SysInitRecordsDomain sysInitRecordsDomain,
+      StopsComponentDomain stopsComponentDomain,
+      StopsDomain stopsDomain,
+      IStop stopImpl) {
+    this.sysInitRecordsDomain = sysInitRecordsDomain;
+    this.stopsComponentDomain = stopsComponentDomain;
+    this.stopsDomain = stopsDomain;
+    this.stopImpl = stopImpl;
   }
 
-  @Transactional
+  @Override
+  public boolean isInBootPage() {
+    // Determine if the boot flag is true
+    if (SysParamsCache.IS_BOOT_COMPLETE) {
+      return false;
+    }
+    // Query is boot record
+    SysInitRecords sysInitRecordsLastNew = sysInitRecordsDomain.getSysInitRecordsLastNew(1);
+    return null == sysInitRecordsLastNew || !sysInitRecordsLastNew.getIsSucceed();
+  }
+
   @Override
   public String initComponents(String currentUser) {
     boolean inBootPage = isInBootPage();
     if (!inBootPage) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("No initialization, enter the boot page");
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.INIT_COMPONENTS_COMPLETED_MSG());
     }
-    Map<String, Object> rtnMap = new HashMap<>();
-    ExecutorService es =
-        new ThreadPoolExecutor(
-            1, 5, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(100000));
-    List<String> stopsBundleList = loadStopGroup(currentUser);
-    if (null != stopsBundleList && !stopsBundleList.isEmpty()) {
-      if (null != stopsBundleList && stopsBundleList.size() > 0) {
-        for (String stopListInfos : stopsBundleList) {
-          es.execute(
-              () -> {
-                Boolean aBoolean1 = loadStop(stopListInfos);
-                if (!aBoolean1) {
-                  logger.warn("stop load failed, bundle : " + stopListInfos);
-                }
-              });
-        }
-      }
-      List<Stops> stopsList = stopsMapper.getStopsList();
-      if (null != stopsList && stopsList.size() > 0) {
-        for (Stops stops : stopsList) {
-          if (null == stops) {
-            continue;
-          }
-          es.execute(
-              () -> {
-                try {
-                  syncStopsProperties(stops, currentUser);
-                } catch (IllegalAccessException e) {
-                  logger.error("update stops data error", e);
-                } catch (ClassNotFoundException e) {
-                  logger.error("update stops data error", e);
-                }
-              });
-        }
+
+    SysParamsCache.INIT_STOP_THREAD_POOL_EXECUTOR =
+        ThreadPoolExecutorUtils.createThreadPoolExecutor(1, 5, 0L);
+
+    List<String> sparkStopsBundleList = loadStopGroup(currentUser, Constants.ENGIN_SPARK);
+    if (null == sparkStopsBundleList) {
+      return ReturnMapUtils.setSucceededMsgRtnJsonStr(MessageConfig.INTERFACE_CALL_ERROR_MSG());
+    }
+    if (sparkStopsBundleList.isEmpty()) {
+      return ReturnMapUtils.setSucceededMsgRtnJsonStr(
+          MessageConfig.INTERFACE_RETURN_VALUE_IS_NULL_MSG());
+    } else {
+      for (String stopListInfos : sparkStopsBundleList) {
+        SysParamsCache.INIT_STOP_THREAD_POOL_EXECUTOR.execute(
+            () -> {
+              Boolean aBoolean1 = loadStop(stopListInfos);
+              if (!aBoolean1) {
+                logger.warn("spark stop load failed, bundle : " + stopListInfos);
+              }
+            });
       }
     }
-    SysParamsCache.THREAD_POOL_EXECUTOR = ((ThreadPoolExecutor) es);
-    rtnMap.put("code", 200);
-    return JsonUtils.toJsonNoException(rtnMap);
+
+    List<String> flinkStopsBundleList = loadStopGroup(currentUser, Constants.ENGIN_FLINK);
+    if (null == flinkStopsBundleList) {
+      return ReturnMapUtils.setSucceededMsgRtnJsonStr(MessageConfig.INTERFACE_CALL_ERROR_MSG());
+    }
+    if (flinkStopsBundleList.isEmpty()) {
+      return ReturnMapUtils.setSucceededMsgRtnJsonStr(
+          MessageConfig.INTERFACE_RETURN_VALUE_IS_NULL_MSG());
+    } else {
+      for (String stopListInfos : flinkStopsBundleList) {
+        SysParamsCache.INIT_STOP_THREAD_POOL_EXECUTOR.execute(
+            () -> {
+              Boolean aBoolean1 = loadStop(stopListInfos);
+              if (!aBoolean1) {
+                logger.warn("flink stop load failed, bundle : " + stopListInfos);
+              }
+            });
+      }
+    }
+
+    List<Stops> stopsList = stopsDomain.getStopsList();
+    if (null != stopsList && stopsList.size() > 0) {
+      for (Stops stops : stopsList) {
+        if (null == stops) {
+          continue;
+        }
+        SysParamsCache.INIT_STOP_THREAD_POOL_EXECUTOR.execute(
+            () -> {
+              try {
+                syncStopsProperties(stops, currentUser);
+              } catch (Exception e) {
+                logger.error("update stops data error", e);
+              }
+            });
+      }
+    }
+
+    return ReturnMapUtils.setSucceededMsgRtnJsonStr(MessageConfig.SUCCEEDED_MSG());
   }
 
   @Override
   public String threadMonitoring(String currentUser) {
-    if (null == SysParamsCache.THREAD_POOL_EXECUTOR) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("THREAD_POOL_EXECUTOR is null");
+    if (null == SysParamsCache.INIT_STOP_THREAD_POOL_EXECUTOR) {
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.INIT_COMPONENTS_ERROR_MSG());
     }
     // Total number of threads
-    double taskCount = SysParamsCache.THREAD_POOL_EXECUTOR.getTaskCount();
+    double taskCount = SysParamsCache.INIT_STOP_THREAD_POOL_EXECUTOR.getTaskCount();
     // Number of execution completion threads
-    double completedTaskCount = SysParamsCache.THREAD_POOL_EXECUTOR.getCompletedTaskCount();
+    double completedTaskCount =
+        SysParamsCache.INIT_STOP_THREAD_POOL_EXECUTOR.getCompletedTaskCount();
+    if (0 == taskCount) {
+      taskCount = 1;
+      completedTaskCount = 1;
+    }
     double progressNum = ((completedTaskCount / taskCount) * 40);
     if (39 < progressNum && progressNum < 40) {
       progressNum = 39;
     }
-    long progressNumLong = (long) Math.ceil(progressNum) + 60;
+    double progressNumLong = DecimalFormatUtils.formatTwoDecimalPlaces(progressNum) + 60;
 
     if (100 == progressNumLong) {
       addSysInitRecordsAndSave();
@@ -140,21 +165,26 @@ public class SysInitRecordsServiceImpl implements ISysInitRecordsService {
     return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("progress", progressNumLong);
   }
 
-  private List<String> loadStopGroup(String currentUser) {
-    Map<String, List<String>> stopsListWithGroup = stopImpl.getStopsListWithGroup();
-    if (null == stopsListWithGroup || stopsListWithGroup.isEmpty()) {
+  private List<String> loadStopGroup(String currentUser, String engineType) {
+    Map<String, List<String>> stopsListWithGroup = stopImpl.getStopsListWithGroup(engineType);
+    if (null == stopsListWithGroup) {
       return null;
     }
+    if (stopsListWithGroup.isEmpty()) {
+      return new ArrayList<>();
+    }
+
     // The call is successful, empty the "StopsComponentGroup" and "StopsComponent" message and
     // insert
-    int deleteGroup = stopsComponentGroupDomain.deleteStopsComponentGroup();
-    logger.debug("Successful deletion Group" + deleteGroup + "piece of data!!!");
-    int deleteStopsInfo = stopsComponentDomain.deleteStopsComponent();
+    int deleteGroup = stopsComponentDomain.deleteStopsComponentGroup(engineType);
+    logger.info("Successful deletion Group" + deleteGroup + "piece of data!!!");
+    int deleteStopsInfo = stopsComponentDomain.deleteStopsComponentByEngineType(engineType);
     logger.info("Successful deletion StopsInfo" + deleteStopsInfo + "piece of data!!!");
 
     int addStopsComponentGroupRows = 0;
     // StopsComponent bundle list
     List<String> stopsBundleList = new ArrayList<>();
+
     // Loop stopsListWithGroup
     for (String groupName : stopsListWithGroup.keySet()) {
       if (StringUtils.isBlank(groupName)) {
@@ -165,15 +195,16 @@ public class SysInitRecordsServiceImpl implements ISysInitRecordsService {
           StopsComponentGroupUtils.stopsComponentGroupNewNoId(currentUser);
       stopsComponentGroup.setId(UUIDUtils.getUUID32());
       stopsComponentGroup.setGroupName(groupName);
+      stopsComponentGroup.setEngineType(engineType);
       addStopsComponentGroupRows +=
-          stopsComponentGroupDomain.addStopsComponentGroup(stopsComponentGroup);
+          stopsComponentDomain.addStopsComponentGroup(stopsComponentGroup);
       // get current group stops bundle list
       List<String> list = stopsListWithGroup.get(groupName);
       stopsBundleList.addAll(list);
     }
-    logger.debug("Successful insert Group" + addStopsComponentGroupRows + "piece of data!!!");
+    logger.info("Successful insert Group" + addStopsComponentGroupRows + "piece of data!!!");
     // Deduplication
-    HashSet<String> stopsBundleListDeduplication = new HashSet<String>(stopsBundleList);
+    HashSet<String> stopsBundleListDeduplication = new HashSet<>(stopsBundleList);
     stopsBundleList.clear();
     stopsBundleList.addAll(stopsBundleListDeduplication);
     return stopsBundleList;
@@ -189,31 +220,30 @@ public class SysInitRecordsServiceImpl implements ISysInitRecordsService {
     List<String> list = Arrays.asList(thirdStopsComponentVo.getGroups().split(","));
     // Query group information according to groupName in stops
     List<StopsComponentGroup> stopGroupByName =
-        stopsComponentGroupMapper.getStopGroupByNameList(list);
+        stopsComponentDomain.getStopGroupByNameList(list, thirdStopsComponentVo.getEngineType());
     StopsComponent stopsComponent =
         StopsComponentUtils.thirdStopsComponentVoToStopsTemplate(
             "init", thirdStopsComponentVo, stopGroupByName);
+
     if (null != stopsComponent) {
-      int insertStopsTemplate = stopsComponentMapper.insertStopsComponent(stopsComponent);
+      stopsComponent.setComponentType(ComponentFileType.DEFAULT);
+      stopsComponent.setEngineType(thirdStopsComponentVo.getEngineType());
+      int insertStopsTemplate = stopsComponentDomain.addStopsComponentAndChildren(stopsComponent);
       logger.info("flow_stops_template affects the number of rows : " + insertStopsTemplate);
-      logger.info(
-          "=============================association_groups_stops_template=====start==================");
+
+      logger.info("===============association_groups_stops_template=====start=============");
+
       List<StopsComponentGroup> stopGroupList = stopsComponent.getStopGroupList();
       for (StopsComponentGroup stopGroup : stopGroupList) {
         String stopGroupId = stopGroup.getId();
         String stopsTemplateId = stopsComponent.getId();
         int insertAssociationGroupsStopsTemplate =
-            stopsComponentGroupMapper.insertAssociationGroupsStopsTemplate(
-                stopGroupId, stopsTemplateId);
+            stopsComponentDomain.insertAssociationGroupsStopsTemplate(
+                stopGroupId, stopsTemplateId, stopsComponent.getEngineType());
         logger.info(
             "association_groups_stops_template Association table insertion affects the number of rows : "
                 + insertAssociationGroupsStopsTemplate);
       }
-      List<StopsComponentProperty> properties = stopsComponent.getProperties();
-      int insertPropertyTemplate =
-          stopsComponentPropertyMapper.insertStopsComponentProperty(properties);
-      logger.info(
-          "flow_stops_property_template affects the number of rows : " + insertPropertyTemplate);
     }
     return true;
   }
@@ -223,18 +253,18 @@ public class SysInitRecordsServiceImpl implements ISysInitRecordsService {
     sysInitRecords.setId(UUIDUtils.getUUID32());
     sysInitRecords.setInitDate(new Date());
     sysInitRecords.setIsSucceed(true);
-    sysInitRecordsDomain.saveOrUpdate(sysInitRecords);
+    sysInitRecordsDomain.insertSysInitRecords(sysInitRecords);
     SysParamsCache.setIsBootComplete(true);
+    SysParamsCache.INIT_STOP_THREAD_POOL_EXECUTOR.shutdown();
     return true;
   }
 
-  private void syncStopsProperties(Stops stops, String currentUser)
-      throws IllegalAccessException, ClassNotFoundException {
+  private void syncStopsProperties(Stops stops, String currentUser) {
     if (null == stops) {
       return;
     }
-    String bundle = stops.getBundel();
-    StopsComponent stopsComponentByBundle = stopsComponentMapper.getStopsComponentByBundle(bundle);
+    String bundle = stops.getBundle();
+    StopsComponent stopsComponentByBundle = stopsComponentDomain.getStopsComponentByBundle(bundle);
     if (null == stopsComponentByBundle) {
       logger.info("The Stops component (" + bundle + ") has been deleted");
       return;
@@ -263,7 +293,7 @@ public class SysInitRecordsServiceImpl implements ISysInitRecordsService {
             propertiesTemplateMap.get(property.getName());
         if (null == stopsComponentProperty) {
           property.setIsOldData(true);
-          propertyMapper.updateStopsProperty(property);
+          stopsDomain.updateStopsProperty(property);
           continue;
         }
         /*
@@ -290,14 +320,12 @@ public class SysInitRecordsServiceImpl implements ISysInitRecordsService {
         property.setId(UUIDUtils.getUUID32());
         property.setStops(stops);
         property.setCustomValue(stopsComponentProperty.getDefaultValue());
+        String allowableValues = stopsComponentProperty.getAllowableValues();
         // Indicates "select"
-        if (stopsComponentProperty.getAllowableValues().contains(",")
-            && stopsComponentProperty.getAllowableValues().length() > 4) {
+        if (allowableValues.contains(",") && allowableValues.length() > 4) {
           property.setIsSelect(true);
           // Determine if there is a default value in "select"
-          if (!stopsComponentProperty
-              .getAllowableValues()
-              .contains(stopsComponentProperty.getDefaultValue())) {
+          if (!allowableValues.contains(stopsComponentProperty.getDefaultValue())) {
             // Default value if not present
             property.setCustomValue("");
           }
@@ -307,7 +335,7 @@ public class SysInitRecordsServiceImpl implements ISysInitRecordsService {
         addProperties.add(property);
       }
       stops.setProperties(properties);
-      propertyMapper.addPropertyList(addProperties);
+      stopsDomain.addPropertyList(addProperties);
     }
   }
 }

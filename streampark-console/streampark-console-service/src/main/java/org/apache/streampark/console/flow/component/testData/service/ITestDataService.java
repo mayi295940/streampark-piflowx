@@ -1,8 +1,8 @@
 package org.apache.streampark.console.flow.component.testData.service;
 
-import org.springframework.web.multipart.MultipartFile;
-import org.apache.streampark.console.flow.controller.requestVo.RequestTestDataVo;
 import org.apache.streampark.console.flow.controller.requestVo.TestDataSchemaValuesSaveVo;
+import org.apache.streampark.console.flow.controller.requestVo.TestDataVoRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface ITestDataService {
 
@@ -16,7 +16,7 @@ public interface ITestDataService {
    * @throws Exception
    */
   public String saveOrUpdateTestDataAndSchema(
-          String username, boolean isAdmin, RequestTestDataVo testDataVo, boolean flag)
+      String username, boolean isAdmin, TestDataVoRequest testDataVo, boolean flag)
       throws Exception;
 
   /**
@@ -40,6 +40,7 @@ public interface ITestDataService {
    * @return String
    */
   public String checkTestDataName(String username, boolean isAdmin, String testDataName);
+
   /**
    * delTestData
    *
@@ -112,6 +113,7 @@ public interface ITestDataService {
       Integer limit,
       String param,
       String testDataId);
+
   /**
    * getTestDataSchemaValuesCustomList
    *

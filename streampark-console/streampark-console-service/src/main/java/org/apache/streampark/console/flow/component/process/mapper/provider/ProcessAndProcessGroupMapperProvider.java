@@ -1,7 +1,7 @@
 package org.apache.streampark.console.flow.component.process.mapper.provider;
 
+import org.apache.streampark.console.flow.base.utils.SqlUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.streampark.console.flow.base.util.SqlUtils;
 
 public class ProcessAndProcessGroupMapperProvider {
 

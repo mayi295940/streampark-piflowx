@@ -1,7 +1,7 @@
 package org.apache.streampark.console.flow.component.flow.utils;
 
-import java.util.Date;
 import org.apache.streampark.console.flow.component.flow.entity.Property;
+import java.util.Date;
 
 public class PropertyUtils {
 

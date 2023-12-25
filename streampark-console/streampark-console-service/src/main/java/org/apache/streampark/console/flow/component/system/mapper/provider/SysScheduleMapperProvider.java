@@ -1,13 +1,12 @@
 package org.apache.streampark.console.flow.component.system.mapper.provider;
 
-import java.util.Date;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.jdbc.SQL;
-import org.apache.streampark.console.flow.base.util.DateUtils;
-import org.apache.streampark.console.flow.base.util.SqlUtils;
+import org.apache.streampark.console.flow.base.utils.DateUtils;
+import org.apache.streampark.console.flow.base.utils.SqlUtils;
 import org.apache.streampark.console.flow.common.Eunm.ScheduleState;
 import org.apache.streampark.console.flow.component.system.entity.SysSchedule;
+import java.util.Date;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.jdbc.SQL;
 
 public class SysScheduleMapperProvider {
 
@@ -133,10 +132,9 @@ public class SysScheduleMapperProvider {
     return sqlStr;
   }
 
-  public String getSysScheduleListByStatus(
-      @Param("isAdmin") boolean isAdmin, @Param("status") ScheduleState status) {
+  public String getSysScheduleListByStatus(boolean isAdmin, ScheduleState status) {
     if (!isAdmin || null == status) {
-      return "SELECT 0";
+      return "SELECT * FROM sys_schedule WHERE id IS NULL";
     }
     StringBuffer sqlStrbuf = new StringBuffer();
     sqlStrbuf.append("SELECT * ");
@@ -157,7 +155,7 @@ public class SysScheduleMapperProvider {
    * @return
    */
   public String getSysScheduleList(boolean isAdmin, String param) {
-    String sqlStr = "SELECT 0";
+    String sqlStr = "SELECT * FROM sys_schedule WHERE id IS NULL";
     if (isAdmin) {
       StringBuffer sqlStrbuf = new StringBuffer();
       sqlStrbuf.append("SELECT * ");

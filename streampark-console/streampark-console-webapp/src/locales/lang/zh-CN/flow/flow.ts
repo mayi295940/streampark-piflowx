@@ -67,6 +67,7 @@ export default {
     create_title: '新建流水线',
     update_title: '更改流水线',
     flow_name: '流水线名称',
+    engine_type: '引擎类型',
     driverMemory: 'Driver内存',
     executorNumber: 'Executor数量',
     executorMemory: 'Executor内存',
@@ -104,7 +105,7 @@ export default {
   },
   template_columns: {
     name: '名称',
-    crtDttm: '创建时间',
+    createTime: '创建时间',
     action: '操作',
   },
   dataSource_columns: {

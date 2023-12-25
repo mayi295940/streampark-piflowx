@@ -1,6 +1,6 @@
 package org.apache.streampark.console.flow.component.process.service;
 
-import org.springframework.transaction.annotation.Transactional;
+import javax.servlet.http.HttpServletResponse;
 
 public interface IProcessStopService {
 
@@ -11,6 +11,13 @@ public interface IProcessStopService {
    * @param pageId
    * @return
    */
-  @Transactional
   public String getProcessStopVoByPageId(String processId, String pageId);
+
+  /**
+   * showViewData
+   *
+   * @param id id
+   * @return json
+   */
+  public void showViewData(HttpServletResponse response, String id) throws Exception;
 }

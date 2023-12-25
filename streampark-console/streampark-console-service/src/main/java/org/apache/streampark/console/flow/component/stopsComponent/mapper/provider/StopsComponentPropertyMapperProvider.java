@@ -1,11 +1,11 @@
 package org.apache.streampark.console.flow.component.stopsComponent.mapper.provider;
 
+import org.apache.streampark.console.flow.base.utils.SqlUtils;
+import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentProperty;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
-import org.apache.streampark.console.flow.base.util.SqlUtils;
-import org.apache.streampark.console.flow.component.stopsComponent.model.StopsComponentProperty;
 
 public class StopsComponentPropertyMapperProvider {
 
@@ -69,8 +69,7 @@ public class StopsComponentPropertyMapperProvider {
   /**
    * 根据stops模板id查询对应的stops的所有属性
    *
-   * @param stopsId
-   * @return
+   * @param stopsId stopsId
    */
   public String getStopsComponentPropertyByStopsId(String stopsId) {
 

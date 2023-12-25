@@ -4,10 +4,9 @@ import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.jdbc.SQL;
-import org.apache.streampark.console.flow.base.util.DateUtils;
-import org.apache.streampark.console.flow.base.util.SqlUtils;
+import org.apache.streampark.console.flow.base.utils.DateUtils;
+import org.apache.streampark.console.flow.base.utils.SqlUtils;
 import org.apache.streampark.console.flow.component.schedule.entity.Schedule;
-import zio.Schedule$;
 
 @Mapper
 public class ScheduleMapperProvider {
@@ -90,34 +89,42 @@ public class ScheduleMapperProvider {
     String sqlStr = "SELECT 0";
     boolean flag = this.preventSQLInjectionSchedule(schedule);
     if (flag) {
-      StringBuffer strBuf = new StringBuffer();
-      strBuf.append("INSERT INTO group_schedule ");
-      strBuf.append("( ");
-      strBuf.append(SqlUtils.baseFieldName() + ", ");
-      strBuf.append("schedule_id, ");
-      strBuf.append("type, ");
-      strBuf.append("status, ");
-      strBuf.append("cron_expression, ");
-      strBuf.append("plan_start_time, ");
-      strBuf.append("plan_end_time, ");
-      strBuf.append("schedule_run_template_id, ");
-      strBuf.append("schedule_process_template_id ");
-      strBuf.append(") ");
-
-      strBuf.append("values ");
-      strBuf.append("(");
-      strBuf.append(SqlUtils.baseFieldValues(schedule) + ", ");
-      strBuf.append(this.scheduleId + ", ");
-      strBuf.append(this.type + ", ");
-      strBuf.append(this.statusStr + ", ");
-      strBuf.append(this.cronExpression + ", ");
-      strBuf.append(this.planStartTimeStr + ", ");
-      strBuf.append(this.planEndTimeStr + ", ");
-      strBuf.append(this.scheduleRunTemplateId + ",");
-      strBuf.append(this.scheduleProcessTemplateId);
-      strBuf.append(")");
+      String strBuf =
+          "INSERT INTO group_schedule "
+              + "( "
+              + SqlUtils.baseFieldName()
+              + ", "
+              + "schedule_id, "
+              + "type, "
+              + "status, "
+              + "cron_expression, "
+              + "plan_start_time, "
+              + "plan_end_time, "
+              + "schedule_run_template_id, "
+              + "schedule_process_template_id "
+              + ") "
+              + "values "
+              + "("
+              + SqlUtils.baseFieldValues(schedule)
+              + ", "
+              + this.scheduleId
+              + ", "
+              + this.type
+              + ", "
+              + this.statusStr
+              + ", "
+              + this.cronExpression
+              + ", "
+              + this.planStartTimeStr
+              + ", "
+              + this.planEndTimeStr
+              + ", "
+              + this.scheduleRunTemplateId
+              + ","
+              + this.scheduleProcessTemplateId
+              + ")";
       this.resetSchedule();
-      sqlStr = strBuf.toString() + ";";
+      sqlStr = strBuf + ";";
     }
     return sqlStr;
   }
@@ -169,7 +176,7 @@ public class ScheduleMapperProvider {
    * @return sql
    */
   public String getScheduleList(boolean isAdmin, String username, String param) {
-    StringBuffer strBuf = new StringBuffer();
+    StringBuilder strBuf = new StringBuilder();
     strBuf.append("SELECT gs.*, CASE gs.type ");
     strBuf.append("WHEN 'FLOW' THEN f.name ");
     strBuf.append("WHEN 'FLOW_GROUP' THEN fg.name ");
@@ -181,19 +188,21 @@ public class ScheduleMapperProvider {
     strBuf.append("gs.enable_flag = 1 ");
     if (StringUtils.isNotBlank(param)) {
       strBuf.append("and ( ");
-      strBuf.append("gs.type like CONCAT('%'," + SqlUtils.preventSQLInjection(param) + ",'%') ");
-      strBuf.append(
-          "or gs.cron_expression like CONCAT('%',"
-              + SqlUtils.preventSQLInjection(param)
-              + ",'%') ");
+      strBuf
+          .append("gs.type like CONCAT('%',")
+          .append(SqlUtils.preventSQLInjection(param))
+          .append(",'%') ");
+      strBuf
+          .append("or gs.cron_expression like CONCAT('%',")
+          .append(SqlUtils.preventSQLInjection(param))
+          .append(",'%') ");
       strBuf.append(") ");
     }
     if (!isAdmin) {
-      strBuf.append("and gs.crt_user = " + SqlUtils.preventSQLInjection(username));
+      strBuf.append("and gs.crt_user = ").append(SqlUtils.preventSQLInjection(username));
     }
     strBuf.append("order by crt_dttm desc ");
-    String sqlStr = strBuf.toString();
-    return sqlStr;
+    return strBuf.toString();
   }
 
   /**
@@ -208,17 +217,16 @@ public class ScheduleMapperProvider {
     if (StringUtils.isBlank(id)) {
       return "SELECT 0";
     }
-    StringBuffer strBuf = new StringBuffer();
+    StringBuilder strBuf = new StringBuilder();
     strBuf.append("select * ");
     strBuf.append("from group_schedule ");
     strBuf.append("where ");
     strBuf.append("enable_flag = 1 ");
-    strBuf.append("and id = " + SqlUtils.preventSQLInjection(id) + " ");
+    strBuf.append("and id = ").append(SqlUtils.preventSQLInjection(id)).append(" ");
     if (!isAdmin) {
-      strBuf.append("and crt_user = " + SqlUtils.preventSQLInjection(username));
+      strBuf.append("and crt_user = ").append(SqlUtils.preventSQLInjection(username));
     }
-    String sqlStr = strBuf.toString();
-    return sqlStr;
+    return strBuf.toString();
   }
 
   /**
@@ -236,34 +244,39 @@ public class ScheduleMapperProvider {
     if (StringUtils.isBlank(username)) {
       return "SELECT 0";
     }
-    StringBuffer strBuf = new StringBuffer();
+    StringBuilder strBuf = new StringBuilder();
     String lastUpdateDttm = DateUtils.dateTimesToStr(new Date());
     strBuf.append("update group_schedule set ");
     strBuf.append("enable_flag = 0 , ");
-    strBuf.append("last_update_user = " + SqlUtils.preventSQLInjection(username) + " , ");
-    strBuf.append("last_update_dttm = " + SqlUtils.preventSQLInjection(lastUpdateDttm) + " ");
+    strBuf
+        .append("last_update_user = ")
+        .append(SqlUtils.preventSQLInjection(username))
+        .append(" , ");
+    strBuf
+        .append("last_update_dttm = ")
+        .append(SqlUtils.preventSQLInjection(lastUpdateDttm))
+        .append(" ");
     strBuf.append("where ");
     strBuf.append("enable_flag = 1 ");
-    strBuf.append("and id = " + SqlUtils.preventSQLInjection(id) + " ");
+    strBuf.append("and id = ").append(SqlUtils.preventSQLInjection(id)).append(" ");
     if (!isAdmin) {
-      strBuf.append("and crt_user = " + SqlUtils.preventSQLInjection(username));
+      strBuf.append("and crt_user = ").append(SqlUtils.preventSQLInjection(username));
     }
-    String sqlStr = strBuf.toString();
-    return sqlStr;
+    return strBuf.toString();
   }
 
   public String getScheduleIdListByStateRunning(boolean isAdmin, String username) {
     if (StringUtils.isBlank(username)) {
       return "SELECT 0";
     }
-    StringBuffer strBuf = new StringBuffer();
+    StringBuilder strBuf = new StringBuilder();
     strBuf.append("select * from group_schedule ");
     strBuf.append("where ");
     strBuf.append("enable_flag=1 ");
     strBuf.append("and ");
     strBuf.append("status='RUNNING' ");
     if (!isAdmin) {
-      strBuf.append("and crt_user = " + SqlUtils.preventSQLInjection(username));
+      strBuf.append("and crt_user = ").append(SqlUtils.preventSQLInjection(username));
     }
     return strBuf.toString();
   }
@@ -273,15 +286,14 @@ public class ScheduleMapperProvider {
     if (StringUtils.isBlank(username) || StringUtils.isBlank(scheduleRunTemplateId)) {
       return "SELECT 0";
     }
-    StringBuffer strBuf = new StringBuffer();
+    StringBuilder strBuf = new StringBuilder();
     strBuf.append("select count(id) from group_schedule ");
     strBuf.append("where ");
     strBuf.append("enable_flag=1 ");
     strBuf.append("and ");
-    strBuf.append(
-        "schedule_run_template_id=" + SqlUtils.preventSQLInjection(scheduleRunTemplateId));
+    strBuf.append("schedule_run_template_id=").append(SqlUtils.preventSQLInjection(scheduleRunTemplateId));
     if (!isAdmin) {
-      strBuf.append("and crt_user = " + SqlUtils.preventSQLInjection(username));
+      strBuf.append("and crt_user = ").append(SqlUtils.preventSQLInjection(username));
     }
     return strBuf.toString();
   }

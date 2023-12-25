@@ -1,11 +1,14 @@
 package org.apache.streampark.console.flow.component.schedule.mapper;
 
 import java.util.List;
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.DeleteProvider;
+import org.apache.ibatis.annotations.InsertProvider;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.streampark.console.flow.component.schedule.entity.Schedule;
 import org.apache.streampark.console.flow.component.schedule.mapper.provider.ScheduleMapperProvider;
 import org.apache.streampark.console.flow.component.schedule.vo.ScheduleVo;
-import zio.Schedule$;
 
 @Mapper
 public interface ScheduleMapper {
@@ -16,8 +19,7 @@ public interface ScheduleMapper {
   /**
    * update schedule
    *
-   * @param schedule
-   * @return
+   * @param schedule schedule
    */
   @UpdateProvider(type = ScheduleMapperProvider.class, method = "update")
   int update(Schedule schedule);

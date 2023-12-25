@@ -34,7 +34,7 @@ function initDatatableFlowPage(testTableId, url, searchInputId) {
             , cols: [[
                 {field: 'name', title: 'Name', sort: true},
                 {field: 'description', title: 'Description', sort: true},
-                {field: 'crtDttm', title: 'CreateTime', sort: true},
+                {field: 'createTime', title: 'CreateTime', sort: true},
                 {
                     field: 'right', title: 'Actions', sort: true, height: 100, templet: function (data) {
                         return responseHandlerFlow(data);

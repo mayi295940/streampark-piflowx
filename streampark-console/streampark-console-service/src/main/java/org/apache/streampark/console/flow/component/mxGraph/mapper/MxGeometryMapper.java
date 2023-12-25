@@ -1,8 +1,13 @@
 package org.apache.streampark.console.flow.component.mxGraph.mapper;
 
-import org.apache.ibatis.annotations.*;
 import org.apache.streampark.console.flow.component.mxGraph.entity.MxGeometry;
 import org.apache.streampark.console.flow.component.mxGraph.mapper.provider.MxGeometryMapperProvider;
+import org.apache.ibatis.annotations.InsertProvider;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 
 @Mapper
 public interface MxGeometryMapper {
@@ -10,26 +15,23 @@ public interface MxGeometryMapper {
   /**
    * add MxGeometry
    *
-   * @param mxGeometry
-   * @return
+   * @param mxGeometry mxGeometry
    */
   @InsertProvider(type = MxGeometryMapperProvider.class, method = "addMxGeometry")
-  public int addMxGeometry(MxGeometry mxGeometry);
+  int addMxGeometry(MxGeometry mxGeometry);
 
   /**
    * update MxGeometry
    *
-   * @param mxGeometry
-   * @return
+   * @param mxGeometry mxGeometry
    */
   @UpdateProvider(type = MxGeometryMapperProvider.class, method = "updateMxGeometry")
-  public int updateMxGeometry(MxGeometry mxGeometry);
+  int updateMxGeometry(MxGeometry mxGeometry);
 
   /**
    * Query MxGeometry based on id
    *
-   * @param id
-   * @return
+   * @param id id
    */
   @SelectProvider(type = MxGeometryMapperProvider.class, method = "getMxGeometryById")
   @Results({
@@ -40,13 +42,12 @@ public interface MxGeometryMapper {
     @Result(column = "mx_width", property = "width"),
     @Result(column = "mx_height", property = "height")
   })
-  public MxGeometry getMxGeometryById(String id);
+  MxGeometry getMxGeometryById(String id);
 
   /**
    * Query MxGeometry based on flowId
    *
-   * @param flowId
-   * @return
+   * @param mxCellId mxCellId
    */
   @SelectProvider(type = MxGeometryMapperProvider.class, method = "getMxGeometryByMxCellId")
   @Results({
@@ -57,8 +58,14 @@ public interface MxGeometryMapper {
     @Result(column = "mx_width", property = "width"),
     @Result(column = "mx_height", property = "height")
   })
-  public MxGeometry getMxGeometryByMxCellId(String mxCellId);
+  MxGeometry getMxGeometryByMxCellId(String mxCellId);
 
-  @UpdateProvider(type = MxGeometryMapperProvider.class, method = "updateEnableFlagById")
-  public int updateEnableFlagById(String username, String id);
+  /**
+   * Delete 'MxGeometry' by 'mxCellId'
+   *
+   * @param username username
+   * @param mxCellId mxCellId
+   */
+  @UpdateProvider(type = MxGeometryMapperProvider.class, method = "deleteMxGeometryByFlowId")
+  int deleteMxGeometryByFlowId(String username, String mxCellId);
 }

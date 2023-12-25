@@ -1,6 +1,8 @@
 package org.apache.streampark.console.flow.component.mxGraph.vo;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,4 +31,6 @@ public class MxCellVo implements Serializable {
   private String vertex;
 
   private MxGeometryVo mxGeometryVo;
+
+  private Map<String, String> paramData = new HashMap<>();
 }

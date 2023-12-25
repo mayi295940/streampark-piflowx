@@ -1,10 +1,10 @@
 package org.apache.streampark.console.flow.component.dashboard.mapper;
 
+import org.apache.streampark.console.flow.component.dashboard.mapper.provider.StatisticProvider;
 import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.SelectProvider;
-import org.apache.streampark.console.flow.component.dashboard.mapper.provider.StatisticProvider;
 
 @Mapper
 public interface StatisticMapper {
@@ -15,7 +15,7 @@ public interface StatisticMapper {
    * @return statistic info map
    */
   @SelectProvider(type = StatisticProvider.class, method = "getFlowProcessStatisticInfo")
-  public List<Map<String, String>> getFlowProcessStatisticInfo();
+  List<Map<String, String>> getFlowProcessStatisticInfo();
 
   /**
    * query flow count
@@ -23,7 +23,7 @@ public interface StatisticMapper {
    * @return flowCount
    */
   @SelectProvider(type = StatisticProvider.class, method = "getFlowCount")
-  public int getFlowCount();
+  int getFlowCount();
 
   /**
    * query group progress statistic info
@@ -31,7 +31,7 @@ public interface StatisticMapper {
    * @return statistic info map
    */
   @SelectProvider(type = StatisticProvider.class, method = "getGroupProcessStatisticInfo")
-  public List<Map<String, String>> getGroupProcessStatisticInfo();
+  List<Map<String, String>> getGroupProcessStatisticInfo();
 
   /**
    * query group count
@@ -39,7 +39,7 @@ public interface StatisticMapper {
    * @return groupCount
    */
   @SelectProvider(type = StatisticProvider.class, method = "getGroupCount")
-  public int getGroupCount();
+  int getGroupCount();
 
   /**
    * query schedule statistic info
@@ -47,7 +47,7 @@ public interface StatisticMapper {
    * @return statistic info map
    */
   @SelectProvider(type = StatisticProvider.class, method = "getScheduleStatisticInfo")
-  public List<Map<String, String>> getScheduleStatisticInfo();
+  List<Map<String, String>> getScheduleStatisticInfo();
 
   /**
    * query template count
@@ -55,7 +55,7 @@ public interface StatisticMapper {
    * @return templateCount
    */
   @SelectProvider(type = StatisticProvider.class, method = "getTemplateCount")
-  public int getTemplateCount();
+  int getTemplateCount();
 
   /**
    * query datasource count
@@ -63,7 +63,7 @@ public interface StatisticMapper {
    * @return datasourceCount
    */
   @SelectProvider(type = StatisticProvider.class, method = "getDataSourceCount")
-  public int getDataSourceCount();
+  int getDataSourceCount();
 
   /**
    * query stops hub count
@@ -71,7 +71,7 @@ public interface StatisticMapper {
    * @return stopsHubCount
    */
   @SelectProvider(type = StatisticProvider.class, method = "getStopsHubCount")
-  public int getStopsHubCount();
+  int getStopsHubCount();
 
   /**
    * query stops count
@@ -79,7 +79,7 @@ public interface StatisticMapper {
    * @return stopsCount
    */
   @SelectProvider(type = StatisticProvider.class, method = "getStopsCount")
-  public int getStopsCount();
+  int getStopsCount();
 
   /**
    * query stops group count
@@ -87,5 +87,5 @@ public interface StatisticMapper {
    * @return stopsGroupCount
    */
   @SelectProvider(type = StatisticProvider.class, method = "getStopsGroupCount")
-  public int getStopsGroupCount();
+  int getStopsGroupCount();
 }

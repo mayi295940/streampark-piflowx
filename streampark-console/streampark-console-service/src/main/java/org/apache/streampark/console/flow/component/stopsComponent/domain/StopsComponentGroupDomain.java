@@ -1,18 +1,18 @@
 package org.apache.streampark.console.flow.component.stopsComponent.domain;
 
+import org.apache.streampark.console.flow.base.utils.LoggerUtil;
+import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponent;
+import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentGroup;
+import org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsComponentGroupMapper;
+import org.apache.streampark.console.flow.component.stopsComponent.vo.StopsComponentGroupVo;
 import java.util.List;
-import javax.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.apache.streampark.console.flow.base.util.LoggerUtil;
-import org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsComponentGroupMapper;
-import org.apache.streampark.console.flow.component.stopsComponent.model.StopsComponent;
-import org.apache.streampark.console.flow.component.stopsComponent.model.StopsComponentGroup;
-import org.apache.streampark.console.flow.component.stopsComponent.vo.StopsComponentGroupVo;
 
 @Component
 @Transactional(
@@ -22,11 +22,19 @@ import org.apache.streampark.console.flow.component.stopsComponent.vo.StopsCompo
     rollbackFor = Exception.class)
 public class StopsComponentGroupDomain {
 
-  Logger logger = LoggerUtil.getLogger();
+  /** Introducing logs, note that they are all packaged under "org.slf4j" */
+  private final Logger logger = LoggerUtil.getLogger();
 
-  @Resource private StopsComponentGroupMapper stopsComponentGroupMapper;
+  private final StopsComponentGroupMapper stopsComponentGroupMapper;
+  private final StopsComponentDomain stopsComponentDomain;
 
-  @Resource private StopsComponentDomain stopsComponentDomain;
+  @Autowired
+  public StopsComponentGroupDomain(
+      StopsComponentGroupMapper stopsComponentGroupMapper,
+      StopsComponentDomain stopsComponentDomain) {
+    this.stopsComponentGroupMapper = stopsComponentGroupMapper;
+    this.stopsComponentDomain = stopsComponentDomain;
+  }
 
   public int addStopsComponentGroupAndChildren(StopsComponentGroup stopsComponentGroup) {
     if (null == stopsComponentGroup) {
@@ -37,7 +45,7 @@ public class StopsComponentGroupDomain {
     int affectedRows = insertStopsComponentGroupRows;
     if (insertStopsComponentGroupRows > 0) {
       List<StopsComponent> stopsComponentList = stopsComponentGroup.getStopsComponentList();
-      if (null == stopsComponentList || stopsComponentList.size() <= 0) {
+      if (null == stopsComponentList || stopsComponentList.size() == 0) {
         return affectedRows;
       }
       int insertStopsTemplateRows =
@@ -54,8 +62,9 @@ public class StopsComponentGroupDomain {
     return stopsComponentGroupMapper.insertStopGroup(stopsComponentGroup);
   }
 
-  public List<StopsComponentGroup> getStopGroupByNameList(List<String> groupNameList) {
-    return stopsComponentGroupMapper.getStopGroupByNameList(groupNameList);
+  public List<StopsComponentGroup> getStopGroupByNameList(
+      List<String> groupNameList, String engineType) {
+    return stopsComponentGroupMapper.getStopGroupByNameList(groupNameList, engineType);
   }
 
   public StopsComponentGroup getStopsComponentGroupByGroupName(String groupName) {
@@ -64,23 +73,23 @@ public class StopsComponentGroupDomain {
     }
     List<StopsComponentGroup> stopGroupByName =
         stopsComponentGroupMapper.getStopGroupByName(groupName);
-    if (null == stopGroupByName || stopGroupByName.size() <= 0) {
+    if (null == stopGroupByName || stopGroupByName.size() == 0) {
       return null;
     }
     return stopGroupByName.get(0);
   }
 
-  public int deleteStopsComponentGroup() {
+  public int deleteStopsComponentGroup(String engineType) {
     // the group table information is cleared
     // The call is successful, the group table information is cleared and then inserted.
-    stopsComponentGroupMapper.deleteGroupCorrelation();
-    int deleteRows = stopsComponentGroupMapper.deleteGroup();
+    stopsComponentGroupMapper.deleteGroupCorrelation(engineType);
+    int deleteRows = stopsComponentGroupMapper.deleteGroup(engineType);
     logger.debug("Successful deletion Group" + deleteRows + "piece of data!!!");
     return deleteRows;
   }
 
-  public List<StopsComponentGroup> getStopGroupList() {
-    return stopsComponentGroupMapper.getStopGroupList();
+  public List<StopsComponentGroup> getStopGroupList(String engineType) {
+    return stopsComponentGroupMapper.getStopGroupList(engineType);
   }
 
   public List<StopsComponentGroupVo> getManageStopGroupList() {

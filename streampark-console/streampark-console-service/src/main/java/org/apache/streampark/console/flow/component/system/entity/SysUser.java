@@ -1,10 +1,9 @@
 package org.apache.streampark.console.flow.component.system.entity;
 
+import org.apache.streampark.console.flow.base.BaseModelUUIDNoCorpAgentId;
 import java.util.List;
-import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.streampark.console.flow.base.BaseHibernateModelUUIDNoCorpAgentId;
 
 /**
  * Use JPA to define users. Implement the UserDetails interface, the user entity is the user used by
@@ -12,22 +11,17 @@ import org.apache.streampark.console.flow.base.BaseHibernateModelUUIDNoCorpAgent
  */
 @Getter
 @Setter
-@Entity
-@Table(name = "SYS_USER")
-public class SysUser extends BaseHibernateModelUUIDNoCorpAgentId {
+public class SysUser extends BaseModelUUIDNoCorpAgentId {
 
   private static final long serialVersionUID = 1L;
 
   private String username;
-
   private String password;
-
   private String name;
-
+  private Byte status;
   private Integer age;
-
   private String sex;
-
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "sysUser")
+  private String lastLoginIp;
+  private String developerAccessKey;
   private List<SysRole> roles;
 }

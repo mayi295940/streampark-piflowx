@@ -1,10 +1,16 @@
 package org.apache.streampark.console.flow.component.process.mapper;
 
-import java.util.List;
-import org.apache.ibatis.annotations.*;
-import org.apache.ibatis.mapping.FetchType;
 import org.apache.streampark.console.flow.component.process.entity.ProcessStop;
 import org.apache.streampark.console.flow.component.process.mapper.provider.ProcessStopMapperProvider;
+import java.util.List;
+import org.apache.ibatis.annotations.InsertProvider;
+import org.apache.ibatis.annotations.Many;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
+import org.apache.ibatis.mapping.FetchType;
 
 @Mapper
 public interface ProcessStopMapper {
@@ -12,26 +18,23 @@ public interface ProcessStopMapper {
   /**
    * add processStop
    *
-   * @param processStop
-   * @return
+   * @param processStop processStop
    */
   @InsertProvider(type = ProcessStopMapperProvider.class, method = "addProcessStop")
-  public int addProcessStop(ProcessStop processStop);
+  int addProcessStop(ProcessStop processStop);
 
   /**
    * add processStopList
    *
-   * @param processStopList
-   * @return
+   * @param processStopList processStopList
    */
   @InsertProvider(type = ProcessStopMapperProvider.class, method = "addProcessStopList")
-  public int addProcessStopList(@Param("processStopList") List<ProcessStop> processStopList);
+  int addProcessStopList(List<ProcessStop> processStopList);
 
   /**
    * 根据process查询processStop
    *
-   * @param processId
-   * @return
+   * @param processId processId
    */
   @SelectProvider(type = ProcessStopMapperProvider.class, method = "getProcessStopByProcessId")
   @Results({
@@ -45,14 +48,13 @@ public interface ProcessStopMapper {
                     "cn.cnic.component.process.mapper.ProcessStopPropertyMapper.getStopPropertyByProcessStopId",
                 fetchType = FetchType.LAZY))
   })
-  public ProcessStop getProcessStopByProcessId(String processId);
+  ProcessStop getProcessStopByProcessId(String processId);
 
   /**
    * Query based on pid and pageId
    *
-   * @param processId
-   * @param pageId
-   * @return
+   * @param processId processId
+   * @param pageId pageId
    */
   @SelectProvider(
       type = ProcessStopMapperProvider.class,
@@ -66,16 +68,23 @@ public interface ProcessStopMapper {
             @Many(
                 select =
                     "cn.cnic.component.process.mapper.ProcessStopPropertyMapper.getStopPropertyByProcessStopId",
+                fetchType = FetchType.LAZY)),
+    @Result(
+        column = "id",
+        property = "processStopCustomizedPropertyList",
+        many =
+            @Many(
+                select =
+                    "cn.cnic.component.process.mapper.ProcessStopCustomizedPropertyMapper.getProcessStopCustomizedPropertyListByProcessStopsId",
                 fetchType = FetchType.LAZY))
   })
-  public ProcessStop getProcessStopByPageIdAndPageId(String processId, String pageId);
+  ProcessStop getProcessStopByPageIdAndPageId(String processId, String pageId);
 
   /**
    * Query based on pid and pageId
    *
-   * @param processId
-   * @param pageIds
-   * @return
+   * @param processId processId
+   * @param pageIds pageIds
    */
   @SelectProvider(
       type = ProcessStopMapperProvider.class,
@@ -91,15 +100,13 @@ public interface ProcessStopMapper {
                     "cn.cnic.component.process.mapper.ProcessStopPropertyMapper.getStopPropertyByProcessStopId",
                 fetchType = FetchType.LAZY))
   })
-  public List<ProcessStop> getProcessStopByPageIdAndPageIds(
-      @Param("processId") String processId, @Param("pageIds") String[] pageIds);
+  List<ProcessStop> getProcessStopByPageIdAndPageIds(String processId, String[] pageIds);
 
   /**
    * 根据pid和name查询
    *
-   * @param processId
-   * @param name
-   * @return
+   * @param processId processId
+   * @param name name
    */
   @SelectProvider(type = ProcessStopMapperProvider.class, method = "getProcessStopByNameAndPid")
   @Results({
@@ -113,23 +120,37 @@ public interface ProcessStopMapper {
                     "cn.cnic.component.process.mapper.ProcessStopPropertyMapper.getStopPropertyByProcessStopId",
                 fetchType = FetchType.LAZY))
   })
-  public ProcessStop getProcessStopByNameAndPid(String processId, String name);
+  ProcessStop getProcessStopByNameAndPid(String processId, String name);
+
+  /**
+   * 根据id
+   *
+   * @param stopId stopId
+   */
+  @SelectProvider(type = ProcessStopMapperProvider.class, method = "getProcessAppIdByStopId")
+  String getProcessAppIdByStopId(String stopId);
+
+  /**
+   * 根据id
+   *
+   * @param stopId stopId
+   */
+  @SelectProvider(type = ProcessStopMapperProvider.class, method = "getProcessStopNameByStopId")
+  String getProcessStopNameByStopId(String stopId);
 
   /**
    * 修改ProcessStop
    *
-   * @param processStop
-   * @return
+   * @param processStop processStop
    */
   @UpdateProvider(type = ProcessStopMapperProvider.class, method = "updateProcessStop")
-  public int updateProcessStop(ProcessStop processStop);
+  int updateProcessStop(ProcessStop processStop);
 
   /**
    * logically delete
    *
-   * @param processId
-   * @return
+   * @param processId processId
    */
   @UpdateProvider(type = ProcessStopMapperProvider.class, method = "updateEnableFlagByProcessId")
-  public int updateEnableFlagByProcessId(String processId, String username);
+  int updateEnableFlagByProcessId(String processId, String username);
 }

@@ -1,10 +1,18 @@
 package org.apache.streampark.console.flow.component.mxGraph.mapper;
 
-import java.util.List;
-import org.apache.ibatis.annotations.*;
-import org.apache.ibatis.mapping.FetchType;
 import org.apache.streampark.console.flow.component.mxGraph.entity.MxCell;
 import org.apache.streampark.console.flow.component.mxGraph.mapper.provider.MxCellMapperProvider;
+import java.util.List;
+import org.apache.ibatis.annotations.InsertProvider;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.One;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
+import org.apache.ibatis.mapping.FetchType;
 
 @Mapper
 public interface MxCellMapper {
@@ -12,26 +20,23 @@ public interface MxCellMapper {
   /**
    * add mxCell
    *
-   * @param mxCell
-   * @return
+   * @param mxCell mxCell
    */
   @InsertProvider(type = MxCellMapperProvider.class, method = "addMxCell")
-  public int addMxCell(MxCell mxCell);
+  int addMxCell(MxCell mxCell);
 
   /**
    * update mxCell
    *
-   * @param mxCell
-   * @return
+   * @param mxCell mxCell
    */
   @UpdateProvider(type = MxCellMapperProvider.class, method = "updateMxCell")
-  public int updateMxCell(MxCell mxCell);
+  int updateMxCell(MxCell mxCell);
 
   /**
    * Query MxCell's list based on mxGraphId
    *
-   * @param mxGraphId
-   * @return
+   * @param mxGraphId mxGraphId
    */
   @SelectProvider(type = MxCellMapperProvider.class, method = "getMeCellByMxGraphId")
   @Results({
@@ -53,13 +58,12 @@ public interface MxCellMapper {
                     "cn.cnic.component.mxGraph.mapper.MxGeometryMapper.getMxGeometryByMxCellId",
                 fetchType = FetchType.LAZY))
   })
-  public List<MxCell> getMeCellByMxGraphId(String mxGraphId);
+  List<MxCell> getMeCellByMxGraphId(String mxGraphId);
 
   /**
    * Query MxCell based on Id
    *
-   * @param id
-   * @return
+   * @param id id
    */
   @SelectProvider(type = MxCellMapperProvider.class, method = "getMeCellById")
   @Results({
@@ -81,14 +85,13 @@ public interface MxCellMapper {
                     "cn.cnic.component.mxGraph.mapper.MxGeometryMapper.getMxGeometryByMxCellId",
                 fetchType = FetchType.LAZY))
   })
-  public MxCell getMeCellById(String id);
+  MxCell getMeCellById(String id);
 
   /**
    * Query MxCell based on mxGraphId and pageId
    *
-   * @param mxGraphId
-   * @param pageId
-   * @return
+   * @param mxGraphId mxGraphId
+   * @param pageId pageId
    */
   @SelectProvider(type = MxCellMapperProvider.class, method = "getMxCellByMxGraphIdAndPageId")
   @Results({
@@ -110,15 +113,34 @@ public interface MxCellMapper {
                     "cn.cnic.component.mxGraph.mapper.MxGeometryMapper.getMxGeometryByMxCellId",
                 fetchType = FetchType.LAZY))
   })
-  public MxCell getMxCellByMxGraphIdAndPageId(
-      @Param("mxGraphId") String mxGraphId, @Param("pageId") String pageId);
+  MxCell getMxCellByMxGraphIdAndPageId(String mxGraphId, String pageId);
 
   /**
-   * Logically delete flowInfo according to flowId
+   * Delete according to id logic, set to invalid
    *
-   * @param id
-   * @return
+   * @param username username
+   * @param id id
    */
   @UpdateProvider(type = MxCellMapperProvider.class, method = "updateEnableFlagById")
-  public int updateEnableFlagById(String username, String id);
+  int updateMxCellEnableFlagById(String username, String id);
+
+  /**
+   * Delete 'MxCell' by 'mxGraphModelId'
+   *
+   * @param username username
+   * @param mxGraphModelId mxGraphModelId
+   */
+  @UpdateProvider(type = MxCellMapperProvider.class, method = "deleteMxCellByFlowId")
+  int deleteMxCellByFlowId(String username, String mxGraphModelId);
+
+  /**
+   * query max pageId by mxGraphModelId
+   *
+   * @param mxGraphModelId mxGraphModelId
+   */
+  @Select(
+      "select MAX(s.mx_pageid+0) from mx_cell s "
+          + "where s.enable_flag=1 "
+          + "and s.fk_mx_graph_id=#{mxGraphModelId}")
+  Integer getMaxPageIdByMxGraphModelId(@Param("mxGraphModelId") String mxGraphModelId);
 }

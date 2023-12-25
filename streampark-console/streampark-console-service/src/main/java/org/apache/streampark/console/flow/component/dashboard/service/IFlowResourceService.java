@@ -7,5 +7,5 @@ public interface IFlowResourceService {
    *
    * @return resourceInfo
    */
-  public String getResourceInfo();
+  String getResourceInfo();
 }

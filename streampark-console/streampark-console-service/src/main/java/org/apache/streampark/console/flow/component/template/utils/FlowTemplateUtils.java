@@ -1,7 +1,7 @@
 package org.apache.streampark.console.flow.component.template.utils;
 
-import java.util.Date;
 import org.apache.streampark.console.flow.component.template.entity.FlowTemplate;
+import java.util.Date;
 
 public class FlowTemplateUtils {
 

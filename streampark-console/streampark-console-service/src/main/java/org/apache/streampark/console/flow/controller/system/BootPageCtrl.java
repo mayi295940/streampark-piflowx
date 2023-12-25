@@ -1,35 +1,40 @@
 package org.apache.streampark.console.flow.controller.system;
 
+import org.apache.streampark.console.flow.base.utils.ReturnMapUtils;
+import org.apache.streampark.console.flow.base.utils.SessionUserUtil;
+import org.apache.streampark.console.flow.component.system.service.ISysInitRecordsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.apache.streampark.console.flow.base.util.ReturnMapUtils;
-import org.apache.streampark.console.flow.base.util.SessionUserUtil;
-import org.apache.streampark.console.flow.component.system.service.ISysInitRecordsService;
 
 @Controller
 @RequestMapping("/bootPage")
 public class BootPageCtrl {
 
-  @Autowired private ISysInitRecordsService sysInitRecordsServiceImpl;
+  private final ISysInitRecordsService sysInitRecordsServiceImpl;
 
-  @RequestMapping("/isInBootPage")
+  @Autowired
+  public BootPageCtrl(ISysInitRecordsService sysInitRecordsServiceImpl) {
+    this.sysInitRecordsServiceImpl = sysInitRecordsServiceImpl;
+  }
+
+  @RequestMapping(value = "/isInBootPage", method = RequestMethod.GET)
   @ResponseBody
   public String isInBootPage() {
     boolean inBootPage = sysInitRecordsServiceImpl.isInBootPage();
-    inBootPage = false;
     return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("isIn", inBootPage);
   }
 
-  @RequestMapping("/initComponents")
+  @RequestMapping(value = "/initComponents", method = RequestMethod.GET)
   @ResponseBody
   public String initComponents() {
     String currentUsername = SessionUserUtil.getCurrentUsername();
     return sysInitRecordsServiceImpl.initComponents(currentUsername);
   }
 
-  @RequestMapping("/threadMonitoring")
+  @RequestMapping(value = "/threadMonitoring", method = RequestMethod.GET)
   @ResponseBody
   public String threadMonitoring() {
     String currentUsername = SessionUserUtil.getCurrentUsername();

@@ -8,10 +8,9 @@ import org.apache.streampark.console.flow.third.vo.schedule.ThirdScheduleVo;
 
 public interface ISchedule {
 
-  public Map<String, Object> scheduleStart(
-      Schedule schedule, Process process, ProcessGroup processGroup);
+  Map<String, Object> scheduleStart(Schedule schedule, Process process, ProcessGroup processGroup);
 
-  public String scheduleStop(String scheduleId);
+  String scheduleStop(String scheduleId);
 
-  public ThirdScheduleVo scheduleInfo(String scheduleId);
+  ThirdScheduleVo scheduleInfo(String scheduleId);
 }

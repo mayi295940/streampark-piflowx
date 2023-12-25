@@ -18,6 +18,7 @@
 package org.apache.streampark.console;
 
 import lombok.extern.slf4j.Slf4j;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.PropertySource;
@@ -46,8 +47,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @Slf4j
 @PropertySources({
-    @PropertySource(value = "classpath:apiConfig.properties", encoding = "utf-8")
+  @PropertySource(value = "classpath:flow/apiConfig.properties", encoding = "utf-8"),
+  @PropertySource(value = "classpath:flow/baseConfig.properties", encoding = "utf-8"),
+  @PropertySource(value = "classpath:flow/messageConfig.properties", encoding = "utf-8"),
+  @PropertySource(value = "classpath:flow/docker.properties", encoding = "utf-8")
 })
+@MapperScan(basePackages = "org.apache.streampark.console.flow.**.mapper.*.*")
 @EnableTransactionManagement
 @SpringBootApplication
 @EnableScheduling

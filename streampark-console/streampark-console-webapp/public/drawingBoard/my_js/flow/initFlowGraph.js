@@ -8,13 +8,23 @@ var pathsCells = [];
 var thisEditor = null;
 var graphGlobal = null;
 
+import { defHttp } from '/@/utils/http/axios';
+
+
 //init data
 function initFlowDrawingBoardData(loadId, parentAccessPath) {
     // $('#fullScreen').show();
     window.parent.postMessage(true);
+
+
+    defHttp.get({ url: '/flow/drawingBoardData', {
+      load: loadId,
+      parentAccessPath: parentAccessPath})
+
+
     ajaxRequest({
         type: "get",
-        url: "/flow/drawingBoardData",
+        url: "/basic-api/flow/drawingBoardData",
         async: false,
         data: {
             load: loadId,

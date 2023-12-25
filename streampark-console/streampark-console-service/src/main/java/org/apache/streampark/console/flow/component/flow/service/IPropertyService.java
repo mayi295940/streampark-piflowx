@@ -1,8 +1,8 @@
 package org.apache.streampark.console.flow.component.flow.service;
 
-import java.util.List;
 import org.apache.streampark.console.flow.component.flow.entity.Property;
 import org.apache.streampark.console.flow.component.flow.request.UpdatePathRequest;
+import java.util.List;
 
 public interface IPropertyService {
 
@@ -62,4 +62,6 @@ public interface IPropertyService {
    * @return
    */
   public String deleteLastReloadDataByStopsId(String stopId);
+
+  String updateStopDisabled(String username, Boolean isAdmin, String id, Boolean enable);
 }

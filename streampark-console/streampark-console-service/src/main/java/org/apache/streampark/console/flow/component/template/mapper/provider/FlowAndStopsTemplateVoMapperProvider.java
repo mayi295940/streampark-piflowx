@@ -1,17 +1,17 @@
 package org.apache.streampark.console.flow.component.template.mapper.provider;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.jdbc.SQL;
-import org.apache.streampark.console.flow.base.util.DateUtils;
-import org.apache.streampark.console.flow.base.util.SqlUtils;
+import org.apache.streampark.console.flow.base.utils.DateUtils;
+import org.apache.streampark.console.flow.base.utils.SqlUtils;
 import org.apache.streampark.console.flow.common.Eunm.PortType;
 import org.apache.streampark.console.flow.component.template.entity.FlowTemplate;
 import org.apache.streampark.console.flow.component.template.entity.PropertyTemplateModel;
 import org.apache.streampark.console.flow.component.template.entity.StopTemplateModel;
 import org.apache.streampark.console.flow.component.template.vo.FlowTemplateModelVo;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.jdbc.SQL;
 
 public class FlowAndStopsTemplateVoMapperProvider {
 
@@ -135,7 +135,7 @@ public class FlowAndStopsTemplateVoMapperProvider {
     String sqlStr = "";
     if (null != stops) {
       String id = stops.getId();
-      String bundel = stops.getBundel();
+      String bundle = stops.getBundle();
       String description = stops.getDescription().equals("null") ? null : stops.getDescription();
       String name = stops.getName();
       String inports = stops.getInports();
@@ -172,8 +172,8 @@ public class FlowAndStopsTemplateVoMapperProvider {
       sql.VALUES("enable_flag", enableFlagInt + "");
 
       // handle other fields
-      if (StringUtils.isNotBlank(bundel)) {
-        sql.VALUES("bundel", SqlUtils.addSqlStr(bundel));
+      if (StringUtils.isNotBlank(bundle)) {
+        sql.VALUES("bundle", SqlUtils.addSqlStr(bundle));
       }
       if (StringUtils.isNotBlank(description)) {
         sql.VALUES("description", SqlUtils.addSqlStr(description));

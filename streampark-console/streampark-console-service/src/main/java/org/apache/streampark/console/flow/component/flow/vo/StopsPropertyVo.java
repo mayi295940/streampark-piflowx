@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 /** Stop attribute */
-@Setter
 @Getter
+@Setter
 public class StopsPropertyVo implements Serializable {
 
   private static final long serialVersionUID = 1L;

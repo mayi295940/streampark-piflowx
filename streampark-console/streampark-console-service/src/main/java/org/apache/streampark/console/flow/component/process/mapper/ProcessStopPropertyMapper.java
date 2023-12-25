@@ -1,27 +1,30 @@
 package org.apache.streampark.console.flow.component.process.mapper;
 
-import java.util.List;
-import org.apache.ibatis.annotations.*;
 import org.apache.streampark.console.flow.component.process.entity.ProcessStopProperty;
 import org.apache.streampark.console.flow.component.process.mapper.provider.ProcessStopPropertyMapperProvider;
+import java.util.List;
+import org.apache.ibatis.annotations.InsertProvider;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 
 @Mapper
 public interface ProcessStopPropertyMapper {
 
   @InsertProvider(type = ProcessStopPropertyMapperProvider.class, method = "addProcessStopProperty")
-  public int addProcessStopProperty(ProcessStopProperty processStopProperty);
+  int addProcessStopProperty(ProcessStopProperty processStopProperty);
 
   @InsertProvider(
       type = ProcessStopPropertyMapperProvider.class,
       method = "addProcessStopProperties")
-  public int addProcessStopProperties(
-      @Param("processStopPropertyList") List<ProcessStopProperty> processStopPropertyList);
+  int addProcessStopProperties(List<ProcessStopProperty> processStopPropertyList);
 
   /**
    * Query processStop attribute based on processStopId
    *
-   * @param processStopId
-   * @return
+   * @param processStopId processStopId
    */
   @SelectProvider(
       type = ProcessStopPropertyMapperProvider.class,
@@ -32,15 +35,15 @@ public interface ProcessStopPropertyMapper {
     @Result(column = "property_required", property = "required"),
     @Result(column = "property_sensitive", property = "sensitive")
   })
-  public ProcessStopProperty getStopPropertyByProcessStopId(String processStopId);
+  ProcessStopProperty getStopPropertyByProcessStopId(String processStopId);
 
   @UpdateProvider(
       type = ProcessStopPropertyMapperProvider.class,
       method = "updateProcessStopProperty")
-  public int updateProcessStopProperty(ProcessStopProperty processStopProperty);
+  int updateProcessStopProperty(ProcessStopProperty processStopProperty);
 
   @UpdateProvider(
       type = ProcessStopPropertyMapperProvider.class,
       method = "updateEnableFlagByProcessStopId")
-  public int updateEnableFlagByProcessStopId(String processStopId, String username);
+  int updateEnableFlagByProcessStopId(String processStopId, String username);
 }

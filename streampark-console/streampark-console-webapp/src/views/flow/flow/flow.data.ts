@@ -15,33 +15,13 @@
  * limitations under the License.
  */
 import { BasicColumn, FormSchema } from '/@/components/Table';
-import { h } from 'vue';
-import { Tag } from 'ant-design-vue';
-import { checkUserName } from '/@/api/system/user';
 import { FormTypeEnum } from '/@/enums/formEnum';
 import { useI18n } from '/@/hooks/web/useI18n';
 const { t } = useI18n();
-// user status enum
-export const enum StatusEnum {
-  Effective = '1',
-  Locked = '0',
-}
-
-// gender
-export const enum GenderEnum {
-  Male = '0',
-  Female = '1',
-  Other = '2',
-}
-
-// user type
-export const enum UserTypeEnum {
-  ADMIN = 'ADMIN',
-  USER = 'USER',
-}
 
 export const columns: BasicColumn[] = [
   { title: t('flow.flow.flow_columns.name'), dataIndex: 'name', sorter: true },
+  { title: t('flow.flow.flow_columns.engine_type'), dataIndex: 'engineType', sorter: true },
   { title: t('flow.flow.flow_columns.description'), dataIndex: 'description' },
   { title: t('common.createTime'), dataIndex: 'crtDttmString' },
 ];
@@ -63,6 +43,7 @@ export const searchFormSchema: FormSchema[] = [
 
 export const formSchema = (formType: string): FormSchema[] => {
   const isCreate = formType === FormTypeEnum.Create;
+  const isView = formType === FormTypeEnum.View;
   return [
     { field: 'id', label: 'Id', component: 'Input', show: false },
     {
@@ -83,6 +64,19 @@ export const formSchema = (formType: string): FormSchema[] => {
         },
       ],
       componentProps: { id: 'formUserName', disabled: !isCreate },
+    },
+    {
+      label: t('flow.flow.flow_columns.engine_type'),
+      field: 'engineType',
+      component: 'Select',
+      componentProps: {
+        disabled: isView,
+        options: [
+          { label: 'spark', value: 'spark' },
+          { label: 'flink', value: 'flink' },
+        ],
+      },
+      rules: [{ required: true }],
     },
     {
       field: 'description',

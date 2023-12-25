@@ -1,16 +1,14 @@
 package org.apache.streampark.console.flow.component.stopsComponent.domain;
 
-import javax.annotation.Resource;
+import org.apache.streampark.console.flow.base.utils.UUIDUtils;
+import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentManage;
+import org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsComponentManageMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.apache.streampark.console.flow.base.util.LoggerUtil;
-import org.apache.streampark.console.flow.base.util.UUIDUtils;
-import org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsComponentManageMapper;
-import org.apache.streampark.console.flow.component.stopsComponent.model.StopsComponentManage;
 
 @Component
 @Transactional(
@@ -20,9 +18,12 @@ import org.apache.streampark.console.flow.component.stopsComponent.model.StopsCo
     rollbackFor = Exception.class)
 public class StopsComponentManageDomain {
 
-  Logger logger = LoggerUtil.getLogger();
+  private final StopsComponentManageMapper stopsComponentManageMapper;
 
-  @Resource private StopsComponentManageMapper stopsComponentManageMapper;
+  @Autowired
+  public StopsComponentManageDomain(StopsComponentManageMapper stopsComponentManageMapper) {
+    this.stopsComponentManageMapper = stopsComponentManageMapper;
+  }
 
   public int saveOrUpdeate(StopsComponentManage stopsComponentManage) throws Exception {
     if (null == stopsComponentManage) {

@@ -1,9 +1,9 @@
 package org.apache.streampark.console.flow.component.process.service;
 
-import java.util.List;
-import javax.transaction.Transactional;
 import org.apache.streampark.console.flow.component.process.vo.DebugDataRequest;
 import org.apache.streampark.console.flow.component.process.vo.ProcessVo;
+
+import java.util.List;
 
 public interface IProcessService {
 
@@ -12,7 +12,6 @@ public interface IProcessService {
    *
    * @return
    */
-  @Transactional
   public List<ProcessVo> getProcessAllVoList();
 
   /**
@@ -20,7 +19,6 @@ public interface IProcessService {
    *
    * @return
    */
-  @Transactional
   public List<ProcessVo> getProcessVoList();
 
   /**
@@ -29,7 +27,6 @@ public interface IProcessService {
    * @param id
    * @return
    */
-  @Transactional
   public ProcessVo getProcessAllVoById(String username, boolean isAdmin, String id);
 
   /**
@@ -38,7 +35,6 @@ public interface IProcessService {
    * @param id
    * @return
    */
-  @Transactional
   public String getProcessVoById(String username, boolean isAdmin, String id);
 
   /**
@@ -47,7 +43,6 @@ public interface IProcessService {
    * @param id
    * @return
    */
-  @Transactional
   public ProcessVo getProcessById(String username, boolean isAdmin, String id);
 
   /**
@@ -59,12 +54,13 @@ public interface IProcessService {
   public ProcessVo getProcessVoByAppId(String appId);
 
   /**
-   * Query appInfo at third-party interface according to appID and save it
+   * Query appInfo on a third-party interface based on appID and save
    *
    * @param appID
    * @return
+   * @throws Exception
    */
-  public ProcessVo getAppInfoByThirdAndSave(String appID);
+  public ProcessVo getAppInfoByThirdAndSave(String appID) throws Exception;
 
   /**
    * Query appInfo according to appID
@@ -75,12 +71,13 @@ public interface IProcessService {
   public String getAppInfoByAppId(String appID);
 
   /**
-   * Query and save process at the third-party interface according to appID
+   * Query progress and save on third-party interface according to appID
    *
    * @param appIDs
    * @return
+   * @throws Exception
    */
-  public String getProgressByThirdAndSave(String[] appIDs);
+  public String getProgressByThirdAndSave(String[] appIDs) throws Exception;
 
   /**
    * Query process according to appID
@@ -91,21 +88,24 @@ public interface IProcessService {
   public String getProgressByAppIds(String[] appIDs);
 
   /**
-   * Update process
+   * Modify the process (only update the process table, the subtable is not updated)
    *
    * @param processVo
    * @return
+   * @throws Exception
    */
-  public int updateProcess(String username, boolean isAdmin, ProcessVo processVo);
+  public int updateProcess(String username, boolean isAdmin, ProcessVo processVo) throws Exception;
 
   /**
    * Generate Process from flowId and save it
    *
+   * @param isAdmin
+   * @param username
    * @param flowId
    * @return
    */
-  @Transactional
-  public ProcessVo flowToProcessAndSave(String username, String flowId);
+  public ProcessVo flowToProcessAndSave(boolean isAdmin, String username, String flowId)
+      throws Exception;
 
   /**
    * Logical deletion
@@ -113,8 +113,7 @@ public interface IProcessService {
    * @param processId
    * @return
    */
-  @Transactional
-  public String delProcess(String username, String processId);
+  public String delProcess(boolean isAdmin, String username, String processId);
 
   /**
    * Query the running process List (process List) according to flowId
@@ -132,7 +131,6 @@ public interface IProcessService {
    * @param param
    * @return
    */
-  @Transactional
   public String getProcessVoListPage(
       String username, boolean isAdmin, Integer offset, Integer limit, String param);
 
@@ -150,13 +148,17 @@ public interface IProcessService {
   /**
    * Start processes
    *
+   * @param isAdmin
    * @param username
    * @param processId
    * @param checkpoint
+   * @param runMode
    * @return
+   * @throws Exception
    */
-  @Transactional
-  public String startProcess(String username, String processId, String checkpoint, String runMode);
+  public String startProcess(
+      boolean isAdmin, String username, String processId, String checkpoint, String runMode)
+      throws Exception;
 
   /**
    * Stop running processes
@@ -164,7 +166,6 @@ public interface IProcessService {
    * @param processId
    * @return
    */
-  @Transactional
   public String stopProcess(String username, boolean isAdmin, String processId);
 
   /**
@@ -224,4 +225,13 @@ public interface IProcessService {
    */
   public String drawingBoardData(
       String username, boolean isAdmin, String loadId, String parentAccessPath);
+
+  /**
+   * Query processStop based on processId and pageId
+   *
+   * @param processId
+   * @param pageId
+   * @return
+   */
+  public String getProcessStopVoByPageId(String processId, String pageId);
 }

@@ -1,11 +1,11 @@
 package org.apache.streampark.console.flow.component.schedule.vo;
 
+import org.apache.streampark.console.flow.base.utils.DateUtils;
+import org.apache.streampark.console.flow.common.Eunm.ScheduleState;
 import java.io.Serializable;
 import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.streampark.console.flow.base.util.DateUtils;
-import org.apache.streampark.console.flow.common.Eunm.ScheduleState;
 
 @Setter
 @Getter

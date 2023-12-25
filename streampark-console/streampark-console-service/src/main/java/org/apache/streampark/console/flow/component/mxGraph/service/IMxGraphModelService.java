@@ -4,7 +4,8 @@ import org.apache.streampark.console.flow.component.mxGraph.vo.MxGraphVo;
 
 public interface IMxGraphModelService {
 
-  public String saveDataForTask(String username, String imageXML, String loadId, String operType);
+  public String saveDataForTask(String username, String imageXML, String loadId, String operType)
+      throws Exception;
 
   /**
    * save or add flowGroup
@@ -16,7 +17,8 @@ public interface IMxGraphModelService {
    * @return
    */
   public String saveDataForGroup(
-      String username, String imageXML, String loadId, String operType, boolean flag);
+      String username, String imageXML, String loadId, String operType, boolean flag)
+      throws Exception;
 
   /**
    * addMxCellAndData
@@ -24,6 +26,7 @@ public interface IMxGraphModelService {
    * @param mxGraphVo
    * @param username
    * @return
+   * @throws Exception
    */
-  public String addMxCellAndData(MxGraphVo mxGraphVo, String username);
+  public String addMxCellAndData(MxGraphVo mxGraphVo, String username) throws Exception;
 }

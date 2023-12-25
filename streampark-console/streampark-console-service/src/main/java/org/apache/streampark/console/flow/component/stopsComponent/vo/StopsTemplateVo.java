@@ -1,11 +1,11 @@
 package org.apache.streampark.console.flow.component.stopsComponent.vo;
 
+import org.apache.streampark.console.flow.common.Eunm.PortType;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.streampark.console.flow.common.Eunm.PortType;
 
 @Getter
 @Setter
@@ -14,7 +14,7 @@ public class StopsTemplateVo implements Serializable {
 
   private String name;
 
-  private String bundel;
+  private String bundle;
 
   private String groups;
 
@@ -33,4 +33,6 @@ public class StopsTemplateVo implements Serializable {
   private String stopGroup;
 
   private List<PropertyTemplateVo> propertiesVo = new ArrayList<>();
+
+  private String imageUrl;
 }

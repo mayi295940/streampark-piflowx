@@ -1,13 +1,13 @@
 package org.apache.streampark.console.flow.component.stopsComponent.utils;
 
+import org.apache.streampark.console.flow.base.utils.UUIDUtils;
+import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponent;
+import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentProperty;
+import org.apache.streampark.console.flow.third.vo.stop.ThirdStopsComponentPropertyVo;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.streampark.console.flow.base.util.UUIDUtils;
-import org.apache.streampark.console.flow.component.stopsComponent.model.StopsComponent;
-import org.apache.streampark.console.flow.component.stopsComponent.model.StopsComponentProperty;
-import org.apache.streampark.console.flow.third.vo.stop.ThirdStopsComponentPropertyVo;
 
 public class StopsComponentPropertyUtils {
 

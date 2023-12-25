@@ -22,7 +22,7 @@ import { AddMemberParams, FlowListRecord, UpdateMemberParams } from './model/flo
 
 enum FLOW_API {
   POST = '/flow/saveFlowInfo',
-  UPDATE = '/flow/updateFlowInfo',
+  UPDATE = '/flow/update',
   LIST = '/flow/getFlowListPage',
   DELETE = '/flow/deleteFlow',
 }
@@ -33,7 +33,7 @@ enum FLOW_API {
  * @returns
  */
 export function fetchFlowList(data: BasicTableParams): Promise<FlowListRecord[]> {
-  return defHttp.get({ url: FLOW_API.LIST, data });
+  return defHttp.post({ url: FLOW_API.LIST, data });
 }
 
 /**

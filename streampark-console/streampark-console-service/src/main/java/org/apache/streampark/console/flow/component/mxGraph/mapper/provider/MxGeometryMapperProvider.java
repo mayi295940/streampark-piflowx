@@ -1,17 +1,15 @@
 package org.apache.streampark.console.flow.component.mxGraph.mapper.provider;
 
+import org.apache.streampark.console.flow.base.utils.DateUtils;
+import org.apache.streampark.console.flow.base.utils.SqlUtils;
+import org.apache.streampark.console.flow.component.mxGraph.entity.MxGeometry;
 import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
-import org.apache.streampark.console.flow.base.util.DateUtils;
-import org.apache.streampark.console.flow.base.util.SqlUtils;
-import org.apache.streampark.console.flow.component.mxGraph.entity.MxGeometry;
 
 public class MxGeometryMapperProvider {
 
   private String id;
-  private String crtUser;
-  private String crtDttmStr;
   private int enableFlag;
   private String lastUpdateDttmStr;
   private String lastUpdateUser;
@@ -24,43 +22,36 @@ public class MxGeometryMapperProvider {
   private String y;
   private String mxCellId;
 
-  private void preventSQLInjectionMxGeometry(MxGeometry mxGeometry) {
-    if (null != mxGeometry && StringUtils.isNotBlank(mxGeometry.getLastUpdateUser())) {
-      // Mandatory Field
-      String id = mxGeometry.getId();
-      String crtUser = mxGeometry.getCrtUser();
-      String lastUpdateUser = mxGeometry.getLastUpdateUser();
-      Boolean enableFlag = mxGeometry.getEnableFlag();
-      Long version = mxGeometry.getVersion();
-      Date crtDttm = mxGeometry.getCrtDttm();
-      Date lastUpdateDttm = mxGeometry.getLastUpdateDttm();
-      this.id = SqlUtils.preventSQLInjection(id);
-      this.crtUser = (null != crtUser ? SqlUtils.preventSQLInjection(crtUser) : null);
-      this.lastUpdateUser = SqlUtils.preventSQLInjection(lastUpdateUser);
-      this.enableFlag = ((null != enableFlag && enableFlag) ? 1 : 0);
-      this.version = (null != version ? version : 0L);
-      String crtDttmStr = DateUtils.dateTimesToStr(crtDttm);
-      String lastUpdateDttmStr =
-          DateUtils.dateTimesToStr(null != lastUpdateDttm ? lastUpdateDttm : new Date());
-      this.crtDttmStr = (null != crtDttm ? SqlUtils.preventSQLInjection(crtDttmStr) : null);
-      this.lastUpdateDttmStr = SqlUtils.preventSQLInjection(lastUpdateDttmStr);
-
-      // Selection field
-      this.as = SqlUtils.preventSQLInjection(mxGeometry.getAs());
-      this.relative = SqlUtils.preventSQLInjection(mxGeometry.getRelative());
-      this.height = SqlUtils.preventSQLInjection(mxGeometry.getHeight());
-      this.width = SqlUtils.preventSQLInjection(mxGeometry.getWidth());
-      this.x = SqlUtils.preventSQLInjection(mxGeometry.getX());
-      this.y = SqlUtils.preventSQLInjection(mxGeometry.getY());
-      String mxCellIdStr = (null != mxGeometry.getMxCell() ? mxGeometry.getMxCell().getId() : null);
-      this.mxCellId = (null != mxCellIdStr ? SqlUtils.preventSQLInjection(mxCellIdStr) : null);
+  private boolean preventSQLInjectionMxGeometry(MxGeometry mxGeometry) {
+    if (null == mxGeometry || StringUtils.isBlank(mxGeometry.getLastUpdateUser())) {
+      return false;
     }
+    // Mandatory Field
+    Boolean enableFlag = mxGeometry.getEnableFlag();
+    Long version = mxGeometry.getVersion();
+    Date lastUpdateDttm = mxGeometry.getLastUpdateDttm();
+    this.id = SqlUtils.preventSQLInjection(mxGeometry.getId());
+    this.lastUpdateUser = SqlUtils.preventSQLInjection(mxGeometry.getLastUpdateUser());
+    this.enableFlag = ((null != enableFlag && enableFlag) ? 1 : 0);
+    this.version = (null != version ? version : 0L);
+    String lastUpdateDttmStr =
+        DateUtils.dateTimesToStr(null != lastUpdateDttm ? lastUpdateDttm : new Date());
+    this.lastUpdateDttmStr = SqlUtils.preventSQLInjection(lastUpdateDttmStr);
+
+    // Selection field
+    this.as = SqlUtils.preventSQLInjection(mxGeometry.getAs());
+    this.relative = SqlUtils.preventSQLInjection(mxGeometry.getRelative());
+    this.height = SqlUtils.preventSQLInjection(mxGeometry.getHeight());
+    this.width = SqlUtils.preventSQLInjection(mxGeometry.getWidth());
+    this.x = SqlUtils.preventSQLInjection(mxGeometry.getX());
+    this.y = SqlUtils.preventSQLInjection(mxGeometry.getY());
+    String mxCellIdStr = (null != mxGeometry.getMxCell() ? mxGeometry.getMxCell().getId() : null);
+    this.mxCellId = (null != mxCellIdStr ? SqlUtils.preventSQLInjection(mxCellIdStr) : null);
+    return true;
   }
 
   private void reset() {
     this.id = null;
-    this.crtUser = null;
-    this.crtDttmStr = null;
     this.lastUpdateDttmStr = null;
     this.lastUpdateUser = null;
     this.enableFlag = 1;
@@ -81,42 +72,32 @@ public class MxGeometryMapperProvider {
    * @return
    */
   public String addMxGeometry(MxGeometry mxGeometry) {
-    String sqlStr = "";
-    this.preventSQLInjectionMxGeometry(mxGeometry);
-    if (null != mxGeometry) {
-      SQL sql = new SQL();
-
+    String sqlStr = "SELECT 0";
+    boolean flag = this.preventSQLInjectionMxGeometry(mxGeometry);
+    if (flag) {
+      StringBuffer strBuf = new StringBuffer();
       // INSERT_INTO brackets is table name
-      sql.INSERT_INTO("mx_geometry");
-      // The first string in the value is the field name corresponding to the table in the database.
-      // all types except numeric fields must be enclosed in single quotes
-
-      // Process the required fields first
-      if (null == crtDttmStr) {
-        String crtDttm = DateUtils.dateTimesToStr(new Date());
-        crtDttmStr = SqlUtils.preventSQLInjection(crtDttm);
-      }
-      if (StringUtils.isBlank(crtUser)) {
-        crtUser = SqlUtils.preventSQLInjection("-1");
-      }
-
-      sql.VALUES("id", id);
-      sql.VALUES("crt_dttm", crtDttmStr);
-      sql.VALUES("crt_user", crtUser);
-      sql.VALUES("last_update_dttm", lastUpdateDttmStr);
-      sql.VALUES("last_update_user", lastUpdateUser);
-      sql.VALUES("enable_flag", enableFlag + "");
-      sql.VALUES("version", version + "");
-
-      // handle other fields
-      sql.VALUES("mx_as", as);
-      sql.VALUES("mx_relative", relative);
-      sql.VALUES("mx_height", height);
-      sql.VALUES("mx_width", width);
-      sql.VALUES("mx_x", x);
-      sql.VALUES("mx_y", y);
-      sql.VALUES("fk_mx_cell_id", mxCellId);
-      sqlStr = sql.toString();
+      strBuf.append("INSERT INTO mx_geometry ");
+      strBuf.append("( ");
+      strBuf.append(SqlUtils.baseFieldName() + ", ");
+      strBuf.append("mx_as, ");
+      strBuf.append("mx_relative, ");
+      strBuf.append("mx_height, ");
+      strBuf.append("mx_width, ");
+      strBuf.append("mx_x, ");
+      strBuf.append("mx_y, ");
+      strBuf.append("fk_mx_cell_id ");
+      strBuf.append(") VALUES ( ");
+      strBuf.append(SqlUtils.baseFieldValues(mxGeometry) + ", ");
+      strBuf.append(this.as + ", ");
+      strBuf.append(this.relative + ", ");
+      strBuf.append(this.height + ", ");
+      strBuf.append(this.width + ", ");
+      strBuf.append(this.x + ", ");
+      strBuf.append(this.y + ", ");
+      strBuf.append(this.mxCellId + " ");
+      strBuf.append(") ");
+      sqlStr = strBuf.toString();
     }
     this.reset();
     return sqlStr;
@@ -129,9 +110,8 @@ public class MxGeometryMapperProvider {
    * @return
    */
   public String updateMxGeometry(MxGeometry mxGeometry) {
-    String sqlStr = "";
-    this.preventSQLInjectionMxGeometry(mxGeometry);
-    if (null != mxGeometry) {
+    String sqlStr = "SELECT 0";
+    if (this.preventSQLInjectionMxGeometry(mxGeometry)) {
       SQL sql = new SQL();
       // UPDATE parentheses for the database table name
       sql.UPDATE("mx_geometry");
@@ -187,9 +167,9 @@ public class MxGeometryMapperProvider {
   }
 
   /**
-   * Query MxGeometry based on flowId
+   * Query MxGeometry based on mxCellId
    *
-   * @param flowId
+   * @param mxCellId
    * @return
    */
   public String getMxGeometryByMxCellId(String mxCellId) {
@@ -207,16 +187,17 @@ public class MxGeometryMapperProvider {
   }
 
   /**
-   * Delete according to id logic, set to invalid
+   * delete 'MxGeometry' by 'mxCellId'
    *
-   * @param id
+   * @param username
+   * @param mxCellId
    * @return
    */
-  public String updateEnableFlagById(String username, String id) {
+  public String deleteMxGeometryByFlowId(String username, String mxCellId) {
     if (StringUtils.isBlank(username)) {
       return "SELECT 0";
     }
-    if (StringUtils.isBlank(id)) {
+    if (StringUtils.isBlank(mxCellId)) {
       return "SELECT 0";
     }
     SQL sql = new SQL();
@@ -226,7 +207,7 @@ public class MxGeometryMapperProvider {
     sql.SET(
         "last_update_dttm = " + SqlUtils.preventSQLInjection(DateUtils.dateTimesToStr(new Date())));
     sql.WHERE("enable_flag = 1");
-    sql.WHERE("id = " + SqlUtils.preventSQLInjection(id));
+    sql.WHERE("fk_mx_cell_id = " + SqlUtils.preventSQLInjection(mxCellId));
 
     return sql.toString();
   }

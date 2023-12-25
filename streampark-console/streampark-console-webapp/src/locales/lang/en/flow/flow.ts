@@ -67,6 +67,7 @@ export default {
     create_title: 'Create Flow',
     update_title: 'Update Flow',
     flow_name: 'FlowName',
+    engine_type: 'EngineType',
     driverMemory: 'DriverMemory',
     executorNumber: 'ExecutorNumber',
     executorMemory: 'ExecutorMemory',
@@ -104,7 +105,7 @@ export default {
   },
   template_columns: {
     name: 'Name',
-    crtDttm: 'CreateTime',
+    createTime: 'CreateTime',
     action: 'Actions',
   },
   dataSource_columns: {

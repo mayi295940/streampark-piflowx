@@ -1,5 +1,14 @@
 package org.apache.streampark.console.flow.component.testData.domain;
 
+import org.apache.streampark.console.flow.base.utils.UUIDUtils;
+import org.apache.streampark.console.flow.component.testData.entity.TestData;
+import org.apache.streampark.console.flow.component.testData.entity.TestDataSchema;
+import org.apache.streampark.console.flow.component.testData.entity.TestDataSchemaValues;
+import org.apache.streampark.console.flow.component.testData.mapper.TestDataMapper;
+import org.apache.streampark.console.flow.component.testData.mapper.TestDataSchemaMapper;
+import org.apache.streampark.console.flow.component.testData.mapper.TestDataSchemaValuesMapper;
+import org.apache.streampark.console.flow.component.testData.vo.TestDataSchemaVo;
+import org.apache.streampark.console.flow.component.testData.vo.TestDataVo;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -9,15 +18,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.apache.streampark.console.flow.base.util.UUIDUtils;
-import org.apache.streampark.console.flow.component.testData.entity.TestData;
-import org.apache.streampark.console.flow.component.testData.entity.TestDataSchema;
-import org.apache.streampark.console.flow.component.testData.entity.TestDataSchemaValues;
-import org.apache.streampark.console.flow.component.testData.mapper.TestDataMapper;
-import org.apache.streampark.console.flow.component.testData.mapper.TestDataSchemaMapper;
-import org.apache.streampark.console.flow.component.testData.mapper.TestDataSchemaValuesMapper;
-import org.apache.streampark.console.flow.component.testData.vo.TestDataSchemaVo;
-import org.apache.streampark.console.flow.component.testData.vo.TestDataVo;
 
 @Component
 @Transactional(
@@ -27,11 +27,19 @@ import org.apache.streampark.console.flow.component.testData.vo.TestDataVo;
     rollbackFor = Exception.class)
 public class TestDataDomain {
 
-  @Autowired private TestDataMapper testDataMapper;
+  private final TestDataMapper testDataMapper;
+  private final TestDataSchemaMapper testDataSchemaMapper;
+  private final TestDataSchemaValuesMapper testDataSchemaValuesMapper;
 
-  @Autowired private TestDataSchemaMapper testDataSchemaMapper;
-
-  @Autowired private TestDataSchemaValuesMapper testDataSchemaValuesMapper;
+  @Autowired
+  public TestDataDomain(
+      TestDataMapper testDataMapper,
+      TestDataSchemaMapper testDataSchemaMapper,
+      TestDataSchemaValuesMapper testDataSchemaValuesMapper) {
+    this.testDataMapper = testDataMapper;
+    this.testDataSchemaMapper = testDataSchemaMapper;
+    this.testDataSchemaValuesMapper = testDataSchemaValuesMapper;
+  }
 
   /**
    * save or update TestData

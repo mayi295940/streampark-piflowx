@@ -1,16 +1,12 @@
 package org.apache.streampark.console.flow.component.mxGraph.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import org.apache.streampark.console.flow.base.BaseModelUUIDNoCorpAgentId;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.streampark.console.flow.base.BaseHibernateModelUUIDNoCorpAgentId;
 
 @Setter
 @Getter
-@Entity
-@Table(name = "MX_NODE_IMAGE")
-public class MxNodeImage extends BaseHibernateModelUUIDNoCorpAgentId {
+public class MxNodeImage extends BaseModelUUIDNoCorpAgentId {
 
   private static final long serialVersionUID = 1L;
 

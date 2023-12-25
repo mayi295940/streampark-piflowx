@@ -1,10 +1,11 @@
 package org.apache.streampark.console.flow.component.process.utils;
 
-import java.util.Date;
-import org.springframework.beans.BeanUtils;
-import org.apache.streampark.console.flow.base.util.UUIDUtils;
+import org.apache.streampark.console.flow.base.utils.UUIDUtils;
 import org.apache.streampark.console.flow.component.flow.entity.Paths;
 import org.apache.streampark.console.flow.component.process.entity.ProcessPath;
+import java.util.Date;
+
+import org.springframework.beans.BeanUtils;
 
 public class ProcessPathUtils {
 

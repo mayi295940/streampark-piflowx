@@ -1,15 +1,16 @@
 package org.apache.streampark.console.flow.component.process.utils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import org.springframework.beans.BeanUtils;
-import org.apache.streampark.console.flow.base.util.UUIDUtils;
+import org.apache.streampark.console.flow.base.utils.UUIDUtils;
 import org.apache.streampark.console.flow.component.process.entity.ProcessStop;
 import org.apache.streampark.console.flow.component.process.entity.ProcessStopCustomizedProperty;
 import org.apache.streampark.console.flow.component.process.entity.ProcessStopProperty;
-import org.apache.streampark.console.flow.component.stopsComponent.model.StopsComponent;
-import org.apache.streampark.console.flow.component.stopsComponent.model.StopsComponentProperty;
+import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponent;
+import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentProperty;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
 
 public class ProcessStopUtils {
 
@@ -102,7 +103,7 @@ public class ProcessStopUtils {
   }
 
   public static ProcessStop copyStopsComponentToProcessStop(
-          StopsComponent stopsComponent, String username, boolean isAddId) {
+      StopsComponent stopsComponent, String username, boolean isAddId) {
     if (null == stopsComponent) {
       return null;
     }

@@ -5,36 +5,31 @@ import com.github.pagehelper.PageHelper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Resource;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.streampark.console.flow.component.process.mapper.ProcessMapper;
-import org.slf4j.Logger;
-import org.springframework.stereotype.Service;
-import org.apache.streampark.console.flow.base.util.JsonUtils;
-import org.apache.streampark.console.flow.base.util.LoggerUtil;
-import org.apache.streampark.console.flow.base.util.PageHelperUtils;
-import org.apache.streampark.console.flow.base.util.ReturnMapUtils;
+import org.apache.streampark.console.flow.base.utils.PageHelperUtils;
+import org.apache.streampark.console.flow.base.utils.ReturnMapUtils;
+import org.apache.streampark.console.flow.common.constant.MessageConfig;
+import org.apache.streampark.console.flow.component.process.domain.ProcessGroupDomain;
 import org.apache.streampark.console.flow.component.process.entity.Process;
 import org.apache.streampark.console.flow.component.process.entity.ProcessGroup;
-import org.apache.streampark.console.flow.component.process.mapper.ProcessAndProcessGroupMapper;
-import org.apache.streampark.console.flow.component.process.mapper.ProcessGroupMapper;
-;
 import org.apache.streampark.console.flow.component.process.service.IProcessAndProcessGroupService;
 import org.apache.streampark.console.flow.component.process.utils.ProcessGroupUtils;
 import org.apache.streampark.console.flow.component.process.utils.ProcessUtils;
 import org.apache.streampark.console.flow.component.process.vo.ProcessGroupVo;
 import org.apache.streampark.console.flow.component.process.vo.ProcessVo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ProcessAndProcessGroupServiceImpl implements IProcessAndProcessGroupService {
 
-  Logger logger = LoggerUtil.getLogger();
+  private final ProcessGroupDomain processGroupDomain;
 
-  @Resource private ProcessAndProcessGroupMapper processAndProcessGroupMapper;
+  @Autowired
+  public ProcessAndProcessGroupServiceImpl(ProcessGroupDomain processGroupDomain) {
 
-  @Resource private ProcessGroupMapper processGroupMapper;
-
-  @Resource private ProcessMapper processMapper;
+    this.processGroupDomain = processGroupDomain;
+  }
 
   /**
    * Query ProcessAndProcessGroupList (parameter space-time non-paging)
@@ -48,17 +43,16 @@ public class ProcessAndProcessGroupServiceImpl implements IProcessAndProcessGrou
   public String getProcessAndProcessGroupListPage(
       String username, boolean isAdmin, Integer offset, Integer limit, String param) {
     if (null == offset || null == limit) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(ReturnMapUtils.ERROR_MSG);
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ERROR_MSG());
     }
     Page<Process> page = PageHelper.startPage(offset, limit, "crt_dttm desc");
     if (isAdmin) {
-      processAndProcessGroupMapper.getProcessAndProcessGroupList(param);
+      processGroupDomain.getProcessAndProcessGroupList(param);
     } else {
-      processAndProcessGroupMapper.getProcessAndProcessGroupListByUser(param, username);
+      processGroupDomain.getProcessAndProcessGroupListByUser(param, username);
     }
-    Map<String, Object> rtnMap = ReturnMapUtils.setSucceededMsg(ReturnMapUtils.SUCCEEDED_MSG);
-    rtnMap = PageHelperUtils.setLayTableParam(page, rtnMap);
-    return JsonUtils.toJsonNoException(rtnMap);
+    Map<String, Object> rtnMap = ReturnMapUtils.setSucceededMsg(MessageConfig.SUCCEEDED_MSG());
+    return PageHelperUtils.setLayTableParamRtnStr(page, rtnMap);
   }
 
   /**
@@ -68,15 +62,16 @@ public class ProcessAndProcessGroupServiceImpl implements IProcessAndProcessGrou
    * @param groupAppIds group appId array
    * @return json
    */
+  @Override
   public String getAppInfoList(String[] taskAppIds, String[] groupAppIds) {
-    if ((null == taskAppIds || taskAppIds.length <= 0)
-        && (null == groupAppIds || groupAppIds.length <= 0)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("Incoming parameter is null");
+    if ((null == taskAppIds || taskAppIds.length == 0)
+        && (null == groupAppIds || groupAppIds.length == 0)) {
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_ERROR_MSG());
     }
-    Map<String, Object> rtnMap = ReturnMapUtils.setSucceededMsg(ReturnMapUtils.SUCCEEDED_MSG);
+    Map<String, Object> rtnMap = ReturnMapUtils.setSucceededMsg(MessageConfig.SUCCEEDED_MSG());
     if (null != taskAppIds && taskAppIds.length > 0) {
       Map<String, Object> taskAppInfoMap = new HashMap<>();
-      List<Process> processListByAppIDs = processMapper.getProcessListByAppIDs(taskAppIds);
+      List<Process> processListByAppIDs = processGroupDomain.getProcessListByAppIDs(taskAppIds);
       if (CollectionUtils.isNotEmpty(processListByAppIDs)) {
         for (Process process : processListByAppIDs) {
           ProcessVo processVo = ProcessUtils.processPoToVo(process);
@@ -91,7 +86,7 @@ public class ProcessAndProcessGroupServiceImpl implements IProcessAndProcessGrou
     if (null != groupAppIds && groupAppIds.length > 0) {
       Map<String, Object> groupAppInfoMap = new HashMap<>();
       List<ProcessGroup> processGroupListByAppIDs =
-          processGroupMapper.getProcessGroupListByAppIDs(groupAppIds);
+          processGroupDomain.getProcessGroupListByAppIDs(groupAppIds);
       if (CollectionUtils.isNotEmpty(processGroupListByAppIDs)) {
         for (ProcessGroup processGroup : processGroupListByAppIDs) {
           ProcessGroupVo processGroupVo = ProcessGroupUtils.processGroupPoToVo(processGroup);
@@ -103,6 +98,6 @@ public class ProcessAndProcessGroupServiceImpl implements IProcessAndProcessGrou
       }
       rtnMap.put("groupAppInfo", groupAppInfoMap);
     }
-    return JsonUtils.toJsonNoException(rtnMap);
+    return ReturnMapUtils.toJson(rtnMap);
   }
 }

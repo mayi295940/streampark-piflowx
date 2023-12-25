@@ -1,22 +1,24 @@
 package org.apache.streampark.console.flow.component.stopsComponent.service.impl;
 
-import javax.annotation.Resource;
-import org.slf4j.Logger;
-import org.springframework.stereotype.Service;
-import org.apache.streampark.console.flow.base.util.LoggerUtil;
-import org.apache.streampark.console.flow.base.util.ReturnMapUtils;
+import org.apache.streampark.console.flow.base.utils.ReturnMapUtils;
+import org.apache.streampark.console.flow.common.constant.MessageConfig;
 import org.apache.streampark.console.flow.component.stopsComponent.domain.StopsComponentManageDomain;
-import org.apache.streampark.console.flow.component.stopsComponent.model.StopsComponentManage;
+import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentManage;
 import org.apache.streampark.console.flow.component.stopsComponent.service.IStopsComponentManageService;
 import org.apache.streampark.console.flow.component.stopsComponent.utils.StopsComponentManageUtils;
 import org.apache.streampark.console.flow.controller.requestVo.UpdatestopsComponentIsShow;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class StopsComponentManageServiceImpl implements IStopsComponentManageService {
 
-  Logger logger = LoggerUtil.getLogger();
+  private final StopsComponentManageDomain stopsComponentManageDomain;
 
-  @Resource private StopsComponentManageDomain stopsComponentManageDomain;
+  @Autowired
+  public StopsComponentManageServiceImpl(StopsComponentManageDomain stopsComponentManageDomain) {
+    this.stopsComponentManageDomain = stopsComponentManageDomain;
+  }
 
   /**
    * updateStopsComponentsIsShow
@@ -61,6 +63,6 @@ public class StopsComponentManageServiceImpl implements IStopsComponentManageSer
       stopsComponentManage.setIsShow(stopsManage.getIsShow());
       stopsComponentManageDomain.saveOrUpdeate(stopsComponentManage);
     }
-    return ReturnMapUtils.setSucceededMsgRtnJsonStr(ReturnMapUtils.SUCCEEDED_MSG);
+    return ReturnMapUtils.setSucceededMsgRtnJsonStr(MessageConfig.SUCCEEDED_MSG());
   }
 }

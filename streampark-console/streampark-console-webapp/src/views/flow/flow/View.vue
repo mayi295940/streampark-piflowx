@@ -34,7 +34,7 @@
   </div>
 </template>
 <script lang="ts">
-  import { computed, defineComponent } from 'vue';
+  import { computed, defineComponent, inject } from 'vue';
 
   import { BasicTable, useTable, TableAction, ActionItem } from '/@/components/Table';
   import FlowDrawer from './components/FlowDrawer.vue';
@@ -46,12 +46,13 @@
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useUserStoreWithOut } from '/@/store/modules/user';
   import { useModal } from '/@/components/Modal';
-  import { UserListRecord } from '/@/api/system/model/userModel';
+  import { FlowListRecord } from '/@/api/flow/flow/flowModel';
   import { useI18n } from '/@/hooks/web/useI18n';
   import Icon from '/@/components/Icon';
+  import { useRouter } from 'vue-router';
 
   export default defineComponent({
-    name: 'User',
+    name: 'Flow',
     components: { BasicTable, FlowModal, FlowDrawer, TableAction, Icon },
     setup() {
       const { t } = useI18n();
@@ -62,6 +63,9 @@
       const [registerDrawer, { openDrawer }] = useDrawer();
       const [registerModal, { openModal }] = useModal();
       const { createMessage } = useMessage();
+      const router = useRouter();
+
+      const global: any = inject('global');
 
       const [registerTable, { reload }] = useTable({
         title: t('flow.flow.sidebar.flow'),
@@ -73,7 +77,7 @@
           schemas: searchFormSchema,
           fieldMapToTime: [['createTime', ['createTimeFrom', 'createTimeTo'], 'YYYY-MM-DD']],
         },
-        rowKey: 'userId',
+        rowKey: 'id',
         pagination: true,
         striped: false,
         useSearchForm: true,
@@ -82,18 +86,23 @@
         showIndexColumn: false,
         canResize: false,
         actionColumn: {
-          width: 150,
+          width: 250,
           title: t('component.table.operation'),
           dataIndex: 'action',
         },
       });
-      function getFlowAction(record: UserListRecord): ActionItem[] {
+      function getFlowAction(record: FlowListRecord): ActionItem[] {
         return [
           {
             icon: 'clarity:note-edit-line',
+            auth: 'flow:update',
+            tooltip: t('flow.flow.enter'),
+            onClick: handleButtonSelect.bind(null, 1, record),
+          },
+          {
+            icon: 'clarity:note-edit-line',
             tooltip: t('system.user.table.modify'),
-            auth: 'user:update',
-            ifShow: () => record.username !== 'admin' || userName.value === 'admin',
+            auth: 'flow:update',
             onClick: handleEdit.bind(null, record),
           },
           {
@@ -101,14 +110,24 @@
             tooltip: t('common.detail'),
             onClick: handleView.bind(null, record),
           },
+          {
+            icon: 'ant-design:delete-outlined',
+            color: 'error',
+            tooltip: t('system.member.deleteMember'),
+            auth: 'flow:delete',
+            popConfirm: {
+              title: t('system.member.deletePopConfirm'),
+              confirm: handleDelete.bind(null, record),
+            },
+          },
         ];
       }
-      // user create
+      // flow create
       function handleCreate() {
         openDrawer(true, { formType: FormTypeEnum.Create });
       }
-      // edit user
-      function handleEdit(record: UserListRecord) {
+      // edit flow
+      function handleEdit(record: FlowListRecord) {
         openDrawer(true, {
           record,
           formType: FormTypeEnum.Edit,
@@ -116,8 +135,54 @@
       }
 
       // see detail
-      function handleView(record: UserListRecord) {
+      function handleView(record: FlowListRecord) {
         openModal(true, record);
+      }
+
+      async function handleDelete(record: FlowListRecord) {
+        const { data } = await fetchFlowDelete({ id: record.id });
+        if (data.status === 'success') {
+          createMessage.success(t('system.member.deleteMember') + t('system.member.success'));
+          reload();
+        } else {
+          createMessage.error(t('system.member.deleteMember') + t('system.member.fail'));
+        }
+      }
+
+      function handleButtonSelect(key: Number, record: Recordable) {
+        switch (key) {
+          case 1:
+            global.eventPoll.emit('crumb', [
+              { name: 'Flow', path: '/flow' },
+              { name: 'drawingBoard', path: '/drawingBoard' },
+            ]);
+            router.push({
+              path: '/flow/drawingBoard',
+              query: {
+                src: '/drawingBoard/page/flow/mxGraph/index.html?load=' + record.id,
+              },
+            });
+            break;
+          case 2:
+            this.getRowData(record);
+            break;
+          case 3:
+            this.handleRun(record);
+            break;
+          case 4:
+            this.handleDubug(record);
+            break;
+          case 5:
+            this.handleDeleteRow(record);
+            break;
+          case 6:
+            this.row = record;
+            this.isTemplateOpen = true;
+            break;
+
+          default:
+            break;
+        }
       }
 
       // add/edit user success
@@ -137,6 +202,7 @@
         handleSuccess,
         handleView,
         getFlowAction,
+        handleButtonSelect,
       };
     },
   });

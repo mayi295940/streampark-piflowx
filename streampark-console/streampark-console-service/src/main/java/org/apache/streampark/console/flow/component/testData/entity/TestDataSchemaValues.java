@@ -1,12 +1,12 @@
 package org.apache.streampark.console.flow.component.testData.entity;
 
+import org.apache.streampark.console.flow.base.BaseModelUUIDNoCorpAgentId;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.streampark.console.flow.base.BaseHibernateModelUUIDNoCorpAgentId;
 
 @Setter
 @Getter
-public class TestDataSchemaValues extends BaseHibernateModelUUIDNoCorpAgentId {
+public class TestDataSchemaValues extends BaseModelUUIDNoCorpAgentId {
 
   private static final long serialVersionUID = 1L;
 

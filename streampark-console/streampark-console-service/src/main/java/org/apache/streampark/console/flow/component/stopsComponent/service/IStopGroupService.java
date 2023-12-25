@@ -1,14 +1,14 @@
 package org.apache.streampark.console.flow.component.stopsComponent.service;
 
-import java.util.List;
 import org.apache.streampark.console.flow.component.stopsComponent.vo.StopGroupVo;
+import java.util.List;
 
 public interface IStopGroupService {
 
-  public List<StopGroupVo> getStopGroupAll();
+  List<StopGroupVo> getStopGroupAll(String engineType);
 
   /** Call getAllStops and Group to manage, and save the stop attribute information */
-  public void updateGroupAndStopsListByServer(String username);
+  void updateGroupAndStopsListByServer(String username, String flowId);
 
   /**
    * stopsComponentList
@@ -16,5 +16,5 @@ public interface IStopGroupService {
    * @param username
    * @param isAdmin
    */
-  public String stopsComponentList(String username, boolean isAdmin);
+  String stopsComponentList(String username, boolean isAdmin);
 }

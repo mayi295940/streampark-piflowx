@@ -1,68 +1,30 @@
 package org.apache.streampark.console.flow.component.system.vo;
 
+import org.apache.streampark.console.flow.base.utils.DateUtils;
+import org.apache.streampark.console.flow.component.system.entity.SysRole;
 import java.io.Serializable;
+import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class SysUserVo implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private Integer id;
-
+  private String id;
   private String username;
-
   private String password;
-
   private String name;
-
   private Integer age;
-
   private String sex;
+  private Date crtDttm;
+  private Byte status;
+  private String lastLoginIp;
+  private SysRole role;
 
-  public Integer getId() {
-    return id;
-  }
-
-  public void setId(Integer id) {
-    this.id = id;
-  }
-
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public String getPassword() {
-    return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public Integer getAge() {
-    return age;
-  }
-
-  public void setAge(Integer age) {
-    this.age = age;
-  }
-
-  public String getSex() {
-    return sex;
-  }
-
-  public void setSex(String sex) {
-    this.sex = sex;
+  public String getCreateTime() {
+    return DateUtils.dateTimesToStr(crtDttm);
   }
 }

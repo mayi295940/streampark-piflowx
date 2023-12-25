@@ -1,10 +1,18 @@
 package org.apache.streampark.console.flow.component.flow.mapper;
 
-import java.util.List;
-import org.apache.ibatis.annotations.*;
-import org.apache.ibatis.mapping.FetchType;
 import org.apache.streampark.console.flow.component.flow.entity.CustomizedProperty;
 import org.apache.streampark.console.flow.component.flow.mapper.provider.CustomizedPropertyMapperProvider;
+import org.apache.streampark.console.flow.component.flow.vo.StopsCustomizedPropertyVo;
+import java.util.List;
+import org.apache.ibatis.annotations.InsertProvider;
+import org.apache.ibatis.annotations.Many;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.UpdateProvider;
+import org.apache.ibatis.mapping.FetchType;
 
 @Mapper
 public interface CustomizedPropertyMapper {
@@ -15,17 +23,14 @@ public interface CustomizedPropertyMapper {
    *
    * @param customizedPropertyList (Content: "customizedPropertyList" with a value of
    *     "List<CustomizedProperty>")
-   * @return
    */
   @InsertProvider(
       type = CustomizedPropertyMapperProvider.class,
       method = "addCustomizedPropertyList")
-  public int addCustomizedPropertyList(
-      @Param("customizedPropertyList") List<CustomizedProperty> customizedPropertyList);
+  int addCustomizedPropertyList(List<CustomizedProperty> customizedPropertyList);
 
   @InsertProvider(type = CustomizedPropertyMapperProvider.class, method = "addCustomizedProperty")
-  public int addCustomizedProperty(
-      @Param("customizedProperty") CustomizedProperty customizedProperty);
+  int addCustomizedProperty(CustomizedProperty customizedProperty);
 
   @Select("select * from flow_stops_customized_property where id = #{id} and enable_flag = 1 ")
   @Results({
@@ -37,30 +42,35 @@ public interface CustomizedPropertyMapper {
                 select = "cn.cnic.component.flow.mapper.StopsMapper.getStopsById",
                 fetchType = FetchType.LAZY))
   })
-  public CustomizedProperty getCustomizedPropertyById(String id);
+  CustomizedProperty getCustomizedPropertyById(@Param("id") String id);
 
   @Select(
       "select * from flow_stops_customized_property where fk_stops_id = #{stopsId} and enable_flag = 1 ")
-  public List<CustomizedProperty> getCustomizedPropertyListByStopsId(String stopsId);
+  List<CustomizedProperty> getCustomizedPropertyListByStopsId(@Param("stopsId") String stopsId);
 
   @Select(
       "select * from flow_stops_customized_property where fk_stops_id = #{stopsId} and name = #{name} and enable_flag = 1 ")
-  public List<CustomizedProperty> getCustomizedPropertyListByStopsIdAndName(
-      String stopsId, String name);
+  List<CustomizedProperty> getCustomizedPropertyListByStopsIdAndName(String stopsId, String name);
 
   @UpdateProvider(
       type = CustomizedPropertyMapperProvider.class,
       method = "updateStopsCustomizedProperty")
-  public int updateStopsCustomizedProperty(
-      @Param("customizedProperty") CustomizedProperty customizedProperty);
+  int updateStopsCustomizedProperty(CustomizedProperty customizedProperty);
 
   @UpdateProvider(
       type = CustomizedPropertyMapperProvider.class,
       method = "updateEnableFlagByStopId")
-  public int updateEnableFlagByStopId(@Param("username") String username, @Param("id") String id);
+  int updateEnableFlagByStopId(String username, String id);
 
   @UpdateProvider(
       type = CustomizedPropertyMapperProvider.class,
       method = "updateCustomizedPropertyCustomValue")
-  public int updateCustomizedPropertyCustomValue(String username, String content, String id);
+  int updateCustomizedPropertyCustomValue(String username, String content, String id);
+
+  @Select(
+      "select * from flow_stops_customized_property "
+          + "where fk_stops_id = #{stopsId} "
+          + "and enable_flag = 1 ")
+  List<StopsCustomizedPropertyVo> getCustomizedPropertyVoListByStopsId(
+      @Param("stopsId") String stopsId);
 }

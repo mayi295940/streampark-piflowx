@@ -1,7 +1,7 @@
 package org.apache.streampark.console.flow.component.mxGraph.utils;
 
-import java.util.Date;
 import org.apache.streampark.console.flow.component.mxGraph.entity.MxGeometry;
+import java.util.Date;
 
 public class MxGeometryUtils {
 

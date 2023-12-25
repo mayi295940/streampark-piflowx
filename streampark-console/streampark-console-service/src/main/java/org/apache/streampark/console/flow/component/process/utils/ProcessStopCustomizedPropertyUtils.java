@@ -1,7 +1,7 @@
 package org.apache.streampark.console.flow.component.process.utils;
 
-import java.util.Date;
 import org.apache.streampark.console.flow.component.process.entity.ProcessStopCustomizedProperty;
+import java.util.Date;
 
 public class ProcessStopCustomizedPropertyUtils {
 

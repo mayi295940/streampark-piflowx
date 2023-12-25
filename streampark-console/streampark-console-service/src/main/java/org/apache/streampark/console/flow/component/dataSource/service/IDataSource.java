@@ -1,7 +1,7 @@
 package org.apache.streampark.console.flow.component.dataSource.service;
 
-import java.util.List;
 import org.apache.streampark.console.flow.component.dataSource.vo.DataSourceVo;
+import java.util.List;
 
 public interface IDataSource {
 
@@ -12,7 +12,7 @@ public interface IDataSource {
    * @return
    */
   public String saveOrUpdate(
-          String username, boolean isAdmin, DataSourceVo dataSourceVo, boolean isSynchronize);
+      String username, boolean isAdmin, DataSourceVo dataSourceVo, boolean isSynchronize);
 
   /**
    * Query DataSourceVo according to ID (query contains its subtable)

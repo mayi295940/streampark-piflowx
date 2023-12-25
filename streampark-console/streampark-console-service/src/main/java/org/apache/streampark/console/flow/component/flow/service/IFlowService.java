@@ -1,91 +1,90 @@
 package org.apache.streampark.console.flow.component.flow.service;
 
+import com.github.pagehelper.Page;
 import java.util.List;
-import javax.transaction.Transactional;
 import org.apache.streampark.console.flow.component.flow.entity.Flow;
 import org.apache.streampark.console.flow.component.flow.vo.FlowVo;
+import org.apache.streampark.console.flow.controller.requestVo.FlowInfoVoRequestAdd;
+import org.apache.streampark.console.flow.controller.requestVo.FlowInfoVoRequestUpdate;
 
 public interface IFlowService {
 
   /**
    * Query flow information based on id
    *
-   * @param id
-   * @return
+   * @param id id
    */
-  @Transactional
-  public Flow getFlowById(String username, boolean isAdmin, String id);
+  Flow getFlowById(String username, boolean isAdmin, String id);
 
   /**
    * Query flow information based on pageId
    *
-   * @param fid
-   * @param pageId
-   * @return
+   * @param fid fid
+   * @param pageId pageId
    */
-  @Transactional
-  public FlowVo getFlowByPageId(String fid, String pageId);
+  FlowVo getFlowByPageId(String fid, String pageId);
 
   /**
    * Query flow information based on id
    *
-   * @param id
-   * @return
+   * @param id id
    */
-  @Transactional
-  public String getFlowVoById(String id);
+  String getFlowVoById(String id);
 
   /**
    * add flow(Contains drawing board information)
    *
-   * @param flowVo
-   * @return
+   * @param username username
+   * @param flowVo flowVo
+   * @throws Exception e
    */
-  @Transactional
-  public String addFlow(String username, FlowVo flowVo);
+  String addFlow(String username, FlowInfoVoRequestAdd flowVo) throws Exception;
 
-  @Transactional
-  public String updateFlow(String username, Flow flow);
+  String deleteFLowInfo(String username, boolean isAdmin, String id);
 
-  @Transactional
-  public String deleteFLowInfo(String username, boolean isAdmin, String id);
+  Integer getMaxStopPageId(String flowId);
 
-  public Integer getMaxStopPageId(String flowId);
-
-  public List<FlowVo> getFlowList();
+  List<FlowVo> getFlowList();
 
   /**
    * Paging query flow
    *
-   * @param username
-   * @param isAdmin
+   * @param username username
+   * @param isAdmin isAdmin
    * @param offset Number of pages
    * @param limit Number of pages per page
    * @param param search for the keyword
-   * @return
    */
-  public String getFlowListPage(
-      String username, boolean isAdmin, Integer offset, Integer limit, String param);
+  Page<FlowVo> getFlowListPage(
+      String username, boolean isAdmin, int offset, int limit, String param);
 
-  public String getFlowExampleList();
+  String getFlowExampleList();
 
   /**
    * Call the start interface and save the return information
    *
-   * @param flowId
-   * @return
+   * @param flowId flowId
    */
-  public String runFlow(String username, boolean isAdmin, String flowId, String runMode);
+  String runFlow(String username, boolean isAdmin, String flowId, String runMode) throws Exception;
 
-  public String updateFlowBaseInfo(String username, String fId, FlowVo flowVo);
+  /**
+   * Call the start interface and save the return information
+   *
+   * @param publishingId publishingId
+   */
+  String runFlowByPublishingId(
+      String username, boolean isAdmin, String publishingId, String runMode) throws Exception;
 
-  public String updateFlowNameById(
-      String username, String id, String flowGroupId, String flowName, String pageId);
+  String updateFlowBaseInfo(String username, String fId, FlowInfoVoRequestUpdate flowVo)
+      throws Exception;
 
-  public Boolean updateFlowNameById(String username, String id, String flowName);
+  String updateFlowNameById(
+      String username, String id, String flowGroupId, String flowName, String pageId)
+      throws Exception;
 
-  public Integer getMaxFlowPageIdByFlowGroupId(String flowGroupId);
+  Boolean updateFlowNameById(String username, String id, String flowName) throws Exception;
 
-  public String drawingBoardData(
-      String username, boolean isAdmin, String load, String parentAccessPath);
+  Integer getMaxFlowPageIdByFlowGroupId(String flowGroupId);
+
+  String drawingBoardData(String username, boolean isAdmin, String load, String parentAccessPath);
 }

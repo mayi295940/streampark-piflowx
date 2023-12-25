@@ -1,11 +1,11 @@
 package org.apache.streampark.console.flow.component.testData.utils;
 
+import org.apache.streampark.console.flow.controller.requestVo.TestDataSchemaValuesSaveVo;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.streampark.console.flow.controller.requestVo.TestDataSchemaValuesSaveVo;
 
 public class TestDataSchemaValuesSaveVoUtils {
 
@@ -15,7 +15,8 @@ public class TestDataSchemaValuesSaveVoUtils {
     }
     // Also convert the json string to a json object, and then convert the json object to a java
     // object, as shown below.
-    JSONObject obj = JSONObject.fromObject(json); // Convert a json string to a json object
+    // Convert a json string to a json object
+    JSONObject obj = JSONObject.fromObject(json);
     // Needed when there is a List in jsonObj
     @SuppressWarnings("rawtypes")
     Map<String, Class> classMap = new HashMap<String, Class>();

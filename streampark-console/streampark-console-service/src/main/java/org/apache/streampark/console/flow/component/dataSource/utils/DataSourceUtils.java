@@ -1,15 +1,15 @@
 package org.apache.streampark.console.flow.component.dataSource.utils;
 
+import org.apache.streampark.console.flow.component.dataSource.entity.DataSource;
+import org.apache.streampark.console.flow.component.dataSource.entity.DataSourceProperty;
+import org.apache.streampark.console.flow.component.dataSource.vo.DataSourcePropertyVo;
+import org.apache.streampark.console.flow.component.dataSource.vo.DataSourceVo;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.apache.streampark.console.flow.component.dataSource.entity.DataSource;
-import org.apache.streampark.console.flow.component.dataSource.entity.DataSourceProperty;
-import org.apache.streampark.console.flow.component.dataSource.vo.DataSourcePropertyVo;
-import org.apache.streampark.console.flow.component.dataSource.vo.DataSourceVo;
 
 public class DataSourceUtils {
   /**

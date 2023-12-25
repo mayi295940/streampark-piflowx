@@ -1,16 +1,14 @@
 package org.apache.streampark.console.flow.component.mxGraph.utils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
-import org.apache.streampark.console.flow.base.util.UUIDUtils;
+import org.apache.streampark.console.flow.base.utils.UUIDUtils;
 import org.apache.streampark.console.flow.component.mxGraph.entity.MxCell;
 import org.apache.streampark.console.flow.component.mxGraph.entity.MxGeometry;
 import org.apache.streampark.console.flow.component.mxGraph.entity.MxGraphModel;
 import org.apache.streampark.console.flow.component.mxGraph.vo.MxCellVo;
 import org.apache.streampark.console.flow.component.mxGraph.vo.MxGeometryVo;
+import java.util.*;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 
 public class MxCellUtils {
 
@@ -188,5 +186,109 @@ public class MxCellUtils {
       mxCellNew.setMxGeometry(mxGeometryNew);
     }
     return mxCellNew;
+  }
+
+  /**
+   * copyAndNewMxCell
+   *
+   * @param username operator
+   * @param mxCell source data
+   * @param isAddId Add ID or not
+   * @return
+   */
+  public static MxCell copyAndNewMxCell(String username, MxCell mxCell, boolean isAddId) {
+    if (null == mxCell) {
+      return null;
+    }
+    MxCell mxCellNew = new MxCell();
+    BeanUtils.copyProperties(mxCell, mxCellNew);
+    if (isAddId) {
+      mxCellNew.setId(UUIDUtils.getUUID32());
+    } else {
+      mxCellNew.setId(null);
+    }
+    mxCellNew = initMxCellBasicPropertiesNoId(mxCellNew, username);
+    MxGeometry mxGeometry = mxCell.getMxGeometry();
+    if (null != mxGeometry) {
+      MxGeometry mxGeometryNew = new MxGeometry();
+      BeanUtils.copyProperties(mxGeometry, mxGeometryNew);
+      if (isAddId) {
+        mxGeometryNew.setId(UUIDUtils.getUUID32());
+      } else {
+        mxGeometryNew.setId(null);
+      }
+      mxGeometryNew.setMxCell(mxCellNew);
+      mxGeometryNew = MxGeometryUtils.initMxGeometryBasicPropertiesNoId(mxGeometryNew, username);
+      mxCellNew.setMxGeometry(mxGeometryNew);
+    }
+    return mxCellNew;
+  }
+
+  /**
+   * mxCellVoToNewMxCell
+   *
+   * @param username operator
+   * @param mxCellVo source data
+   * @param isAddId Add ID or not
+   * @return
+   */
+  public static MxCell mxCellVoToNewMxCell(String username, MxCellVo mxCellVo, boolean isAddId) {
+    if (null == mxCellVo) {
+      return null;
+    }
+
+    MxCell mxCellNew = new MxCell();
+    // Copy the value in mxCellVo to mxCell
+    BeanUtils.copyProperties(mxCellVo, mxCellNew);
+    if (isAddId) {
+      mxCellNew.setId(UUIDUtils.getUUID32());
+    } else {
+      mxCellNew.setId(null);
+    }
+    // 'mxCell' basic properties (required when creating)
+    mxCellNew = initMxCellBasicPropertiesNoId(mxCellNew, username);
+
+    MxGeometryVo mxGeometryVo = mxCellVo.getMxGeometryVo();
+    if (null != mxGeometryVo) {
+      MxGeometry mxGeometryNew = new MxGeometry();
+      // Copy the value in mxGeometryVo to mxGeometry
+      BeanUtils.copyProperties(mxGeometryVo, mxGeometryNew);
+      if (isAddId) {
+        mxGeometryNew.setId(UUIDUtils.getUUID32());
+      } else {
+        mxGeometryNew.setId(null);
+      }
+      // mxGeometry basic properties(required when creating)
+      mxGeometryNew = MxGeometryUtils.initMxGeometryBasicPropertiesNoId(mxGeometryNew, username);
+      mxGeometryNew.setMxCell(mxCellNew);
+      mxCellNew.setMxGeometry(mxGeometryNew);
+    }
+    return mxCellNew;
+  }
+
+  public static Map<String, String> mxCellStyleToParamData(String style) {
+    if (StringUtils.isBlank(style)) {
+      return new HashMap<>();
+    }
+    String[] styleArray = style.split(";data=");
+    if (styleArray.length <= 1) {
+      return new HashMap<>();
+    }
+    String[] paramDataArray = styleArray[1].split(";")[0].split("&");
+    if (paramDataArray.length <= 0) {
+      return new HashMap<>();
+    }
+    Map<String, String> paramData = new HashMap<>();
+    for (String str : paramDataArray) {
+      if (StringUtils.isBlank(str)) {
+        continue;
+      }
+      String[] paramArray = str.split("=");
+      if (paramArray.length <= 1) {
+        continue;
+      }
+      paramData.put(paramArray[0], paramArray[1]);
+    }
+    return paramData;
   }
 }

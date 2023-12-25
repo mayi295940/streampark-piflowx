@@ -1,46 +1,58 @@
 package org.apache.streampark.console.flow.component.mxGraph.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import javax.annotation.Resource;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import org.apache.streampark.console.flow.base.util.FileUtils;
-import org.apache.streampark.console.flow.base.util.LoggerUtil;
-import org.apache.streampark.console.flow.base.util.ReturnMapUtils;
-import org.apache.streampark.console.flow.base.util.UUIDUtils;
+import org.apache.streampark.console.flow.base.utils.FileUtils;
+import org.apache.streampark.console.flow.base.utils.ReturnMapUtils;
+import org.apache.streampark.console.flow.base.utils.UUIDUtils;
+import org.apache.streampark.console.flow.common.constant.Constants;
+import org.apache.streampark.console.flow.common.constant.MessageConfig;
 import org.apache.streampark.console.flow.common.constant.SysParamsCache;
+import org.apache.streampark.console.flow.component.mxGraph.domain.MxNodeImageDomain;
 import org.apache.streampark.console.flow.component.mxGraph.entity.MxNodeImage;
-import org.apache.streampark.console.flow.component.mxGraph.jpa.domain.MxNodeImageDomain;
 import org.apache.streampark.console.flow.component.mxGraph.service.IMxNodeImageService;
 import org.apache.streampark.console.flow.component.mxGraph.utils.MxNodeImageUtils;
 import org.apache.streampark.console.flow.component.mxGraph.vo.MxNodeImageVo;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class MxNodeImageServiceImpl implements IMxNodeImageService {
 
-  Logger logger = LoggerUtil.getLogger();
+  private final MxNodeImageDomain mxNodeImageDomain;
 
-  @Resource private MxNodeImageDomain mxNodeImageDomain;
+  @Autowired
+  public MxNodeImageServiceImpl(MxNodeImageDomain mxNodeImageDomain) {
+    this.mxNodeImageDomain = mxNodeImageDomain;
+  }
 
   @Override
-  public String uploadNodeImage(String username, MultipartFile file, String imageType) {
+  public String uploadNodeImage(
+      String username, MultipartFile file, String imageType, String nodeEngineType)
+      throws Exception {
+
     if (StringUtils.isBlank(username)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("illegal user");
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
     }
     if (StringUtils.isBlank(imageType)) {
       return ReturnMapUtils.setFailedMsgRtnJsonStr("imageType is null");
     }
     if (file.isEmpty()) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("Upload failed, please try again later");
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.UPLOAD_FAILED_MSG());
     }
-    Map<String, Object> uploadMap = FileUtils.uploadRtnMap(file, SysParamsCache.IMAGES_PATH, null);
+
+    String imagePath =
+        Constants.ENGIN_FLINK.equalsIgnoreCase(nodeEngineType)
+            ? SysParamsCache.ENGINE_FLINK_IMAGES_PATH
+            : SysParamsCache.ENGINE_SPARK_IMAGES_PATH;
+
+    Map<String, Object> uploadMap = FileUtils.uploadRtnMap(file, imagePath, null);
     if (null == uploadMap || uploadMap.isEmpty()) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("Upload failed, please try again later");
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.UPLOAD_FAILED_MSG());
     }
     Integer code = (Integer) uploadMap.get("code");
     if (500 == code) {
@@ -55,14 +67,14 @@ public class MxNodeImageServiceImpl implements IMxNodeImageService {
     mxNodeImage.setImagePath(path);
     mxNodeImage.setImageUrl("/images/" + saveFileName);
     mxNodeImage.setImageType(imageType);
-    mxNodeImageDomain.saveOrUpdate(mxNodeImage);
+    mxNodeImageDomain.addMxNodeImage(mxNodeImage);
     return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("imgUrl", mxNodeImage.getImageUrl());
   }
 
   @Override
   public String getMxNodeImageList(String username, String imageType) {
     if (StringUtils.isBlank(username)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("illegal user");
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
     }
     if (StringUtils.isBlank(imageType)) {
       return ReturnMapUtils.setFailedMsgRtnJsonStr("imageType is null");
@@ -70,7 +82,7 @@ public class MxNodeImageServiceImpl implements IMxNodeImageService {
     List<MxNodeImageVo> mxNodeImageVoList = new ArrayList<>();
     List<MxNodeImage> mxNodeImageList =
         mxNodeImageDomain.userGetMxNodeImageListByImageType(username, imageType);
-    if (null == mxNodeImageList || mxNodeImageList.size() <= 0) {
+    if (null == mxNodeImageList || mxNodeImageList.size() == 0) {
       return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("nodeImageList", mxNodeImageList);
     }
     MxNodeImageVo mxNodeImageVo;

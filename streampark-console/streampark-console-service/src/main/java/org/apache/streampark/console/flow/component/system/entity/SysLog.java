@@ -1,0 +1,25 @@
+package org.apache.streampark.console.flow.component.system.entity;
+
+import java.io.Serializable;
+import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
+
+/** sys_operation_log */
+@Getter
+@Setter
+public class SysLog implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
+  private String id;
+  private String username;
+  private String lastLoginIp;
+  private String action;
+  private Boolean status;
+  private String result;
+  private String comment;
+  private Date ctrDttm;
+  private Date lastUpdateDttm;
+  private Boolean enableFlag;
+}

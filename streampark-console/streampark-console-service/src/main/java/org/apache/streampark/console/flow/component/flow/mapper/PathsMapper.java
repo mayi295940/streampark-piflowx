@@ -1,39 +1,49 @@
 package org.apache.streampark.console.flow.component.flow.mapper;
 
-import java.util.List;
-import org.apache.ibatis.annotations.*;
-import org.apache.ibatis.mapping.FetchType;
 import org.apache.streampark.console.flow.component.flow.entity.Paths;
 import org.apache.streampark.console.flow.component.flow.mapper.provider.PathsMapperProvider;
+import java.util.List;
+import org.apache.ibatis.annotations.InsertProvider;
+import org.apache.ibatis.annotations.Many;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
+import org.apache.ibatis.mapping.FetchType;
 
 @Mapper
 public interface PathsMapper {
+
+  /**
+   * Insert paths
+   *
+   * @param paths paths
+   */
+  @InsertProvider(type = PathsMapperProvider.class, method = "addPaths")
+  int addPaths(Paths paths);
+
   /**
    * Insert "list<Paths>" Note that the method of spelling SQL must use "map" to connect the "Param"
    * content to the key value.
    *
-   * @param username
-   * @param pathsList
-   * @return
+   * @param pathsList pathsList
    */
   @InsertProvider(type = PathsMapperProvider.class, method = "addPathsList")
-  public int addPathsList(
-      @Param("username") String username, @Param("pathsList") List<Paths> pathsList);
+  int addPathsList(List<Paths> pathsList);
 
   /**
    * update paths
    *
-   * @param paths
-   * @return
+   * @param paths paths
    */
   @UpdateProvider(type = PathsMapperProvider.class, method = "updatePaths")
-  public int updatePaths(String username, Paths paths);
+  int updatePaths(Paths paths);
 
   /**
    * Query according to "flowId"
    *
-   * @param flowId
-   * @return
+   * @param flowId flowId
    */
   @SelectProvider(type = PathsMapperProvider.class, method = "getPathsListByFlowId")
   @Results({
@@ -42,7 +52,7 @@ public interface PathsMapper {
     @Result(column = "line_outport", property = "outport"),
     @Result(column = "line_inport", property = "inport")
   })
-  public List<Paths> getPathsListByFlowId(String flowId);
+  List<Paths> getPathsListByFlowId(String flowId);
 
   /**
    * Query connection information
@@ -51,7 +61,6 @@ public interface PathsMapper {
    * @param pageId path pageID
    * @param from path from
    * @param to path to
-   * @return
    */
   @SelectProvider(type = PathsMapperProvider.class, method = "getPaths")
   @Results({
@@ -68,7 +77,7 @@ public interface PathsMapper {
                 select = "cn.cnic.component.flow.mapper.FlowMapper.getFlowById",
                 fetchType = FetchType.LAZY))
   })
-  public List<Paths> getPaths(String flowId, String pageId, String from, String to);
+  List<Paths> getPaths(String flowId, String pageId, String from, String to);
 
   /**
    * Query connection information
@@ -77,7 +86,6 @@ public interface PathsMapper {
    * @param pageId path pageID
    * @param from path from
    * @param to path to
-   * @return
    */
   @SelectProvider(type = PathsMapperProvider.class, method = "getPaths")
   @Results({
@@ -94,8 +102,7 @@ public interface PathsMapper {
                 select = "cn.cnic.component.flow.mapper.FlowMapper.getFlowById",
                 fetchType = FetchType.LAZY))
   })
-  public List<Paths> getPathsByFlowIdAndStopPageId(
-      String flowId, String pageId, String from, String to);
+  List<Paths> getPathsByFlowIdAndStopPageId(String flowId, String pageId, String from, String to);
 
   /**
    * Query the number of connections
@@ -104,26 +111,25 @@ public interface PathsMapper {
    * @param pageId path pageID
    * @param from path from
    * @param to path to
-   * @return
    */
   @SelectProvider(type = PathsMapperProvider.class, method = "getPathsCounts")
-  public Integer getPathsCounts(String flowId, String pageId, String from, String to);
+  Integer getPathsCounts(String flowId, String pageId, String from, String to);
 
   /**
    * Query paths by id
    *
-   * @param id
-   * @return
+   * @param id id
    */
   @SelectProvider(type = PathsMapperProvider.class, method = "getPathsById")
-  public Paths getPathsById(String id);
+  Paths getPathsById(String id);
 
   /**
    * Logically delete flowInfo according to flowId
    *
-   * @param id
-   * @return
+   * @param username username
+   * @param flowId flowId
    */
   @UpdateProvider(type = PathsMapperProvider.class, method = "updateEnableFlagByFlowId")
-  public int updateEnableFlagByFlowId(String username, String flowId);
+  int updateEnableFlagByFlowId(String username, String flowId);
+
 }

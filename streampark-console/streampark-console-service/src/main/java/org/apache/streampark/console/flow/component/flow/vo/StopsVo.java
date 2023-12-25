@@ -1,5 +1,8 @@
 package org.apache.streampark.console.flow.component.flow.vo;
 
+import org.apache.streampark.console.flow.base.utils.DateUtils;
+import org.apache.streampark.console.flow.common.Eunm.PortType;
+import org.apache.streampark.console.flow.component.dataSource.vo.DataSourceVo;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -7,9 +10,6 @@ import java.util.Date;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.streampark.console.flow.base.util.DateUtils;
-import org.apache.streampark.console.flow.common.Eunm.PortType;
-import org.apache.streampark.console.flow.component.dataSource.vo.DataSourceVo;
 
 /** Stop component table */
 @Setter
@@ -24,7 +24,7 @@ public class StopsVo implements Serializable {
 
   private String name;
 
-  private String bundel;
+  private String bundle;
 
   private String groups;
 
@@ -59,6 +59,10 @@ public class StopsVo implements Serializable {
   private List<StopsPropertyVo> oldPropertiesVo = new ArrayList<>();
 
   private List<StopsCustomizedPropertyVo> stopsCustomizedPropertyVoList = new ArrayList<>();
+
+  private Boolean isDataSource = false;
+
+  private Boolean isDisabled = false;
 
   public String getCrtDttmString() {
     SimpleDateFormat sdf = new SimpleDateFormat(DateUtils.DATE_PATTERN_yyyy_MM_dd_HH_MM_ss);

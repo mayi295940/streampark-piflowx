@@ -13,6 +13,7 @@ public class ThirdStopsComponentVo implements Serializable {
 
   private String name;
   private String bundle;
+  private String engineType;
   private String owner;
   private String inports;
   private String outports;
@@ -22,4 +23,5 @@ public class ThirdStopsComponentVo implements Serializable {
   private String icon;
   private String visualizationType;
   List<ThirdStopsComponentPropertyVo> properties;
+  private boolean isDataSource;
 }

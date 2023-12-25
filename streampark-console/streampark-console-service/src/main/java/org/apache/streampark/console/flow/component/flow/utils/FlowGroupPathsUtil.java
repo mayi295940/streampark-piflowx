@@ -1,12 +1,13 @@
 package org.apache.streampark.console.flow.component.flow.utils;
 
+import org.apache.streampark.console.flow.base.utils.UUIDUtils;
+import org.apache.streampark.console.flow.component.flow.entity.FlowGroupPaths;
+import org.apache.streampark.console.flow.component.flow.vo.FlowGroupPathsVo;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import org.springframework.beans.BeanUtils;
-import org.apache.streampark.console.flow.base.util.UUIDUtils;
-import org.apache.streampark.console.flow.component.flow.entity.FlowGroupPaths;
-import org.apache.streampark.console.flow.component.flow.vo.FlowGroupPathsVo;
 
 public class FlowGroupPathsUtil {
   /**

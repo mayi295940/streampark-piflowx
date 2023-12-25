@@ -1,12 +1,12 @@
 package org.apache.streampark.console.flow.component.flow.vo;
 
+import org.apache.streampark.console.flow.base.utils.DateUtils;
+import org.apache.streampark.console.flow.component.flow.entity.Stops;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.streampark.console.flow.base.util.DateUtils;
-import org.apache.streampark.console.flow.component.flow.entity.Stops;
 
 @Getter
 @Setter

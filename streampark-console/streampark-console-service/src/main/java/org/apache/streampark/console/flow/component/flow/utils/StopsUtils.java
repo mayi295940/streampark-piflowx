@@ -1,8 +1,8 @@
 package org.apache.streampark.console.flow.component.flow.utils;
 
-import java.util.*;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.streampark.console.flow.base.utils.LoggerUtil;
 import org.apache.streampark.console.flow.component.dataSource.entity.DataSource;
+import org.apache.streampark.console.flow.component.dataSource.entity.DataSourceProperty;
 import org.apache.streampark.console.flow.component.dataSource.utils.DataSourceUtils;
 import org.apache.streampark.console.flow.component.dataSource.vo.DataSourceVo;
 import org.apache.streampark.console.flow.component.flow.entity.CustomizedProperty;
@@ -11,11 +11,16 @@ import org.apache.streampark.console.flow.component.flow.entity.Stops;
 import org.apache.streampark.console.flow.component.flow.vo.StopsCustomizedPropertyVo;
 import org.apache.streampark.console.flow.component.flow.vo.StopsPropertyVo;
 import org.apache.streampark.console.flow.component.flow.vo.StopsVo;
-import org.apache.streampark.console.flow.component.stopsComponent.model.StopsComponent;
-import org.apache.streampark.console.flow.component.stopsComponent.model.StopsComponentProperty;
+import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponent;
+import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentProperty;
+import java.util.*;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 
 public class StopsUtils {
+
+  private static Logger logger = LoggerUtil.getLogger();
 
   public static Stops stopsNewNoId(String username) {
 
@@ -96,6 +101,14 @@ public class StopsUtils {
     List<StopsPropertyVo> oldPropertyVos =
         propertyListPoToVo(stop.getOldProperties(), dataSourcePropertyMap);
     stopsVo.setOldPropertiesVo(oldPropertyVos);
+
+    return stopComponentToStopsVo(stopsVo, stopComponent);
+  }
+
+  public static StopsVo stopComponentToStopsVo(StopsVo stopsVo, StopsComponent stopComponent) {
+    if (null == stopsVo) {
+      stopsVo = new StopsVo();
+    }
     if (null != stopComponent) {
       List<StopsComponentProperty> stopComponentProperties = stopComponent.getProperties();
       List<StopsPropertyVo> propertiesVo = stopsVo.getPropertiesVo();
@@ -135,7 +148,7 @@ public class StopsUtils {
    * @return
    */
   public static List<StopsPropertyVo> propertyListPoToVo(
-          List<Property> properties, Map<String, String> dataSourcePropertyMap) {
+      List<Property> properties, Map<String, String> dataSourcePropertyMap) {
     List<StopsPropertyVo> propertiesVo = null;
     if (null != properties && properties.size() > 0) {
       propertiesVo = new ArrayList<>();
@@ -187,5 +200,74 @@ public class StopsUtils {
       }
     }
     return propertiesVo;
+  }
+
+  public static Stops fillStopsPropertiesByDatasource(
+      Stops stops, DataSource dataSource, String username) {
+    return PropertiesCopyDatasourceToStops(stops, dataSource, username, true);
+  }
+
+  public static Stops PropertiesCopyDatasourceToStops(
+      Stops stops, DataSource dataSource, String username, boolean isLockedProperty) {
+    if (null == stops) {
+      logger.error("fill failed, stop is null ");
+      return null;
+    }
+    // Get Stops all attributes
+    List<Property> propertyList = stops.getProperties();
+    // Determine if the "stop" attribute with ID "stopId" is empty. Returns if it is empty,
+    // otherwise continues.
+    if (null == propertyList || propertyList.size() <= 0) {
+      logger.error("fill failed,stop property is null");
+      return stops;
+    }
+    if (null == dataSource) {
+      logger.error("fill failed,dataSource is null");
+      return stops;
+    }
+    // Get Database all attributes
+    List<DataSourceProperty> dataSourcePropertyList = dataSource.getDataSourcePropertyList();
+    // Determine whether the Datasource attribute whose ID is "dataSourceId" is empty. Returns if it
+    // is empty, otherwise it is converted to Map.
+    if (null == dataSourcePropertyList || dataSourcePropertyList.size() <= 0) {
+      logger.error("fill failed,dataSource property is null");
+      return stops;
+    }
+    // datasource Property Map(Key is the attribute name)
+    Map<String, String> dataSourcePropertyMap = new HashMap<>();
+    // Loop "datasource" attribute to map
+    for (DataSourceProperty dataSourceProperty : dataSourcePropertyList) {
+      // "datasource" attribute name
+      String dataSourcePropertyName = dataSourceProperty.getName();
+      // Judge empty and lowercase
+      if (StringUtils.isNotBlank(dataSourcePropertyName)) {
+        dataSourcePropertyName = dataSourcePropertyName.toLowerCase();
+      }
+      dataSourcePropertyMap.put(dataSourcePropertyName, dataSourceProperty.getValue());
+    }
+    // Loop fill "stop"
+    for (Property property : propertyList) {
+      // "stop" attribute name
+      String name = property.getName();
+      property.setStops(stops);
+      // Judge empty
+      if (StringUtils.isBlank(name)) {
+        continue;
+      }
+      // Go to the map of the "datasource" attribute
+      String value = dataSourcePropertyMap.get(name.toLowerCase());
+      // Judge empty
+      if (StringUtils.isBlank(value)) {
+        continue;
+      }
+      // Assignment
+      property.setCustomValue(value);
+      property.setIsLocked(isLockedProperty);
+      property.setLastUpdateDttm(new Date());
+      property.setLastUpdateUser(username);
+    }
+    stops.setDataSource(dataSource);
+    stops.setProperties(propertyList);
+    return stops;
   }
 }

@@ -4,7 +4,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface IMxNodeImageService {
 
-  public String uploadNodeImage(String username, MultipartFile file, String imageType);
+  String uploadNodeImage(
+      String username, MultipartFile file, String imageType, String nodeEngineType)
+      throws Exception;
 
-  public String getMxNodeImageList(String username, String imageType);
+  String getMxNodeImageList(String username, String imageType);
 }

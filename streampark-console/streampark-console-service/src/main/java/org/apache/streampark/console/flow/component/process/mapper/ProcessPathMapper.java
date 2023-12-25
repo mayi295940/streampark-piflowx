@@ -1,9 +1,14 @@
 package org.apache.streampark.console.flow.component.process.mapper;
 
-import java.util.List;
-import org.apache.ibatis.annotations.*;
 import org.apache.streampark.console.flow.component.process.entity.ProcessPath;
 import org.apache.streampark.console.flow.component.process.mapper.provider.ProcessPathMapperProvider;
+import java.util.List;
+import org.apache.ibatis.annotations.InsertProvider;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 
 @Mapper
 public interface ProcessPathMapper {
@@ -11,26 +16,23 @@ public interface ProcessPathMapper {
   /**
    * add processPath
    *
-   * @param processPath
-   * @return
+   * @param processPath processPath
    */
   @InsertProvider(type = ProcessPathMapperProvider.class, method = "addProcessPath")
-  public int addProcessPath(ProcessPath processPath);
+  int addProcessPath(ProcessPath processPath);
 
   /**
    * add processPath
    *
-   * @param processPathList
-   * @return
+   * @param processPathList processPathList
    */
   @InsertProvider(type = ProcessPathMapperProvider.class, method = "addProcessPathList")
-  public int addProcessPathList(@Param("processPathList") List<ProcessPath> processPathList);
+  int addProcessPathList(List<ProcessPath> processPathList);
 
   /**
    * Query processPath according to process Id
    *
-   * @param processId
-   * @return
+   * @param processId processId
    */
   @SelectProvider(type = ProcessPathMapperProvider.class, method = "getProcessPathByProcessId")
   @Results({
@@ -39,14 +41,13 @@ public interface ProcessPathMapper {
     @Result(column = "line_inport", property = "inport"),
     @Result(column = "line_to", property = "to")
   })
-  public ProcessPath getProcessPathByProcessId(String processId);
+  ProcessPath getProcessPathByProcessId(String processId);
 
   /**
    * Query based on pid and pageId
    *
-   * @param processId
-   * @param pageId
-   * @return
+   * @param processId processId
+   * @param pageId pageId
    */
   @SelectProvider(type = ProcessPathMapperProvider.class, method = "getProcessPathByPageIdAndPid")
   @Results({
@@ -56,26 +57,24 @@ public interface ProcessPathMapper {
     @Result(column = "line_inport", property = "inport"),
     @Result(column = "line_to", property = "to")
   })
-  public ProcessPath getProcessPathByPageIdAndPid(String processId, String pageId);
+  ProcessPath getProcessPathByPageIdAndPid(String processId, String pageId);
 
   /**
    * update processPath
    *
-   * @param processPath
-   * @return
+   * @param processPath processPath
    */
   @UpdateProvider(type = ProcessPathMapperProvider.class, method = "updateProcessPath")
-  public int updateProcessPath(ProcessPath processPath);
+  int updateProcessPath(ProcessPath processPath);
 
   @UpdateProvider(type = ProcessPathMapperProvider.class, method = "updateEnableFlagByProcessId")
-  public int updateEnableFlagByProcessId(String processId, String userName);
+  int updateEnableFlagByProcessId(String processId, String userName);
 
   /**
    * Query based on processGroupId and pageId
    *
-   * @param processGroupId
-   * @param pageId
-   * @return
+   * @param processGroupId processGroupId
+   * @param pageId pageId
    */
   @SelectProvider(
       type = ProcessPathMapperProvider.class,
@@ -87,5 +86,6 @@ public interface ProcessPathMapper {
     @Result(column = "line_inport", property = "inport"),
     @Result(column = "line_to", property = "to")
   })
-  public ProcessPath getProcessPathByPageIdAndProcessGroupId(String processGroupId, String pageId);
+  ProcessPath getProcessPathByPageIdAndProcessGroupId(String processGroupId, String pageId);
+
 }

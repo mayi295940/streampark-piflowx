@@ -1,5 +1,7 @@
 package org.apache.streampark.console.flow.component.testData.mapper;
 
+import org.apache.streampark.console.flow.component.testData.entity.TestDataSchemaValues;
+import org.apache.streampark.console.flow.component.testData.mapper.provider.TestDataSchemaValuesMapperProvider;
 import java.util.LinkedHashMap;
 import java.util.List;
 import org.apache.ibatis.annotations.InsertProvider;
@@ -12,8 +14,6 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.mapping.FetchType;
-import org.apache.streampark.console.flow.component.testData.entity.TestDataSchemaValues;
-import org.apache.streampark.console.flow.component.testData.mapper.provider.TestDataSchemaValuesMapperProvider;
 
 @Mapper
 public interface TestDataSchemaValuesMapper {
@@ -21,74 +21,96 @@ public interface TestDataSchemaValuesMapper {
   /**
    * add TestDataSchemaValues
    *
-   * @param testDataSchemaValues
-   * @return
+   * @param testDataSchemaValues testDataSchemaValues
    */
   @InsertProvider(
       type = TestDataSchemaValuesMapperProvider.class,
       method = "addTestDataSchemaValues")
-  public Integer addTestDataSchemaValues(TestDataSchemaValues testDataSchemaValues);
+  Integer addTestDataSchemaValues(TestDataSchemaValues testDataSchemaValues);
 
   /**
    * add TestDataSchemaValues list
    *
-   * @param testDataSchemaValuesList
-   * @return
+   * @param testDataSchemaValuesList testDataSchemaValuesList
    */
   @InsertProvider(
       type = TestDataSchemaValuesMapperProvider.class,
       method = "addTestDataSchemaValuesList")
-  public Integer addTestDataSchemaValuesList(List<TestDataSchemaValues> testDataSchemaValuesList);
+  Integer addTestDataSchemaValuesList(List<TestDataSchemaValues> testDataSchemaValuesList);
 
   /**
    * update TestDataSchemaValues
    *
-   * @param testDataSchemaValues
-   * @return
+   * @param testDataSchemaValues testDataSchemaValues
    */
   @UpdateProvider(
       type = TestDataSchemaValuesMapperProvider.class,
       method = "updateTestDataSchemaValues")
-  public Integer updateTestDataSchemaValues(TestDataSchemaValues testDataSchemaValues);
+  Integer updateTestDataSchemaValues(TestDataSchemaValues testDataSchemaValues);
 
   /**
    * update TestDataSchemaValues enable_flag
    *
-   * @param isAdmin
-   * @param username
-   * @param testDataId
-   * @return
+   * @param isAdmin isAdmin
+   * @param username username
+   * @param testDataId testDataId
    */
   @UpdateProvider(
       type = TestDataSchemaValuesMapperProvider.class,
       method = "delTestDataSchemaValuesByTestDataId")
-  public Integer delTestDataSchemaValuesByTestDataId(
-      @Param("isAdmin") boolean isAdmin,
-      @Param("username") String username,
-      @Param("testDataId") String testDataId);
+  Integer delTestDataSchemaValuesByTestDataId(boolean isAdmin, String username, String testDataId);
 
   /**
    * update TestDataSchemaValues enable_flag
    *
-   * @param isAdmin
-   * @param username
-   * @param schemaId
-   * @return
+   * @param isAdmin isAdmin
+   * @param username username
+   * @param schemaId schemaId
    */
   @UpdateProvider(
       type = TestDataSchemaValuesMapperProvider.class,
       method = "delTestDataSchemaValuesBySchemaId")
-  public Integer delTestDataSchemaValuesBySchemaId(
-      @Param("isAdmin") boolean isAdmin,
-      @Param("username") String username,
+  Integer delTestDataSchemaValuesBySchemaId(boolean isAdmin, String username, String schemaId);
+
+  /** get TestDataSchemaValues list */
+  @Select("select * from test_data_schema_values where enable_flag = 1 order by data_row asc ")
+  @Results({
+    @Result(
+        column = "fk_test_data_schema_id",
+        property = "testDataSchema",
+        one =
+            @One(
+                select =
+                    "cn.cnic.component.testData.mapper.TestDataSchemaMapper.getTestDataSchemaById",
+                fetchType = FetchType.LAZY))
+  })
+  List<TestDataSchemaValues> getTestDataSchemaValuesList();
+
+  /**
+   * get TestDataSchemaValuesList by schemaId
+   *
+   * @param schemaId schemaId
+   */
+  @Select(
+      "select * from test_data_schema_values "
+          + "where enable_flag = 1 "
+          + "and fk_test_data_schema_id = #{schemaId} "
+          + "order by data_row asc ")
+  @Results({
+    @Result(
+        column = "fk_test_data_schema_id",
+        property = "testDataSchema",
+        one =
+            @One(
+                select =
+                    "cn.cnic.component.testData.mapper.TestDataSchemaMapper.getTestDataSchemaById",
+                fetchType = FetchType.LAZY))
+  })
+  List<TestDataSchemaValues> getTestDataSchemaValuesListBySchemaId(
       @Param("schemaId") String schemaId);
 
-  /**
-   * get TestDataSchemaValues list
-   *
-   * @return
-   */
-  @Select("select * from test_data_schema_values where enable_flag=1 order by data_row asc ")
+  @Select(
+      "select * from test_data_schema_values where enable_flag = 1 and id = #{id} order by data_row asc ")
   @Results({
     @Result(
         column = "fk_test_data_schema_id",
@@ -99,50 +121,18 @@ public interface TestDataSchemaValuesMapper {
                     "cn.cnic.component.testData.mapper.TestDataSchemaMapper.getTestDataSchemaById",
                 fetchType = FetchType.LAZY))
   })
-  public List<TestDataSchemaValues> getTestDataSchemaValuesList();
+  TestDataSchemaValues getTestDataSchemaValuesById(@Param("id") String id);
 
   /**
    * get TestDataSchemaValuesList by schemaId
    *
-   * @param schemaId
-   * @return
+   * @param testDataId testDataId
    */
   @Select(
-      "select * from test_data_schema_values where enable_flag=1 and fk_test_data_schema_id=#{schemaId} order by data_row asc ")
-  @Results({
-    @Result(
-        column = "fk_test_data_schema_id",
-        property = "testDataSchema",
-        one =
-            @One(
-                select =
-                    "cn.cnic.component.testData.mapper.TestDataSchemaMapper.getTestDataSchemaById",
-                fetchType = FetchType.LAZY))
-  })
-  public List<TestDataSchemaValues> getTestDataSchemaValuesListBySchemaId(String schemaId);
-
-  @Select(
-      "select * from test_data_schema_values where enable_flag=1 and id=#{id} order by data_row asc ")
-  @Results({
-    @Result(
-        column = "fk_test_data_schema_id",
-        property = "testDataSchema",
-        one =
-            @One(
-                select =
-                    "cn.cnic.component.testData.mapper.TestDataSchemaMapper.getTestDataSchemaById",
-                fetchType = FetchType.LAZY))
-  })
-  public TestDataSchemaValues getTestDataSchemaValuesById(String id);
-
-  /**
-   * get TestDataSchemaValuesList by schemaId
-   *
-   * @param testDataId
-   * @return
-   */
-  @Select(
-      "select * from test_data_schema_values where enable_flag=1 and fk_test_data_id=#{testDataId} order by data_row asc ")
+      "select * from test_data_schema_values "
+          + "where enable_flag = 1 "
+          + "and fk_test_data_id = #{testDataId} "
+          + "order by data_row asc ")
   @Results({
     @Result(
         column = "fk_test_data_id",
@@ -160,41 +150,34 @@ public interface TestDataSchemaValuesMapper {
                     "cn.cnic.component.testData.mapper.TestDataSchemaMapper.getTestDataSchemaById",
                 fetchType = FetchType.LAZY))
   })
-  public List<TestDataSchemaValues> getTestDataSchemaValuesListByTestDataId(String testDataId);
+  List<TestDataSchemaValues> getTestDataSchemaValuesListByTestDataId(
+      @Param("testDataId") String testDataId);
 
   /**
    * get TestDataSchemaValues custom list
    *
-   * @param isAdmin
-   * @param username
-   * @param testDataId
-   * @param map
-   * @return
+   * @param isAdmin isAdmin
+   * @param username username
+   * @param testDataId testDataId
+   * @param map map
    */
   @SelectProvider(
       type = TestDataSchemaValuesMapperProvider.class,
       method = "getTestDataSchemaValuesCustomList")
-  public List<LinkedHashMap<String, Object>> getTestDataSchemaValuesCustomList(
-      @Param("isAdmin") boolean isAdmin,
-      @Param("username") String username,
-      @Param("testDataId") String testDataId,
-      @Param("fieldNameList") List<LinkedHashMap<String, Object>> map);
+  List<LinkedHashMap<String, Object>> getTestDataSchemaValuesCustomList(
+      boolean isAdmin, String username, String testDataId, List<LinkedHashMap<String, Object>> map);
 
   /**
    * get testDataSchemaValuesId custom list
    *
-   * @param isAdmin
-   * @param username
-   * @param testDataId
-   * @param map
-   * @return
+   * @param isAdmin isAdmin
+   * @param username username
+   * @param testDataId testDataId
+   * @param map map
    */
   @SelectProvider(
       type = TestDataSchemaValuesMapperProvider.class,
       method = "getTestDataSchemaValuesCustomListId")
-  public List<LinkedHashMap<String, Object>> getTestDataSchemaValuesCustomListId(
-      @Param("isAdmin") boolean isAdmin,
-      @Param("username") String username,
-      @Param("testDataId") String testDataId,
-      @Param("fieldNameList") List<LinkedHashMap<String, Object>> map);
+  List<LinkedHashMap<String, Object>> getTestDataSchemaValuesCustomListId(
+      boolean isAdmin, String username, String testDataId, List<LinkedHashMap<String, Object>> map);
 }

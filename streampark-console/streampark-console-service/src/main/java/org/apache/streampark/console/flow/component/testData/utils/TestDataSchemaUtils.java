@@ -1,11 +1,11 @@
 package org.apache.streampark.console.flow.component.testData.utils;
 
+import org.apache.streampark.console.flow.base.utils.UUIDUtils;
+import org.apache.streampark.console.flow.component.testData.entity.TestDataSchema;
+import org.apache.streampark.console.flow.controller.requestVo.TestDataSchemaVoRequest;
 import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.apache.streampark.console.flow.base.util.UUIDUtils;
-import org.apache.streampark.console.flow.component.testData.entity.TestDataSchema;
-import org.apache.streampark.console.flow.controller.requestVo.RequestTestDataSchemaVo;
 
 public class TestDataSchemaUtils {
 
@@ -34,7 +34,7 @@ public class TestDataSchemaUtils {
    * @return
    */
   public static TestDataSchema copyDataToTestDataSchema(
-          RequestTestDataSchemaVo testDataSchemaVo, TestDataSchema testDataSchema, String username) {
+      TestDataSchemaVoRequest testDataSchemaVo, TestDataSchema testDataSchema, String username) {
     if (null == testDataSchemaVo || StringUtils.isBlank(username)) {
       return null;
     }

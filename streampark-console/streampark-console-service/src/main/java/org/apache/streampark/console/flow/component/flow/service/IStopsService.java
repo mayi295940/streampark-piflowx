@@ -1,42 +1,15 @@
 package org.apache.streampark.console.flow.component.flow.service;
 
-import java.util.List;
-import org.apache.streampark.console.flow.component.flow.vo.StopsVo;
+
+import org.apache.streampark.console.flow.component.flow.vo.StopsCustomizedPropertyVo;
 import org.apache.streampark.console.flow.controller.requestVo.RunStopsVo;
-import org.apache.streampark.console.flow.third.vo.flow.ThirdFlowInfoStopVo;
 
 public interface IStopsService {
 
-  public int deleteStopsByFlowId(String id);
-
   /**
-   * Query "stops" based on "flowId" and "pagesId"
+   * Modify the "isCheckpoint" field
    *
-   * @param flowId Required
-   * @param pageIds Can be empty
-   * @return
-   */
-  public List<StopsVo> getStopsByFlowIdAndPageIds(String flowId, String[] pageIds);
-
-  /**
-   * update stop
-   *
-   * @param stopsVo
-   * @return
-   */
-  public Integer stopsUpdate(String username, StopsVo stopsVo) throws Exception;
-
-  /**
-   * Modify the "stops" individual fields returned by the interface
-   *
-   * @param stopVo
-   * @return
-   */
-  public int updateStopsByFlowIdAndName(ThirdFlowInfoStopVo stopVo);
-
-  /**
-   * Modify the isCheckpoint field
-   *
+   * @param username
    * @param stopId
    * @param isCheckpointStr
    * @return
@@ -48,6 +21,7 @@ public interface IStopsService {
   /**
    * Modify "stopName" based on id
    *
+   * @param username
    * @param id
    * @param stopName
    * @return
@@ -85,17 +59,28 @@ public interface IStopsService {
       String pageId)
       throws Exception;
 
+  /**
+   * get Stop port info
+   *
+   * @param flowId
+   * @param sourceId
+   * @param targetId
+   * @param pathLineId
+   * @return
+   */
   public String getStopsPort(String flowId, String sourceId, String targetId, String pathLineId);
 
   /**
    * fill datasource to stop
    *
+   * @param username
+   * @param isAdmin
    * @param dataSourceId
    * @param stopId
    * @return
    * @throws Exception
    */
-  public String fillDatasource(String username, String dataSourceId, String stopId)
+  public String fillDatasource(String username, boolean isAdmin, String dataSourceId, String stopId)
       throws Exception;
 
   /**
@@ -126,4 +111,69 @@ public interface IStopsService {
    * @return
    */
   public String checkDatasourceLinked(String datasourceId);
+
+  /**
+   * Add Stop customized property
+   *
+   * @param username
+   * @param stopsCustomizedPropertyVo
+   * @return
+   * @throws Exception
+   */
+  public String addStopCustomizedProperty(
+      String username, StopsCustomizedPropertyVo stopsCustomizedPropertyVo) throws Exception;
+
+  /**
+   * Update Stop customized property
+   *
+   * @param username
+   * @param stopsCustomizedPropertyVo
+   * @return
+   */
+  public String updateStopsCustomizedProperty(
+      String username, StopsCustomizedPropertyVo stopsCustomizedPropertyVo);
+
+  /**
+   * Delete Stop customized property
+   *
+   * @param username
+   * @param customPropertyId
+   * @return
+   */
+  public String deleteStopsCustomizedProperty(String username, String customPropertyId);
+
+  /**
+   * Delete RouterStop customized property
+   *
+   * @param username
+   * @param customPropertyId
+   * @return
+   */
+  public String deleteRouterStopsCustomizedProperty(String username, String customPropertyId);
+
+  /**
+   * Get RouterStops customized property
+   *
+   * @param customPropertyId
+   * @return
+   */
+  public String getRouterStopsCustomizedProperty(String customPropertyId);
+
+  /**
+   * Get stops name by flow id
+   *
+   * @param flowId
+   * @return
+   */
+  public String getStopsNameByFlowId(String flowId);
+
+  /**
+   * Get stops info by id,if type is python,it's file_record_id,if type is scala,it's
+   * flow_stops_template_id
+   *
+   * @param id
+   * @param type
+   * @return
+   */
+  String getStopsInfoById(String id, String type);
 }

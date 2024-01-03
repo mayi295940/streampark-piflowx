@@ -155,7 +155,7 @@ insert into `t_menu` values (150702, 150601, 'flow add', null, null, 'flow:add',
 insert into `t_menu` values (150703, 150601, 'flow update', null, null, 'flow:update', null, '1', 1, null, now(), now());
 insert into `t_menu` values (150704, 150601, 'flow delete', null, null, 'flow:delete', null, '1', 1, null, now(), now());
 
-insert into `t_menu` values (150801, 160000, 'flow.drawingBoard', '/flow/drawingBoard', 'flow/flow/DrawingBoard', null, null, '1', 1, null, now(), now());
+insert into `t_menu` values (150801, 160000, 'flow.drawingBoard', '/flow/drawingBoard', 'flow/draw/drawingBoard', null, null, '0', 0, null, now(), now());
 
 -- ----------------------------
 -- Records of t_role

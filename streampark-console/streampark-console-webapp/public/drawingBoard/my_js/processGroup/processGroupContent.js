@@ -4,15 +4,16 @@ var checkpointShow = $('#checkpointShow');
 var isLoadProcessInfo = true;
 var isEnd = false;
 var timer;
+var isProgress = false;
 
 function processGroupOperationBtn(processState) {
-    console.log(processState);
     if ($('#runFlowGroup')) {
         if ("COMPLETED" !== processState && "FAILED" !== processState && "KILLED" !== processState) {
             $('#runFlowGroup').hide();
             $('#debugFlowGroup').hide();
             $('#stopFlowGroup').show();
-            timer = window.setInterval("processGroupMonitoring(appId)", 5000);
+            //timer = window.setInterval("processGroupMonitoring(appId)", 5000);
+            processGroupMonitoring(appId);
         } else {
             $('#runFlowGroup').show();
             $('#debugFlowGroup').show();
@@ -187,7 +188,7 @@ function selectRunMode(runMode) {
         + '</div>';
     layer.open({
         type: 1,
-        title: '<span style="color: #269252;">Select Run Mode</span>',
+        title: '<span style="color: var(--button-color);">Select Run Mode</span>',
         shadeClose: true,
         closeBtn: 1,
         shift: 7,
@@ -263,7 +264,7 @@ function stopProcessGroup() {
         url: "/processGroup/stopProcessGroup",//This is the name of the file where I receive data in the background.
         //data:$('#loginForm').serialize(),//Serialize the form
         data: {
-            processGroupId: processGroupId
+            processGroupId: loadId
         },
         async: true,//Setting it to true indicates that other code can still be executed after the request has started. If this option is set to false, it means that all requests are no longer asynchronous, which also causes the browser to be locked.
         error: function (request) {//Operation after request failure
@@ -299,7 +300,7 @@ function openLogWindow() {
         + '</div>';
     layer.open({
         type: 1,
-        title: '<span style="color: #269252;">Log Windows</span>',
+        title: '<span style="color: var(--button-color);">Log Windows</span>',
         shadeClose: true,
         closeBtn: 1,
         shift: 7,
@@ -378,23 +379,17 @@ function processGroupMonitoring(appId) {
         success: function (data) {
             var dataMap = JSON.parse(data);
             if (200 === dataMap.code) {
-                if (dataMap.state && "" !== dataMap.state) {
-                    if ('STARTED' !== dataMap.state && '100.00' === dataMap.progress) {
-                        console.log(dataMap);
-                        window.clearInterval(timer);
-                        $('#runFlowGroup').show();
-                        $('#debugFlowGroup').show();
-                        $('#stopFlowGroup').hide();
-                    }
-                }
                 var processGroupVo = dataMap.processGroupVo;
                 if (processGroupVo && '' != processGroupVo) {
                     $("#groupProgress").html(dataMap.progress + "%");
                     //$("#groupProgress").css({'width': dataMap.progress + "%"});
-                    $("#processStartTimeShow").html(processGroupVo.startTime);
-                    $("#processStopTimeShow").html(processGroupVo.endTime);
-                    $("#processStateShow").html(dataMap.state);
-                    $("#processProgressShow").html(dataMap.progress + "%");
+                    if (!isProgress){
+                        $("#processStartTimeShow").html(processGroupVo.startTime);
+                        $("#processStopTimeShow").html(processGroupVo.endTime);
+                        $("#processStateShow").html(dataMap.state);
+                        $("#processProgressShow").html(dataMap.progress + "%");
+                    }
+
                     // task
                     var processVoList = processGroupVo.processVoList;
                     if (processVoList && '' != processVoList) {
@@ -424,15 +419,22 @@ function processGroupMonitoring(appId) {
                                     $("#processStartTimeShow").html(processGroupVo.startTime);
                                     $("#processStopTimeShow").html(processGroupVo.endTime);
                                     $("#processStateShow").html(processGroupVo.state);
-                                    $("#processStateShow").html(processGroupVo.state);
-                                    $("#processStateShow").html(processGroupVo.state);
-                                    $("#processStateShow").html(processGroupVo.state);
                                 }
                                 processGroupMonitor(processGroupVo.pageId, processGroupVo.state)
                             }
                         }
                     }
                 }
+            }
+            if ('STARTED' !== dataMap.state || '100.00' === dataMap.progress) {
+                $('#runFlowGroup').show();
+                $('#debugFlowGroup').show();
+                $('#stopFlowGroup').hide();
+            } else {
+                setTimeout(() => {
+                    processGroupMonitoring(appId);
+                }, 5000);
+                
             }
         }
     });
@@ -493,7 +495,7 @@ function getDebugData(stopName, portName) {
             var open_window_height = (window_height > 400 ? 570 : window_height);
             layer.open({
                 type: 1,
-                title: '<span style="color: #269252;">Debug Data</span>',
+                title: '<span style="color: var(--button-color);">Debug Data</span>',
                 shadeClose: true,
                 closeBtn: 1,
                 shift: 7,
@@ -511,6 +513,10 @@ function loadDebugData() {
     var debug_port_name = $("#debug_port_name");
     var debug_data_last_read_line = $("#debug_data_last_read_line");
     var debug_data_last_file_name = $("#debug_data_last_file_name");
+
+    if(!debug_data_last_read_line.html()){
+        debug_data_last_read_line.html(0);
+    }
     ajaxRequest({
         type: "POST",
         async: false,

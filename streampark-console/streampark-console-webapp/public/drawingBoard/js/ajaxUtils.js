@@ -161,7 +161,7 @@ function openLayerWindowLoadHtml(htmlStr, window_width, window_height, title, sh
     shade = shade ? shade : 0;
     layer.open({
         type: 1,
-        title: '<span style="color: #269252;">' + title + '</span>',
+        title: '<span style="color: var(--button-color);">' + title + '</span>',
         shade: shade,
         shadeClose: false,
         closeBtn: 1,
@@ -176,7 +176,7 @@ function openLayerTypeIframeWindowLoadUrl(url, window_width, window_height, titl
     shade = shade ? shade : 0;
     layer.open({
         type: 2,
-        title: '<span style="color: #269252;">' + title + '</span>',
+        title: '<span style="color: var(--button-color);">' + title + '</span>',
         shade: shade,
         shadeClose: false,
         closeBtn: 1,
@@ -195,8 +195,9 @@ function window_location_href(url) {
 }
 
 function new_window_open(url) {
+    var tempWindow = window.top.location.href = window.location.origin + "/#/drawingBoard?src=" + web_drawingBoard + url;
 
-    var tempWindow = window.open(window.location.origin + "/#/drawingBoard?src=" + web_drawingBoard + url);
+    // var tempWindow = window.open(window.location.origin + "/#/drawingBoard?src=" + web_drawingBoard + url);
     if (tempWindow == null || typeof (tempWindow) == 'undefined') {
         alert('The window cannot be opened. Please check your browser settings.')
     }

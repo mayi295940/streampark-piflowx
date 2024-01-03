@@ -408,6 +408,7 @@ function processGroupMxEventClick(cell) {
 function queryProcessGroup(loadId) {
     ajaxLoad("", "/page/processGroup/inc/process_group_info_inc.html", function (data) {
         $("#right-group")[0].innerHTML = data;
+        isProgress = false;
         ajaxRequest({
             cache: true,
             type: "POST",
@@ -421,7 +422,6 @@ function queryProcessGroup(loadId) {
                 var dataMap = JSON.parse(data);
                 $('#processGroup_info_inc_loading').hide();
                 if (200 === dataMap.code) {
-                    console.log(dataMap);
                     var processGroupVo = dataMap.processGroupVo;
                     if (!processGroupVo) {
                         $('#processGroup_info_inc_no_data').show();
@@ -436,7 +436,7 @@ function queryProcessGroup(loadId) {
                         //Process Running Information
                         $("#processGroupStartTimeShow").text(processGroupVo.startTimeStr);
                         $("#processGroupStopTimeShow").text(processGroupVo.endTimeStr);
-                        var processGroupVo_state_text = (null !== processGroupVo.state) ? processGroupVo.state.stringValue : "INIT";
+                        var processGroupVo_state_text = (undefined !== processGroupVo.state && null !== processGroupVo.state) ? processGroupVo.state.stringValue : "INIT";
                         $("#processGroupStateShow").text(processGroupVo_state_text);
                         if (processGroupVo.progress) {
                             $("#processGroupProgressShow").text(processGroupVo.progress + "%");
@@ -457,6 +457,7 @@ function queryProcessGroup(loadId) {
 
 // query node info
 function queryNodeInfo(loadId, pageId) {
+    isProgress = true;
     ajaxLoad("", "/page/processGroup/inc/process_group_node_property_inc.html", function (data) {
         $("#right-group")[0].innerHTML = data
         ajaxRequest({
@@ -473,7 +474,6 @@ function queryNodeInfo(loadId, pageId) {
             },
             success: function (data) {
                 var dataMap = JSON.parse(data);
-                console.log(dataMap);
                 $("#processGroup_node_property_inc_loading").hide();
                 var nodeType = dataMap.nodeType;
                 if ("flow" === nodeType) {
@@ -486,7 +486,7 @@ function queryNodeInfo(loadId, pageId) {
                     //Process Running Information
                     $("#processStartTimeShow").text(processVo.startTimeStr);
                     $("#processStopTimeShow").text(processVo.endTimeStr);
-                    var processVo_state_text = (null !== processVo.state) ? processVo.state.stringValue : "INIT";
+                    var processVo_state_text = (undefined !== processVo.state && null !== processVo.state) ? processVo.state.stringValue : "INIT";
                     $("#processStateShow").text(processVo_state_text);
                     if (processVo.progress) {
                         $("#processProgressShow").text(processVo.progress + "%");
@@ -506,7 +506,7 @@ function queryNodeInfo(loadId, pageId) {
                     //Process Running Information
                     $("#processGroupStartTimeShow").text(processGroupVo.startTimeStr);
                     $("#processGroupStopTimeShow").text(processGroupVo.endTimeStr);
-                    var processGroupVo_state_text = (null !== processGroupVo.state) ? processGroupVo.state.stringValue : "INIT";
+                    var processGroupVo_state_text = (undefined !== processGroupVo.state && null !== processGroupVo.state) ? processGroupVo.state.stringValue : "INIT";
                     $("#processGroupStateShow").text(processGroupVo_state_text);
                     if (processGroupVo.progress) {
                         $("#processGroupProgressShow").text(processGroupVo.progress + "%");

@@ -68,6 +68,10 @@ Make stream processing easier
 pnpm install
 ```
 
+```bash
+ pnpm install --ignore-scripts
+```
+
 2. 运行：
 
 ```bash

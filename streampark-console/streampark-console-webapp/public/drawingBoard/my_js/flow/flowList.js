@@ -10,7 +10,7 @@ function newPath() {
     $("#executorCores").val('1');
     layer.open({
         type: 1,
-        title: '<span style="color: #269252;">create flow</span>',
+        title: '<span style="color: var(--button-color);">create flow</span>',
         shadeClose: true,
         closeBtn: 1,
         shift: 7,
@@ -34,7 +34,7 @@ function initDatatableFlowPage(testTableId, url, searchInputId) {
             , cols: [[
                 {field: 'name', title: 'Name', sort: true},
                 {field: 'description', title: 'Description', sort: true},
-                {field: 'createTime', title: 'CreateTime', sort: true},
+                {field: 'crtDttm', title: 'CreateTime', sort: true},
                 {
                     field: 'right', title: 'Actions', sort: true, height: 100, templet: function (data) {
                         return responseHandlerFlow(data);
@@ -114,7 +114,7 @@ function responseHandlerFlow(res) {
 function openFlowBaseInfo(id) {
     ajaxRequest({
         cache: true,//Keep cached data
-        type: "get",//Request type post
+        type: "POST",//Request type post
         url: "/flow/queryFlowData",//This is the name of the file where I receive data in the background.
         data: {load: id},
         async: false,//Setting it to true indicates that other code can still be executed after the request has started. If this option is set to false, it means that all requests are no longer asynchronous, which also causes the browser to be locked.
@@ -139,7 +139,7 @@ function openFlowBaseInfo(id) {
                 $("#executorCores").val(flowVo.executorCores);
                 layer.open({
                     type: 1,
-                    title: '<span style="color: #269252;">update flow</span>',
+                    title: '<span style="color: var(--button-color);">update flow</span>',
                     shadeClose: true,
                     closeBtn: false,
                     shift: 7,
@@ -211,8 +211,8 @@ function updateFlow() {
     if (checkFlowInput(flowName, description, driverMemory, executorNumber, executorMemory, executorCores))
         ajaxRequest({
             cache: true,//Keep cached data
-            type: "get",//Request type post
-            url: "/flow/updateFlowInfo",//This is the name of the file where I receive data in the background.
+            type: "POST",//Request type post
+            url: "/flow/updateFlowBaseInfo",//This is the name of the file where I receive data in the background.
             data: {
                 id: id,
                 name: flowName,

@@ -11,7 +11,8 @@ function initProcessContentPage(nodeArr) {
             $('#runFlow').hide();
             $('#debugFlow').hide();
             $('#stopFlow').show();
-            timer = window.setInterval("processMonitoring(appId)", 5000);
+            processMonitoring(appId);
+            //timer = window.setInterval("processMonitoring(appId)", 5000);
         } else {
             $('#runFlow').show();
             $('#debugFlow').show();
@@ -251,7 +252,7 @@ function getLogUrl() {
         success: function (data) {//Operation after request successful
             layer.open({
                 type: 1,
-                title: '<span style="color: #269252;">Log Windows</span>',
+                title: '<span style="color: var(--button-color);">Log Windows</span>',
                 shadeClose: true,
                 closeBtn: 1,
                 shift: 7,
@@ -342,14 +343,6 @@ function processMonitoring(appId) {
         success: function (data) {
             var dataMap = JSON.parse(data);
             if (200 === dataMap.code) {
-                if (dataMap.state && "" !== dataMap.state) {
-                    if ("COMPLETED" === dataMap.state || "FAILED" === dataMap.state || "KILLED" === dataMap.state) {
-                        window.clearInterval(timer);
-                        $('#runFlow').show();
-                        $('#debugFlow').show();
-                        $('#stopFlow').hide();
-                    }
-                }
                 var processVo = dataMap.processVo;
                 if (processVo && '' != processVo) {
                     $("#progress").html(dataMap.progress + "%");
@@ -377,6 +370,17 @@ function processMonitoring(appId) {
                         }
                     }
                 }
+            }
+            if ("COMPLETED" === dataMap.state || "FAILED" === dataMap.state || "KILLED" === dataMap.state) {
+                //aff
+                //window.clearInterval(timer);
+                $('#runFlow').show();
+                $('#debugFlow').show();
+                $('#stopFlow').hide();
+            } else {
+                setTimeout(() => {
+                    processMonitoring(appId);
+                }, 5000);
             }
         }
     });
@@ -452,6 +456,9 @@ function loadDebugData() {
     var debug_port_name = $("#debug_port_name");
     var debug_data_last_read_line = $("#debug_data_last_read_line");
     var debug_data_last_file_name = $("#debug_data_last_file_name");
+    if(!debug_data_last_read_line.html()){
+        debug_data_last_read_line.html(0);
+    }
     ajaxRequest({
         type: "POST",
         async: false,

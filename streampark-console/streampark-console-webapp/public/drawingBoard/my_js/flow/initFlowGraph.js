@@ -1,6 +1,6 @@
 // Extends EditorUi to update I/O action states based on availability of backend
 
-var parentsId, xmlDate, maxStopPageId, isExample, consumedFlag, timerPath, statusgroup, removegroupPaths, stopsId;
+var parentsId, xmlDate, maxStopPageId, isExample, consumedFlag, timerPath, statusgroup, removegroupPaths, stopsId, stopsDisabled, nodeId;
 
 var index = true;
 var flag = 0;
@@ -8,23 +8,13 @@ var pathsCells = [];
 var thisEditor = null;
 var graphGlobal = null;
 
-import { defHttp } from '/@/utils/http/axios';
-
-
 //init data
 function initFlowDrawingBoardData(loadId, parentAccessPath) {
     // $('#fullScreen').show();
     window.parent.postMessage(true);
-
-
-    defHttp.get({ url: '/flow/drawingBoardData', {
-      load: loadId,
-      parentAccessPath: parentAccessPath})
-
-
     ajaxRequest({
         type: "get",
-        url: "/basic-api/flow/drawingBoardData",
+        url: "/flow/drawingBoardData",
         async: false,
         data: {
             load: loadId,
@@ -67,6 +57,7 @@ function initFlowDrawingBoardData(loadId, parentAccessPath) {
                 //     }
                 // }
                 xmlDate = dataMap.xmlDate;
+                stopsDisabled = dataMap.stopsDisabled
                 maxStopPageId = dataMap.maxStopPageId;
                 isExample = dataMap.isExample;
                 if (dataMap.groupsVoList) {
@@ -74,14 +65,26 @@ function initFlowDrawingBoardData(loadId, parentAccessPath) {
                         for (var i = 0; i < dataMap.groupsVoList.length; i++) {
                             var groupsVoList_i = dataMap.groupsVoList[i];
                             if (groupsVoList_i && '' !== groupsVoList_i) {
-                                Sidebar.prototype.component_data.push({
+                                Sidebar.prototype.component_Stop_data.push({
                                     component_name: groupsVoList_i.groupName,
+                                    component_type: 'Stop',
                                     component_group: groupsVoList_i.stopsTemplateVoList,
                                     component_prefix: (web_header_prefix + "/images/"),
                                     addImagePaletteId: 'clipart'
                                 });
                             }
                         }
+                    }
+                }
+                if (dataMap.dataSourceVoList) {
+                    if (dataMap.dataSourceVoList && dataMap.dataSourceVoList.length > 0) {
+                        Sidebar.prototype.component_DataSource_data.push({
+                            component_name: 'DataSource',
+                            component_type: 'DataSource',
+                            component_group: dataMap.dataSourceVoList,
+                            component_prefix: (web_header_prefix + "/images/"),
+                            addImagePaletteId: 'clipart'
+                        });
                     }
                 }
             } else {
@@ -142,8 +145,8 @@ function imageAjax() {
                     for (var i = 0; i < imgwrap1.length; i++) {
                         imgwrap1[i].style.backgroundColor = "#fff"
                     }
-                    e.toElement.style = "background-color:#009688;width:100%;height:100%"
-                    imagSrc = e.toElement.src
+                    e.srcElement.style = "background-color:var(--button-color);width:100%;height:100%"
+                    imagSrc = e.srcElement.src
                 }
             })
             var imgwrap1 = $(".imageimg")
@@ -193,7 +196,7 @@ function updateMxGraphCellImage(cellEditor, selState, newValue, fn) {
     });
     layer.open({
         type: 1,
-        title: '<span style="color: #269252;">已有现存可选择更改的图片</span>',
+        title: '<span style="color: var(--button-color);">已有现存可选择更改的图片</span>',
         shadeClose: true,
         shade: 0.3,
         closeBtn: 1,
@@ -238,6 +241,7 @@ function initFlowGraph() {
     Menus.prototype.customCellRightMenu = ['runCurrentStop', 'runCurrentAndBelowStops'];
     Actions.prototype.RunCells = RunFlowOrFlowCells;
     Actions.prototype.RunCellsUp = RunFlowOrFlowCellsUp;
+    Graph.prototype.errorToast = toastErrorMsg;
     Format.hideSidebar(false, true);
     //EditorUi.prototype.formatWidth = 0;
     $("#right-group-wrap")[0].style.display = "block";
@@ -245,6 +249,7 @@ function initFlowGraph() {
     EditorUi.prototype.init = function () {
         editorUiInit.apply(this, arguments);
         graphGlobal = this.editor.graph;
+        undoManagerGlobal = this.editor.undoManager;
         thisEditor = this.editor;
         this.actions.get('export').setEnabled(false);
         //Monitoring event
@@ -279,6 +284,10 @@ function initFlowGraph() {
         graphGlobal.setCellsResizable(false);
         // repeat connection
         graphGlobal.setMultigraph(false);
+        // Disconnect cell On Move
+        graphGlobal.setDisconnectOnMove(false);
+        // Not Allow Loop connection
+        graphGlobal.setAllowLoops(false);
     };
 
     // Adds required resources (disables loading of fallback properties, this can only
@@ -336,6 +345,14 @@ function loadXml(loadStr, cells) {
     var node = xml.documentElement;
     var dec = new mxCodec(node.ownerDocument);
     dec.decode(node, graphGlobal.getModel());
+
+    let disabledArr= [];
+    if (!!stopsDisabled && stopsDisabled.length>0)
+        for (let i=0;i<stopsDisabled.length;i++){
+            disabledArr.push(graphGlobal.getModel().getCell(stopsDisabled[i]))
+        }
+    mxUtils.setCellStyles(graphGlobal.getModel(), disabledArr, mxConstants.STYLE_OPACITY,40);
+
     eraseRecord()
     if (cells) {
         var new_load_cells = graphGlobal.getModel().getCell(cells[0].id);
@@ -409,6 +426,7 @@ function flowMxEventClickFunc(cell, consumedFlag) {
         $("#flow_info_inc_id").show();
         // info
         queryFlowInfo(loadId);
+        // distributeList(loadId);
         return;
     }
     var cells_arr = graphGlobal.getSelectionCells();
@@ -416,6 +434,7 @@ function flowMxEventClickFunc(cell, consumedFlag) {
         $("#flow_info_inc_id").show();
         // info
         queryFlowInfo(loadId);
+        // distributeList(loadId);
     } else {
         var selectedCell = cells_arr[0]
         if (selectedCell && (selectedCell.edge === 1 || selectedCell.edge)) {
@@ -428,6 +447,7 @@ function flowMxEventClickFunc(cell, consumedFlag) {
             $("#flow_info_inc_id").show();
             // info
             queryFlowInfo(loadId);
+            // distributeList(loadId);
         }
     }
 }
@@ -492,6 +512,67 @@ function queryFlowInfo(loadId) {
     });
 }
 
+// //Publishing List Information
+// function distributeList(flowId){
+//     $("#flow_distribute_list").hide();
+//     const urlParams = getUrlParams(window.location.href);
+//     if (!flowId)
+//         flowId=urlParams.load
+//
+//     ajaxRequest({
+//         type: "POST",
+//         url: "/stops/getPublishingList",
+//         async: true,
+//         data: {"flowId": flowId},
+//         success: function (data) {//After the request is successful
+//             var dataMap = JSON.parse(data);
+//             var publishingDataList = dataMap.publishingDataList;
+//             if (publishingDataList.length>0 && !!publishingDataList) {
+//                 $("#flow_distribute_list").show();
+//                 var runningProcessID_tbody = $("#flow_distribute_list").find("tbody");
+//                 if (runningProcessID_tbody) {
+//                     var tableTitle = '<tr>'
+//                         + '<td style="width: 50%;"><label>Name</label></td>'
+//                         + '<td style="width: 50%;"><label>operation</label></td>'
+//                         + '</tr>';
+//                     var tableAllTd = '';
+//                     for (var i = 0; i < publishingDataList.length; i++) {
+//                         tableAllTd += ('<tr>'
+//                             + '<td style="border: 1px solid #e8e8e8; width: 70%;">'
+//                             + '<a href="' + web_base_origin + web_drawingBoard + '/page/process/mxGraph/index.html?drawingBoardType=PROCESS&processType=PROCESS&load=' + publishingDataList[i].publishingId + '">' + publishingDataList[i].name + '</a>'
+//                             + '</td>'
+//                             + '<td style="border: 1px solid #e8e8e8; width: 30%;">' +
+//                             '<button type="button" class="btn btn-default" onclick="chooseRelease(\'edit\',\'' + publishingDataList[i].publishingId + '\')">edit</button>' +
+//                             '<button type="button" class="btn btn-default" style="margin-left: 10px" onclick="distributeDelete(\'' + publishingDataList[i].publishingId + '\')">delete</button></td>'
+//                             + '</tr>');
+//                     }
+//                     runningProcessID_tbody.html(tableTitle + tableAllTd);
+//                 }
+//             }
+//         },
+//         error: function (request) {//Operation after request failure
+//             return;
+//         }
+//     });
+// }
+//Publishing delete
+function distributeDelete(publishingId){
+    ajaxRequest({
+        type: "POST",
+        url: "/stops/deleteFlowStopsPublishing",
+        async: true,
+        data: {"publishingId": publishingId},
+        success: function (data) {//After the request is successful
+            var dataMap = JSON.parse(data);
+            // distributeList(loadId);
+
+        },
+        error: function (request) {//Operation after request failure
+            return;
+        }
+    });
+}
+
 //query Flow path
 function queryPathInfo(stopPageId, loadId) {
     ajaxRequest({
@@ -521,6 +602,7 @@ function queryPathInfo(stopPageId, loadId) {
                 }
             } else {
                 queryFlowInfo(loadId);
+                // distributeList(loadId);
                 console.log("Path attribute query null");
             }
         },
@@ -537,9 +619,11 @@ function queryStopsProperty(stopPageId, loadId) {
     $("#div_propertiesVo_html").hide();
     $("#div_customized_html").hide();
     $("#div_stops_checkpoint_html").hide();
+    $("#div_stops_disabled_html").hide();
     $("#div_del_last_reload").hide();
     $("#div_properties_example_html").hide();
     isShowUpdateStopsName(false);
+    nodeId=stopPageId;
     ajaxRequest({
         type: "POST",
         url: "/stops/queryIdInfo",
@@ -561,7 +645,7 @@ function queryStopsProperty(stopPageId, loadId) {
                     $('#span_stopsVo_name').text(stopsVoData.name);
                     $('#span_processStopVo_description').text(stopsVoData.description);
                     $('#span_processStopVo_groups').text(stopsVoData.groups);
-                    $('#span_flowStopsVo_bundle').text(stopsVoData.bundel);
+                    $('#span_flowStopsVo_bundle').text(stopsVoData.bundle);
                     $('#span_flowStopsVo_version').text(stopsVoData.version);
                     $('#span_processStopVo_owner').text(stopsVoData.owner);
                     $('#span_processStopVo_crtDttmString').text(stopsVoData.crtDttmString);
@@ -586,10 +670,12 @@ function queryStopsProperty(stopPageId, loadId) {
                             var propertyVo_name = propertyVo.name;
                             var propertyVo_description = propertyVo.description;
                             var propertyVo_displayName = propertyVo.displayName;
-                            var propertyVo_customValue = (!propertyVo.customValue || customValue == 'null') ? '' : propertyVo.customValue;
+                            // var propertyVo_customValue = (!propertyVo.customValue || customValue == null  ) ? '' : propertyVo.customValue;
+                            var propertyVo_customValue = (!propertyVo.customValue || propertyVo.customValue == null || propertyVo.customValue =='' ) ? propertyVo.example : propertyVo.customValue;
                             var propertyVo_allowableValues = propertyVo.allowableValues;
                             var propertyVo_isSelect = propertyVo.isSelect;
                             var propertyVo_required = propertyVo.required;
+                            var propertyVo_sensitive = propertyVo.sensitive;
                             var propertyVo_isLocked = propertyVo.isLocked;
                             var propertyVo_example = propertyVo.example;
 
@@ -654,6 +740,9 @@ function queryStopsProperty(stopPageId, loadId) {
                                 property_value_obj.style.background = "rgb(245, 245, 245)";
                                 property_value_obj.setAttribute('value', '' + propertyVo_customValue + '');
                                 //Port uneditable
+                                if (propertyVo_sensitive){
+                                    property_value_obj.setAttribute('type', 'password');
+                                }
                                 if ("outports" == propertyVo_name || "inports" == propertyVo_name) {
                                     property_value_obj.setAttribute('disabled', 'disabled');
                                 }
@@ -704,6 +793,9 @@ function queryStopsProperty(stopPageId, loadId) {
                                 tbody_example_tr_i.appendChild(tbody_example_td_1);
                                 tbody_example_tr_i.appendChild(tbody_example_td_2);
                                 tbody_example.appendChild(tbody_example_tr_i);
+                                if (propertyVo_sensitive){
+                                    tbody_example_td_2_obj.setAttribute('type', 'password');
+                                }
                             }
                         }
                         if (isExample) {
@@ -734,6 +826,20 @@ function queryStopsProperty(stopPageId, loadId) {
                     $("#div_stops_checkpoint_html").append('<span>&nbsp;&nbsp;Whether to add Checkpoint</span>');
                     $('#div_stops_checkpoint_html').show();
 
+
+                    //disabledCheckpoint
+                    var disabledCheckpoint = document.createElement('input');
+                    disabledCheckpoint.setAttribute('type', 'checkbox');
+                    disabledCheckpoint.setAttribute('id', 'isDisabledCheckpoint');
+                    if (stopsVoData.isDisabled) {
+                        disabledCheckpoint.setAttribute('checked', 'checked');
+                    }
+                    disabledCheckpoint.setAttribute('onclick', 'StopDisabled("' + stopsVoData.id + '")');
+                    $("#div_stops_disabled_html").html("");
+                    $("#div_stops_disabled_html").append(disabledCheckpoint);
+                    $("#div_stops_disabled_html").append('<span>&nbsp;&nbsp;Whether the abandoned</span>');
+                    $('#div_stops_disabled_html').show();
+
                     //stopsCustomizedPropertyVoList
                     if (stopsVoData.isCustomized) {
                         $("#div_a_customized_html").attr("href", "javascript:openAddStopCustomAttrPage('" + stopsVoData.id + "');");
@@ -759,8 +865,13 @@ function queryStopsProperty(stopPageId, loadId) {
                         }
                         $("#div_customized_html").show();
                     }
-                    // datasource
-                    getDatasourceList(stopsVoData.id, stopsVoData.pageId, stopsVoData.dataSourceVo);
+                    if (stopsVoData.isDataSource) {
+                        $("#div_datasource_html").hide();
+                    } else {
+                        $("#div_datasource_html").show();
+                        // datasource
+                        getDatasourceList(stopsVoData.id, stopsVoData.pageId, stopsVoData.dataSourceVo);
+                    }
 
                     var oldPropertiesVo = stopsVoData.oldPropertiesVo;
                     if (oldPropertiesVo && oldPropertiesVo.length > 0) {
@@ -897,6 +1008,35 @@ function queryStopsProperty(stopPageId, loadId) {
     });
 }
 
+function StopDisabled(stopsId){
+    var isCheckpoint = false;
+    if ($('#isDisabledCheckpoint').is(':checked')) {
+        isCheckpoint = true;
+    }
+    ajaxRequest({
+        type: "POST",
+        url: "/stops/updateStopDisabled",
+        async: true,
+        data: {"id": stopsId,"disabled":isCheckpoint},
+        success: function (data) {
+            var dataMap = JSON.parse(data);
+            if (200 === dataMap.code) {
+                if (!isCheckpoint)
+                    mxUtils.setCellStyles(graphGlobal.getModel(), [graphGlobal.getModel().getCell(nodeId)], mxConstants.STYLE_OPACITY,100);
+                else
+                    mxUtils.setCellStyles(graphGlobal.getModel(), [graphGlobal.getModel().getCell(nodeId)], mxConstants.STYLE_OPACITY,40);
+            } else {
+
+            }
+            layer.close(layer.index);
+        },
+        error: function (request) {
+            //alert("Jquery Ajax request error!!!");
+            return;
+        }
+    });
+}
+
 //open Datasource list
 function openDatasourceList() {
     var window_width = $(window).width();//Get browser window width
@@ -950,6 +1090,9 @@ function getDatasourceList(stop_id, stops_page_id, dataSourceVo) {
                 }
                 select_html += (option_html + "</select></div>");
                 $('#datasourceDivElement').html(select_html);
+                var option = $('#datasourceSelectElement option:selected').text();
+                if(option.indexOf('(STOP)')!==-1)
+                    $('#datasourceSelectElement').attr('disabled', 'disabled');
                 if (isExample) {
                     $('#datasourceSelectElement').attr('disabled', 'disabled');
                 }
@@ -1022,6 +1165,7 @@ function saveXml(paths, operType, cells) {
                 }
                 if ("REMOVED" === operType) {
                     queryFlowInfo(loadId);
+                    // distributeList(loadId);
                 } else if ("ADD" === operType) {
                     xmlDate = dataMap.xmlData;
                     loadXml(xmlDate, cells);
@@ -1197,7 +1341,7 @@ function getStopsPortNew(paths) {
                     } else {
                         layer.open({
                             type: 1,
-                            title: '<span style="color: #269252;">CreatePort</span>',
+                            title: '<span style="color: var(--button-color);">CreatePort</span>',
                             shadeClose: false,
                             closeBtn: 0,
                             shift: 7,
@@ -1470,10 +1614,14 @@ function addMxCellOperation(evt) {
 
 // moved MxCell operation
 function movedMxCellOperation(evt) {
-    statusgroup = ""
-    if (evt.properties.disconnect) {
-        saveXml(null, 'MOVED');   // preservation method
+    let evtCellsArr =  evt.properties.cells;
+    if(evtCellsArr.length === 1 && evtCellsArr[0].edge == 1) {
+        console.log("Connect Line MOVE");
     }
+    statusgroup = ""
+    // if (evt.properties.disconnect) {
+        saveXml(null, 'MOVED');   // preservation method
+    // }
     consumedFlag = evt.consumed ? true : false;
     flowMxEventClickFunc(evt.properties.cell, consumedFlag);
 }
@@ -2029,7 +2177,7 @@ function openTemplateList() {
                 showSelectDivHtml += (showSelectHtml + loadTemplateBtn + '</div>');
                 layer.open({
                     type: 1,
-                    title: '<span style="color: #269252;">Please choose</span>',
+                    title: '<span style="color: var(--button-color);">Please choose</span>',
                     shadeClose: false,
                     resize: false,
                     closeBtn: 1,
@@ -2230,6 +2378,13 @@ function runFlow(runMode) {
     });
 }
 
+function chooseRelease(type,id){
+    if(document.readyState === 'complete') {
+        let urlParams = getUrlParams(window.location.href);
+        window.parent['processToRelease']({value: urlParams.load,type:type,id:id});
+    }
+}
+
 // run cells  runFollowUp
 function RunFlowOrFlowCellsUp(includeEdges) {
     StopsComponentIsNeeedSourceData(stopsId, true)
@@ -2267,4 +2422,19 @@ window.addEventListener("message",function(event){
 function RunFlowOrFlowCells(includeEdges) {
     StopsComponentIsNeeedSourceData(stopsId, false)
 
+}
+
+//toast error msg
+function toastErrorMsg(errorMsg) {
+    switch (errorMsg) {
+        case 'loop':
+            layer.msg('不允许连接相同元素！', {icon: 2, shade: 0, time: 2000});
+            break;
+        case 'muti':
+            layer.msg('不允许同时连接两条线！', {icon: 2, shade: 0, time: 2000});
+            break;
+        case 'disConnect':
+            layer.msg('不允许单独移动边！', {icon: 2, shade: 0, time: 2000});
+            break;
+    }
 }

@@ -6,7 +6,7 @@ function newFlowGroup() {
     $("#description").val("");
     layer.open({
         type: 1,
-        title: '<span style="color: #269252;">create flow group</span>',
+        title: '<span style="color: var(--button-color);">create flow group</span>',
         shadeClose: true,
         closeBtn: 1,
         shift: 7,
@@ -31,7 +31,7 @@ function initDatatableFlowGroupPage(testTableId, url, searchInputId) {
             , cols: [[
                 {field: 'name', title: 'Name', sort: true},
                 {field: 'description', title: 'Description', sort: true},
-                {field: 'createTime', title: 'CreateTime', sort: true},
+                {field: 'crtDttm', title: 'CreateTime', sort: true},
                 {
                     field: 'right', title: 'Actions', sort: true, height: 100, templet: function (data) {
                         return responseActionsFlow(data);
@@ -102,7 +102,7 @@ function openFlowGroup(flowGroupId) {
 function openFlowBaseInfo(id) {
     ajaxRequest({
         cache: true,//Keep cached data
-        type: "get",//Request type post
+        type: "POST",//Request type post
         url: "/flowGroup/queryFlowGroupData",//This is the name of the file where I receive data in the background.
         data: {load: id},
         async: false,//Setting it to true indicates that other code can still be executed after the request has started. If this option is set to false, it means that all requests are no longer asynchronous, which also causes the browser to be locked.
@@ -123,7 +123,7 @@ function openFlowBaseInfo(id) {
                 $("#description").val(flowGroupVo.description);
                 layer.open({
                     type: 1,
-                    title: '<span style="color: #269252;">update flow group</span>',
+                    title: '<span style="color: var(--button-color);">update flow group</span>',
                     shadeClose: true,
                     closeBtn: false,
                     shift: 7,

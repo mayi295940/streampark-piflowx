@@ -56,8 +56,17 @@ function initFlowGroupDrawingBoardData(loadId, parentAccessPath, backFunc) {
                             component_prefix = component_prefix.replace('/piflow-web', web_header_prefix)
                         }
                         mxGraphComponentList[index].component_prefix = component_prefix
+                        var component_name = mxGraphComponentList[index].component_name;
+                        if ('Group' === component_name) {
+                            mxGraphComponentList[index].component_type = 'Group';
+                            mxGraphComponentList[index].component_group[0].imageUrl = '/piflow-web/img/group.png';
+                        } else if ('Task' === component_name) {
+                            mxGraphComponentList[index].component_type = 'Flow';
+                            mxGraphComponentList[index].component_group[0].imageUrl = '/piflow-web/img/flow.png';
+                        }
                     }
-                    Sidebar.prototype.component_data = mxGraphComponentList
+                    Sidebar.prototype.component_data = mxGraphComponentList;
+                    Sidebar.prototype.component_data.component_type = 'Group';
                 }
             } else {
                 window_location_href("/page/error/errorPage.html");
@@ -120,8 +129,8 @@ function imageAjax() {
                     for (var i = 0; i < imgwrap1.length; i++) {
                         imgwrap1[i].style.backgroundColor = "#fff"
                     }
-                    e.toElement.style = "background-color:#009688;width:100%;height:100%"
-                    imagSrc = e.toElement.src
+                    e.srcElement.style = "background-color:var(--button-color);width:100%;height:100%"
+                    imagSrc = e.srcElement.src
                 }
             })
             var imgwrap1 = $(".imageimg")
@@ -129,49 +138,57 @@ function imageAjax() {
         }
     });
 }
-
+var uploadInst;
 function updateMxGraphCellImage(cellEditor, selState, newValue, fn) {
     //   Change picture
     layui.use('upload', function () {
-        var upload = layui.upload;
+        upload = layui.upload;
         var loading
-        //执行实例
-        var uploadInst = upload.render({
-            elem: '#uploadimage' //绑定元素
-            , url: '/piflow-web/mxGraph/uploadNodeImage' //上传接口
-            , headers: {
-                Authorization: ("Bearer " + token)
-            }
-            , before: function (obj) {
-                this.data = {imageType: "TASK"};
-                loading = layer.load(0, {
-                    shade: false,
-                    success: function (layerContentStyle) {
-                        layerContentStyle.find('.layui-layer-content').css({
-                            'padding-top': '35px',
-                            'text-align': 'left',
-                            'width': '120px',
-                        });
-                    },
-                    icon: 2,
-                    // time: 100*1000
-                });
-            }
-            , done: function (res) {
-                //上传完毕回调
-                console.log("upload success")
-                imageAjax();
-                layer.close(loading);
-            }
-            , error: function () {
-                //请求异常回调
-                console.log("upload error")
-            }
-        });
+        if (uploadInst) {
+            uploadInst.config.elem = $('#uploadimage');
+        } else {
+            //执行实例
+            uploadInst = upload.render({
+                elem: '#uploadimage' //绑定元素
+                , url: web_header_prefix + '/mxGraph/uploadNodeImage' //上传接口
+                , headers: {
+                    Authorization: ("Bearer " + token)
+                }
+                , before: function (obj) {
+                    this.data = {imageType: imgType};
+                    loading = layer.load(0, {
+                        shade: false,
+                        success: function (layerContentStyle) {
+                            layerContentStyle.find('.layui-layer-content').css({
+                                'padding-top': '35px',
+                                'text-align': 'left',
+                                'width': '120px',
+                            });
+                        },
+                        icon: 2,
+                        // time: 100*1000
+                    });
+                }
+                , done: function (res) {
+                    //上传完毕回调
+                    console.log("upload success")
+                    imageAjax();
+                    layer.close(loading);
+                }
+                , error: function () {
+                    //请求异常回调
+                    console.log("upload error")
+                }
+            });
+            console.log(cellEditor);
+            console.log(selState);
+            console.log(newValue);
+            console.log(fn);
+        }
     });
     layer.open({
         type: 1,
-        title: '<span style="color: #269252;">已有现存可选择更改的图片</span>',
+        title: '<span style="color: var(--button-color);">已有现存可选择更改的图片</span>',
         shadeClose: true,
         shade: 0.3,
         closeBtn: 1,
@@ -215,6 +232,7 @@ function initFlowGroupGraph() {
     Actions.prototype.RunAll = runFlowGroup;
     Actions.prototype.RunCells = RunFlowOrFlowGroupCells;
     EditorUi.prototype.saveGraphData = saveXml;
+    Graph.prototype.errorToast = toastErrorMsg;
     Format.hideSidebar(true, true);
     Format.customizeType = "GROUP";
     var editorUiInit = EditorUi.prototype.init;
@@ -261,6 +279,10 @@ function initFlowGroupGraph() {
             }
         });
         loadXml(xmlDate);
+        // Disconnect cell On Move
+        graphGlobal.setDisconnectOnMove(false);
+        // Not Allow Loop connection
+        graphGlobal.setAllowLoops(false);
     };
 
     // Adds required resources (disables loading of fallback properties, this can only
@@ -509,9 +531,9 @@ function removeMxCellOperation(evt) {
 
 // moved node
 function movedMxCellOperation(evt) {
-    if (evt.properties.disconnect) {
+    // if (evt.properties.disconnect) {
         saveXml(null, 'MOVED');   // preservation method
-    }
+    // }
 }
 
 // example operation
@@ -666,7 +688,7 @@ function openNewFlowWindow(id, pageId) {
     $("#executorCores").val('1');
     layer.open({
         type: 1,
-        title: '<span style="color: #269252;">Create Flow</span>',
+        title: '<span style="color: var(--button-color);">Create Flow</span>',
         shadeClose: false,
         shade: 0.3,
         closeBtn: 0,
@@ -685,7 +707,7 @@ function openNewFlowGroupWindow(id, pageId) {
     $("#flowGroup_description").val("");
     layer.open({
         type: 1,
-        title: '<span style="color: #269252;">create flow group</span>',
+        title: '<span style="color: var(--button-color);">create flow group</span>',
         shadeClose: false,
         shade: 0.3,
         closeBtn: 0,
@@ -1493,7 +1515,7 @@ function openTemplateList() {
                 showSelectDivHtml += (showSelectHtml + loadTemplateBtn + '</div>');
                 layer.open({
                     type: 1,
-                    title: '<span style="color: #269252;">Please choose</span>',
+                    title: '<span style="color: var(--button-color);">Please choose</span>',
                     shadeClose: false,
                     resize: false,
                     closeBtn: 1,
@@ -1616,3 +1638,17 @@ function runFlowGroup(runMode) {
     });
 }
 
+//toast error msg
+function toastErrorMsg(errorMsg) {
+    switch (errorMsg) {
+        case 'loop':
+            layer.msg('不允许连接相同元素！', {icon: 2, shade: 0, time: 2000});
+            break;
+        case 'muti':
+            layer.msg('不允许同时连接两条线！', {icon: 2, shade: 0, time: 2000});
+            break;
+        case 'disConnect':
+            layer.msg('不允许单独移动边！', {icon: 2, shade: 0, time: 2000});
+            break;
+    }
+}

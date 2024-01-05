@@ -1,7 +1,7 @@
 // var web_header_prefix = "http://10.0.88.46:86/piflow";
 var web_base_origin = window.location.origin;
 var web_drawingBoard = "/drawingBoard";
-var sever_base_origin = "http://10.0.85.80:6002/piflow-web";
+var sever_base_origin = "http://10.0.85.80:6002";
 // var basePath = window.sessionStorage.getItem("basePath")
 var basePath = null;
 // var token = top.window.sessionStorage.getItem('token') //此处放置请求到的用户token
@@ -22,10 +22,18 @@ if (document.cookie && document.cookie != '') {
             token = cookie.substring('token'.length + 2, cookie.length);
             // break
         }
+
+        if (!token) {
+          token = localStorage.getItem('token')
+        }
+     
     }
 }
 
+var basePath = 'basic-api';
 var web_header_prefix = basePath.indexOf(window.location.origin) || basePath.indexOf('http') > -1 ? basePath : web_base_origin + basePath; //与 .env.production 内容同步
+var web_header_prefix2 = web_base_origin + 'basic-api';
+
 /**
  * ajax工具js
  * @param requestType 请求类型(get,post)
@@ -59,30 +67,27 @@ function ajaxRequest(param) {
     if (undefined !== param.contentType) {
         contentType = param.contentType
     }
+
+    if (url.indexOf(".") > -1) {
+      url = web_header_prefix2 + url;
+    } else {
+      url = "/" + basePath + "/" + param.url;
+    }
+
     $.ajax({
         cache: cache,
         type: requestType,
         async: async,
-        url: web_header_prefix + url,
+        url: url,
         data: requestData,
         traditional: traditional,
         contentType: contentType,
         processData: processData,
         headers: {
-            Authorization: ("Bearer " + token)
+            Authorization: (token)
         },
-        // dataType: 'json',
-        // beforeSend: function (request) {
-        //     request.setRequestHeader("token", tokenInfo);
-        // },
-        // xhrFields: {
-        //     withCredentials: true
-        // },
         success: function (data) {
-            //data =  JSON.parse(data);
             if (data.code === 403 || data.code === 401) {
-                //  alert(data.errMsg);
-                // console.log(data);
                 window.location.href = web_base_origin + "/#/login";
                 return;
             }
@@ -189,13 +194,13 @@ function openLayerTypeIframeWindowLoadUrl(url, window_width, window_height, titl
 
 // window.location
 function window_location_href(url) {
-    window.top.location.href = window.location.origin + "/#/drawingBoard?src=" + web_drawingBoard + url ;
+    window.top.location.href = window.location.origin + "/#/flow/drawingBoard?src=" + web_drawingBoard + url ;
     // window.top.location.reload();
     // window.open(window.location.origin + "/#/drawingBoard?src=" + web_drawingBoard + url,"_blank");
 }
 
 function new_window_open(url) {
-    var tempWindow = window.top.location.href = window.location.origin + "/#/drawingBoard?src=" + web_drawingBoard + url;
+    var tempWindow = window.top.location.href = window.location.origin + "/#/flow/drawingBoard?src=" + web_drawingBoard + url;
 
     // var tempWindow = window.open(window.location.origin + "/#/drawingBoard?src=" + web_drawingBoard + url);
     if (tempWindow == null || typeof (tempWindow) == 'undefined') {

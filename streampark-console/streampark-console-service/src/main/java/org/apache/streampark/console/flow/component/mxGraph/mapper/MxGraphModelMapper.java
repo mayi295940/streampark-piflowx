@@ -57,7 +57,7 @@ public interface MxGraphModelMapper {
         property = "root",
         many =
             @Many(
-                select = "cn.cnic.component.mxGraph.mapper.MxCellMapper.getMeCellByMxGraphId",
+                select = "org.apache.streampark.console.flow.component.mxGraph.mapper.MxCellMapper.getMeCellByMxGraphId",
                 fetchType = FetchType.LAZY))
   })
   MxGraphModel getMxGraphModelById(String id);
@@ -89,7 +89,7 @@ public interface MxGraphModelMapper {
         property = "root",
         many =
             @Many(
-                select = "cn.cnic.component.mxGraph.mapper.MxCellMapper.getMeCellByMxGraphId",
+                select = "org.apache.streampark.console.flow.component.mxGraph.mapper.MxCellMapper.getMeCellByMxGraphId",
                 fetchType = FetchType.LAZY))
   })
   MxGraphModel getMxGraphModelByFlowId(String flowId);
@@ -121,7 +121,7 @@ public interface MxGraphModelMapper {
         property = "root",
         many =
             @Many(
-                select = "cn.cnic.component.mxGraph.mapper.MxCellMapper.getMeCellByMxGraphId",
+                select = "org.apache.streampark.console.flow.component.mxGraph.mapper.MxCellMapper.getMeCellByMxGraphId",
                 fetchType = FetchType.LAZY))
   })
   MxGraphModel getMxGraphModelByFlowGroupId(String flowGroupId);
@@ -153,7 +153,7 @@ public interface MxGraphModelMapper {
         property = "root",
         many =
             @Many(
-                select = "cn.cnic.component.mxGraph.mapper.MxCellMapper.getMeCellByMxGraphId",
+                select = "org.apache.streampark.console.flow.component.mxGraph.mapper.MxCellMapper.getMeCellByMxGraphId",
                 fetchType = FetchType.LAZY))
   })
   MxGraphModel getMxGraphModelByProcessId(String processId);
@@ -185,7 +185,7 @@ public interface MxGraphModelMapper {
         property = "root",
         many =
             @Many(
-                select = "cn.cnic.component.mxGraph.mapper.MxCellMapper.getMeCellByMxGraphId",
+                select = "org.apache.streampark.console.flow.component.mxGraph.mapper.MxCellMapper.getMeCellByMxGraphId",
                 fetchType = FetchType.LAZY))
   })
   MxGraphModel getMxGraphModelByProcessGroupId(String processGroupId);

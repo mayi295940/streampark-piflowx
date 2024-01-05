@@ -69,7 +69,7 @@ function initProcessDrawingBoardData(loadId, parentAccessPath, backFunc) {
                 var link = top.document.getElementById('ProcessParents');
                 if (processGroupId !== 'null' && processGroupId !== undefined){
                     link.style.display = 'inline-block';
-                    link.href='#/drawingBoard?src=/drawingBoard/page/processGroup/mxGraph/index.html?drawingBoardType=PROCESS&parentAccessPath=processGroupList&processType=PROCESS_GROUP&load='+processGroupId;
+                    link.href='#/flow/drawingBoard?src=/drawingBoard/page/processGroup/mxGraph/index.html?drawingBoardType=PROCESS&parentAccessPath=processGroupList&processType=PROCESS_GROUP&load='+processGroupId;
                 }else {
                     link.style.display = 'none';
                 }
@@ -1496,7 +1496,7 @@ function getChart(e,softData,isSoft, ifTheFirst) {
 }
 
 function getCustomView(dataId) {
-    var customViewDataUrl = base64encode(utf16to8('/piflow-web/process/showViewStopData/' + dataId));
+    var customViewDataUrl = base64encode(utf16to8('/process/showViewStopData/' + dataId));
     //http://10.0.90.210:6001/HighDimensionVis/?url=aHR0cDovLzEwLjAuOTAuMjEwOjYwMDEvcGlmbG93LXdlYi9wcm9jZXNzL3Nob3dWaWV3U3RvcERhdGEvZmMzYWI4MGRjZjg1NGU5ZjljMzE4ODBiYzk3NWEyZWI%3D
     var viewUrl = "/HighDimensionVis/?url=" + customViewDataUrl;
     if(document.readyState === 'complete') {

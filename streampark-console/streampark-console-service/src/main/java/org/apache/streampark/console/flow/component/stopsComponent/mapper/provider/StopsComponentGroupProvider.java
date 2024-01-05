@@ -1,9 +1,9 @@
 package org.apache.streampark.console.flow.component.stopsComponent.mapper.provider;
 
-import org.apache.streampark.console.flow.base.utils.SqlUtils;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.jdbc.SQL;
+import org.apache.streampark.console.flow.base.utils.SqlUtils;
 
 public class StopsComponentGroupProvider {
 
@@ -20,7 +20,7 @@ public class StopsComponentGroupProvider {
   }
 
   public String getStopGroupByGroupNameList(
-      @Param("group_name") List<String> groupName, @Param("engineType") String engineType) {
+      @Param("groupName") List<String> groupName, @Param("engineType") String engineType) {
     return "select * from flow_stops_groups where group_name in ("
         + SqlUtils.strListToStr(groupName)
         + ") and enable_flag = 1 and engine_type = '"

@@ -38,7 +38,7 @@ public interface SysUserMapper {
         property = "role",
         many =
             @Many(
-                select = "cn.cnic.component.system.mapper.SysRoleMapper.getSysRoleBySysUserId",
+                select = "org.apache.streampark.console.flow.component.system.mapper.SysRoleMapper.getSysRoleBySysUserId",
                 fetchType = FetchType.EAGER))
   })
   List<SysUserVo> getSysUserVoList(boolean isAdmin, String username, String param);
@@ -57,7 +57,7 @@ public interface SysUserMapper {
         property = "roles",
         many =
             @Many(
-                select = "cn.cnic.component.system.mapper.SysRoleMapper.getSysRoleListBySysUserId",
+                select = "org.apache.streampark.console.flow.component.system.mapper.SysRoleMapper.getSysRoleListBySysUserId",
                 fetchType = FetchType.EAGER))
   })
   SysUser findUserByUserName(String userName);

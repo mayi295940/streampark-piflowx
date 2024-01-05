@@ -45,14 +45,14 @@ public interface FlowGroupMapper {
         one =
             @One(
                 select =
-                    "cn.cnic.component.mxGraph.mapper.MxGraphModelMapper.getMxGraphModelByFlowGroupId",
+                    "org.apache.streampark.console.flow.component.mxGraph.mapper.MxGraphModelMapper.getMxGraphModelByFlowGroupId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
         property = "flowList",
         many =
             @Many(
-                select = "cn.cnic.component.flow.mapper.FlowMapper.getFlowListGroupId",
+                select = "org.apache.streampark.console.flow.component.flow.mapper.FlowMapper.getFlowListGroupId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -60,7 +60,7 @@ public interface FlowGroupMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.flow.mapper.FlowGroupMapper.getFlowGroupListByFkGroupId",
+                    "org.apache.streampark.console.flow.component.flow.mapper.FlowGroupMapper.getFlowGroupListByFkGroupId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -68,14 +68,14 @@ public interface FlowGroupMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.flow.mapper.FlowGroupPathsMapper.getFlowGroupPathsByFlowGroupId",
+                    "org.apache.streampark.console.flow.component.flow.mapper.FlowGroupPathsMapper.getFlowGroupPathsByFlowGroupId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "fk_flow_group_id",
         property = "flowGroup",
         one =
             @One(
-                select = "cn.cnic.component.flow.mapper.FlowGroupMapper.getFlowGroupById",
+                select = "org.apache.streampark.console.flow.component.flow.mapper.FlowGroupMapper.getFlowGroupById",
                 fetchType = FetchType.LAZY))
   })
   FlowGroup getFlowGroupById(String id);
@@ -94,14 +94,14 @@ public interface FlowGroupMapper {
         one =
             @One(
                 select =
-                    "cn.cnic.component.mxGraph.mapper.MxGraphModelMapper.getMxGraphModelByFlowGroupId",
+                    "corg.apache.streampark.console.flow.component.mxGraph.mapper.MxGraphModelMapper.getMxGraphModelByFlowGroupId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
         property = "flowList",
         many =
             @Many(
-                select = "cn.cnic.component.flow.mapper.FlowMapper.getFlowListGroupId",
+                select = "org.apache.streampark.console.flow.component.flow.mapper.FlowMapper.getFlowListGroupId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -109,7 +109,7 @@ public interface FlowGroupMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.flow.mapper.FlowGroupMapper.getFlowGroupListByFkGroupId",
+                    "org.apache.streampark.console.flow.component.flow.mapper.FlowGroupMapper.getFlowGroupListByFkGroupId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -117,7 +117,7 @@ public interface FlowGroupMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.flow.mapper.FlowGroupPathsMapper.getFlowGroupPathsByFlowGroupId",
+                    "org.apache.streampark.console.flow.component.flow.mapper.FlowGroupPathsMapper.getFlowGroupPathsByFlowGroupId",
                 fetchType = FetchType.LAZY))
   })
   List<FlowGroup> getFlowGroupListByFkGroupId(String fkFlowGroupId);

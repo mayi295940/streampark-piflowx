@@ -20,7 +20,7 @@ function initFlowDrawingBoardData(loadId, parentAccessPath) {
             load: loadId,
             parentAccessPath: parentAccessPath
         },
-        success: function (data) {//Operation after request successful
+        success: function (data) {
             var dataMap = JSON.parse(data);
             if (200 === dataMap.code) {
                 window.parent.postMessage(false);
@@ -29,33 +29,29 @@ function initFlowDrawingBoardData(loadId, parentAccessPath) {
                 } else {
                     parentsId = 'null';
                 }
-                let herf = top.window.location.href.split("src=")[1];
-                if (herf.indexOf('BreadcrumbSchedule') !== -1) {
-                    top.document.getElementById('BreadcrumbSchedule').style.display = 'block';
-                    top.document.getElementById('BreadcrumbFlow').style.display = 'none';
-                } else {
-                    top.document.getElementById('BreadcrumbFlow').style.display = 'block';
-                    top.document.getElementById('BreadcrumbSchedule').style.display = 'none';
-                }
-                top.document.getElementById('BreadcrumbGroup').style.display = 'none';
-                top.document.getElementById('BreadcrumbProcess').style.display = 'none';
-                top.document.getElementById('BreadcrumbProcessGroup').style.display = 'none';
+                // todo
+                // let herf = top.window.location.href.split("src=")[1];
+                // if (herf.indexOf('BreadcrumbSchedule') !== -1) {
+                //     top.document.getElementById('BreadcrumbSchedule').style.display = 'block';
+                //     top.document.getElementById('BreadcrumbFlow').style.display = 'none';
+                // } else {
+                //     top.document.getElementById('BreadcrumbFlow').style.display = 'block';
+                //     top.document.getElementById('BreadcrumbSchedule').style.display = 'none';
+                // }
+                // top.document.getElementById('BreadcrumbGroup').style.display = 'none';
+                // top.document.getElementById('BreadcrumbProcess').style.display = 'none';
+                // top.document.getElementById('BreadcrumbProcessGroup').style.display = 'none';
 
                 var link = top.document.getElementById('FlowParents');
-                if (parentsId !== 'null') {
-                    link.style.display = 'inline-block';
-                    link.href = '#/drawingBoard?src=/drawingBoard/page/flowGroup/mxGraph/index.html?drawingBoardType=GROUP&parentAccessPath=flowGroupList&load=' + parentsId;
-                } else {
-                    link.style.display = 'none';
+                if (link) {
+                  if (parentsId !== 'null') {
+                      link.style.display = 'inline-block';
+                      link.href = '#/flow/drawingBoard?src=/drawingBoard/page/flowGroup/mxGraph/index.html?drawingBoardType=GROUP&parentAccessPath=flowGroupList&load=' + parentsId;
+                  } else {
+                      link.style.display = 'none';
+                  }
                 }
 
-                // for (var key in window.parent.__VUE_HOT_MAP__){
-                //     if( window.parent.__VUE_HOT_MAP__[key].options.name === 'DrawingBoard'){
-                //         window.parent.postMessage({
-                //             parentsId :parentsId
-                //         },'*');
-                //     }
-                // }
                 xmlDate = dataMap.xmlDate;
                 stopsDisabled = dataMap.stopsDisabled
                 maxStopPageId = dataMap.maxStopPageId;
@@ -136,7 +132,7 @@ function imageAjax() {
                 var image = document.createElement("img");
                 image.className = "imageimg"
                 image.style = "width:100%;height:100%";
-                image.src = web_header_prefix + (item.imageUrl.replace("/piflow-web", ""));
+                image.src = web_header_prefix + (item.imageUrl.replace("", ""));
 
                 div.appendChild(image);
                 nowimage.appendChild(div);

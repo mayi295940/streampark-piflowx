@@ -1,9 +1,5 @@
 package org.apache.streampark.console.flow.component.flow.mapper;
 
-import org.apache.streampark.console.flow.component.flow.entity.Stops;
-import org.apache.streampark.console.flow.component.flow.mapper.provider.StopsMapperProvider;
-import org.apache.streampark.console.flow.component.flow.vo.StopsVo;
-import org.apache.streampark.console.flow.third.vo.flow.ThirdFlowInfoStopVo;
 import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.annotations.InsertProvider;
@@ -16,6 +12,10 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.mapping.FetchType;
+import org.apache.streampark.console.flow.component.flow.entity.Stops;
+import org.apache.streampark.console.flow.component.flow.mapper.provider.StopsMapperProvider;
+import org.apache.streampark.console.flow.component.flow.vo.StopsVo;
+import org.apache.streampark.console.flow.third.vo.flow.ThirdFlowInfoStopVo;
 
 /** Stop component table */
 @Mapper
@@ -57,14 +57,16 @@ public interface StopsMapper {
         column = "fk_data_source_id",
         many =
             @Many(
-                select = "cn.cnic.component.dataSource.mapper.DataSourceMapper.getDataSourceById",
+                select =
+                    "org.apache.streampark.console.flow.component.dataSource.mapper.DataSourceMapper.getDataSourceById",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
         property = "properties",
         many =
             @Many(
-                select = "cn.cnic.component.flow.mapper.PropertyMapper.getPropertyListByStopsId",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.PropertyMapper.getPropertyListByStopsId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -72,7 +74,7 @@ public interface StopsMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.flow.mapper.CustomizedPropertyMapper.getCustomizedPropertyListByStopsId",
+                    "org.apache.streampark.console.flow.component.flow.mapper.CustomizedPropertyMapper.getCustomizedPropertyListByStopsId",
                 fetchType = FetchType.LAZY))
   })
   List<Stops> getStopsList();
@@ -93,14 +95,15 @@ public interface StopsMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.dataSource.mapper.DataSourceMapper.adminGetDataSourceById",
+                    "org.apache.streampark.console.flow.component.dataSource.mapper.DataSourceMapper.adminGetDataSourceById",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
         property = "properties",
         many =
             @Many(
-                select = "cn.cnic.component.flow.mapper.PropertyMapper.getPropertyListByStopsId",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.PropertyMapper.getPropertyListByStopsId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -108,7 +111,7 @@ public interface StopsMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.flow.mapper.CustomizedPropertyMapper.getCustomizedPropertyListByStopsId",
+                    "org.apache.streampark.console.flow.component.flow.mapper.CustomizedPropertyMapper.getCustomizedPropertyListByStopsId",
                 fetchType = FetchType.LAZY))
   })
   List<Stops> getStopsListByFlowId(String flowId);
@@ -122,14 +125,16 @@ public interface StopsMapper {
         column = "fk_data_source_id",
         many =
             @Many(
-                select = "cn.cnic.component.dataSource.mapper.DataSourceMapper.getDataSourceById",
+                select =
+                    "org.apache.streampark.console.flow.component.dataSource.mapper.DataSourceMapper.getDataSourceById",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
         property = "properties",
         many =
             @Many(
-                select = "cn.cnic.component.flow.mapper.PropertyMapper.getPropertyListByStopsId",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.PropertyMapper.getPropertyListByStopsId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -137,7 +142,7 @@ public interface StopsMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.flow.mapper.CustomizedPropertyMapper.getCustomizedPropertyListByStopsId",
+                    "org.apache.streampark.console.flow.component.flow.mapper.CustomizedPropertyMapper.getCustomizedPropertyListByStopsId",
                 fetchType = FetchType.LAZY))
   })
   List<Stops> getStopsListByFlowIdAndPageIds(
@@ -160,14 +165,16 @@ public interface StopsMapper {
         property = "properties",
         many =
             @Many(
-                select = "cn.cnic.component.flow.mapper.PropertyMapper.getPropertyListByStopsId",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.PropertyMapper.getPropertyListByStopsId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "fk_flow_id",
         property = "flow",
         many =
             @Many(
-                select = "cn.cnic.component.flow.mapper.FlowMapper.getFlowById",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.FlowMapper.getFlowById",
                 fetchType = FetchType.LAZY))
   })
   Stops getStopsById(String Id);
@@ -210,14 +217,16 @@ public interface StopsMapper {
         property = "properties",
         many =
             @Many(
-                select = "cn.cnic.component.flow.mapper.PropertyMapper.getPropertyListByStopsId",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.PropertyMapper.getPropertyListByStopsId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
         property = "oldProperties",
         many =
             @Many(
-                select = "cn.cnic.component.flow.mapper.PropertyMapper.getOldPropertyListByStopsId",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.PropertyMapper.getOldPropertyListByStopsId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -225,14 +234,15 @@ public interface StopsMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.flow.mapper.CustomizedPropertyMapper.getCustomizedPropertyListByStopsId",
+                    "org.apache.streampark.console.flow.component.flow.mapper.CustomizedPropertyMapper.getCustomizedPropertyListByStopsId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "fk_flow_id",
         property = "flow",
         many =
             @Many(
-                select = "cn.cnic.component.flow.mapper.FlowMapper.getFlowById",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.FlowMapper.getFlowById",
                 fetchType = FetchType.LAZY)),
     @Result(column = "is_data_source", property = "isDataSource"),
     @Result(
@@ -240,7 +250,8 @@ public interface StopsMapper {
         property = "dataSource",
         many =
             @Many(
-                select = "cn.cnic.component.dataSource.mapper.DataSourceMapper.getDataSourceById",
+                select =
+                    "org.apache.streampark.console.flow.component.dataSource.mapper.DataSourceMapper.getDataSourceById",
                 fetchType = FetchType.LAZY))
   })
   Stops getStopsByPageId(@Param("fid") String fid, @Param("stopPageId") String stopPageId);
@@ -258,7 +269,8 @@ public interface StopsMapper {
         property = "properties",
         many =
             @Many(
-                select = "cn.cnic.component.flow.mapper.PropertyMapper.getPropertyListByStopsId",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.PropertyMapper.getPropertyListByStopsId",
                 fetchType = FetchType.LAZY)),
     @Result(column = "is_data_source", property = "isDataSource")
   })
@@ -285,7 +297,8 @@ public interface StopsMapper {
         property = "propertiesVo",
         many =
             @Many(
-                select = "cn.cnic.component.flow.mapper.PropertyMapper.getPropertyVoListByStopsId",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.PropertyMapper.getPropertyVoListByStopsId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -293,7 +306,7 @@ public interface StopsMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.flow.mapper.PropertyMapper.getOldPropertyVoListByStopsId",
+                    "org.apache.streampark.console.flow.component.flow.mapper.PropertyMapper.getOldPropertyVoListByStopsId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -301,14 +314,15 @@ public interface StopsMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.flow.mapper.CustomizedPropertyMapper.getCustomizedPropertyVoListByStopsId",
+                    "org.apache.streampark.console.flow.component.flow.mapper.CustomizedPropertyMapper.getCustomizedPropertyVoListByStopsId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "fk_flow_id",
         property = "flowVo",
         many =
             @Many(
-                select = "cn.cnic.component.flow.mapper.FlowMapper.getFlowVoById",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.FlowMapper.getFlowVoById",
                 fetchType = FetchType.LAZY)),
     @Result(column = "is_data_source", property = "isDataSource"),
     @Result(
@@ -316,7 +330,8 @@ public interface StopsMapper {
         property = "dataSourceVo",
         many =
             @Many(
-                select = "cn.cnic.component.dataSource.mapper.DataSourceMapper.getDataSourceVoById",
+                select =
+                    "org.apache.streampark.console.flow.component.dataSource.mapper.DataSourceMapper.getDataSourceVoById",
                 fetchType = FetchType.LAZY))
   })
   StopsVo getStopsVoById(String Id);
@@ -360,14 +375,16 @@ public interface StopsMapper {
         property = "properties",
         many =
             @Many(
-                select = "cn.cnic.component.flow.mapper.PropertyMapper.getPropertyListByStopsId",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.PropertyMapper.getPropertyListByStopsId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "fk_flow_id",
         property = "flow",
         many =
             @Many(
-                select = "cn.cnic.component.flow.mapper.FlowMapper.getFlowById",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.FlowMapper.getFlowById",
                 fetchType = FetchType.LAZY))
   })
   List<Stops> getStopsBindDatasourceByIds(List<String> Ids);

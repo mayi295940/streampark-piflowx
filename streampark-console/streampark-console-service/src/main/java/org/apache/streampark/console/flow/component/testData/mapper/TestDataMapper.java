@@ -62,7 +62,7 @@ public interface TestDataMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.testData.mapper.TestDataSchemaMapper.getTestDataSchemaListByTestDataId",
+                    "org.apache.streampark.console.flow.component.testData.mapper.TestDataSchemaMapper.getTestDataSchemaListByTestDataId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -70,7 +70,7 @@ public interface TestDataMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.testData.mapper.TestDataSchemaValuesMapper.getTestDataSchemaValuesListByTestDataId",
+                    "org.apache.streampark.console.flow.component.testData.mapper.TestDataSchemaValuesMapper.getTestDataSchemaValuesListByTestDataId",
                 fetchType = FetchType.LAZY))
   })
   TestData getTestDataById(@Param("id") String id);

@@ -23,7 +23,7 @@
     @ok="handleSubmit"
   >
     <template #title>
-      <Icon icon="ant-design:user-add-outlined" />
+      <Icon icon="ant-design:partition-outlined" />
       {{ getTitle }}
     </template>
     <BasicForm @register="registerForm" />
@@ -87,9 +87,9 @@
 
       const getTitle = computed(() => {
         return {
-          [FormTypeEnum.Create]: t('system.user.form.create'),
-          [FormTypeEnum.Edit]: t('system.user.form.edit'),
-          [FormTypeEnum.View]: t('system.user.form.view'),
+          [FormTypeEnum.Create]: t('flow.flow.flow_form.create'),
+          [FormTypeEnum.Edit]: t('flow.flow.flow_form.edit'),
+          [FormTypeEnum.View]: t('flow.flow.flow_form.view'),
         }[unref(formType)];
       });
 

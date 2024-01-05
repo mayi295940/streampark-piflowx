@@ -61,7 +61,7 @@ public interface CodeSnippetMapper {
         property = "noteBook",
         one =
             @One(
-                select = "cn.cnic.component.livy.mapper.NoteBookMapper.adminGetNoteBookById",
+                select = "org.apache.streampark.console.flow.component.livy.mapper.NoteBookMapper.adminGetNoteBookById",
                 fetchType = FetchType.LAZY))
   })
   CodeSnippet getCodeSnippetById(@Param("id") String id);

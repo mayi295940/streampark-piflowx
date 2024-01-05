@@ -82,6 +82,15 @@ export default {
     required: '流水线名称为必填项',
     min: '流水线名称长度不能少于 2 个字符',
     max: '超过 20 个字符的最大长度限制',
+    create: '创建流水线',
+    edit: '编辑流水线',
+    view: '查看流水线',
+    notice: 'Notice',
+    deletePopConfirm: '您确定要删除吗',
+  },
+  flow_table: {
+    enter: '设计',
+    modify: '编辑流水线',
   },
   group_columns: {
     create_title: '新建流水线组',
@@ -196,5 +205,5 @@ export default {
     OtherStatistics:
       '其他统计信息，包括数据源DataSource数量、自定义组件插件StopsHub数量、模板Template数量。',
     ComponentStatistics: '组件统计信息，包括数据处理组件Stop数量，数据处理组件组StopGroup数量。',
-  },
+  }
 };

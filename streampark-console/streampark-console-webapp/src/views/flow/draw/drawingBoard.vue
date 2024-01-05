@@ -1,23 +1,67 @@
 <template>
   <div :style="{ height }">
     <iframe :src="src" id="bariframe" style="width: 100%; height: 100%" frameborder="0"></iframe>
-    <img id="piflow-bgc" src="../../../assets/img/hbbj.jpg" />
+    <!-- <img id="piflow-bgc" src="../../../assets/img/hbbj.jpg" /> -->
+
+    <!--The online programming-->
+    <Modal
+      :title="programming_Title"
+      :visible="programming_Modal"
+      centered
+      :width="1000"
+      @ok="updateStopsProperty"
+      @cancel="programming_Modal = false"
+    >
+      <div>
+        <RadioGroup size="small" v-model="buttonSize" type="button">
+          <RadioButton label="text" :disabled="buttonSize === 'text' ? false : true"
+            >text</RadioButton
+          >
+          <RadioButton label="scala" :disabled="buttonSize === 'scala' ? false : true"
+            >scala</RadioButton
+          >
+          <RadioButton label="javascript" :disabled="buttonSize === 'javascript' ? false : true"
+            >java</RadioButton
+          >
+          <RadioButton label="python" :disabled="buttonSize === 'python' ? false : true"
+            >python</RadioButton
+          >
+          <RadioButton label="sh" :disabled="buttonSize === 'sh' ? false : true">shell</RadioButton>
+          <RadioButton label="sql" :disabled="buttonSize === 'sql' ? false : true">sql</RadioButton>
+        </RadioGroup>
+
+        <SqlEditor ref="flinkSql" v-model:value="editorContent" v-if="buttonSize === 'sql'" />
+        <OnlineProgram ref="programModal" v-model:value="editorContent" :language="buttonSize" v-else />
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script lang="ts">
+  import { Modal, Radio } from 'ant-design-vue';
   import { defineComponent, inject } from 'vue';
-  // import CodeEditor from '/@/components/compon/CodeFormat';
+  import OnlineProgram from './components/OnlineProgram.vue';
+  import SqlEditor from './components/SqlEditor.vue';
+  import { updateStopsProperty } from '/@/api/flow/stop';
+  import { useDrawer } from '/@/components/Drawer';
   import { useI18n } from '/@/hooks/web/useI18n';
   const { t } = useI18n();
 
   export default defineComponent({
     name: 'DrawingBoard',
-    // components: { CodeEditor },
+    components: {
+      Modal,
+      RadioGroup: Radio.Group,
+      RadioButton: Radio.Button,
+      SqlEditor,
+      OnlineProgram,
+    },
+    setup() {
+      const [registerReviewDrawer, { openDrawer: openReviewDrawer }] = useDrawer();
+    },
     data() {
       return {
         height: '100%',
-        Programming: '400px',
         src: '',
         parentsId: '',
         editorContent: '',
@@ -121,7 +165,7 @@
         //       if (e.data.parentsId !== 'null'){
         //          this.global.eventPoll.emit("crumb", [
         //           { name: "Group", path: "/group" },
-        //           { name: footerName, path:"/drawingBoard?src=" + "/drawingBoard" +"/page/flowGroup/mxGraph/index.html?drawingBoardType=GROUP&parentAccessPath=flowGroupList&load=" + e.data.parentsId},
+        //           { name: footerName, path:"/flow/drawingBoard?src=" + "/drawingBoard" +"/page/flowGroup/mxGraph/index.html?drawingBoardType=GROUP&parentAccessPath=flowGroupList&load=" + e.data.parentsId},
         //           { name: "drawingBoard", path: "/drawingBoard" },
         //         ]);
         //       }else if(e.data.parentsId === 'null') {
@@ -207,7 +251,7 @@
         function (event) {
           // 通过origin属性判断消息来源地址
           // if (event.origin == 'localhost') {
-          this.global.eventPoll.emit('looding', event.data);
+          _this.global.eventPoll.emit('looding', event.data);
           // console.log(event.source);
           // }
         },
@@ -215,10 +259,6 @@
       );
       //  接收可视化编程data
       window['openRightHelpPage'] = (val, id, language, name) => {
-        _this.Programming =
-          window.innerHeight > 300
-            ? window.innerHeight - window.innerHeight * 0.3 + 'px'
-            : window.innerHeight + 'px';
         _this.programming_Modal = true;
         _this.editorContent = val;
         _this.stopsId = id;
@@ -315,40 +355,23 @@
         this.parentsId = val;
       },
       // 保存更改的flow配置信息
-      updateStopsProperty() {
-        let data = {};
-        data.id = this.stopsId;
-        data.content = this.editorContent;
-        this.$axios
-          .post('/stops/updateStopsOne', this.$qs.stringify(data))
-          .then((res) => {
-            var dataMap = res.data;
-            if (dataMap.code == 200) {
-              document
-                .getElementById('bariframe')
-                .contentWindow.document.getElementById(`${this.stopsId}`).value = dataMap.value;
-              document
-                .getElementById('bariframe')
-                .contentWindow.document.getElementById(`${this.stopsId}`)
-                .setAttribute('data', `${dataMap.value}`);
+      async updateStopsProperty() {
+        let param = {};
+        param.id = this.stopsId;
+        param.content = this.editorContent;
+        console.log(this.editorContent);
 
-              // console.log(document.frames('bariframe').document)
-              // $("#" + stopsPropertyId).val(dataMap.value);
-              // $("#" + stopsPropertyId).attr("data", dataMap.value);
-            } else {
-              // this.$Modal.error({
-              //   title: this.$t("tip.title"),
-              //   content: `${row.jobName} ` + this.$t("tip.stop_fail_content")
-              // });
-            }
-          })
-          .catch((error) => {
-            console.log(error);
-            // this.$Message.error({
-            //   content: this.$t("tip.fault_content"),
-            //   duration: 3
-            // });
-          });
+        const { data } = await updateStopsProperty(param);
+        if (data.code == 200) {
+          document
+            .getElementById('bariframe')
+            .contentWindow.document.getElementById(`${this.stopsId}`).value = data.value;
+          document
+            .getElementById('bariframe')
+            .contentWindow.document.getElementById(`${this.stopsId}`)
+            .setAttribute('data', `${data.value}`);
+        }
+        this.programming_Modal = false;
       },
 
       // run parameters

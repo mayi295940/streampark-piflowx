@@ -65,7 +65,7 @@ function searchMonitor(layui_table, layui_table_id, searchInputId) {
 function responseHandlerFlow(res) {
     if (res) {
         var openHtmlStr = '<a class="btn" ' +
-            'href="/piflow-web/page/flow/mxGraph/index.html?drawingBoardType=TASK&load=' + res.id + '"' +
+            'href="/page/flow/mxGraph/index.html?drawingBoardType=TASK&load=' + res.id + '"' +
             'target="_blank" ' +
             'style="margin-right: 2px;">' +
             '<i class="icon-share-alt icon-white"></i>' +
@@ -190,7 +190,7 @@ function saveFlow() {
                         if (tempWindow == null || typeof (tempWindow) == 'undefined') {
                             alert('The window cannot be opened. Please check your browser settings.')
                         } else {
-                            tempWindow.location = "/piflow-web/mxGraph/drawingBoard?drawingBoardType=TASK&load=" + dataMap.flowId;
+                            tempWindow.location = "/mxGraph/drawingBoard?drawingBoardType=TASK&load=" + dataMap.flowId;
                         }
                     });
                 } else {
@@ -278,7 +278,7 @@ function runFlows(loadId, runMode) {
                     if (tempWindow == null || typeof (tempWindow) == 'undefined') {
                         alert('The window cannot be opened. Please check your browser settings.')
                     } else {
-                        tempWindow.location = "/piflow-web/mxGraph/drawingBoard?drawingBoardType=PROCESS&processType=PROCESS&load=" + dataMap.processId;
+                        tempWindow.location = "/mxGraph/drawingBoard?drawingBoardType=PROCESS&processType=PROCESS&load=" + dataMap.processId;
                     }
                 });
             } else {

@@ -17,7 +17,7 @@ public class MxGraphComponentVoUtils {
   public static MxGraphComponentVo InitGroupMxGraphComponent() {
     MxGraphComponentVo mxGraphComponentVo = new MxGraphComponentVo();
     mxGraphComponentVo.setAddImagePaletteId("general");
-    mxGraphComponentVo.setComponent_prefix("/piflow-web/img/");
+    mxGraphComponentVo.setComponent_prefix("/img/");
     mxGraphComponentVo.setComponent_name("Group");
     List<MxGraphComponentVo.COMPONENT_GROUP> component_group_list = new ArrayList<>();
     MxGraphComponentVo.COMPONENT_GROUP component_group = new MxGraphComponentVo.COMPONENT_GROUP();
@@ -33,7 +33,7 @@ public class MxGraphComponentVoUtils {
   public static MxGraphComponentVo InitTaskMxGraphComponent() {
     MxGraphComponentVo mxGraphComponentVo = new MxGraphComponentVo();
     mxGraphComponentVo.setAddImagePaletteId("general");
-    mxGraphComponentVo.setComponent_prefix("/piflow-web/img/");
+    mxGraphComponentVo.setComponent_prefix("/img/");
     mxGraphComponentVo.setComponent_name("Task");
     List<MxGraphComponentVo.COMPONENT_GROUP> component_group_list = new ArrayList<>();
     MxGraphComponentVo.COMPONENT_GROUP component_group = new MxGraphComponentVo.COMPONENT_GROUP();
@@ -49,7 +49,7 @@ public class MxGraphComponentVoUtils {
   public static MxGraphComponentVo InitTextMxGraphComponent() {
     MxGraphComponentVo mxGraphComponentVo = new MxGraphComponentVo();
     mxGraphComponentVo.setAddImagePaletteId("general");
-    mxGraphComponentVo.setComponent_prefix("/piflow-web/img/");
+    mxGraphComponentVo.setComponent_prefix("/img/");
     mxGraphComponentVo.setComponent_name("Text");
     List<MxGraphComponentVo.COMPONENT_GROUP> component_group_list = new ArrayList<>();
     MxGraphComponentVo.COMPONENT_GROUP component_group = new MxGraphComponentVo.COMPONENT_GROUP();

@@ -32,7 +32,7 @@ function getRightInfo(cell) {
         $.ajax({
             cache: true,
             type: "POST",
-            url: "/piflow-web/processGroup/queryProcess",
+            url: "/processGroup/queryProcess",
             data: data,
             async: true,
             error: function (request) {
@@ -48,7 +48,7 @@ function getRightInfo(cell) {
             $.ajax({
                 cache: true,
                 type: "POST",
-                url: " /piflow-web/processGroup/queryProcessGroup",
+                url: " /processGroup/queryProcessGroup",
                 data: data,
                 async: true,
                 error: function (request) {
@@ -62,7 +62,7 @@ function getRightInfo(cell) {
             $.ajax({
                 cache: true,
                 type: "POST",
-                url: "/piflow-web/page/process/inc/process_info_inc.html",
+                url: "/page/process/inc/process_info_inc.html",
                 data: {processId: processGroupId},
                 async: true,
                 error: function (request) {
@@ -73,14 +73,12 @@ function getRightInfo(cell) {
                 }
             })
         }
-
-
         //task
     } else if (cell && cell.style && (cell.style).indexOf("image\;") === 0 && processType == "TASK") {
         $.ajax({
             cache: true,
             type: "POST",
-            url: "/piflow-web/page/process/inc/process_property_inc.html",
+            url: "/page/process/inc/process_property_inc.html",
             data: {processId: processGroupId, pageId: cell.id},
             async: true,
             error: function (request) {
@@ -96,7 +94,7 @@ function getRightInfo(cell) {
             $.ajax({
                 cache: true,
                 type: "POST",
-                url: "/piflow-web/processGroup/queryProcessGroupPath",
+                url: "/processGroup/queryProcessGroupPath",
                 data: {processGroupId, pageId: cell.id},
                 async: true,
                 error: function (request) {
@@ -110,7 +108,7 @@ function getRightInfo(cell) {
             $.ajax({
                 cache: true,
                 type: "POST",
-                url: "/piflow-web/page/process/inc/process_path_inc.html",
+                url: "/page/process/inc/process_path_inc.html",
                 data: {processId: processGroupId, pageId: cell.id},
                 async: true,
                 error: function (request) {
@@ -162,7 +160,7 @@ function initGraph() {
                     img_element_init.setAttribute("width", 20);
                     img_element_init.setAttribute("height", 20);
                     img_element_init.setAttribute("PiFlow_IMG", "IMG");
-                    img_element_init.href.baseVal = "/piflow-web/img/Loading.gif";
+                    img_element_init.href.baseVal = "/img/Loading.gif";
                     img_element_init.setAttribute("id", "stopLoadingShow" + item.pageId);
 
                     var img_element_ok = document.createElementNS("http://www.w3.org/2000/svg", "image");
@@ -171,7 +169,7 @@ function initGraph() {
                     img_element_ok.setAttribute("width", 20);
                     img_element_ok.setAttribute("height", 20);
                     img_element_ok.setAttribute("PiFlow_IMG", "IMG");
-                    img_element_ok.href.baseVal = "/piflow-web/img/Ok.png";
+                    img_element_ok.href.baseVal = "/img/Ok.png";
                     img_element_ok.setAttribute("id", "stopOkShow" + item.pageId);
 
                     var img_element_fail = document.createElementNS("http://www.w3.org/2000/svg", "image");
@@ -180,7 +178,7 @@ function initGraph() {
                     img_element_fail.setAttribute("width", 20);
                     img_element_fail.setAttribute("height", 20);
                     img_element_fail.setAttribute("PiFlow_IMG", "IMG");
-                    img_element_fail.href.baseVal = "/piflow-web/img/Fail.png";
+                    img_element_fail.href.baseVal = "/img/Fail.png";
                     img_element_fail.setAttribute("id", "stopFailShow" + item.pageId);
                     img_element_init.style.display = "none";
                     img_element_fail.style.display = "none";
@@ -347,7 +345,7 @@ function prohibitEditing(evt, operationType) {
     $.ajax({
         cache: true,//Keep cached data
         type: "POST",//Request type post
-        url: "/piflow-web/mxGraph/eraseRecord",
+        url: "/mxGraph/eraseRecord",
         data: {},
         async: true,
         error: function (request) {//Operation after request failure
@@ -471,7 +469,7 @@ function groupGraphAddCells(cells) {
         $.ajax({
             cache: true,//Keep cached data
             type: "POST",//Request type post
-            url: "/piflow-web/mxGraph/addMxCellAndData",
+            url: "/mxGraph/addMxCellAndData",
             data: JSON.stringify({
                 mxCellVoList: addCellArray,
                 loadId: loadId
@@ -659,7 +657,7 @@ function openProcessMonitor(evt) {
         $.ajax({
             cache: true,
             type: "POST",
-            url: "/piflow-web/flowGroup/findFlowByGroup",
+            url: "/flowGroup/findFlowByGroup",
             data: {"pageId": cellFor.id, "fId": loadId},
             async: true,
             error: function (request) {
@@ -671,10 +669,10 @@ function openProcessMonitor(evt) {
                 if (200 === dataMap.code) {
                     if ('flow' === dataMap.nodeType) {
                         var flow_obj = dataMap.flowVo;
-                        window.location.href = "/piflow-web/mxGraph/drawingBoard?drawingBoardType=TASK&parentAccessPath=flowGroupList&load=" + flow_obj.id;
+                        window.location.href = "/mxGraph/drawingBoard?drawingBoardType=TASK&parentAccessPath=flowGroupList&load=" + flow_obj.id;
                     } else if ('flowGroup' === dataMap.nodeType) {
                         var flowGroup_obj = dataMap.flowGroupVo;
-                        window.location.href = "/piflow-web/mxGraph/drawingBoard?drawingBoardType=GROUP&parentAccessPath=flowGroupList&load=" + flowGroup_obj.id;
+                        window.location.href = "/mxGraph/drawingBoard?drawingBoardType=GROUP&parentAccessPath=flowGroupList&load=" + flowGroup_obj.id;
                     }
                 } else {
                     console.log(dataMap.errorMsg);
@@ -693,7 +691,7 @@ function OpenTheMonitorArtboard(evt) {
         $.ajax({
             cache: true,//Keep cached data
             type: "POST",//Request type post
-            url: "/piflow-web/processGroup/getProcessIdByPageId",//This is the name of the file where I receive data in the background.
+            url: "/processGroup/getProcessIdByPageId",//This is the name of the file where I receive data in the background.
             data: {
                 processGroupId: processGroupId,
                 pageId: cellFor.id
@@ -709,14 +707,14 @@ function OpenTheMonitorArtboard(evt) {
                     if (200 === dataMap.code) {
                         var urlPath = "";
                         // if ('flow' === dataMap.nodeType) {
-                        //     urlPath = "/piflow-web/mxGraph/drawingBoard?drawingBoardType=PROCESS&processType=PROCESS&load=" + dataMap.processId;
+                        //     urlPath = "/mxGraph/drawingBoard?drawingBoardType=PROCESS&processType=PROCESS&load=" + dataMap.processId;
                         // } else if ('flowGroup' === dataMap.nodeType) {
-                        //     urlPath = "/piflow-web/mxGraph/drawingBoard?drawingBoardType=PROCESS&processType=PROCESS_GROUP&load=" + dataMap.processGroupId;
+                        //     urlPath = "/mxGraph/drawingBoard?drawingBoardType=PROCESS&processType=PROCESS_GROUP&load=" + dataMap.processGroupId;
                         // }
                         if ('flow' === dataMap.nodeType) {
-                            urlPath = "/piflow-web/mxGraph/drawingBoard?drawingBoardType=PROCESS&parentAccessPath=processGroupList&processType=PROCESS&load=" + dataMap.processId;
+                            urlPath = "/mxGraph/drawingBoard?drawingBoardType=PROCESS&parentAccessPath=processGroupList&processType=PROCESS&load=" + dataMap.processId;
                         } else if ('flowGroup' === dataMap.nodeType) {
-                            urlPath = "/piflow-web/mxGraph/drawingBoard?drawingBoardType=PROCESS&parentAccessPath=processGroupList&processType=PROCESS_GROUP&load=" + dataMap.processGroupId;
+                            urlPath = "/mxGraph/drawingBoard?drawingBoardType=PROCESS&parentAccessPath=processGroupList&processType=PROCESS_GROUP&load=" + dataMap.processGroupId;
                         }
                         if (urlPath) {
                             var tempWindow = window.location.href = urlPath;
@@ -784,7 +782,7 @@ function queryStopsProperty(stopPageId) {
     $.ajax({
         cache: true,
         type: "POST",
-        url: "/piflow-web/stops/queryIdInfo",
+        url: "/stops/queryIdInfo",
         data: {"stopPageId": stopPageId, "fid": loadId},
         async: true,
         error: function (request) {
@@ -888,7 +886,7 @@ function queryStopsProperty(stopPageId) {
                         }
 
                         var img = document.createElement("img");
-                        img.setAttribute('src', '/piflow-web/img/descIcon.png');
+                        img.setAttribute('src', '/img/descIcon.png');
                         img.style.cursor = "pointer";
                         img.setAttribute('title', '' + oldPropertiesVo[y].description + '');
                         var tr = document.createElement("tr");
@@ -958,7 +956,7 @@ function queryFlowOrFlowGroupProperty(flowPageId) {
     $.ajax({
         cache: true,
         type: "POST",
-        url: "/piflow-web/flowGroup/queryIdInfo",
+        url: "/flowGroup/queryIdInfo",
         data: {"flowPageId": pageId, "fId": loadId},
         async: true,
         error: function (request) {
@@ -1085,10 +1083,10 @@ function queryPathInfo(id) {
     param_values.customizeBasic_td_6_1_span_children = 'to：';
     param_values.customizeBasic_td_7_1_span_children = 'createTime：';
     if ('TASK' === Format.customizeType) {
-        param_values.url = "/piflow-web/path/queryPathInfo";
+        param_values.url = "/path/queryPathInfo";
         param_values.customizeBasic_td_2_1_span_children = 'flowName：';
     } else if ('GROUP' === Format.customizeType) {
-        param_values.url = "/piflow-web/flowGroupPath/queryPathInfoFlowGroup";
+        param_values.url = "/flowGroupPath/queryPathInfoFlowGroup";
         param_values.customizeBasic_td_2_1_span_children = 'flowGroupName：';
     }
     if (param_values.url) {
@@ -1231,7 +1229,7 @@ function taskAdd(addParamData) {
             }
 
             var img = document.createElement("img");
-            img.setAttribute('src', '/piflow-web/img/descIcon.png');
+            img.setAttribute('src', '/img/descIcon.png');
             img.style.cursor = "pointer";
             img.setAttribute('title', '' + data[y].description + '');
             var tr = document.createElement("tr");
@@ -1279,7 +1277,7 @@ function taskAdd(addParamData) {
             $.ajax({
                 cache: true,
                 type: "POST",
-                url: "/piflow-web/stops/updateStops",
+                url: "/stops/updateStops",
                 data: {content: arrayObj},
                 async: true,
                 traditional: true,
@@ -1315,7 +1313,7 @@ function taskAdd(addParamData) {
             + '<tbody>'
             + '<tr>'
             + '<td style="width: 99px;"><span>dataSource: </span></td>'
-            + '<td style="width: 25px;"><img src="/piflow-web/img/descIcon.png" title="Fill Datasoure" style="cursor: pointer;"></td>'
+            + '<td style="width: 25px;"><img src="/img/descIcon.png" title="Fill Datasoure" style="cursor: pointer;"></td>'
             + '<td>'
             // + '<select id="datasourceSelectElement" onblur="alert(1);" class="form-control" style="height: 32px;">'
             + '<div id="datasourceDivElement" style="float: left;width: 98%;">'
@@ -1393,7 +1391,7 @@ function groupAdd(addParamData, flowId, nodeType) {
             mxUtils.write(spanDisplayName, '' + addData_i.name + '' + ": ");
             mxUtils.write(spanFlag, '*');
             var img = document.createElement("img");
-            img.setAttribute('src', '/piflow-web/img/descIcon.png');
+            img.setAttribute('src', '/img/descIcon.png');
             img.style.cursor = "pointer";
             img.setAttribute('title', '' + addData_i.description + '');
             var tr_1 = document.createElement("tr");
@@ -1441,7 +1439,7 @@ function setCustomizedTableHtml(stopPageId, stopsCustomizedPropertyVo, stopOutPo
             + '<span style="margin-left: 10px;">' + stopsCustomizedPropertyVo.name + ': </span>'
             + '</td>'
             + '<td style="width: 25px;">'
-            + '<img src="/piflow-web/img/descIcon.png" title="' + stopsCustomizedPropertyVo.description + '" style="cursor: pointer;">'
+            + '<img src="/img/descIcon.png" title="' + stopsCustomizedPropertyVo.description + '" style="cursor: pointer;">'
             + '</td>'
             + '<td>'
             + '<input data-toggle="true"class="form-control"'
@@ -1464,7 +1462,7 @@ function getDatasourceList(stop_id, stop_page_id, dataSourceVo) {
     $.ajax({
         cache: true,//sava cache data
         type: "POST",// request type
-        url: "/piflow-web/datasource/getDatasourceList",
+        url: "/datasource/getDatasourceList",
 
         //data:$('#loginForm').serialize(),//Form serialization
         async: true,//open asynchronous request
@@ -1512,7 +1510,7 @@ function fillDatasource(datasource, stop_id, stop_page_id) {
         $.ajax({
             cache: true,//Keep cached data
             type: "POST",//Request type post
-            url: "/piflow-web/datasource/fillDatasource",//This is the name of the file where I receive data in the background.
+            url: "/datasource/fillDatasource",//This is the name of the file where I receive data in the background.
             //data:$('#loginForm').serialize(),//Serialize the form
             data: {"dataSourceId": datasourceId, "stopId": stop_id},
             async: true,//Setting it to true indicates that other code can still be executed after the request has started. If this option is set to false, it means that all requests are no longer asynchronous, which also causes the browser to be locked.
@@ -1540,11 +1538,11 @@ function saveXml(paths, operType) {
     var getXml = thisEditor.getGraphXml();
     var xml_outer_html = getXml.outerHTML;
     //var waitxml = encodeURIComponent(getXml.outerHTML);//This is the XML code to submit to the background
-    var url = "/piflow-web/mxGraph/saveDataForTask";
+    var url = "/mxGraph/saveDataForTask";
     if ('TASK' === Format.customizeType) {
-        url = "/piflow-web/mxGraph/saveDataForTask";
+        url = "/mxGraph/saveDataForTask";
     } else if ('GROUP' === Format.customizeType) {
-        url = "/piflow-web/mxGraph/saveDataForGroup";
+        url = "/mxGraph/saveDataForGroup";
     }
     var time, time1
     $.ajax({
@@ -1790,7 +1788,7 @@ function saveOrUpdateFlowGroup() {
                 $.ajax({
                     cache: true,
                     type: "POST",
-                    url: "/piflow-web/flowGroup/updateFlowGroupBaseInfo",
+                    url: "/flowGroup/updateFlowGroupBaseInfo",
                     data: {
                         id: flowGroupdata.id,
                         description: description,
@@ -1897,7 +1895,7 @@ function saveFlow() {
                 $.ajax({
                     cache: true,
                     type: "POST",
-                    url: "/piflow-web/flow/updateFlowBaseInfo",
+                    url: "/flow/updateFlowBaseInfo",
                     data: {
                         id: flowdatas.id,
                         driverMemory: driverMemory,
@@ -1940,7 +1938,7 @@ function saveFlow() {
         //     $.ajax({
         //         cache: true,
         //         type: "POST",
-        //         url: "/piflow-web/flow/updateFlowBaseInfo",
+        //         url: "/flow/updateFlowBaseInfo",
         //         data: {
         //             id: flowdatas.id,
         //             driverMemory: driverMemory,
@@ -1981,7 +1979,7 @@ function saveFlow() {
         // // $.ajax({
         //     // cache: true,//Keep cached data
         //     // type: "get",//Request type post
-        //     // url: "/piflow-web/flow/saveFlowInfo",//This is the name of the file where I receive data in the background.
+        //     // url: "/flow/saveFlowInfo",//This is the name of the file where I receive data in the background.
         //     //
         //     // async: false,//Setting it to true indicates that other code can still be executed after the request has started. If this option is set to false, it means that all requests are no longer asynchronous, which also causes the browser to be locked.
         //     // error: function (request) {//Operation after request failure
@@ -1999,7 +1997,7 @@ function saveFlow() {
         //                 if (tempWindow == null || typeof(tempWindow)=='undefined'){
         //                     alert('The window cannot be opened. Please check your browser settings.')
         //                 } else {
-        //                     tempWindow.location = "/piflow-web/mxGraph/drawingBoard?drawingBoardType=TASK&load=" + dataMap.flowId;
+        //                     tempWindow.location = "/mxGraph/drawingBoard?drawingBoardType=TASK&load=" + dataMap.flowId;
         //                 }
         //             });
         //         } else {
@@ -2052,7 +2050,7 @@ function openXml() {
     $.ajax({
         cache: true,//Keep cached data
         type: "POST",//Request type post
-        url: "/piflow-web/flow/loadData",
+        url: "/flow/loadData",
         //data:$('#loginForm').serialize(),//Serialize the form
         async: true,//Synchronous Asynchronous
         error: function (request) {//Operation after request failure
@@ -2082,7 +2080,7 @@ function reloadStops() {
         data: {"load": loadId},
         cache: true,//Keep cached data
         type: "POST",//Request type post
-        url: "/piflow-web/stops/reloadStops",
+        url: "/stops/reloadStops",
         error: function (request) {//Operation after request failure
             // fullScreen.hide();
             window.parent.postMessage(false);
@@ -2093,7 +2091,7 @@ function reloadStops() {
         success: function (data) {//Operation after request successful
             var dataMap = JSON.parse(data);
             if (200 === dataMap.code) {
-                window.location.href = "/piflow-web/mxGraph/drawingBoard?drawingBoardType=TASK&load=" + dataMap.load + "&_" + new Date().getTime();
+                window.location.href = "/mxGraph/drawingBoard?drawingBoardType=TASK&load=" + dataMap.load + "&_" + new Date().getTime();
             } else {
                 //alert("reload fail");
                 layer.msg("reload fail", {icon: 2, shade: 0, time: 2000});
@@ -2109,7 +2107,7 @@ function queryFlowInfo() {
         data: {"load": loadId},
         cache: true,//Keep cached data
         type: "POST",//Request type post
-        url: "/piflow-web/flow/queryFlowData",
+        url: "/flow/queryFlowData",
         async: true,//Synchronous Asynchronous
         error: function (request) {//Operation after request failure
             return;
@@ -2144,7 +2142,7 @@ function queryFlowGroup() {
         data: {"load": loadId},
         cache: true,//Keep cached data
         type: "POST",//Request type post
-        url: "/piflow-web/flowGroup/queryFlowGroupData",
+        url: "/flowGroup/queryFlowGroupData",
         async: true,//Synchronous Asynchronous
         error: function (request) {//Operation after request failure
             return;
@@ -2184,7 +2182,7 @@ function runFlow(runMode) {
     $.ajax({
         cache: true,//Keep cached data
         type: "POST",//Request type post
-        url: "/piflow-web/flow/runFlow",
+        url: "/flow/runFlow",
         //data:$('#loginForm').serialize(),//Serialize the form
         data: data,
         async: true,//Synchronous Asynchronous
@@ -2206,7 +2204,7 @@ function runFlow(runMode) {
                     if (tempWindow == null || typeof (tempWindow) == 'undefined') {
                         alert('The window cannot be opened. Please check your browser settings.')
                     } else {
-                        tempWindow.location = "/piflow-web/mxGraph/drawingBoard?drawingBoardType=PROCESS&processType=PROCESS&load=" + dataMap.processId;
+                        tempWindow.location = "/mxGraph/drawingBoard?drawingBoardType=PROCESS&processType=PROCESS&load=" + dataMap.processId;
                     }
                 });
             } else {
@@ -2230,7 +2228,7 @@ function runFlowGroup(runMode) {
     $.ajax({
         cache: true,//Keep cached data
         type: "POST",//Request type post
-        url: "/piflow-web/flowGroup/runFlowGroup",
+        url: "/flowGroup/runFlowGroup",
         //data:$('#loginForm').serialize(),//Serialize the form
         data: data,
         async: true,//Synchronous Asynchronous
@@ -2248,7 +2246,7 @@ function runFlowGroup(runMode) {
             if (200 === dataMap.code) {
                 layer.msg(dataMap.errorMsg, {icon: 1, shade: 0, time: 2000}, function () {
                     //Jump to the monitoring page after starting successfully
-                    var windowOpen = window.open("/piflow-web/mxGraph/drawingBoard?drawingBoardType=PROCESS&processType=PROCESS_GROUP&load=" + dataMap.processGroupId, '_blank');
+                    var windowOpen = window.open("/mxGraph/drawingBoard?drawingBoardType=PROCESS&processType=PROCESS_GROUP&load=" + dataMap.processGroupId, '_blank');
                     //var tempwindow = window.open('_blank');
                     if (windowOpen == null || typeof (windowOpen) == 'undefined') {
                         alert('The window cannot be opened. Please check your browser settings.')
@@ -2286,7 +2284,7 @@ function getStopsPortNew(paths) {
             $.ajax({
                 cache: true,
                 type: "get",
-                url: "/piflow-web/stops/getStopsPort",
+                url: "/stops/getStopsPort",
                 data: {
                     "flowId": loadId,
                     "sourceId": sourceMxCellId,
@@ -2545,7 +2543,7 @@ function choosePortNew() {
             $.ajax({
                 cache: true,
                 type: "get",
-                url: "/piflow-web/path/savePathsPort",
+                url: "/path/savePathsPort",
                 data: reqData,
                 async: true,
                 traditional: true,
@@ -2609,7 +2607,7 @@ function saveCheckpoints(stopId) {
     $.ajax({
         cache: true,
         type: "POST",
-        url: "/piflow-web/stops/updateStopsById",
+        url: "/stops/updateStopsById",
         data: {
             stopId: stopId,
             isCheckpoint: isCheckpoint
@@ -2652,7 +2650,7 @@ function saveTemplateFun(url) {
         $.ajax({
             cache: true,//Keep cached data
             type: "POST",//Request type post
-            url: "/piflow-web/flowTemplate/saveFlowTemplate",
+            url: "/flowTemplate/saveFlowTemplate",
             data: {
                 value: xml_outer_html,
                 load: loadId,
@@ -2695,7 +2693,7 @@ function uploadTemplateFile(element) {
     var formData = new FormData($('#uploadForm')[0]);
     $.ajax({
         type: 'post',
-        url: '/piflow-web/flowTemplate/uploadXmlFile',
+        url: '/flowTemplate/uploadXmlFile',
         data: formData,
         cache: false,
         processData: false,
@@ -2741,7 +2739,7 @@ function loadingXml(id, loadId) {
             load: loadId
         },
         async: true,
-        url: "/piflow-web/flowTemplate/loadingXmlPage",
+        url: "/flowTemplate/loadingXmlPage",
     }).success(function (data) {
         var dataMap = JSON.parse(data);
         var icon_code = 2;
@@ -2770,7 +2768,7 @@ function openTemplateList() {
         return;
     }
     $.ajax({
-        url: "/piflow-web/flowTemplate/flowTemplateList",
+        url: "/flowTemplate/flowTemplateList",
         type: "post",
         async: false,
         success: function (data) {
@@ -2845,7 +2843,7 @@ function getRunningProcessList() {
     $.ajax({
         cache: true,//Keep cached data
         type: "POST",//Request type post
-        url: "/piflow-web/process/getRunningProcessList",
+        url: "/process/getRunningProcessList",
         data: {"flowId": loadId},
         async: true,
         error: function (request) {//Operation after request failure
@@ -2891,7 +2889,7 @@ function openAddStopCustomAttrPage(stopId) {
 function addStopCustomProperty(reqData) {
     $.ajax({
         type: "POST",//Request type post
-        url: "/piflow-web/stops/addStopCustomizedProperty",//This is the name of the file where I receive data in the background.
+        url: "/stops/addStopCustomizedProperty",//This is the name of the file where I receive data in the background.
         data: reqData,
         error: function (request) {//Operation after request failure
             return;
@@ -2915,7 +2913,7 @@ function removeStopCustomProperty(stopPageId, customPropertyId, isRouter) {
     if (isRouter) {
         getRouterAllPaths(customPropertyId)
     } else {
-        var reqUrl = "/piflow-web/stops/deleteStopsCustomizedProperty";
+        var reqUrl = "/stops/deleteStopsCustomizedProperty";
         var reqData = {customPropertyId: customPropertyId};
         $.ajax({
             type: "POST",//Request type post
@@ -2941,7 +2939,7 @@ function removeStopCustomProperty(stopPageId, customPropertyId, isRouter) {
 }
 
 function getRouterAllPaths(customPropertyId) {
-    var reqUrl = "/piflow-web/stops/getRouterStopsCustomizedProperty";
+    var reqUrl = "/stops/getRouterStopsCustomizedProperty";
     var reqData = {customPropertyId: customPropertyId};
     $.ajax({
         type: "POST",//Request type post
@@ -2970,7 +2968,7 @@ function getRouterAllPaths(customPropertyId) {
 }
 
 function removeRouterStopCustomProperty(customPropertyId) {
-    var reqUrl = "/piflow-web/stops/deleteRouterStopsCustomizedProperty";
+    var reqUrl = "/stops/deleteRouterStopsCustomizedProperty";
     var reqData = {customPropertyId: customPropertyId};
     $.ajax({
         type: "POST",//Request type post
@@ -3017,7 +3015,7 @@ function openDatasourceList() {
     var window_height = $(window).height();//Get browser window height
     $.ajax({
         type: "POST",//Request type post
-        url: "/piflow-web/page/dataSource/getDatasourceListPage",
+        url: "/page/dataSource/getDatasourceListPage",
         error: function (request) {//Operation after request failure
             return;
         },
@@ -3041,7 +3039,7 @@ function getFlowList() {
     var window_height = $(window).height();//Get browser window height
     $.ajax({
         type: "POST",//Request type post
-        url: "/piflow-web/page/flow/getFlowListHtml",//This is the name of the file where I receive data in the background.
+        url: "/page/flow/getFlowListHtml",//This is the name of the file where I receive data in the background.
         error: function (request) {//Operation after request failure
             return;
         },
@@ -3107,7 +3105,7 @@ function ClickSlider() {
 function deleteLastReloadData(stopId) {
     $.ajax({
         type: "POST",//Request type post
-        url: "/piflow-web/stops/deleteLastReloadData",//This is the name of the file where I receive data in the background.
+        url: "/stops/deleteLastReloadData",//This is the name of the file where I receive data in the background.
         data: {stopId: stopId},
         error: function (request) {//Operation after request failure
             return;

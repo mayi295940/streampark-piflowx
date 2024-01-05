@@ -17,7 +17,7 @@
 <template>
   <BasicModal :width="600" :show-cancel-btn="false" @register="registerModal" @ok="closeModal">
     <template #title>
-      <Icon icon="ant-design:user-add-outlined" />
+      <Icon icon="ant-design:partition-outlined" />
       {{ t('system.user.userInfo') }}
     </template>
     <Description :column="1" :data="flowInfo" :schema="flowColumn" />

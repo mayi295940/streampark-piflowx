@@ -111,7 +111,7 @@ public class MxCellUtils {
     defaultFlowMxCell.setPageId(pageId);
     defaultFlowMxCell.setParent("1");
     defaultFlowMxCell.setStyle(
-        "image;html=1;labelBackgroundColor=#ffffff00;image=/piflow-web/img/flow.png");
+        "image;html=1;labelBackgroundColor=#ffffff00;image=/img/flow.png");
     defaultFlowMxCell.setValue(name);
     defaultFlowMxCell.setVertex("1");
     MxGeometry defaultFlowMxCellMxGeometry = MxGeometryUtils.mxGeometryNewNoId(username);
@@ -133,7 +133,7 @@ public class MxCellUtils {
     defaultFlowMxCell.setPageId(pageId);
     defaultFlowMxCell.setParent("1");
     defaultFlowMxCell.setStyle(
-        "image;html=1;labelBackgroundColor=#ffffff00;image=/piflow-web" + imgUrl);
+        "image;html=1;labelBackgroundColor=#ffffff00;image=" + imgUrl);
     defaultFlowMxCell.setValue(name);
     defaultFlowMxCell.setVertex("1");
     MxGeometry defaultFlowMxCellMxGeometry = MxGeometryUtils.mxGeometryNewNoId(username);

@@ -66,7 +66,7 @@ public class StopsComponentDomain {
     int insertRows = insertStopsComponentRows;
     if (insertStopsComponentRows > 0) {
       List<StopsComponentProperty> properties = stopsComponent.getProperties();
-      if (null == properties || properties.size() <= 0) {
+      if (null == properties || properties.size() == 0) {
         return insertRows;
       }
       int insertStopsTemplateRows =

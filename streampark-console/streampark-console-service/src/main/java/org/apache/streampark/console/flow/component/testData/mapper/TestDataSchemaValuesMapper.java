@@ -81,7 +81,7 @@ public interface TestDataSchemaValuesMapper {
         one =
             @One(
                 select =
-                    "cn.cnic.component.testData.mapper.TestDataSchemaMapper.getTestDataSchemaById",
+                    "org.apache.streampark.console.flow.component.testData.mapper.TestDataSchemaMapper.getTestDataSchemaById",
                 fetchType = FetchType.LAZY))
   })
   List<TestDataSchemaValues> getTestDataSchemaValuesList();
@@ -103,7 +103,7 @@ public interface TestDataSchemaValuesMapper {
         one =
             @One(
                 select =
-                    "cn.cnic.component.testData.mapper.TestDataSchemaMapper.getTestDataSchemaById",
+                    "org.apache.streampark.console.flow.component.testData.mapper.TestDataSchemaMapper.getTestDataSchemaById",
                 fetchType = FetchType.LAZY))
   })
   List<TestDataSchemaValues> getTestDataSchemaValuesListBySchemaId(
@@ -118,7 +118,7 @@ public interface TestDataSchemaValuesMapper {
         one =
             @One(
                 select =
-                    "cn.cnic.component.testData.mapper.TestDataSchemaMapper.getTestDataSchemaById",
+                    "org.apache.streampark.console.flow.component.testData.mapper.TestDataSchemaMapper.getTestDataSchemaById",
                 fetchType = FetchType.LAZY))
   })
   TestDataSchemaValues getTestDataSchemaValuesById(@Param("id") String id);
@@ -139,7 +139,7 @@ public interface TestDataSchemaValuesMapper {
         property = "testData",
         one =
             @One(
-                select = "cn.cnic.component.testData.mapper.TestDataMapper.getTestDataByIdOnly",
+                select = "org.apache.streampark.console.flow.component.testData.mapper.TestDataMapper.getTestDataByIdOnly",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "fk_test_data_schema_id",
@@ -147,7 +147,7 @@ public interface TestDataSchemaValuesMapper {
         one =
             @One(
                 select =
-                    "cn.cnic.component.testData.mapper.TestDataSchemaMapper.getTestDataSchemaById",
+                    "org.apache.streampark.console.flow.component.testData.mapper.TestDataSchemaMapper.getTestDataSchemaById",
                 fetchType = FetchType.LAZY))
   })
   List<TestDataSchemaValues> getTestDataSchemaValuesListByTestDataId(

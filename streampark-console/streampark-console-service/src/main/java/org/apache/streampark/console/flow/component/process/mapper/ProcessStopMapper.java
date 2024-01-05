@@ -1,7 +1,5 @@
 package org.apache.streampark.console.flow.component.process.mapper;
 
-import org.apache.streampark.console.flow.component.process.entity.ProcessStop;
-import org.apache.streampark.console.flow.component.process.mapper.provider.ProcessStopMapperProvider;
 import java.util.List;
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Many;
@@ -11,6 +9,8 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.mapping.FetchType;
+import org.apache.streampark.console.flow.component.process.entity.ProcessStop;
+import org.apache.streampark.console.flow.component.process.mapper.provider.ProcessStopMapperProvider;
 
 @Mapper
 public interface ProcessStopMapper {
@@ -45,7 +45,7 @@ public interface ProcessStopMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.process.mapper.ProcessStopPropertyMapper.getStopPropertyByProcessStopId",
+                    "org.apache.streampark.console.flow.component.process.mapper.ProcessStopPropertyMapper.getStopPropertyByProcessStopId",
                 fetchType = FetchType.LAZY))
   })
   ProcessStop getProcessStopByProcessId(String processId);
@@ -67,7 +67,7 @@ public interface ProcessStopMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.process.mapper.ProcessStopPropertyMapper.getStopPropertyByProcessStopId",
+                    "org.apache.streampark.console.flow.component.process.mapper.ProcessStopPropertyMapper.getStopPropertyByProcessStopId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -75,7 +75,7 @@ public interface ProcessStopMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.process.mapper.ProcessStopCustomizedPropertyMapper.getProcessStopCustomizedPropertyListByProcessStopsId",
+                    "org.apache.streampark.console.flow.component.process.mapper.ProcessStopCustomizedPropertyMapper.getProcessStopCustomizedPropertyListByProcessStopsId",
                 fetchType = FetchType.LAZY))
   })
   ProcessStop getProcessStopByPageIdAndPageId(String processId, String pageId);
@@ -97,7 +97,7 @@ public interface ProcessStopMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.process.mapper.ProcessStopPropertyMapper.getStopPropertyByProcessStopId",
+                    "org.apache.streampark.console.flow.component.process.mapper.ProcessStopPropertyMapper.getStopPropertyByProcessStopId",
                 fetchType = FetchType.LAZY))
   })
   List<ProcessStop> getProcessStopByPageIdAndPageIds(String processId, String[] pageIds);
@@ -117,7 +117,7 @@ public interface ProcessStopMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.process.mapper.ProcessStopPropertyMapper.getStopPropertyByProcessStopId",
+                    "org.apache.streampark.console.flow.component.process.mapper.ProcessStopPropertyMapper.getStopPropertyByProcessStopId",
                 fetchType = FetchType.LAZY))
   })
   ProcessStop getProcessStopByNameAndPid(String processId, String name);

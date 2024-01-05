@@ -44,7 +44,7 @@ public interface ProcessStopCustomizedPropertyMapper {
         property = "stops",
         many =
             @Many(
-                select = "cn.cnic.component.flow.mapper.StopsMapper.getStopsById",
+                select = "org.apache.streampark.console.flow.component.flow.mapper.StopsMapper.getStopsById",
                 fetchType = FetchType.LAZY))
   })
   ProcessStopCustomizedProperty getProcessStopCustomizedPropertyById(@Param("id") String id);

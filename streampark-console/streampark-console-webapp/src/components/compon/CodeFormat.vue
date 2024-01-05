@@ -246,9 +246,12 @@
   .wrap {
     position: relative;
     height: 100%;
+    .w-100 {
+      width: 100%;
+    }
     .code-editor {
       min-height: 200px;
-      height: 100%;
+      height: 95%;
       border: 1px solid #282f3a;
       background-color: #0e1013;
     }

@@ -255,11 +255,11 @@ public class MxGraphModelUtils {
     }
     String name = object.getClass().getName();
     MxCell mxCell = null;
-    if ("cn.cnic.component.mxGraph.vo.MxCellVo".equals(name)) {
+    if ("org.apache.streampark.console.flow.component.mxGraph.vo.MxCellVo".equals(name)) {
       MxCellVo mxCellVo = (MxCellVo) object;
       mxCell = new MxCell();
       BeanUtils.copyProperties(mxCellVo, mxCell);
-    } else if ("cn.cnic.component.mxGraph.entity.MxCell".equals(name)) {
+    } else if ("org.apache.streampark.console.flow.component.mxGraph.entity.MxCell".equals(name)) {
       mxCell = (MxCell) object;
     } else {
       return null;
@@ -481,7 +481,7 @@ public class MxGraphModelUtils {
       if (null == mxCellVo) {
         continue;
       }
-      // image;html=1;labelBackgroundColor=#ffffff00;image=/piflow-web/img/group.png
+      // image;html=1;labelBackgroundColor=#ffffff00;image=/img/group.png
       String mxCellVoStyle = mxCellVo.getStyle();
       // Judge whether it is empty
       if (StringUtils.isBlank(mxCellVoStyle)) {

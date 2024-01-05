@@ -85,7 +85,7 @@ public interface FlowStopsPublishingMapper {
         property = "stopsVo",
         one =
             @One(
-                select = "cn.cnic.component.flow.mapper.StopsMapper.getStopsVoById",
+                select = "org.apache.streampark.console.flow.component.flow.mapper.StopsMapper.getStopsVoById",
                 fetchType = FetchType.LAZY))
   })
   List<FlowStopsPublishingVo> getFlowStopsPublishingVoByPublishingId(String publishingId);

@@ -17,7 +17,14 @@
 import { BasicColumn, FormSchema } from '/@/components/Table';
 import { FormTypeEnum } from '/@/enums/formEnum';
 import { useI18n } from '/@/hooks/web/useI18n';
+import { renderEngineType } from './useFlowRender';
+
 const { t } = useI18n();
+
+export enum EngineTypeEnum {
+  FLINK = 'flink',
+  SPARK = 'spark',
+}
 
 export const columns: BasicColumn[] = [
   { title: t('flow.flow.flow_columns.name'), dataIndex: 'name', sorter: true },
@@ -69,13 +76,8 @@ export const formSchema = (formType: string): FormSchema[] => {
       label: t('flow.flow.flow_columns.engine_type'),
       field: 'engineType',
       component: 'Select',
-      componentProps: {
-        disabled: isView,
-        options: [
-          { label: 'spark', value: 'spark' },
-          { label: 'flink', value: 'flink' },
-        ],
-      },
+      render: ({ model }) => renderEngineType({ model }),
+      defaultValue: EngineTypeEnum.FLINK,
       rules: [{ required: true }],
     },
     {

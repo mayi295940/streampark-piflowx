@@ -55,7 +55,7 @@ public interface MxCellMapper {
         one =
             @One(
                 select =
-                    "cn.cnic.component.mxGraph.mapper.MxGeometryMapper.getMxGeometryByMxCellId",
+                    "org.apache.streampark.console.flow.component.mxGraph.mapper.MxGeometryMapper.getMxGeometryByMxCellId",
                 fetchType = FetchType.LAZY))
   })
   List<MxCell> getMeCellByMxGraphId(String mxGraphId);
@@ -82,7 +82,7 @@ public interface MxCellMapper {
         one =
             @One(
                 select =
-                    "cn.cnic.component.mxGraph.mapper.MxGeometryMapper.getMxGeometryByMxCellId",
+                    "org.apache.streampark.console.flow.component.mxGraph.mapper.MxGeometryMapper.getMxGeometryByMxCellId",
                 fetchType = FetchType.LAZY))
   })
   MxCell getMeCellById(String id);
@@ -110,7 +110,7 @@ public interface MxCellMapper {
         one =
             @One(
                 select =
-                    "cn.cnic.component.mxGraph.mapper.MxGeometryMapper.getMxGeometryByMxCellId",
+                    "org.apache.streampark.console.flow.component.mxGraph.mapper.MxGeometryMapper.getMxGeometryByMxCellId",
                 fetchType = FetchType.LAZY))
   })
   MxCell getMxCellByMxGraphIdAndPageId(String mxGraphId, String pageId);

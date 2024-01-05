@@ -1,5 +1,12 @@
 package org.apache.streampark.console.flow.component.stopsComponent.service.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.console.flow.base.utils.LoggerUtil;
 import org.apache.streampark.console.flow.base.utils.ReturnMapUtils;
 import org.apache.streampark.console.flow.base.utils.UUIDUtils;
@@ -22,19 +29,11 @@ import org.apache.streampark.console.flow.component.stopsComponent.vo.StopsCompo
 import org.apache.streampark.console.flow.component.stopsComponent.vo.StopsTemplateVo;
 import org.apache.streampark.console.flow.third.service.IStop;
 import org.apache.streampark.console.flow.third.vo.stop.ThirdStopsComponentVo;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class StopGroupServiceImpl implements IStopGroupService {
@@ -224,17 +223,12 @@ public class StopGroupServiceImpl implements IStopGroupService {
         }
         stopsComponent.setComponentType(ComponentFileType.DEFAULT);
         stopsComponentDomain.addStopsComponentAndChildren(stopsComponent);
-        logger.debug(
-            "=============================association_groups_stops_template=====start==================");
-        stopsComponent.getStopGroupList();
+        logger.debug("========association_groups_stops_template=====start============");
         stopsComponentDomain.stopsComponentLinkStopsComponentGroupList(
             stopsComponent, stopsComponent.getStopGroupList());
         updateStopsComponentNum++;
       } else {
-        logger.info(
-            "==========component exists,just skip,bundle is "
-                + bundle
-                + "method is reload stops==========");
+        logger.info("component exists,just skip,bundle is {} method is reload stops", bundle);
       }
     }
     //        //查询出所有dataSource中不为空且去重后的stops_template_bundle

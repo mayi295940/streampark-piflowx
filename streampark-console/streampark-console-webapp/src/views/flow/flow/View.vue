@@ -34,7 +34,7 @@
   </div>
 </template>
 <script lang="ts">
-  import { computed, defineComponent, inject } from 'vue';
+  import { defineComponent, inject } from 'vue';
 
   import { BasicTable, useTable, TableAction, ActionItem } from '/@/components/Table';
   import FlowDrawer from './components/FlowDrawer.vue';
@@ -44,7 +44,6 @@
   import { columns, searchFormSchema } from './flow.data';
   import { FormTypeEnum } from '/@/enums/formEnum';
   import { useMessage } from '/@/hooks/web/useMessage';
-  import { useUserStoreWithOut } from '/@/store/modules/user';
   import { useModal } from '/@/components/Modal';
   import { FlowListRecord } from '/@/api/flow/flow/flowModel';
   import { useI18n } from '/@/hooks/web/useI18n';
@@ -56,10 +55,6 @@
     components: { BasicTable, FlowModal, FlowDrawer, TableAction, Icon },
     setup() {
       const { t } = useI18n();
-      const userStore = useUserStoreWithOut();
-      const userName = computed(() => {
-        return userStore.getUserInfo?.username;
-      });
       const [registerDrawer, { openDrawer }] = useDrawer();
       const [registerModal, { openModal }] = useModal();
       const { createMessage } = useMessage();
@@ -94,14 +89,14 @@
       function getFlowAction(record: FlowListRecord): ActionItem[] {
         return [
           {
-            icon: 'clarity:note-edit-line',
+            icon: 'fluent:hand-draw-28-regular',
             auth: 'flow:update',
-            tooltip: t('flow.flow.enter'),
+            tooltip: t('flow.flow.flow_table.enter'),
             onClick: handleButtonSelect.bind(null, 1, record),
           },
           {
             icon: 'clarity:note-edit-line',
-            tooltip: t('system.user.table.modify'),
+            tooltip: t('flow.flow.flow_table.modify'),
             auth: 'flow:update',
             onClick: handleEdit.bind(null, record),
           },
@@ -113,10 +108,10 @@
           {
             icon: 'ant-design:delete-outlined',
             color: 'error',
-            tooltip: t('system.member.deleteMember'),
+            tooltip: t('common.delText'),
             auth: 'flow:delete',
             popConfirm: {
-              title: t('system.member.deletePopConfirm'),
+              title: t('flow.flow.flow_form.deletePopConfirm'),
               confirm: handleDelete.bind(null, record),
             },
           },
@@ -193,7 +188,6 @@
 
       return {
         t,
-        userName,
         registerTable,
         registerDrawer,
         registerModal,

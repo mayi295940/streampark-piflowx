@@ -41,7 +41,7 @@ function initFlowGroupDrawingBoardData(loadId, parentAccessPath, backFunc) {
                 var link = top.document.getElementById('GroupParents');
                 if (parentsId !== 'null') {
                     link.style.display = 'inline-block';
-                    link.href = '#/drawingBoard?src=/drawingBoard/page/flowGroup/mxGraph/index.html?drawingBoardType=GROUP&parentAccessPath=flowGroupList&load=' + parentsId;
+                    link.href = '#/flow/drawingBoard?src=/drawingBoard/page/flowGroup/mxGraph/index.html?drawingBoardType=GROUP&parentAccessPath=flowGroupList&load=' + parentsId;
                 } else {
                     link.style.display = 'none';
                 }
@@ -52,17 +52,17 @@ function initFlowGroupDrawingBoardData(loadId, parentAccessPath, backFunc) {
                     var mxGraphComponentList = dataMap.mxGraphComponentList;
                     for (var index = 0; index < mxGraphComponentList.length; index++) {
                         var component_prefix = mxGraphComponentList[index].component_prefix
-                        if (component_prefix.indexOf("/piflow-web/") > -1) {
-                            component_prefix = component_prefix.replace('/piflow-web', web_header_prefix)
+                        if (component_prefix.indexOf("/") > -1) {
+                            component_prefix = component_prefix.replace('', web_header_prefix)
                         }
                         mxGraphComponentList[index].component_prefix = component_prefix
                         var component_name = mxGraphComponentList[index].component_name;
                         if ('Group' === component_name) {
                             mxGraphComponentList[index].component_type = 'Group';
-                            mxGraphComponentList[index].component_group[0].imageUrl = '/piflow-web/img/group.png';
+                            mxGraphComponentList[index].component_group[0].imageUrl = '/img/group.png';
                         } else if ('Task' === component_name) {
                             mxGraphComponentList[index].component_type = 'Flow';
-                            mxGraphComponentList[index].component_group[0].imageUrl = '/piflow-web/img/flow.png';
+                            mxGraphComponentList[index].component_group[0].imageUrl = '/img/flow.png';
                         }
                     }
                     Sidebar.prototype.component_data = mxGraphComponentList;
@@ -120,7 +120,7 @@ function imageAjax() {
                 image.className = "imageimg"
                 image.style = "width:100%;height:100%";
                 console.log("-------------------------------");
-                image.src = web_header_prefix + (item.imageUrl.replace("/piflow-web", ""));
+                image.src = web_header_prefix + (item.imageUrl.replace("", ""));
 
                 div.appendChild(image);
                 nowimage.appendChild(div);

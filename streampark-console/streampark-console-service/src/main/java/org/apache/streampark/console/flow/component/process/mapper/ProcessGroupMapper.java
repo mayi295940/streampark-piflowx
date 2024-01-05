@@ -45,7 +45,7 @@ public interface ProcessGroupMapper {
         property = "processGroup",
         one =
             @One(
-                select = "cn.cnic.component.process.mapper.ProcessGroupMapper.getProcessGroupById",
+                select = "org.apache.streampark.console.flow.component.process.mapper.ProcessGroupMapper.getProcessGroupById",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -53,7 +53,7 @@ public interface ProcessGroupMapper {
         one =
             @One(
                 select =
-                    "cn.cnic.component.mxGraph.mapper.MxGraphModelMapper.getMxGraphModelByProcessGroupId",
+                    "org.apache.streampark.console.flow.component.mxGraph.mapper.MxGraphModelMapper.getMxGraphModelByProcessGroupId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -61,7 +61,7 @@ public interface ProcessGroupMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.process.mapper.ProcessMapper.getProcessByProcessGroupId",
+                    "org.apache.streampark.console.flow.component.process.mapper.ProcessMapper.getProcessByProcessGroupId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -69,7 +69,7 @@ public interface ProcessGroupMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.process.mapper.ProcessGroupMapper.getProcessGroupByProcessGroupId",
+                    "org.apache.streampark.console.flow.component.process.mapper.ProcessGroupMapper.getProcessGroupByProcessGroupId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -77,7 +77,7 @@ public interface ProcessGroupMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.process.mapper.ProcessGroupPathMapper.getProcessPathByProcessGroupId",
+                    "org.apache.streampark.console.flow.component.process.mapper.ProcessGroupPathMapper.getProcessPathByProcessGroupId",
                 fetchType = FetchType.LAZY))
   })
   ProcessGroup getProcessGroupByIdAndUser(String username, boolean isAdmin, String id);
@@ -95,7 +95,7 @@ public interface ProcessGroupMapper {
         property = "processGroup",
         one =
             @One(
-                select = "cn.cnic.component.process.mapper.ProcessGroupMapper.getProcessGroupById",
+                select = "org.apache.streampark.console.flow.component.process.mapper.ProcessGroupMapper.getProcessGroupById",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -103,7 +103,7 @@ public interface ProcessGroupMapper {
         one =
             @One(
                 select =
-                    "cn.cnic.component.mxGraph.mapper.MxGraphModelMapper.getMxGraphModelByProcessGroupId",
+                    "org.apache.streampark.console.flow.component.mxGraph.mapper.MxGraphModelMapper.getMxGraphModelByProcessGroupId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -111,7 +111,7 @@ public interface ProcessGroupMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.process.mapper.ProcessMapper.getProcessByProcessGroupId",
+                    "org.apache.streampark.console.flow.component.process.mapper.ProcessMapper.getProcessByProcessGroupId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -119,7 +119,7 @@ public interface ProcessGroupMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.process.mapper.ProcessGroupMapper.getProcessGroupByProcessGroupId",
+                    "org.apache.streampark.console.flow.component.process.mapper.ProcessGroupMapper.getProcessGroupByProcessGroupId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -127,7 +127,7 @@ public interface ProcessGroupMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.process.mapper.ProcessGroupPathMapper.getProcessPathByProcessGroupId",
+                    "org.apache.streampark.console.flow.component.process.mapper.ProcessGroupPathMapper.getProcessPathByProcessGroupId",
                 fetchType = FetchType.LAZY))
   })
   ProcessGroup getProcessGroupById(String id);
@@ -147,7 +147,7 @@ public interface ProcessGroupMapper {
         property = "processGroup",
         one =
             @One(
-                select = "cn.cnic.component.process.mapper.ProcessGroupMapper.getProcessGroupById",
+                select = "org.apache.streampark.console.flow.component.process.mapper.ProcessGroupMapper.getProcessGroupById",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -155,7 +155,7 @@ public interface ProcessGroupMapper {
         one =
             @One(
                 select =
-                    "cn.cnic.component.mxGraph.mapper.MxGraphModelMapper.getMxGraphModelByProcessGroupId",
+                    "org.apache.streampark.console.flow.component.mxGraph.mapper.MxGraphModelMapper.getMxGraphModelByProcessGroupId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -163,7 +163,7 @@ public interface ProcessGroupMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.process.mapper.ProcessMapper.getProcessByProcessGroupId",
+                    "org.apache.streampark.console.flow.component.process.mapper.ProcessMapper.getProcessByProcessGroupId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -171,7 +171,7 @@ public interface ProcessGroupMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.process.mapper.ProcessGroupMapper.getProcessGroupByProcessGroupId",
+                    "org.apache.streampark.console.flow.component.process.mapper.ProcessGroupMapper.getProcessGroupByProcessGroupId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -179,7 +179,7 @@ public interface ProcessGroupMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.process.mapper.ProcessGroupPathMapper.getProcessPathByProcessGroupId",
+                    "org.apache.streampark.console.flow.component.process.mapper.ProcessGroupPathMapper.getProcessPathByProcessGroupId",
                 fetchType = FetchType.LAZY))
   })
   ProcessGroup getProcessGroupByProcessGroupId(String processGroupId);
@@ -205,7 +205,7 @@ public interface ProcessGroupMapper {
         property = "processGroup",
         one =
             @One(
-                select = "cn.cnic.component.process.mapper.ProcessGroupMapper.getProcessGroupById",
+                select = "org.apache.streampark.console.flow.component.process.mapper.ProcessGroupMapper.getProcessGroupById",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -213,7 +213,7 @@ public interface ProcessGroupMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.process.mapper.ProcessMapper.getProcessByProcessGroupId",
+                    "org.apache.streampark.console.flow.component.process.mapper.ProcessMapper.getProcessByProcessGroupId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -221,7 +221,7 @@ public interface ProcessGroupMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.process.mapper.ProcessGroupMapper.getProcessGroupByProcessGroupId",
+                    "org.apache.streampark.console.flow.component.process.mapper.ProcessGroupMapper.getProcessGroupByProcessGroupId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -229,7 +229,7 @@ public interface ProcessGroupMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.process.mapper.ProcessGroupPathMapper.getProcessPathByProcessGroupId",
+                    "org.apache.streampark.console.flow.component.process.mapper.ProcessGroupPathMapper.getProcessPathByProcessGroupId",
                 fetchType = FetchType.LAZY))
   })
   ProcessGroup getProcessGroupByAppId(String appID);
@@ -256,7 +256,7 @@ public interface ProcessGroupMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.process.mapper.ProcessMapper.getProcessByProcessGroupId",
+                    "org.apache.streampark.console.flow.component.process.mapper.ProcessMapper.getProcessByProcessGroupId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -264,7 +264,7 @@ public interface ProcessGroupMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.process.mapper.ProcessGroupPathMapper.getProcessPathByProcessGroupId",
+                    "org.apache.streampark.console.flow.component.process.mapper.ProcessGroupPathMapper.getProcessPathByProcessGroupId",
                 fetchType = FetchType.LAZY))
   })
   List<ProcessGroup> getProcessGroupListByAppIDs(String[] appIDs);

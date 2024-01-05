@@ -85,7 +85,7 @@ public interface TestDataSchemaMapper {
   @Results({
     @Result(id = true, column = "id", property = "id"),
     // @Result(column = "id", property = "schemaValuesList", many = @Many(select =
-    // "cn.cnic.component.testData.mapper.TestDataSchemaValuesMapper.getTestDataSchemaValuesListBySchemaId", fetchType = FetchType.LAZY))
+    // "org.apache.streampark.console.flow.component.testData.mapper.TestDataSchemaValuesMapper.getTestDataSchemaValuesListBySchemaId", fetchType = FetchType.LAZY))
   })
   List<TestDataSchema> getTestDataSchemaListByTestDataId(@Param("testDataId") String testDataId);
 

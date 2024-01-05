@@ -88,6 +88,13 @@ public class SysParamsCache {
     SYS_CONTEXT_PATH = sysContextPath;
   }
 
+  public static String IMG_PATH_PREFIX;
+
+  @Value("${flow.images.path.prefix}")
+  public void setImgPathPrefix(String imgPathPrefix) {
+      IMG_PATH_PREFIX = imgPathPrefix;
+  }
+
   public static Boolean IS_IFRAME;
 
   @Value("${syspara.isIframe}")

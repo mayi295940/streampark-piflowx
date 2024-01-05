@@ -17,11 +17,12 @@
 
 package org.apache.streampark.console.base.config;
 
-import org.apache.streampark.console.base.interceptor.UploadFileTypeInterceptor;
-
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import java.util.Arrays;
+import java.util.List;
+import org.apache.streampark.console.base.interceptor.UploadFileTypeInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,9 +34,8 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import java.util.List;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
@@ -67,6 +67,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
         .allowedHeaders("*")
         .allowCredentials(true)
         .maxAge(3600);
+
+    WebMvcConfigurer.super.addCorsMappings(registry);
   }
 
   @Bean
@@ -78,9 +80,51 @@ public class WebMvcConfig implements WebMvcConfigurer {
   }
 
   @Override
+  public void addResourceHandlers(ResourceHandlerRegistry registry) {
+
+    String storagePathHead = System.getProperty("user.dir");
+
+    String imagesPathFlink = ("file:" + storagePathHead + "/storage/flink/image/");
+    String videosPathFlink = ("file:" + storagePathHead + "/storage/flink/video/");
+    String xmlPathFlink = ("file:" + storagePathHead + "/storage/flink/xml/");
+
+    String imagesPathSpark = ("file:" + storagePathHead + "/storage/spark/image/");
+    String videosPathSpark = ("file:" + storagePathHead + "/storage/spark/video/");
+    String xmlPathSpark = ("file:" + storagePathHead + "/storage/spark/xml/");
+
+    registry
+        .addResourceHandler("/images/**", "/videos/**", "/xml/**")
+        .addResourceLocations(
+            imagesPathFlink,
+            videosPathFlink,
+            xmlPathFlink,
+            imagesPathSpark,
+            videosPathSpark,
+            xmlPathSpark);
+
+    registry
+        .addResourceHandler("/**")
+        .addResourceLocations("classpath:/META-INF/resources/")
+        .addResourceLocations("classpath:/resources/")
+        .addResourceLocations("classpath:/static/")
+        .addResourceLocations("classpath:/public/");
+
+    WebMvcConfigurer.super.addResourceHandlers(registry);
+  }
+
+  @Override
   public void addInterceptors(InterceptorRegistry registry) {
     registry
         .addInterceptor(uploadFileTypeInterceptor)
-        .addPathPatterns("/flink/app/upload", "/resource/upload");
+        .excludePathPatterns(
+            Arrays.asList(
+                "/flink/app/upload",
+                "/resource/upload",
+                "/components/**",
+                "/js/**",
+                "/css/**",
+                "/img/**",
+                "/images/**",
+                "/img/*"));
   }
 }

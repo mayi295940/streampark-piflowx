@@ -164,7 +164,7 @@ function saveOrUpdateFlowGroup() {
                 var dataMap = JSON.parse(data);
                 if (200 === dataMap.code) {
                     layer.msg('success ', {icon: 1, shade: 0, time: 2000}, function () {
-                        new_window_open("/piflow-web/mxGraph/drawingBoard?drawingBoardType=GROUP&load=" + dataMap.flowGroupId);
+                        new_window_open("/mxGraph/drawingBoard?drawingBoardType=GROUP&load=" + dataMap.flowGroupId);
                     });
                 } else {
                     layer.msg('failed', {icon: 2, shade: 0, time: 2000});

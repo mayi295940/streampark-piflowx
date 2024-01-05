@@ -33,7 +33,7 @@ public interface StopsHubFileRecordMapper {
         one =
             @One(
                 select =
-                    "cn.cnic.component.stopsComponent.mapper.StopsComponentMapper.getOnlyStopsComponentByBundle",
+                    "org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsComponentMapper.getOnlyStopsComponentByBundle",
                 fetchType = FetchType.LAZY))
   })
   List<StopsHubFileRecord> getStopsHubFileRecordByHubId(@Param("hubId") String hubId);

@@ -56,7 +56,7 @@ public interface DataSourceMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.dataSource.mapper.DataSourcePropertyMapper.getDataSourcePropertyListByDataSourceId",
+                    "org.apache.streampark.console.flow.component.dataSource.mapper.DataSourcePropertyMapper.getDataSourcePropertyListByDataSourceId",
                 fetchType = FetchType.LAZY))
   })
   List<DataSource> getDataSourceTemplateList();
@@ -76,7 +76,7 @@ public interface DataSourceMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.dataSource.mapper.DataSourcePropertyMapper.getDataSourcePropertyListByDataSourceId",
+                    "org.apache.streampark.console.flow.component.dataSource.mapper.DataSourcePropertyMapper.getDataSourcePropertyListByDataSourceId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "stops_template_bundle",
@@ -84,7 +84,7 @@ public interface DataSourceMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.stopsComponent.mapper.StopsComponentMapper.getDataSourceStopsComponentByBundle",
+                    "org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsComponentMapper.getDataSourceStopsComponentByBundle",
                 fetchType = FetchType.LAZY))
   })
   DataSource getDataSourceByIdAndUser(@Param("username") String username,
@@ -106,7 +106,7 @@ public interface DataSourceMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.dataSource.mapper.DataSourcePropertyMapper.getDataSourcePropertyListByDataSourceId",
+                    "org.apache.streampark.console.flow.component.dataSource.mapper.DataSourcePropertyMapper.getDataSourcePropertyListByDataSourceId",
                 fetchType = FetchType.LAZY))
   })
   DataSource getDataSourceById(String id);
@@ -126,7 +126,7 @@ public interface DataSourceMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.dataSource.mapper.DataSourcePropertyMapper.getDataSourcePropertyListByDataSourceId",
+                    "org.apache.streampark.console.flow.component.dataSource.mapper.DataSourcePropertyMapper.getDataSourcePropertyListByDataSourceId",
                 fetchType = FetchType.LAZY))
   })
   DataSource adminGetDataSourceById(String id);
@@ -193,7 +193,7 @@ public interface DataSourceMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.dataSource.mapper.DataSourcePropertyMapper.getDataSourcePropertyVoListByDataSourceId",
+                    "org.apache.streampark.console.flow.component.dataSource.mapper.DataSourcePropertyMapper.getDataSourcePropertyVoListByDataSourceId",
                 fetchType = FetchType.LAZY))
   })
   DataSourceVo getDataSourceVoById(String id);

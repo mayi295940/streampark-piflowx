@@ -62,7 +62,7 @@ public interface FlowGroupPathsMapper {
         property = "flowGroup",
         many =
             @Many(
-                select = "cn.cnic.component.flow.mapper.FlowGroupMapper.getFlowGroupById",
+                select = "org.apache.streampark.console.flow.component.flow.mapper.FlowGroupMapper.getFlowGroupById",
                 fetchType = FetchType.LAZY))
   })
   List<FlowGroupPaths> getFlowGroupPaths(String flowGroupId, String pageId, String from, String to);

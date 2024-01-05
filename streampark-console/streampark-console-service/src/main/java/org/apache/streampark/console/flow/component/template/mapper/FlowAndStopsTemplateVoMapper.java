@@ -74,7 +74,7 @@ public interface FlowAndStopsTemplateVoMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.template.mapper.FlowAndStopsTemplateVoMapper.getPropertyListByStopsId",
+                    "org.apache.streampark.console.flow.component.template.mapper.FlowAndStopsTemplateVoMapper.getPropertyListByStopsId",
                 fetchType = FetchType.EAGER))
   })
   List<StopTemplateModel> getStopsListByTemPlateId(@Param("templateId") String templateId);

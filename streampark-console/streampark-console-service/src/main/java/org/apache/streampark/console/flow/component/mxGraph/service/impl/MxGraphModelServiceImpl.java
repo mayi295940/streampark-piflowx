@@ -1,5 +1,8 @@
 package org.apache.streampark.console.flow.component.mxGraph.service.impl;
 
+import java.util.*;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.console.flow.base.utils.LoggerUtil;
 import org.apache.streampark.console.flow.base.utils.ReturnMapUtils;
 import org.apache.streampark.console.flow.base.utils.UUIDUtils;
@@ -11,7 +14,12 @@ import org.apache.streampark.console.flow.component.dataSource.entity.DataSource
 import org.apache.streampark.console.flow.component.flow.domain.FlowDomain;
 import org.apache.streampark.console.flow.component.flow.domain.FlowGroupDomain;
 import org.apache.streampark.console.flow.component.flow.domain.FlowStopsPublishingDomain;
+import org.apache.streampark.console.flow.component.flow.entity.Flow;
+import org.apache.streampark.console.flow.component.flow.entity.FlowGroup;
+import org.apache.streampark.console.flow.component.flow.entity.FlowGroupPaths;
+import org.apache.streampark.console.flow.component.flow.entity.Paths;
 import org.apache.streampark.console.flow.component.flow.entity.Property;
+import org.apache.streampark.console.flow.component.flow.entity.Stops;
 import org.apache.streampark.console.flow.component.flow.utils.FlowXmlUtils;
 import org.apache.streampark.console.flow.component.flow.utils.PropertyUtils;
 import org.apache.streampark.console.flow.component.flow.utils.StopsUtils;
@@ -30,14 +38,6 @@ import org.apache.streampark.console.flow.component.mxGraph.vo.MxGraphVo;
 import org.apache.streampark.console.flow.component.stopsComponent.domain.StopsComponentDomain;
 import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponent;
 import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentProperty;
-import java.util.*;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.streampark.console.flow.component.flow.entity.Flow;
-import org.apache.streampark.console.flow.component.flow.entity.FlowGroup;
-import org.apache.streampark.console.flow.component.flow.entity.FlowGroupPaths;
-import org.apache.streampark.console.flow.component.flow.entity.Paths;
-import org.apache.streampark.console.flow.component.flow.entity.Stops;
 import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -190,7 +190,7 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
       String nodeOrPath = MxGraphModelUtils.isNodeOrPath(mxCell);
       if (MxGraphModelUtils.NODE.equals(nodeOrPath)) {
         Map<String, String> paramData = mxCellVo.getParamData();
-        if (null == paramData || paramData.size() <= 0) {
+        if (null == paramData || paramData.size() == 0) {
           return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_IS_NULL_MSG("nodeType"));
         }
         // mxCell to stops
@@ -233,7 +233,7 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
       addMxCellList.add(mxCell);
     }
     // Judge whether there is a new "MxCell"
-    if (null == addMxCellList || addMxCellList.size() == 0) {
+    if (CollectionUtils.isEmpty(addMxCellList)) {
       return ReturnMapUtils.setFailedMsgRtnJsonStr("No data can be added, the addition failed");
     }
     // add
@@ -241,7 +241,7 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
     mxGraphModelDB.setRoot(mxCellRootDB);
     flowDB.setMxGraphModel(mxGraphModelDB);
     // Judge whether there is a new "Stops"
-    if (null != addStopsList && addStopsList.size() > 0) {
+    if (CollectionUtils.isNotEmpty(addStopsList)) {
       List<Stops> stopsList = flowDB.getStopsList();
       stopsList.addAll(addStopsList);
       flowDB.setStopsList(stopsList);
@@ -264,13 +264,7 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
     return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("xmlData", xmlData);
   }
 
-  /**
-   * Modification of the drawing board
-   *
-   * @param mxGraphModelVo
-   * @param flowId
-   * @return
-   */
+  /** Modification of the drawing board */
   private String movedOperation(String username, MxGraphModelVo mxGraphModelVo, String flowId)
       throws Exception {
     // If "mxGraphModel" and "mxCellList" are empty, the modification will fail,
@@ -292,21 +286,21 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
 
     // Copy the value from mxGraphModelVo to mxGraphModelDb
     BeanUtils.copyProperties(mxGraphModelVo, mxGraphModelDB);
-    // setmxGraphModel basic attribute
+    // set mxGraphModel basic attribute
     mxGraphModelDB.setLastUpdateUser(username); // last update user
     mxGraphModelDB.setLastUpdateDttm(new Date()); // last update time
     mxGraphModelDB.setEnableFlag(true); // is it effective
 
     // Take out the MxCellList information queried by the database.
     List<MxCell> mxCellListDB = mxGraphModelDB.getRoot();
-    if (null == mxCellListDB || mxCellListDB.size() <= 0) {
+    if (null == mxCellListDB || mxCellListDB.size() == 0) {
       return ReturnMapUtils.setFailedMsgRtnJsonStr(
           "The database mxCellList is empty and the modification failed.");
     }
     // The data passed from the page MxCellVo
     List<MxCellVo> mxCellVoList = mxGraphModelVo.getRootVo();
     // Convert the list passed to the page to map key for pageId
-    Map<String, MxCellVo> mxCellVoMap = new HashMap<String, MxCellVo>();
+    Map<String, MxCellVo> mxCellVoMap = new HashMap<>();
     // Determine if it is empty
     if (null != mxCellVoList) {
       for (MxCellVo mxCell : mxCellVoList) {
@@ -378,17 +372,16 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
   /**
    * mxCell to stops
    *
-   * @param mxCell
-   * @param username
+   * @param mxCell mxCell
+   * @param username username
    * @param isAddId Add ID or not
-   * @return
    */
   private Stops stopsTemplateToStops(
       MxCell mxCell, Map<String, String> paramData, String username, boolean isAddId) {
     if (null == mxCell) {
       return null;
     }
-    if (null == paramData || paramData.size() <= 0) {
+    if (null == paramData || paramData.size() == 0) {
       return null;
     }
     // Get the bundle of the stops
@@ -450,17 +443,16 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
   /**
    * mxCell to datasource stops
    *
-   * @param mxCell
-   * @param username
+   * @param mxCell mxCell
+   * @param username username
    * @param isAddId Add ID or not
-   * @return
    */
   private Stops dataSourceToStops(
       MxCell mxCell, Map<String, String> paramData, String username, boolean isAddId) {
     if (null == mxCell) {
       return null;
     }
-    if (null == paramData || paramData.size() <= 0) {
+    if (null == paramData || paramData.size() == 0) {
       return null;
     }
     String dataSourceId = paramData.get("id");
@@ -489,7 +481,7 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
     stops.setIsDataSource(true);
     stops.setDataSource(dataSource);
     List<StopsComponentProperty> propertiesTemplateList = stopsComponent.getProperties();
-    if (null == propertiesTemplateList || propertiesTemplateList.size() <= 0) {
+    if (null == propertiesTemplateList || propertiesTemplateList.size() == 0) {
       return stops;
     }
     List<DataSourceProperty> dataSourcePropertyList = dataSource.getDataSourcePropertyList();
@@ -532,7 +524,6 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
    *
    * @param mxGraphModelVo Information from the page
    * @param flowId The data to be modified
-   * @return
    */
   private String removedOperation(String username, MxGraphModelVo mxGraphModelVo, String flowId)
       throws Exception {
@@ -567,14 +558,14 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
     mxGraphModelDB.setFlow(flowDB);
     // Take out the MxCellList information queried by the database.
     List<MxCell> mxCellListDB = mxGraphModelDB.getRoot();
-    if (null == mxCellListDB || mxCellListDB.size() <= 0) {
+    if (null == mxCellListDB || mxCellListDB.size() == 0) {
       return ReturnMapUtils.setFailedMsgRtnJsonStr(
           "The database mxCellList is empty and the modification failed.");
     }
     // The data passed from the page MxCellVo
     List<MxCellVo> mxCellVoList = mxGraphModelVo.getRootVo();
     // Convert the list passed to the page to map key for pageId
-    Map<String, MxCellVo> mxCellVoMap = new HashMap<String, MxCellVo>();
+    Map<String, MxCellVo> mxCellVoMap = new HashMap<>();
     // Determine if it is empty
     if (null != mxCellVoList) {
       for (MxCellVo mxCell : mxCellVoList) {
@@ -607,13 +598,13 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
 
     // Need to delete the path
     // Key is from and to (that is, the pageId of stop) value is inport and outport
-    Map<String, String> pathsDelInfoMap = new HashMap<String, String>();
+    Map<String, String> pathsDelInfoMap = new HashMap<>();
 
     // Get out the PathsList stored in the database
     List<Paths> pathsListDB = flowDB.getPathsList();
     if (null != pathsListDB && pathsListDB.size() > 0) {
       // The pathsList to be modified
-      List<Paths> updatePaths = new ArrayList<Paths>();
+      List<Paths> updatePaths = new ArrayList<>();
       // The data pathsList of the loop database is retrieved by using the pageId in
       // the stops to convert the map to the value of the page passed by the map.
       for (Paths pathsDB : pathsListDB) {
@@ -713,7 +704,7 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
         // Take out the attribute list
         List<Property> properties = stopsDB.getProperties();
         // Judge
-        if (null == properties || properties.size() <= 0) {
+        if (null == properties || properties.size() == 0) {
           continue;
         }
         boolean isUpdate = false;
@@ -726,10 +717,8 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
           if ("inports".equals(property.getName()) && StringUtils.isNotBlank(inprot)) {
             property = this.replacePortValue(inprot, property);
             isUpdate = true;
-            continue;
           } else if ("outports".equals(property.getName()) && StringUtils.isNotBlank(outprot)) {
             property = this.replacePortValue(outprot, property);
-            continue;
           }
         }
         stopsDB.setProperties(properties);
@@ -765,9 +754,8 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
   /**
    * Replace port properties
    *
-   * @param prot
-   * @param property
-   * @return
+   * @param prot prot
+   * @param property property
    */
   private Property replacePortValue(String prot, Property property) {
     String customValue = property.getCustomValue();
@@ -787,11 +775,10 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
   /**
    * save or add flowGroup
    *
-   * @param imageXML
-   * @param loadId
-   * @param operType
-   * @param flag
-   * @return
+   * @param imageXML imageXML
+   * @param loadId loadId
+   * @param operType operType
+   * @param flag flag
    */
   @Override
   public String saveDataForGroup(
@@ -804,7 +791,7 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
     if (StringUtils.isAnyEmpty(imageXML, loadId, operType)) {
       return ReturnMapUtils.setFailedMsgRtnJsonStr("The incoming parameters are empty");
     }
-    // Change the `XML'from the page to `mxGraphModel'
+    // Change the `XML' from the page to `mxGraphModel'
     MxGraphModelVo mxGraphModelVo = FlowXmlUtils.xmlToMxGraphModel(imageXML);
     // Parameter null
     if (StringUtils.isAnyEmpty(loadId, operType)) {
@@ -830,13 +817,7 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
     }
   }
 
-  /**
-   * add flows and drawing board mxCell
-   *
-   * @param mxGraphModelVo
-   * @param flowGroupId
-   * @return
-   */
+  /** add flows and drawing board mxCell */
   private Map<String, Object> addGroupFlows(
       String username, MxGraphModelVo mxGraphModelVo, String flowGroupId) throws Exception {
     if (StringUtils.isBlank(username)) {
@@ -874,8 +855,7 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
     List<MxCell> mxCellDbRoot = mxGraphModel.getRoot();
     // Convert MxCellVo map to MxCellVoList
     List<MxCellVo> addMxCellVoList = this.filterNewMxCell(mxGraphModelVo.getRootVo(), mxCellDbRoot);
-    ;
-    if (null == addMxCellVoList || addMxCellVoList.size() <= 0) {
+    if (null == addMxCellVoList || addMxCellVoList.size() == 0) {
       return ReturnMapUtils.setFailedMsg("No data can be added, the addition failed");
     }
 
@@ -932,13 +912,7 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
     return ReturnMapUtils.setSucceededMsg("Succeeded");
   }
 
-  /**
-   * Modification of the drawing board
-   *
-   * @param mxGraphModelVo
-   * @param flowGroupId
-   * @return
-   */
+  /** Modification of the drawing board */
   private Map<String, Object> updateGroupMxGraph(
       String username, MxGraphModelVo mxGraphModelVo, String flowGroupId) throws Exception {
     if (StringUtils.isBlank(username)) {
@@ -968,7 +942,7 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
     List<MxCell> mxCellList = mxGraphModel.getRoot();
     // If the mxCellList is empty, the modification fails because this method only processes the
     // modifications and is not responsible for adding
-    if (null == mxCellList || mxCellList.size() <= 0) {
+    if (null == mxCellList || mxCellList.size() == 0) {
       return ReturnMapUtils.setFailedMsg(
           "The database mxCellList is empty and the modification failed.");
     }
@@ -1038,7 +1012,6 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
    *
    * @param mxGraphModelVo Information from the page
    * @param flowGroupId The data to be modified
-   * @return
    */
   private Map<String, Object> updateFlowGroup(
       String username, MxGraphModelVo mxGraphModelVo, String flowGroupId) throws Exception {
@@ -1177,7 +1150,6 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
   /**
    * @param mxCellVoList Data passed from page
    * @param mxCellDbRoot database data
-   * @return
    */
   private List<MxCellVo> filterNewMxCell(List<MxCellVo> mxCellVoList, List<MxCell> mxCellDbRoot) {
     List<MxCellVo> rtnMxCellVoList = null;
@@ -1243,11 +1215,10 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
     List<MxCell> mxCellDbRoot = mxGraphModel.getRoot();
     // Convert MxCellVo map to MxCellVoList
     List<MxCellVo> addMxCellVoList = mxGraphVo.getMxCellVoList();
-    ;
-    if (null == addMxCellVoList || addMxCellVoList.size() <= 0) {
+    if (null == addMxCellVoList || addMxCellVoList.size() == 0) {
       return ReturnMapUtils.setFailedMsgRtnJsonStr("No data can be added, the addition failed");
     }
-    if (null == mxCellDbRoot || mxCellDbRoot.size() <= 0) {
+    if (null == mxCellDbRoot || mxCellDbRoot.size() == 0) {
       mxCellDbRoot = MxCellUtils.initMxCell(username, mxGraphModel);
     }
     for (MxCellVo mxCellVo : addMxCellVoList) {
@@ -1262,8 +1233,8 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
       if (null != mxCellVo.getValue()) {
         mxCell.setValue(mxCellVo.getValue() + mxCellVo.getPageId());
       }
-      mxCell.setVertex(("true".equals(mxCellVo.getVertex()) ? 1 : 0) + "");
-      mxCell.setEdge(("false".equals(mxCellVo.getEdge()) ? 0 : 1) + "");
+      mxCell.setVertex(String.valueOf("true".equals(mxCellVo.getVertex()) ? 1 : 0));
+      mxCell.setEdge(String.valueOf("false".equals(mxCellVo.getEdge()) ? 0 : 1));
       // Basic properties of mxCell (Required when creating)
       mxCell.setCrtDttm(new Date());
       mxCell.setCrtUser(username);
@@ -1300,7 +1271,7 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
     flowGroup.setMxGraphModel(mxGraphModel);
     flowGroup = addFlowGroupNodeAndEdge(flowGroup, addMxCellVoList, username);
     flowGroupDomain.updateFlowGroup(flowGroup);
-    if (null == addMxCellVoList || addMxCellVoList.size() <= 0) {
+    if (null == addMxCellVoList || addMxCellVoList.size() == 0) {
       return ReturnMapUtils.setSucceededMsgRtnJsonStr(MessageConfig.SUCCEEDED_MSG());
     }
 
@@ -1327,7 +1298,6 @@ public class MxGraphModelServiceImpl implements IMxGraphModelService {
         addNodeIdAndPageId.put("pageId", mxCellVo.getPageId());
         addNodeIdAndPageId.put("type", "flowGroup");
         addNodeIdAndPageIdList.add(addNodeIdAndPageId);
-        continue;
       }
     }
     return ReturnMapUtils.setSucceededCustomParamRtnJsonStr(

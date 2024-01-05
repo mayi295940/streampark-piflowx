@@ -51,14 +51,14 @@ public interface PropertyMapper {
         column = "fk_data_source_id",
         many =
             @Many(
-                select = "cn.cnic.component.dataSource.mapper.DataSourceMapper.getDataSourceById",
+                select = "org.apache.streampark.console.flow.component.dataSource.mapper.DataSourceMapper.getDataSourceById",
                 fetchType = FetchType.LAZY)),
     @Result(
         property = "properties",
         column = "id",
         many =
             @Many(
-                select = "cn.cnic.component.flow.mapper.PropertyMapper.getPropertyByStopsId",
+                select = "org.apache.streampark.console.flow.component.flow.mapper.PropertyMapper.getPropertyByStopsId",
                 fetchType = FetchType.LAZY)),
     @Result(
         property = "customizedPropertyList",
@@ -66,7 +66,7 @@ public interface PropertyMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.flow.mapper.CustomizedPropertyMapper.getCustomizedPropertyListByStopsId",
+                    "org.apache.streampark.console.flow.component.flow.mapper.CustomizedPropertyMapper.getCustomizedPropertyListByStopsId",
                 fetchType = FetchType.LAZY))
   })
   Stops getStopGroupList(@Param("fid") String fid, @Param("stopPageId") String stopPageId);

@@ -39,7 +39,7 @@ public interface CustomizedPropertyMapper {
         property = "stops",
         many =
             @Many(
-                select = "cn.cnic.component.flow.mapper.StopsMapper.getStopsById",
+                select = "org.apache.streampark.console.flow.component.flow.mapper.StopsMapper.getStopsById",
                 fetchType = FetchType.LAZY))
   })
   CustomizedProperty getCustomizedPropertyById(@Param("id") String id);

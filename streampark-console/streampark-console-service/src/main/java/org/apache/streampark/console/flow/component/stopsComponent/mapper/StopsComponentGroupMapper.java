@@ -1,8 +1,5 @@
 package org.apache.streampark.console.flow.component.stopsComponent.mapper;
 
-import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentGroup;
-import org.apache.streampark.console.flow.component.stopsComponent.mapper.provider.StopsComponentGroupProvider;
-import org.apache.streampark.console.flow.component.stopsComponent.vo.StopsComponentGroupVo;
 import java.util.List;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
@@ -14,6 +11,9 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentGroup;
+import org.apache.streampark.console.flow.component.stopsComponent.mapper.provider.StopsComponentGroupProvider;
+import org.apache.streampark.console.flow.component.stopsComponent.vo.StopsComponentGroupVo;
 
 @Mapper
 public interface StopsComponentGroupMapper {
@@ -28,7 +28,7 @@ public interface StopsComponentGroupMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.stopsComponent.mapper.StopsComponentMapper.getStopsComponentListByGroupId"))
+                    "org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsComponentMapper.getStopsComponentListByGroupId"))
   })
   List<StopsComponentGroup> getStopGroupList(String engineType);
 
@@ -42,7 +42,7 @@ public interface StopsComponentGroupMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.stopsComponent.mapper.StopsComponentMapper.getManageStopsComponentListByGroupId"))
+                    "org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsComponentMapper.getManageStopsComponentListByGroupId"))
   })
   List<StopsComponentGroupVo> getManageStopGroupList();
 
@@ -93,7 +93,8 @@ public interface StopsComponentGroupMapper {
       @Param("groupNameList") List<String> groupNameList, @Param("engineType") String engineType);
 
   @SelectProvider(type = StopsComponentGroupProvider.class, method = "getStopGroupByGroupNameList")
-  List<StopsComponentGroup> getStopGroupByGroupNameList(List<String> groupName, String engineType);
+  List<StopsComponentGroup> getStopGroupByGroupNameList(
+      @Param("groupName") List<String> groupName, @Param("engineType") String engineType);
 
   /**
    * Query flow_stops_groups based on groupName
@@ -109,7 +110,7 @@ public interface StopsComponentGroupMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.stopsComponent.mapper.StopsComponentMapper.getStopsComponentListByGroupId"))
+                    "org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsComponentMapper.getStopsComponentListByGroupId"))
   })
   List<StopsComponentGroup> getStopGroupByName(@Param("groupName") String groupName);
 

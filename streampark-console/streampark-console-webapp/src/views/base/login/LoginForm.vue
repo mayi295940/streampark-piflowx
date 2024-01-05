@@ -195,6 +195,7 @@
           userStore.teamId = lastTeamId || '';
           sessionStorage.setItem(APP_TEAMID_KEY_, userStore.teamId);
           localStorage.setItem(APP_TEAMID_KEY_, userStore.teamId);
+          localStorage.setItem('token', data.token);
           if (nickName) successText += `: ${nickName}`;
         }
 

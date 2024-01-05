@@ -74,7 +74,7 @@ public interface PathsMapper {
         property = "flow",
         many =
             @Many(
-                select = "cn.cnic.component.flow.mapper.FlowMapper.getFlowById",
+                select = "org.apache.streampark.console.flow.component.flow.mapper.FlowMapper.getFlowById",
                 fetchType = FetchType.LAZY))
   })
   List<Paths> getPaths(String flowId, String pageId, String from, String to);
@@ -99,7 +99,7 @@ public interface PathsMapper {
         property = "flow",
         many =
             @Many(
-                select = "cn.cnic.component.flow.mapper.FlowMapper.getFlowById",
+                select = "org.apache.streampark.console.flow.component.flow.mapper.FlowMapper.getFlowById",
                 fetchType = FetchType.LAZY))
   })
   List<Paths> getPathsByFlowIdAndStopPageId(String flowId, String pageId, String from, String to);

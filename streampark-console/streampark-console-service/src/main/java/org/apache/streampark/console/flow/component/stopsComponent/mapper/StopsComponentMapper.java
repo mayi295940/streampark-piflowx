@@ -45,7 +45,7 @@ public interface StopsComponentMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.stopsComponent.mapper.StopsComponentPropertyMapper.getStopsComponentPropertyByStopsId"))
+                    "org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsComponentPropertyMapper.getStopsComponentPropertyByStopsId"))
   })
   StopsComponent getStopsComponentAndPropertyById(String id);
 
@@ -83,7 +83,7 @@ public interface StopsComponentMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.stopsComponent.mapper.StopsComponentPropertyMapper.getStopsComponentPropertyByStopsId",
+                    "org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsComponentPropertyMapper.getStopsComponentPropertyByStopsId",
                 fetchType = FetchType.LAZY))
   })
   List<StopsComponent> getStopsComponentByName(String stopsName);
@@ -110,7 +110,7 @@ public interface StopsComponentMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.stopsComponent.mapper.StopsComponentPropertyMapper.getStopsComponentPropertyByStopsId",
+                    "org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsComponentPropertyMapper.getStopsComponentPropertyByStopsId",
                 fetchType = FetchType.LAZY))
   })
   StopsComponent getStopsComponentByBundle(@Param("bundle") String bundle);
@@ -142,7 +142,7 @@ public interface StopsComponentMapper {
         many =
             @Many(
                 select =
-                    "cn.cnic.component.stopsComponent.mapper.StopsComponentPropertyMapper.getStopsComponentPropertyByStopsId",
+                    "org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsComponentPropertyMapper.getStopsComponentPropertyByStopsId",
                 fetchType = FetchType.LAZY))
   })
   StopsComponent getDataSourceStopsComponentByBundle(@Param("bundle") String bundle);

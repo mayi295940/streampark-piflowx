@@ -1,5 +1,5 @@
 export default {
-  title: 'PiFlow Big Data Pipeline System',
+  title: 'PiFlowX Big Data Pipeline System',
   logOut: 'Log out',
   sidebar: {
     dashboard: 'Dashboard',
@@ -45,12 +45,10 @@ export default {
     delete_success_content: 'deleted successfully！',
     delete_fail_content: 'deletion failed！',
     request_fail_content: 'Data request failed！',
-
     upload_success_content: 'Template upload successful！',
     upload_fail_content: 'Template upload failed！',
     download_success_content: 'download successful！',
     download_fail_content: 'download failed！',
-
     data_fail_content: 'Data acquisition failed！',
   },
   modal: {
@@ -82,6 +80,15 @@ export default {
     required: 'name is required',
     min: 'username length cannot be less than 2 characters',
     max: 'exceeds maximum length limit of 20 characters',
+    create: 'Create Flow',
+    edit: 'Edit Flow',
+    view: 'View Flow',
+    notice: 'Notice',
+    deletePopConfirm: 'Are you sure to delete',
+  },
+  flow_table: {
+    enter: 'Enter',
+    modify: 'modify flow',
   },
   group_columns: {
     create_title: 'Create Group',

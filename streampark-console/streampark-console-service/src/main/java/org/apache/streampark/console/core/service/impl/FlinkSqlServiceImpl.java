@@ -118,7 +118,7 @@ public class FlinkSqlServiceImpl extends ServiceImpl<FlinkSqlMapper, FlinkSql>
   }
 
   @Override
-  public List<FlinkSql> history(Application application) {
+  public List<FlinkSql> listFlinkSqlHistory(Application application) {
     LambdaQueryWrapper<FlinkSql> queryWrapper =
         new LambdaQueryWrapper<FlinkSql>()
             .eq(FlinkSql::getAppId, application.getId())
@@ -173,11 +173,11 @@ public class FlinkSqlServiceImpl extends ServiceImpl<FlinkSqlMapper, FlinkSql>
   @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
   public void rollback(Application application) {
     FlinkSql sql = getCandidate(application.getId(), CandidateTypeEnum.HISTORY);
-    Utils.notNull(sql);
+    Utils.requireNotNull(sql);
     try {
       // check and backup current job
       FlinkSql effectiveSql = getEffective(application.getId(), false);
-      Utils.notNull(effectiveSql);
+      Utils.requireNotNull(effectiveSql);
       // rollback history sql
       backUpService.rollbackFlinkSql(application, sql);
     } catch (Exception e) {

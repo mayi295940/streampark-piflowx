@@ -175,16 +175,16 @@ public class ApplicationInfoServiceImpl extends ServiceImpl<ApplicationMapper, A
     }
 
     // result json
-    Map<String, Serializable> map = new HashMap<>(8);
-    map.put("task", overview);
-    map.put("jmMemory", totalJmMemory);
-    map.put("tmMemory", totalTmMemory);
-    map.put("totalTM", totalTm);
-    map.put("availableSlot", availableSlot);
-    map.put("totalSlot", totalSlot);
-    map.put("runningJob", runningJob);
+    Map<String, Serializable> dashboardDataMap = new HashMap<>(8);
+    dashboardDataMap.put("task", overview);
+    dashboardDataMap.put("jmMemory", totalJmMemory);
+    dashboardDataMap.put("tmMemory", totalTmMemory);
+    dashboardDataMap.put("totalTM", totalTm);
+    dashboardDataMap.put("availableSlot", availableSlot);
+    dashboardDataMap.put("totalSlot", totalSlot);
+    dashboardDataMap.put("runningJob", runningJob);
 
-    return map;
+    return dashboardDataMap;
   }
 
   @Override
@@ -403,7 +403,7 @@ public class ApplicationInfoServiceImpl extends ServiceImpl<ApplicationMapper, A
           return AppExistsStateEnum.IN_YARN;
         }
         // check whether clusterId, namespace, jobId on kubernetes
-        else if (FlinkExecutionMode.isKubernetesMode(appParam.getExecutionMode())
+        if (FlinkExecutionMode.isKubernetesMode(appParam.getExecutionMode())
             && k8SFlinkTrackMonitor.checkIsInRemoteCluster(toTrackId(appParam))) {
           return AppExistsStateEnum.IN_KUBERNETES;
         }
@@ -419,7 +419,7 @@ public class ApplicationInfoServiceImpl extends ServiceImpl<ApplicationMapper, A
         return AppExistsStateEnum.IN_YARN;
       }
       // check whether clusterId, namespace, jobId on kubernetes
-      else if (FlinkExecutionMode.isKubernetesMode(appParam.getExecutionMode())
+      if (FlinkExecutionMode.isKubernetesMode(appParam.getExecutionMode())
           && k8SFlinkTrackMonitor.checkIsInRemoteCluster(toTrackId(appParam))) {
         return AppExistsStateEnum.IN_KUBERNETES;
       }

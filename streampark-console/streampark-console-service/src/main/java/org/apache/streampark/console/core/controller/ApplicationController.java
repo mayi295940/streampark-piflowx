@@ -139,8 +139,8 @@ public class ApplicationController {
   @Operation(summary = "Get applications dashboard data")
   @PostMapping("dashboard")
   public RestResponse dashboard(Long teamId) {
-    Map<String, Serializable> map = applicationInfoService.getDashboardDataMap(teamId);
-    return RestResponse.success(map);
+    Map<String, Serializable> dashboardMap = applicationInfoService.getDashboardDataMap(teamId);
+    return RestResponse.success(dashboardMap);
   }
 
   @Operation(summary = "List applications")
@@ -361,7 +361,7 @@ public class ApplicationController {
   public RestResponse checkjar(String jar) {
     File file = new File(jar);
     try {
-      Utils.checkJarFile(file.toURI().toURL());
+      Utils.requireCheckJarFile(file.toURI().toURL());
       return RestResponse.success(true);
     } catch (IOException e) {
       return RestResponse.success(file).message(e.getLocalizedMessage());
@@ -405,9 +405,8 @@ public class ApplicationController {
     String error = applicationInfoService.checkSavepointPath(app);
     if (error == null) {
       return RestResponse.success(true);
-    } else {
-      return RestResponse.success(false).message(error);
     }
+    return RestResponse.success(false).message(error);
   }
 
   @Operation(summary = "Get application on k8s deploy logs")

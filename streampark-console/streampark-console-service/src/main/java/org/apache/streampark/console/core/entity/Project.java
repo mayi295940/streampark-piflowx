@@ -43,9 +43,10 @@ import org.eclipse.jgit.lib.Constants;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Data
@@ -185,24 +186,20 @@ public class Project implements Serializable {
 
   @JsonIgnore
   public String getMavenArgs() {
-    String mvn = "mvn";
     boolean windows = Utils.isWindows();
+    String mvn = windows ? "mvn.cmd" : "mvn";
+
+    String mavenHome = System.getenv("M2_HOME");
+    if (mavenHome == null) {
+      mavenHome = System.getenv("MAVEN_HOME");
+    }
+    if (mavenHome != null) {
+      mvn = mavenHome + "/bin/" + mvn;
+    }
+
     try {
-      if (windows) {
-        CommandUtils.execute("mvn.cmd --version");
-      } else {
-        CommandUtils.execute("mvn --version");
-      }
+      CommandUtils.execute(mvn + " --version");
     } catch (Exception e) {
-      File wrapperJar = new File(WebUtils.getAppHome().concat("/.mvn/wrapper/maven-wrapper.jar"));
-      if (wrapperJar.exists()) {
-        try {
-          JarFile jarFile = new JarFile(wrapperJar, true);
-          jarFile.close();
-        } catch (Exception ignored) {
-          FileUtils.deleteQuietly(wrapperJar);
-        }
-      }
       if (windows) {
         mvn = WebUtils.getAppHome().concat("/bin/mvnw.cmd");
       } else {
@@ -213,15 +210,60 @@ public class Project implements Serializable {
     StringBuilder cmdBuffer = new StringBuilder(mvn).append(" clean package -DskipTests ");
 
     if (StringUtils.isNotBlank(this.buildArgs)) {
-      cmdBuffer.append(this.buildArgs.trim());
+      List<String> dangerArgs = getDangerArgs(this.buildArgs);
+      if (dangerArgs.isEmpty()) {
+        cmdBuffer.append(this.buildArgs.trim());
+      } else {
+        throw new IllegalArgumentException(
+            String.format(
+                "Invalid build args, dangerous operation symbol detected: %s, in your buildArgs: %s",
+                dangerArgs.stream().collect(Collectors.joining(",")), this.buildArgs));
+      }
     }
 
     String setting = InternalConfigHolder.get(CommonConfig.MAVEN_SETTINGS_PATH());
     if (StringUtils.isNotBlank(setting)) {
-      cmdBuffer.append(" --settings ").append(setting);
+      List<String> dangerArgs = getDangerArgs(setting);
+      if (dangerArgs.isEmpty()) {
+        File file = new File(setting);
+        if (file.exists() && file.isFile()) {
+          cmdBuffer.append(" --settings ").append(setting);
+        } else {
+          throw new IllegalArgumentException(
+              String.format("Invalid maven setting path, %s no exists or not file", setting));
+        }
+      } else {
+        throw new IllegalArgumentException(
+            String.format(
+                "Invalid maven setting path, dangerous operation symbol detected: %s, in your maven setting path: %s",
+                dangerArgs.stream().collect(Collectors.joining(",")), setting));
+      }
     }
-
     return cmdBuffer.toString();
+  }
+
+  private List<String> getDangerArgs(String param) {
+    String[] args = param.split("\\s+");
+    List<String> dangerArgs = new ArrayList<>();
+    for (String arg : args) {
+      if (arg.length() == 1) {
+        if (arg.equals("|")) {
+          dangerArgs.add("|");
+        }
+        if (arg.equals("&")) {
+          dangerArgs.add("&");
+        }
+      } else {
+        arg = arg.substring(0, 2);
+        if (arg.equals("||")) {
+          dangerArgs.add("||");
+        }
+        if (arg.equals("&&")) {
+          dangerArgs.add("&&");
+        }
+      }
+    }
+    return dangerArgs;
   }
 
   @JsonIgnore

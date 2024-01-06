@@ -79,10 +79,21 @@ object FileUtils {
       s"[StreamPark] Failed to create directory within $TEMP_DIR_ATTEMPTS  attempts (tried $baseName 0 to $baseName ${TEMP_DIR_ATTEMPTS - 1})")
   }
 
+  def mkdir(dir: File) = {
+    if (dir.exists && !dir.isDirectory) {
+      throw new IOException(s"File $dir exists and is not a directory. Unable to create directory.")
+    } else if (!dir.mkdirs) {
+      // Double-check that some other thread or process hasn't made
+      if (!dir.isDirectory) {
+        throw new IOException(s"Unable to create directory $dir")
+      }
+    }
+  }
+
   def getPathFromEnv(env: String): String = {
     val path = Option(System.getenv(env)).getOrElse(System.getProperty(env))
     require(
-      Utils.notEmpty(path),
+      Utils.requireNotEmpty(path),
       s"[StreamPark] FileUtils.getPathFromEnv: $env is not set on system env")
     val file = new File(path)
     require(file.exists(), s"[StreamPark] FileUtils.getPathFromEnv: $env is not exist!")

@@ -109,15 +109,14 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project>
 
     if (status) {
       return response.message("Add project successfully").data(true);
-    } else {
-      return response.message("Add project failed").data(false);
     }
+    return response.message("Add project failed").data(false);
   }
 
   @Override
   public boolean update(Project projectParam) {
     Project project = getById(projectParam.getId());
-    Utils.notNull(project);
+    Utils.requireNotNull(project);
     ApiAlertException.throwIfFalse(
         project.getTeamId().equals(projectParam.getTeamId()),
         "TeamId can't be changed, update project failed.");
@@ -160,7 +159,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project>
   @Override
   public boolean removeById(Long id) {
     Project project = getById(id);
-    Utils.notNull(project);
+    Utils.requireNotNull(project);
     LambdaQueryWrapper<Application> queryWrapper =
         new LambdaQueryWrapper<Application>().eq(Application::getProjectId, id);
     long count = applicationManageService.count(queryWrapper);
@@ -230,9 +229,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project>
   }
 
   @Override
-  public List<String> modules(Long id) {
+  public List<String> listModules(Long id) {
     Project project = getById(id);
-    Utils.notNull(project);
+    Utils.requireNotNull(project);
 
     if (BuildStateEnum.SUCCESSFUL != BuildStateEnum.of(project.getBuildState())
         || !project.getDistHome().exists()) {
@@ -246,17 +245,17 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project>
   }
 
   @Override
-  public List<String> jars(Project project) {
-    List<String> list = new ArrayList<>(0);
+  public List<String> listJars(Project project) {
+    List<String> jarList = new ArrayList<>(0);
     ApiAlertException.throwIfNull(
         project.getModule(), "Project module can't be null, please check.");
     File apps = new File(project.getDistHome(), project.getModule());
     for (File file : Objects.requireNonNull(apps.listFiles())) {
       if (file.getName().endsWith(Constant.JAR_SUFFIX)) {
-        list.add(file.getName());
+        jarList.add(file.getName());
       }
     }
-    return list;
+    return jarList;
   }
 
   @Override
@@ -296,13 +295,13 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project>
       if (!unzipFile.exists()) {
         GZipUtils.deCompress(file.getAbsolutePath(), file.getParentFile().getAbsolutePath());
       }
-      List<Map<String, Object>> list = new ArrayList<>();
+      List<Map<String, Object>> confList = new ArrayList<>();
       File[] files = unzipFile.listFiles(x -> "conf".equals(x.getName()));
-      Utils.notNull(files);
+      Utils.requireNotNull(files);
       for (File item : files) {
-        eachFile(item, list, true);
+        eachFile(item, confList, true);
       }
-      return list;
+      return confList;
     } catch (Exception e) {
       log.info(e.getMessage());
     }
@@ -312,30 +311,30 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project>
   private void eachFile(File file, List<Map<String, Object>> list, Boolean isRoot) {
     if (file != null && file.exists() && file.listFiles() != null) {
       if (isRoot) {
-        Map<String, Object> map = new HashMap<>(0);
-        map.put("key", file.getName());
-        map.put("title", file.getName());
-        map.put("value", file.getAbsolutePath());
+        Map<String, Object> fileMap = new HashMap<>(0);
+        fileMap.put("key", file.getName());
+        fileMap.put("title", file.getName());
+        fileMap.put("value", file.getAbsolutePath());
         List<Map<String, Object>> children = new ArrayList<>();
         eachFile(file, children, false);
         if (!children.isEmpty()) {
-          map.put("children", children);
+          fileMap.put("children", children);
         }
-        list.add(map);
+        list.add(fileMap);
       } else {
         for (File item : Objects.requireNonNull(file.listFiles())) {
           String title = item.getName();
           String value = item.getAbsolutePath();
-          Map<String, Object> map = new HashMap<>(0);
-          map.put("key", title);
-          map.put("title", title);
-          map.put("value", value);
+          Map<String, Object> fileMap = new HashMap<>(0);
+          fileMap.put("key", title);
+          fileMap.put("title", title);
+          fileMap.put("value", value);
           List<Map<String, Object>> children = new ArrayList<>();
           eachFile(item, children, false);
           if (!children.isEmpty()) {
-            map.put("children", children);
+            fileMap.put("children", children);
           }
-          list.add(map);
+          list.add(fileMap);
         }
       }
     }

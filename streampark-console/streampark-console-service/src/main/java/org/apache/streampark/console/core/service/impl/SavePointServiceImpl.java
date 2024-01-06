@@ -292,7 +292,7 @@ public class SavePointServiceImpl extends ServiceImpl<SavePointMapper, SavePoint
     Map<String, Object> properties = new HashMap<>();
 
     if (FlinkExecutionMode.isRemoteMode(application.getFlinkExecutionMode())) {
-      Utils.notNull(
+      Utils.requireNotNull(
           cluster,
           String.format(
               "The clusterId=%s cannot be find, maybe the clusterId is wrong or the cluster has been deleted. Please contact the Admin.",
@@ -307,17 +307,17 @@ public class SavePointServiceImpl extends ServiceImpl<SavePointMapper, SavePoint
   private String getClusterId(Application application, FlinkCluster cluster) {
     if (FlinkExecutionMode.isKubernetesMode(application.getExecutionMode())) {
       return application.getClusterId();
-    } else if (FlinkExecutionMode.isYarnMode(application.getExecutionMode())) {
+    }
+    if (FlinkExecutionMode.isYarnMode(application.getExecutionMode())) {
       if (FlinkExecutionMode.YARN_SESSION == application.getFlinkExecutionMode()) {
-        Utils.notNull(
+        Utils.requireNotNull(
             cluster,
             String.format(
                 "The yarn session clusterId=%s cannot be find, maybe the clusterId is wrong or the cluster has been deleted. Please contact the Admin.",
                 application.getFlinkClusterId()));
         return cluster.getClusterId();
-      } else {
-        return application.getAppId();
       }
+      return application.getAppId();
     }
     return null;
   }
@@ -352,8 +352,10 @@ public class SavePointServiceImpl extends ServiceImpl<SavePointMapper, SavePoint
     if (applicationConfig == null) {
       return null;
     }
-    Map<String, String> map = applicationConfig.readConfig();
-    return FlinkUtils.isCheckpointEnabled(map) ? map.get(SAVEPOINT_DIRECTORY.key()) : null;
+    Map<String, String> configMap = applicationConfig.readConfig();
+    return FlinkUtils.isCheckpointEnabled(configMap)
+        ? configMap.get(SAVEPOINT_DIRECTORY.key())
+        : null;
   }
 
   /**
@@ -376,7 +378,7 @@ public class SavePointServiceImpl extends ServiceImpl<SavePointMapper, SavePoint
 
     // At the remote mode, request the flink webui interface to get the savepoint path
     FlinkCluster cluster = flinkClusterService.getById(application.getFlinkClusterId());
-    Utils.notNull(
+    Utils.requireNotNull(
         cluster,
         String.format(
             "The clusterId=%s cannot be find, maybe the clusterId is wrong or "
@@ -441,8 +443,8 @@ public class SavePointServiceImpl extends ServiceImpl<SavePointMapper, SavePoint
   private void expire(SavePoint entity) {
     FlinkEnv flinkEnv = flinkEnvService.getByAppId(entity.getAppId());
     Application application = applicationManageService.getById(entity.getAppId());
-    Utils.notNull(flinkEnv);
-    Utils.notNull(application);
+    Utils.requireNotNull(flinkEnv);
+    Utils.requireNotNull(application);
 
     int cpThreshold =
         tryGetChkNumRetainedFromDynamicProps(application.getDynamicProperties())

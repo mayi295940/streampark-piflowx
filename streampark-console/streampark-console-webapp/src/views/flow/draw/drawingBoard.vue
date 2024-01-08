@@ -13,25 +13,50 @@
       @cancel="programming_Modal = false"
     >
       <div>
-        <RadioGroup size="small" v-model="buttonSize" type="button">
-          <RadioButton label="text" :disabled="buttonSize === 'text' ? false : true"
+        <!-- <RadioGroup size="small" v-model="stopLanguage" type="button">
+          <RadioButton label="text" :disabled="stopLanguage === 'text' ? false : true"
             >text</RadioButton
           >
-          <RadioButton label="scala" :disabled="buttonSize === 'scala' ? false : true"
+          <RadioButton label="scala" :disabled="stopLanguage === 'scala' ? false : true"
             >scala</RadioButton
           >
-          <RadioButton label="javascript" :disabled="buttonSize === 'javascript' ? false : true"
+          <RadioButton label="javascript" :disabled="stopLanguage === 'javascript' ? false : true"
             >java</RadioButton
           >
-          <RadioButton label="python" :disabled="buttonSize === 'python' ? false : true"
+          <RadioButton label="python" :disabled="stopLanguage === 'python' ? false : true"
             >python</RadioButton
           >
-          <RadioButton label="sh" :disabled="buttonSize === 'sh' ? false : true">shell</RadioButton>
-          <RadioButton label="sql" :disabled="buttonSize === 'sql' ? false : true">sql</RadioButton>
-        </RadioGroup>
+          <RadioButton label="sh" :disabled="stopLanguage === 'sh' ? false : true"
+            >shell</RadioButton
+          >
+          <RadioButton label="sql" :disabled="stopLanguage === 'sql' ? false : true"
+            >sql</RadioButton
+          >
+        </RadioGroup> -->
 
-        <SqlEditor ref="flinkSql" v-model:value="editorContent" v-if="buttonSize === 'sql'" />
-        <OnlineProgram ref="programModal" v-model:value="editorContent" :language="buttonSize" v-else />
+        <DataGenSchema
+          ref="dataGenSchema"
+          v-model:value="editorContent"
+          v-if="stopLanguage === 'dataGenSchema'"
+          @update-value="handleDataGenSchemaEvent"
+        />
+        <FlinkTableDefinition
+          ref="flinkTableSchema"
+          v-model:value="editorContent"
+          v-else-if="stopLanguage === 'flinkTableSchema'"
+          @update-value="handleDataGenSchemaEvent"
+        />
+        <SqlEditor
+          ref="flinkSql"
+          v-model:value="editorContent"
+          v-else-if="stopLanguage === 'sql'"
+        />
+        <OnlineProgram
+          ref="programModal"
+          v-model:value="editorContent"
+          :language="stopLanguage"
+          v-else
+        />
       </div>
     </Modal>
   </div>
@@ -41,6 +66,8 @@
   import { Modal, Radio } from 'ant-design-vue';
   import { defineComponent, inject } from 'vue';
   import OnlineProgram from './components/OnlineProgram.vue';
+  import DataGenSchema from './components/DataGenSchema.vue';
+  import FlinkTableDefinition from './components/FlinkTableDefinition.vue';
   import SqlEditor from './components/SqlEditor.vue';
   import { updateStopsProperty } from '/@/api/flow/stop';
   import { useDrawer } from '/@/components/Drawer';
@@ -55,6 +82,8 @@
       RadioButton: Radio.Button,
       SqlEditor,
       OnlineProgram,
+      DataGenSchema,
+      FlinkTableDefinition,
     },
     setup() {
       const [registerReviewDrawer, { openDrawer: openReviewDrawer }] = useDrawer();
@@ -67,7 +96,7 @@
         editorContent: '',
         readonly: false,
         programming_Modal: false,
-        buttonSize: 'text',
+        stopLanguage: 'text',
         stopsId: '',
         programming_Title: 'Set Data For Each Port',
 
@@ -265,22 +294,28 @@
         _this.programming_Title = name;
         switch (language) {
           case 'Text':
-            _this.buttonSize = 'text';
+            _this.stopLanguage = 'text';
             break;
           case 'Scala':
-            _this.buttonSize = 'scala';
+            _this.stopLanguage = 'scala';
             break;
           case 'Javascript':
-            _this.buttonSize = 'javascript';
+            _this.stopLanguage = 'javascript';
             break;
           case 'Python':
-            _this.buttonSize = 'python';
+            _this.stopLanguage = 'python';
             break;
           case 'Shell':
-            _this.buttonSize = 'sh';
+            _this.stopLanguage = 'sh';
             break;
           case 'Sql':
-            _this.buttonSize = 'sql';
+            _this.stopLanguage = 'sql';
+            break;
+          case 'DataGenSchema':
+            _this.stopLanguage = 'dataGenSchema';
+            break;
+          case 'FlinkTableSchema':
+            _this.stopLanguage = 'flinkTableSchema';
             break;
           default:
             break;
@@ -354,13 +389,14 @@
       GetChildValue(val) {
         this.parentsId = val;
       },
+      handleDataGenSchemaEvent(schema: String) {
+        this.editorContent = schema;
+      },
       // 保存更改的flow配置信息
       async updateStopsProperty() {
         let param = {};
         param.id = this.stopsId;
         param.content = this.editorContent;
-        console.log(this.editorContent);
-
         const { data } = await updateStopsProperty(param);
         if (data.code == 200) {
           document

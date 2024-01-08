@@ -19,20 +19,18 @@ package org.apache.streampark.console.core.service.application.impl;
 
 import org.apache.streampark.common.Constant;
 import org.apache.streampark.common.conf.ConfigKeys;
-import org.apache.streampark.common.conf.K8sFlinkConfig;
 import org.apache.streampark.common.conf.Workspace;
 import org.apache.streampark.common.enums.ApplicationType;
+import org.apache.streampark.common.enums.ClusterState;
 import org.apache.streampark.common.enums.FlinkDevelopmentMode;
 import org.apache.streampark.common.enums.FlinkExecutionMode;
 import org.apache.streampark.common.enums.FlinkRestoreMode;
 import org.apache.streampark.common.enums.ResolveOrder;
 import org.apache.streampark.common.fs.FsOperator;
-import org.apache.streampark.common.util.CompletableFutureUtils;
 import org.apache.streampark.common.util.DeflaterUtils;
 import org.apache.streampark.common.util.ExceptionUtils;
 import org.apache.streampark.common.util.HadoopUtils;
 import org.apache.streampark.common.util.PropertiesUtils;
-import org.apache.streampark.common.util.ThreadUtils;
 import org.apache.streampark.common.util.Utils;
 import org.apache.streampark.console.base.exception.ApiAlertException;
 import org.apache.streampark.console.base.exception.ApplicationException;
@@ -65,9 +63,11 @@ import org.apache.streampark.console.core.service.SavePointService;
 import org.apache.streampark.console.core.service.SettingService;
 import org.apache.streampark.console.core.service.VariableService;
 import org.apache.streampark.console.core.service.application.ApplicationActionService;
+import org.apache.streampark.console.core.service.application.ApplicationInfoService;
 import org.apache.streampark.console.core.service.application.ApplicationManageService;
 import org.apache.streampark.console.core.utils.FlinkK8sDataTypeConverterStub;
 import org.apache.streampark.console.core.watcher.FlinkAppHttpWatcher;
+import org.apache.streampark.console.core.watcher.FlinkClusterWatcher;
 import org.apache.streampark.flink.client.FlinkClient;
 import org.apache.streampark.flink.client.bean.CancelRequest;
 import org.apache.streampark.flink.client.bean.CancelResponse;
@@ -100,6 +100,7 @@ import com.google.common.collect.Sets;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -116,10 +117,7 @@ import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Executor;
 
 import static org.apache.streampark.console.core.watcher.FlinkK8sWatcherWrapper.Bridge.toTrackId;
 import static org.apache.streampark.console.core.watcher.FlinkK8sWatcherWrapper.isKubernetesApp;
@@ -130,19 +128,15 @@ import static org.apache.streampark.console.core.watcher.FlinkK8sWatcherWrapper.
 public class ApplicationActionServiceImpl extends ServiceImpl<ApplicationMapper, Application>
     implements ApplicationActionService {
 
-  private final ExecutorService executorService =
-      new ThreadPoolExecutor(
-          Runtime.getRuntime().availableProcessors() * 5,
-          Runtime.getRuntime().availableProcessors() * 10,
-          60L,
-          TimeUnit.SECONDS,
-          new LinkedBlockingQueue<>(1024),
-          ThreadUtils.threadFactory("streampark-deploy-executor"),
-          new ThreadPoolExecutor.AbortPolicy());
+  @Qualifier("streamparkDeployExecutor")
+  @Autowired
+  private Executor executorService;
 
   @Autowired private ApplicationBackUpService backUpService;
 
   @Autowired private ApplicationManageService applicationManageService;
+
+  @Autowired private ApplicationInfoService applicationInfoService;
 
   @Autowired private ApplicationConfigService configService;
 
@@ -169,6 +163,8 @@ public class ApplicationActionServiceImpl extends ServiceImpl<ApplicationMapper,
   @Autowired private ResourceService resourceService;
 
   @Autowired private FlinkK8sDataTypeConverterStub flinkK8sDataTypeConverter;
+
+  @Autowired private FlinkClusterWatcher flinkClusterWatcher;
 
   private final Map<Long, CompletableFuture<SubmitResponse>> startFutureMap =
       new ConcurrentHashMap<>();
@@ -229,7 +225,7 @@ public class ApplicationActionServiceImpl extends ServiceImpl<ApplicationMapper,
       cancelFuture.cancel(true);
     }
     if (startFuture == null && cancelFuture == null) {
-      this.updateToStopped(appParam);
+      this.doStopped(appParam);
     }
   }
 
@@ -325,60 +321,60 @@ public class ApplicationActionServiceImpl extends ServiceImpl<ApplicationMapper,
 
     cancelFutureMap.put(application.getId(), cancelFuture);
 
-    CompletableFutureUtils.runTimeout(
-            cancelFuture,
-            10L,
-            TimeUnit.MINUTES,
-            cancelResponse -> {
-              applicationLog.setSuccess(true);
-              if (cancelResponse != null && cancelResponse.savePointDir() != null) {
-                String savePointDir = cancelResponse.savePointDir();
-                log.info("savePoint path: {}", savePointDir);
-                SavePoint savePoint = new SavePoint();
-                savePoint.setPath(savePointDir);
-                savePoint.setAppId(application.getId());
-                savePoint.setLatest(true);
-                savePoint.setType(CheckPointTypeEnum.SAVEPOINT.get());
-                savePoint.setCreateTime(new Date());
-                savePoint.setTriggerTime(triggerTime);
-                savePointService.save(savePoint);
+    cancelFuture.whenComplete(
+        (cancelResponse, throwable) -> {
+          cancelFutureMap.remove(application.getId());
+
+          if (throwable != null) {
+            String exception = ExceptionUtils.stringifyException(throwable);
+            applicationLog.setException(exception);
+            applicationLog.setSuccess(false);
+            applicationLogService.save(applicationLog);
+
+            if (throwable instanceof CancellationException) {
+              doStopped(application);
+            } else {
+              log.error("stop flink job failed.", throwable);
+              application.setOptionState(OptionStateEnum.NONE.getValue());
+              application.setState(FlinkAppStateEnum.FAILED.getValue());
+              updateById(application);
+
+              if (appParam.getSavePointed()) {
+                savePointService.expire(application.getId());
               }
+              // re-tracking flink job on kubernetes and logging exception
               if (isKubernetesApp(application)) {
-                k8SFlinkTrackMonitor.unWatching(toTrackId(application));
-              }
-            },
-            e -> {
-              if (e.getCause() instanceof CancellationException) {
-                updateToStopped(application);
+                TrackId id = toTrackId(application);
+                k8SFlinkTrackMonitor.unWatching(id);
+                k8SFlinkTrackMonitor.doWatching(id);
               } else {
-                log.error("stop flink job fail.", e);
-                application.setOptionState(OptionStateEnum.NONE.getValue());
-                application.setState(FlinkAppStateEnum.FAILED.getValue());
-                updateById(application);
-
-                if (appParam.getSavePointed()) {
-                  savePointService.expire(application.getId());
-                }
-
-                // re-tracking flink job on kubernetes and logging exception
-                if (isKubernetesApp(application)) {
-                  TrackId id = toTrackId(application);
-                  k8SFlinkTrackMonitor.unWatching(id);
-                  k8SFlinkTrackMonitor.doWatching(id);
-                } else {
-                  FlinkAppHttpWatcher.unWatching(application.getId());
-                }
-
-                String exception = ExceptionUtils.stringifyException(e);
-                applicationLog.setException(exception);
-                applicationLog.setSuccess(false);
+                FlinkAppHttpWatcher.unWatching(application.getId());
               }
-            })
-        .whenComplete(
-            (t, e) -> {
-              cancelFutureMap.remove(application.getId());
-              applicationLogService.save(applicationLog);
-            });
+            }
+            return;
+          }
+
+          applicationLog.setSuccess(true);
+          // save log...
+          applicationLogService.save(applicationLog);
+
+          if (cancelResponse != null && cancelResponse.savePointDir() != null) {
+            String savePointDir = cancelResponse.savePointDir();
+            log.info("savePoint path: {}", savePointDir);
+            SavePoint savePoint = new SavePoint();
+            savePoint.setPath(savePointDir);
+            savePoint.setAppId(application.getId());
+            savePoint.setLatest(true);
+            savePoint.setType(CheckPointTypeEnum.SAVEPOINT.get());
+            savePoint.setCreateTime(new Date());
+            savePoint.setTriggerTime(triggerTime);
+            savePointService.save(savePoint);
+          }
+
+          if (isKubernetesApp(application)) {
+            k8SFlinkTrackMonitor.unWatching(toTrackId(application));
+          }
+        });
   }
 
   @Override
@@ -389,10 +385,15 @@ public class ApplicationActionServiceImpl extends ServiceImpl<ApplicationMapper,
     ApiAlertException.throwIfTrue(
         !application.isCanBeStart(), "[StreamPark] The application cannot be started repeatedly.");
 
+    if (FlinkExecutionMode.isRemoteMode(application.getFlinkExecutionMode())
+        || FlinkExecutionMode.isSessionMode(application.getFlinkExecutionMode())) {
+      checkBeforeStart(application);
+    }
+
     if (FlinkExecutionMode.isYarnMode(application.getFlinkExecutionMode())) {
 
       ApiAlertException.throwIfTrue(
-          checkAppRepeatInYarn(application.getJobName()),
+          !applicationInfoService.getYarnAppReport(application.getJobName()).isEmpty(),
           "[StreamPark] The same task name is already running in the yarn queue");
     }
 
@@ -477,6 +478,7 @@ public class ApplicationActionServiceImpl extends ServiceImpl<ApplicationMapper,
                 ? null
                 : FlinkRestoreMode.of(appParam.getRestoreMode()),
             applicationArgs,
+            application.getHadoopUser(),
             buildResult,
             kubernetesSubmitParam,
             extraParameter);
@@ -486,98 +488,87 @@ public class ApplicationActionServiceImpl extends ServiceImpl<ApplicationMapper,
 
     startFutureMap.put(application.getId(), future);
 
-    CompletableFutureUtils.runTimeout(
-            future,
-            2L,
-            TimeUnit.MINUTES,
-            submitResponse -> {
-              if (submitResponse.flinkConfig() != null) {
-                String jmMemory =
-                    submitResponse.flinkConfig().get(ConfigKeys.KEY_FLINK_JM_PROCESS_MEMORY());
-                if (jmMemory != null) {
-                  application.setJmMemory(MemorySize.parse(jmMemory).getMebiBytes());
-                }
-                String tmMemory =
-                    submitResponse.flinkConfig().get(ConfigKeys.KEY_FLINK_TM_PROCESS_MEMORY());
-                if (tmMemory != null) {
-                  application.setTmMemory(MemorySize.parse(tmMemory).getMebiBytes());
-                }
-              }
-              application.setAppId(submitResponse.clusterId());
-              if (StringUtils.isNoneEmpty(submitResponse.jobId())) {
-                application.setJobId(submitResponse.jobId());
-              }
+    future.whenComplete(
+        (response, throwable) -> {
+          // 1) remove Future
+          startFutureMap.remove(application.getId());
 
-              if (StringUtils.isNoneEmpty(submitResponse.jobManagerUrl())) {
-                application.setJobManagerUrl(submitResponse.jobManagerUrl());
-                applicationLog.setJobManagerUrl(submitResponse.jobManagerUrl());
-              }
-              applicationLog.setYarnAppId(submitResponse.clusterId());
-              application.setStartTime(new Date());
-              application.setEndTime(null);
-              if (isKubernetesApp(application)) {
-                application.setRelease(ReleaseStateEnum.DONE.get());
-              }
-              updateById(application);
-
-              // if start completed, will be added task to tracking queue
-              if (isKubernetesApp(application)) {
-                k8SFlinkTrackMonitor.doWatching(toTrackId(application));
+          // 2) exception
+          if (throwable != null) {
+            String exception = ExceptionUtils.stringifyException(throwable);
+            applicationLog.setException(exception);
+            applicationLog.setSuccess(false);
+            applicationLogService.save(applicationLog);
+            if (throwable instanceof CancellationException) {
+              doStopped(application);
+            } else {
+              Application app = getById(appParam.getId());
+              app.setState(FlinkAppStateEnum.FAILED.getValue());
+              app.setOptionState(OptionStateEnum.NONE.getValue());
+              updateById(app);
+              if (isKubernetesApp(app)) {
+                k8SFlinkTrackMonitor.unWatching(toTrackId(app));
               } else {
-                FlinkAppHttpWatcher.setOptionState(appParam.getId(), OptionStateEnum.STARTING);
-                FlinkAppHttpWatcher.doWatching(application);
+                FlinkAppHttpWatcher.unWatching(appParam.getId());
               }
+            }
+            return;
+          }
 
-              applicationLog.setSuccess(true);
-              // set savepoint to expire
-              savePointService.expire(application.getId());
-            },
-            e -> {
-              if (e.getCause() instanceof CancellationException) {
-                updateToStopped(application);
-              } else {
-                String exception = ExceptionUtils.stringifyException(e);
-                applicationLog.setException(exception);
-                applicationLog.setSuccess(false);
-                Application app = getById(appParam.getId());
-                app.setState(FlinkAppStateEnum.FAILED.getValue());
-                app.setOptionState(OptionStateEnum.NONE.getValue());
-                updateById(app);
-                if (isKubernetesApp(app)) {
-                  k8SFlinkTrackMonitor.unWatching(toTrackId(app));
-                } else {
-                  FlinkAppHttpWatcher.unWatching(appParam.getId());
+          // 3) success
+          applicationLog.setSuccess(true);
+          if (response.flinkConfig() != null) {
+            String jmMemory = response.flinkConfig().get(ConfigKeys.KEY_FLINK_JM_PROCESS_MEMORY());
+            if (jmMemory != null) {
+              application.setJmMemory(MemorySize.parse(jmMemory).getMebiBytes());
+            }
+            String tmMemory = response.flinkConfig().get(ConfigKeys.KEY_FLINK_TM_PROCESS_MEMORY());
+            if (tmMemory != null) {
+              application.setTmMemory(MemorySize.parse(tmMemory).getMebiBytes());
+            }
+          }
+          application.setAppId(response.clusterId());
+          if (StringUtils.isNoneEmpty(response.jobId())) {
+            application.setJobId(response.jobId());
+          }
+
+          if (StringUtils.isNoneEmpty(response.jobManagerUrl())) {
+            application.setJobManagerUrl(response.jobManagerUrl());
+            applicationLog.setJobManagerUrl(response.jobManagerUrl());
+          }
+          applicationLog.setYarnAppId(response.clusterId());
+          application.setStartTime(new Date());
+          application.setEndTime(null);
+
+          // if start completed, will be added task to tracking queue
+          if (isKubernetesApp(application)) {
+            application.setRelease(ReleaseStateEnum.DONE.get());
+            k8SFlinkTrackMonitor.doWatching(toTrackId(application));
+            if (FlinkExecutionMode.isKubernetesApplicationMode(application.getExecutionMode())) {
+              String domainName = settingService.getIngressModeDefault();
+              if (StringUtils.isNotBlank(domainName)) {
+                try {
+                  IngressController.configureIngress(
+                      domainName, application.getClusterId(), application.getK8sNamespace());
+                } catch (KubernetesClientException e) {
+                  log.info("Failed to create ingress, stack info:{}", e.getMessage());
+                  applicationLog.setException(e.getMessage());
+                  applicationLog.setSuccess(false);
+                  applicationLogService.save(applicationLog);
+                  application.setState(FlinkAppStateEnum.FAILED.getValue());
+                  application.setOptionState(OptionStateEnum.NONE.getValue());
                 }
               }
-            })
-        .whenComplete(
-            (t, e) -> {
-              if (!K8sFlinkConfig.isV2Enabled()
-                  && FlinkExecutionMode.isKubernetesApplicationMode(
-                      application.getExecutionMode())) {
-                String domainName = settingService.getIngressModeDefault();
-                if (StringUtils.isNotBlank(domainName)) {
-                  try {
-                    IngressController.configureIngress(
-                        domainName, application.getClusterId(), application.getK8sNamespace());
-                  } catch (KubernetesClientException kubernetesClientException) {
-                    log.info(
-                        "Failed to create ingress, stack info:{}",
-                        kubernetesClientException.getMessage());
-                    applicationLog.setException(e.getMessage());
-                    applicationLog.setSuccess(false);
-                    applicationLogService.save(applicationLog);
-                    application.setState(FlinkAppStateEnum.FAILED.getValue());
-                    application.setOptionState(OptionStateEnum.NONE.getValue());
-                    updateById(application);
-                    return;
-                  }
-                }
-              }
-
-              applicationLogService.save(applicationLog);
-              startFutureMap.remove(application.getId());
-            });
+            }
+          } else {
+            FlinkAppHttpWatcher.setOptionState(appParam.getId(), OptionStateEnum.STARTING);
+            FlinkAppHttpWatcher.doWatching(application);
+          }
+          // update app
+          updateById(application);
+          // save log
+          applicationLogService.save(applicationLog);
+        });
   }
 
   /**
@@ -781,8 +772,8 @@ public class ApplicationActionServiceImpl extends ServiceImpl<ApplicationMapper,
     return properties;
   }
 
-  private void updateToStopped(Application app) {
-    Application application = getById(app);
+  private void doStopped(Application appParam) {
+    Application application = getById(appParam);
     application.setOptionState(OptionStateEnum.NONE.getValue());
     application.setState(FlinkAppStateEnum.CANCELED.getValue());
     application.setOptionTime(new Date());
@@ -795,6 +786,18 @@ public class ApplicationActionServiceImpl extends ServiceImpl<ApplicationMapper,
       k8SFlinkTrackMonitor.doWatching(id);
     } else {
       FlinkAppHttpWatcher.unWatching(application.getId());
+    }
+    // kill application
+    if (FlinkExecutionMode.isYarnMode(application.getFlinkExecutionMode())) {
+      try {
+        List<ApplicationReport> applications =
+            applicationInfoService.getYarnAppReport(application.getJobName());
+        if (!applications.isEmpty()) {
+          YarnClient yarnClient = HadoopUtils.yarnClient();
+          yarnClient.killApplication(applications.get(0).getApplicationId());
+        }
+      } catch (Exception ignored) {
+      }
     }
   }
 
@@ -810,5 +813,20 @@ public class ApplicationActionServiceImpl extends ServiceImpl<ApplicationMapper,
       }
     }
     return null;
+  }
+
+  /* check flink cluster before job start job */
+  private void checkBeforeStart(Application application) {
+    FlinkEnv flinkEnv = flinkEnvService.getByAppId(application.getId());
+    ApiAlertException.throwIfNull(flinkEnv, "[StreamPark] can no found flink version");
+
+    ApiAlertException.throwIfFalse(
+        flinkClusterService.existsByFlinkEnvId(flinkEnv.getId()),
+        "[StreamPark] The flink cluster don't exist, please check it");
+
+    FlinkCluster flinkCluster = flinkClusterService.getById(application.getFlinkClusterId());
+    ApiAlertException.throwIfFalse(
+        flinkClusterWatcher.getClusterState(flinkCluster) == ClusterState.RUNNING,
+        "[StreamPark] The flink cluster not running, please start it");
   }
 }

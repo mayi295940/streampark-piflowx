@@ -16,13 +16,7 @@
 -->
 <template>
   <div>
-    <Form
-      ref="tableFormRef"
-      :model="columnList"
-      :label-col="{ style: { width: '10px' } }"
-      :wrapper-col="{ span: 0 }"
-      :rules="rules"
-    >
+    <Form ref="tableFormRef" :model="columnList" :rules="rules">
       <BasicTable @register="registerTable">
         <template #toolbar>
           <a-button type="primary" @click="addColumn">
@@ -41,7 +35,7 @@
               <Select
                 v-model:value="record.columnType"
                 allowClear
-                @change="(value: string[]) => (record.kind = value)"
+                @change="(value: string[]) => (record.columnType = value)"
               >
                 <SelectOption v-for="(v, k) in colunmTypeList" :key="`kind_${k}`" :value="v.value">
                   {{ v.name }}
@@ -93,7 +87,7 @@
           </template>
           <template v-if="column.dataIndex === 'comment'">
             <a-form-item label="" :name="[index, 'comment']">
-              <Input.TextArea v-model:value="record.comment" name="comment" allowClear />
+              <Input v-model:value="record.comment" name="comment" allowClear />
             </a-form-item>
           </template>
           <template v-if="column.dataIndex === 'action'">
@@ -122,7 +116,7 @@
   import { Icon } from '/@/components/Icon';
   import { Select, Input, Popconfirm, Form, Switch, InputNumber } from 'ant-design-vue';
   import { colunmTypeList } from './draw.data';
-  import { FlinkTablePhysicalColumn } from '/@/api/flink/model/flinkTableDefinition';
+  import { TFlinkTablePhysicalColumn } from '/@/api/model/flinkTableDefinition';
 
   const SelectOption = Select.Option;
   const APopconfirm = Popconfirm;
@@ -130,23 +124,18 @@
 
   const tableFormRef = ref();
 
-  const emit = defineEmits(['update:value']);
+  const props = defineProps({
+    modelValue: {
+      type: Array<TFlinkTablePhysicalColumn>,
+      default: [],
+    },
+  });
+  const emits = defineEmits(['update:value']);
 
-  const props = defineProps<{
-    columnList: Array<FlinkTablePhysicalColumn>;
-  }>();
-
-  const columnList = ref(props.columnList?.length ? props.columnList : [getColumn('', '', '')]);
+  //const columnList = ref(props.modelValue?.length ? props.modelValue : [getColumn('', '')]);
+  const columnList = ref([getColumn('', '')]);
 
   const { t } = useI18n();
-
-  watch(
-    () => columnList,
-    (newVal) => {
-      emit('update:value', newVal);
-    },
-    { deep: true },
-  );
 
   const columns = [
     {
@@ -198,8 +187,7 @@
       key: 'action',
       title: t('component.table.operation'),
       dataIndex: 'action',
-      fixed: 'right',
-      align: 'right',
+      align: 'center',
       width: 80,
     },
   ];
@@ -229,17 +217,15 @@
     canResize: true,
   });
 
-  function getColumn(columnName: String, columnType: String, kind: String) {
+  function getColumn(columnName: String, columnType: String) {
     return {
       columnName,
       columnType,
-      kind,
     };
   }
 
   function addColumn() {
-    columnList.value.push(getColumn('', '', ''));
-    handleEvent();
+    columnList.value.push(getColumn('', ''));
   }
 
   function removeColumn(key: String) {
@@ -249,16 +235,33 @@
       }
     });
     if (columnList.value.length === 0) {
-      columnList.value.push(getColumn('', '', ''));
+      columnList.value.push(getColumn('', ''));
     }
-    handleEvent();
   }
 
+  watch(
+    () => columnList,
+    (newValue) => {
+      emits('update:value', newValue.value);
+    },
+    { deep: true, immediate: true },
+  );
+
   function handleEvent() {
-    emit('update:value', JSON.stringify(columnList.value));
+    const value = columnList.value.map(({ name, type, mockType }) => {
+      return { name, type, mockType };
+    });
+    const output = columnList.value.map(({ name, type }) => {
+      return { name, columnType: type };
+    });
+    emits('update:value', () => ({
+      value: JSON.stringify(value),
+      output,
+    }));
   }
 
   defineExpose({
     validSchema,
+    handleEvent,
   });
 </script>

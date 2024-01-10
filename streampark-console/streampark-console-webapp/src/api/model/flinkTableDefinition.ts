@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-export type FlinkTableBaseInfo = {
+export type TFlinkTableBaseInfo = {
   catalogName?: string;
   dbname?: string;
   schema?: string;
@@ -24,15 +24,15 @@ export type FlinkTableBaseInfo = {
   tableComment?: string;
 };
 
-export type FlinkTableAsSelectStatement = {
+export type TFlinkTableAsSelectStatement = {
   selectStatement?: string;
 };
 
-export interface FlinkTableLikeStatement {
+export type TFlinkTableLikeStatement = {
   likeStatement?: string;
-}
+};
 
-export type FlinkTablePhysicalColumn = {
+export type TFlinkTablePhysicalColumn = {
   columnName: string;
   columnType: string;
   length?: number;
@@ -44,31 +44,31 @@ export type FlinkTablePhysicalColumn = {
   comment?: string;
 };
 
-export type FlinkTableMetadataColumn = {
+export type TFlinkTableMetadataColumn = {
   columnName: string;
   columnType: string;
   from: string;
   virtual?: Boolean;
 };
 
-export type FlinkTableComputedColumn = {
+export type TFlinkTableComputedColumn = {
   columnName: string;
   computedColumnExpression: string;
   comment: string;
 };
 
-export type FlinkTableWatermark = {
+export type TFlinkTableWatermark = {
   rowTimeColumnName: string;
   time: Date;
   timeUnit: string;
 };
 
-export interface FlinkTableDefinition {
-  tableBaseInfo: FlinkTableBaseInfo;
-  asSelectStatement: FlinkTableAsSelectStatement;
-  likeStatement: FlinkTableLikeStatement;
-  physicalColumnDefinition: Array<FlinkTablePhysicalColumn>;
-  metadataColumnDefinition: Array<FlinkTableMetadataColumn>;
-  computedColumnDefinition: Array<FlinkTableComputedColumn>;
-  watermarkDefinition: FlinkTableWatermark;
-}
+export type TFlinkTableDefinition = {
+  tableBaseInfo: TFlinkTableBaseInfo;
+  asSelectStatement: TFlinkTableAsSelectStatement;
+  likeStatement: TFlinkTableLikeStatement;
+  physicalColumnDefinition: Array<TFlinkTablePhysicalColumn>;
+  metadataColumnDefinition: Array<TFlinkTableMetadataColumn>;
+  computedColumnDefinition: Array<TFlinkTableComputedColumn>;
+  watermarkDefinition: TFlinkTableWatermark;
+};

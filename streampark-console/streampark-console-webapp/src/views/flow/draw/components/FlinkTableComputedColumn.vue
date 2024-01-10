@@ -16,13 +16,7 @@
 -->
 <template>
   <div>
-    <Form
-      ref="tableFormRef"
-      :model="columnList"
-      :label-col="{ style: { width: '10px' } }"
-      :wrapper-col="{ span: 0 }"
-      :rules="rules"
-    >
+    <Form ref="tableFormRef" :model="columnList" :rules="rules">
       <BasicTable @register="registerTable">
         <template #toolbar>
           <a-button type="primary" @click="addColumn">
@@ -38,7 +32,7 @@
           </template>
           <template v-if="column.dataIndex === 'computedColumnExpression'">
             <a-form-item label="" :name="[index, 'computedColumnExpression']">
-              <Input.TextArea
+              <Input
                 v-model:value="record.computedColumnExpression"
                 name="computedColumnExpression"
                 allowClear
@@ -47,7 +41,7 @@
           </template>
           <template v-if="column.dataIndex === 'comment'">
             <a-form-item label="" :name="[index, 'comment']">
-              <Input.TextArea v-model:value="record.comment" name="comment" allowClear />
+              <Input v-model:value="record.comment" name="comment" allowClear />
             </a-form-item>
           </template>
           <template v-if="column.dataIndex === 'action'">
@@ -75,7 +69,7 @@
   import { useI18n } from '/@/hooks/web/useI18n';
   import { Icon } from '/@/components/Icon';
   import { Input, Popconfirm, Form } from 'ant-design-vue';
-  import { FlinkTableComputedColumn } from '/@/api/flink/model/flinkTableDefinition';
+  import { TFlinkTableComputedColumn } from '/@/api/model/flinkTableDefinition';
 
   const APopconfirm = Popconfirm;
   const AFormItem = Form.Item;
@@ -84,11 +78,15 @@
 
   const emit = defineEmits(['update:value']);
 
-  const props = defineProps<{
-    columnList: Array<FlinkTableComputedColumn>;
-  }>();
+  const props = defineProps({
+    modelValue: {
+      type: Array<TFlinkTableComputedColumn>,
+      default: [],
+    },
+  });
 
-  const columnList = ref(props.columnList?.length ? props.columnList : [getColumn('', '', '')]);
+  // const columnList = ref(props.columnList?.length ? props.columnList : [getColumn('', '', '')]);
+  const columnList = ref([getColumn('', '', '')]);
 
   const { t } = useI18n();
 
@@ -120,9 +118,8 @@
       key: 'action',
       title: t('component.table.operation'),
       dataIndex: 'action',
-      fixed: 'right',
-      align: 'right',
-      width: 80,
+      align: 'center',
+      width: 100,
     },
   ];
 
@@ -158,7 +155,6 @@
 
   function addColumn() {
     columnList.value.push(getColumn('', '', ''));
-    handleEvent();
   }
 
   function removeColumn(key: String) {
@@ -170,11 +166,6 @@
     if (columnList.value.length === 0) {
       columnList.value.push(getColumn('', '', ''));
     }
-    handleEvent();
-  }
-
-  function handleEvent() {
-    emit('update:value', JSON.stringify(columnList.value));
   }
 
   defineExpose({

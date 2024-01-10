@@ -16,13 +16,7 @@
 -->
 <template>
   <div>
-    <Form
-      ref="tableFormRef"
-      :model="columnList"
-      :label-col="{ style: { width: '10px' } }"
-      :wrapper-col="{ span: 0 }"
-      :rules="rules"
-    >
+    <Form ref="tableFormRef" :model="columnList" :rules="rules">
       <BasicTable @register="registerTable">
         <template #toolbar>
           <a-button type="primary" @click="addColumn">
@@ -89,7 +83,7 @@
   import { Icon } from '/@/components/Icon';
   import { Select, Input, Popconfirm, Form, Switch } from 'ant-design-vue';
   import { colunmTypeList } from './draw.data';
-  import { FlinkTableMetadataColumn } from '/@/api/flink/model/flinkTableDefinition';
+  import { TFlinkTableMetadataColumn } from '/@/api/model/flinkTableDefinition';
 
   const SelectOption = Select.Option;
   const APopconfirm = Popconfirm;
@@ -99,11 +93,15 @@
 
   const emit = defineEmits(['update:value']);
 
-  const props = defineProps<{
-    columnList: Array<FlinkTableMetadataColumn>;
-  }>();
+  const props = defineProps({
+    modelValue: {
+      type: Array<TFlinkTableMetadataColumn>,
+      default: [],
+    },
+  });
 
-  const columnList = ref(props.columnList?.length ? props.columnList : [getColumn('', '', '')]);
+  // const columnList = ref(props.columnList?.length ? props.columnList : [getColumn('', '', '')]);
+  const columnList = ref([getColumn('', '', '')]);
 
   const { t } = useI18n();
 
@@ -140,9 +138,8 @@
       key: 'action',
       title: t('component.table.operation'),
       dataIndex: 'action',
-      fixed: 'right',
-      align: 'right',
-      width: 80,
+      align: 'center',
+      width: 100,
     },
   ];
 
@@ -179,8 +176,6 @@
 
   function addColumn() {
     columnList.value.push(getColumn('', '', ''));
-    console.log(columnList);
-    handleEvent();
   }
 
   function removeColumn(key: String) {
@@ -192,11 +187,6 @@
     if (columnList.value.length === 0) {
       columnList.value.push(getColumn('', '', ''));
     }
-    handleEvent();
-  }
-
-  function handleEvent() {
-    emit('update:value', JSON.stringify(columnList.value));
   }
 
   defineExpose({

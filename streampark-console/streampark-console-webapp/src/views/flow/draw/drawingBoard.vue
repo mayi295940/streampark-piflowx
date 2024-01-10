@@ -13,27 +13,6 @@
       @cancel="programming_Modal = false"
     >
       <div>
-        <!-- <RadioGroup size="small" v-model="stopLanguage" type="button">
-          <RadioButton label="text" :disabled="stopLanguage === 'text' ? false : true"
-            >text</RadioButton
-          >
-          <RadioButton label="scala" :disabled="stopLanguage === 'scala' ? false : true"
-            >scala</RadioButton
-          >
-          <RadioButton label="javascript" :disabled="stopLanguage === 'javascript' ? false : true"
-            >java</RadioButton
-          >
-          <RadioButton label="python" :disabled="stopLanguage === 'python' ? false : true"
-            >python</RadioButton
-          >
-          <RadioButton label="sh" :disabled="stopLanguage === 'sh' ? false : true"
-            >shell</RadioButton
-          >
-          <RadioButton label="sql" :disabled="stopLanguage === 'sql' ? false : true"
-            >sql</RadioButton
-          >
-        </RadioGroup> -->
-
         <DataGenSchema
           ref="dataGenSchema"
           v-model:value="editorContent"
@@ -44,7 +23,7 @@
           ref="flinkTableSchema"
           v-model:value="editorContent"
           v-else-if="stopLanguage === 'flinkTableSchema'"
-          @update-value="handleDataGenSchemaEvent"
+          @update:update-table-definition="handleTableDefinitionEvent"
         />
         <SqlEditor
           ref="flinkSql"
@@ -63,11 +42,12 @@
 </template>
 
 <script lang="ts">
-  import { Modal, Radio } from 'ant-design-vue';
+  import { Modal } from 'ant-design-vue';
   import { defineComponent, inject } from 'vue';
   import OnlineProgram from './components/OnlineProgram.vue';
   import DataGenSchema from './components/DataGenSchema.vue';
   import FlinkTableDefinition from './components/FlinkTableDefinition.vue';
+  import { TFlinkTableDefinition } from '/@/api/model/flinkTableDefinition';
   import SqlEditor from './components/SqlEditor.vue';
   import { updateStopsProperty } from '/@/api/flow/stop';
   import { useDrawer } from '/@/components/Drawer';
@@ -78,8 +58,6 @@
     name: 'DrawingBoard',
     components: {
       Modal,
-      RadioGroup: Radio.Group,
-      RadioButton: Radio.Button,
       SqlEditor,
       OnlineProgram,
       DataGenSchema,
@@ -392,11 +370,15 @@
       handleDataGenSchemaEvent(schema: String) {
         this.editorContent = schema;
       },
+      handleTableDefinitionEvent(table: TFlinkTableDefinition) {
+        this.editorContent = JSON.stringify(table);
+      },
       // 保存更改的flow配置信息
       async updateStopsProperty() {
         let param = {};
         param.id = this.stopsId;
         param.content = this.editorContent;
+        console.log('editorContent = ', this.editorContent);
         const { data } = await updateStopsProperty(param);
         if (data.code == 200) {
           document
@@ -407,6 +389,7 @@
             .contentWindow.document.getElementById(`${this.stopsId}`)
             .setAttribute('data', `${data.value}`);
         }
+        this.$refs?.programModal?.setContent('');
         this.programming_Modal = false;
       },
 
@@ -457,10 +440,8 @@
             this.global.eventPoll.emit('looding', false);
           });
       },
-
       JumpToMonitor(id, msg) {
         // 判断页面是否加载完毕
-
         let pageURl = {
           pageURl: id,
           pageMsg: msg,
@@ -472,7 +453,6 @@
         //   param: "sl_btn_sw"
         // },"*");
       },
-
       showDetailEvent(row) {
         this.showDetails = true;
         let data = { testDataId: row.id };

@@ -15,22 +15,34 @@
   limitations under the License.
 -->
 <template>
-  <div>
+  <div class="ml-15px">
     <Tabs tabPosition="top">
       <TabPane key="tableBaseInfo" tab="表信息">
-        <FlinkTableBaseInfo v-model:value="tableBaseInfo" />
+        <FlinkTableBaseInfo
+          v-model:modelValue="tableBaseInfo"
+          @update:value="handleBaseInfoEvent"
+        />
       </TabPane>
       <TabPane key="physicalColumnDefinition" tab="物理列">
-        <FlinkTablePhysicalColumn v-model:value="physicalColumnDefinition" />
+        <FlinkTablePhysicalColumn
+          v-model:modelValue="physicalColumnDefinition"
+          @update:value="handlePhysicalColumnEvent"
+        />
       </TabPane>
       <TabPane key="metadataColumnDefinition" tab="元数据列">
-        <FlinkTableMetadataColumn v-model:value="metadataColumnDefinition" />
+        <FlinkTableMetadataColumn
+          v-model:modelValue="metadataColumnDefinition"
+          @update:value="handleMetadataColumnEvent"
+        />
       </TabPane>
       <TabPane key="computedColumnDefinition" tab="计算列">
-        <FlinkTableComputedColumn v-model:value="computedColumnDefinition" />
+        <FlinkTableComputedColumn
+          v-model:modelValue="computedColumnDefinition"
+          @update:value="handleComputedColumnEvent"
+        />
       </TabPane>
       <TabPane key="watermarkDefinition" tab="水印">
-        <FlinkTableWatermark v-model:value="watermarkDefinition" />
+        <FlinkTableWatermark v-model:modelValue="watermarkDefinition" />
       </TabPane>
     </Tabs>
   </div>
@@ -41,9 +53,16 @@
   };
 </script>
 <script setup lang="ts" name="FlinkTableDefinition">
-  import { computed } from 'vue';
+  import { computed, watch, ref } from 'vue';
   import { Tabs } from 'ant-design-vue';
-  import { FlinkTableDefinition } from '/@/api/flink/model/flinkTableDefinition';
+  import {
+    TFlinkTableDefinition,
+    TFlinkTableBaseInfo,
+    TFlinkTablePhysicalColumn,
+    TFlinkTableMetadataColumn,
+    TFlinkTableComputedColumn,
+    TFlinkTableWatermark,
+  } from '/@/api/model/flinkTableDefinition';
   import FlinkTablePhysicalColumn from './FlinkTablePhysicalColumn.vue';
   import FlinkTableComputedColumn from './FlinkTableComputedColumn.vue';
   import FlinkTableMetadataColumn from './FlinkTableMetadataColumn.vue';
@@ -52,8 +71,9 @@
 
   const TabPane = Tabs.TabPane;
 
-  const props = defineProps<FlinkTableDefinition>();
-  const tableBaseInfo = computed(() => props.tableBaseInfo);
+  const props = defineProps<TFlinkTableDefinition>();
+
+  const tableBaseInfo = props.tableBaseInfo;
   const selectStatement = computed(() => props.asSelectStatement);
   const likeStatement = computed(() => props.likeStatement);
   const physicalColumnDefinition = computed(() => props.physicalColumnDefinition);
@@ -61,7 +81,61 @@
   const computedColumnDefinition = computed(() => props.computedColumnDefinition);
   const watermarkDefinition = computed(() => props.watermarkDefinition);
 
-  // defineExpose({
-  //   validSchema,
-  // });
+  const updateTableBaseInfo = ref();
+  const updatePhysicalColumnDefinition = ref();
+  const updateMetadataColumnDefinition = ref();
+  const updateComputedColumnDefinition = ref();
+  const updateWatermarkDefinition = ref();
+  const updateAsSelectStatement = ref();
+  const updateLikeStatement = ref();
+
+  const updateTableDefinition = ref({
+    tableBaseInfo: updateTableBaseInfo,
+    physicalColumnDefinition: updatePhysicalColumnDefinition,
+    metadataColumnDefinition: updateMetadataColumnDefinition,
+    computedColumnDefinition: updateComputedColumnDefinition,
+    watermarkDefinition: updateWatermarkDefinition,
+    asSelectStatement: updateAsSelectStatement,
+    likeStatement: updateLikeStatement,
+  });
+
+  const emits = defineEmits(['update:updateTableDefinition']);
+
+  watch(
+    () => updateTableDefinition,
+    (newValue) => {
+      const aaa = {
+        tableBaseInfo: updateTableBaseInfo.value,
+        physicalColumnDefinition: updatePhysicalColumnDefinition.value,
+        metadataColumnDefinition: updateMetadataColumnDefinition.value,
+        computedColumnDefinition: updateComputedColumnDefinition.value,
+        watermarkDefinition: updateWatermarkDefinition.value,
+        asSelectStatement: updateAsSelectStatement.value,
+        likeStatement: updateLikeStatement.value,
+      };
+      emits('update:updateTableDefinition', aaa);
+    },
+    { deep: true, immediate: true },
+  );
+
+  function handleBaseInfoEvent(event: TFlinkTableBaseInfo) {
+    updateTableBaseInfo.value = event;
+  }
+
+  function handlePhysicalColumnEvent(event: Array<TFlinkTablePhysicalColumn>) {
+    updatePhysicalColumnDefinition.value = event;
+  }
+
+  function handleMetadataColumnEvent(event: Array<TFlinkTableMetadataColumn>) {
+    updateMetadataColumnDefinition.value = event;
+  }
+
+  function handleComputedColumnEvent(event: Array<TFlinkTableComputedColumn>) {
+    updateComputedColumnDefinition.value = event;
+  }
+
+  defineExpose({
+    handleBaseInfoEvent,
+    handlePhysicalColumnEvent,
+  });
 </script>

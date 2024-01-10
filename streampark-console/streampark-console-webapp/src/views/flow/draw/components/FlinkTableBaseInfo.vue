@@ -20,35 +20,112 @@
   };
 </script>
 <script setup lang="ts" name="FlinkTableBaseInfo">
-  import { ref } from 'vue';
-  import { PageWrapper } from '/@/components/Page';
+  import { ref, watch, PropType, onMounted } from 'vue';
   import { createAsyncComponent } from '/@/utils/factory/createAsyncComponent';
-  import { BasicForm, useForm } from '/@/components/Form';
-  import { useFlinkTableBaseInfo } from './useFlinkTableBaseInfo';
+  import { Form, Input, Switch } from 'ant-design-vue';
+  import { TFlinkTableBaseInfo } from '/@/api/model/flinkTableDefinition';
 
   const FlinkSqlEditor = createAsyncComponent(() => import('./SqlEditor.vue'), {
     loading: true,
   });
 
-  const selectStatement = ref();
-
-  const { getFlinkTableInfoFormSchema } = useFlinkTableBaseInfo();
-
-  const [registerAppForm, {}] = useForm({
-    labelCol: { lg: { span: 5, offset: 0 }, sm: { span: 7, offset: 0 } },
-    wrapperCol: { lg: { span: 16, offset: 0 }, sm: { span: 17, offset: 0 } },
-    baseColProps: { span: 24 },
-    colon: true,
-    showActionButtonGroup: false,
+  const props = defineProps({
+    modelValue: {
+      type: Object as PropType<TFlinkTableBaseInfo>,
+      default: null,
+    },
   });
-</script>
 
+  let formData = ref({
+    catalogName: null,
+    dbname: null,
+    schema: null,
+    ifNotExists: null,
+    tableName: null,
+    tableComment: null,
+  });
+
+  const emits = defineEmits(['update:value']);
+
+  // onMounted(() => {
+  //   const { catalogName, dbname, schema, ifNotExists, tableName, tableComment } =
+  //     props.modelValue || {};
+  //   Object.assign(formData, {
+  //     catalogName,
+  //     dbname,
+  //     schema,
+  //     ifNotExists,
+  //     tableName,
+  //     tableComment,
+  //   });
+  // });
+
+  // watch(
+  //   () => props,
+  //   (newValue) => {
+  //     if (!newValue || !Object.keys(newValue).length) return;
+  //     debugger;
+  //     const { catalogName, dbname, schema, ifNotExists, tableName, tableComment } =
+  //       newValue.modelValue || {};
+  //     Object.assign(formData, {
+  //       catalogName,
+  //       dbname,
+  //       schema,
+  //       ifNotExists,
+  //       tableName,
+  //       tableComment,
+  //     });
+  //     console.log('formData000000000000', formData);
+  //   },
+  //   { deep: true, immediate: true },
+  // );
+  watch(
+    () => formData,
+    (newValue) => {
+      emits('update:value', newValue.value);
+    },
+    { deep: true, immediate: true },
+  );
+  const formStyle = {
+    labelCol: { lg: { span: 3, offset: 0 }, sm: { span: 7, offset: 0 } },
+    wrapperCol: { lg: { span: 16, offset: 0 }, sm: { span: 4, offset: 0 } },
+  };
+</script>
 <template>
-  <PageWrapper contentBackground contentClass="p-26px app_controller">
-    <BasicForm @register="registerAppForm" :schemas="getFlinkTableInfoFormSchema">
-      <template #selectStatement="{ model, field }">
-        <FlinkSqlEditor ref="selectStatement" v-model:value="model[field]" />
-      </template>
-    </BasicForm>
-  </PageWrapper>
+  <Form ref="formRef" autocomplete="off">
+    <!-- <Form :model="formData" ref="formRef" autocomplete="off"> -->
+    <Form.Item name="catalogName" label="目录" :label-col="formStyle.labelCol">
+      <Input v-model:value="formData.catalogName" size="large" class="fix-auto-fill" />
+    </Form.Item>
+    <Form.Item name="dbname" label="数据库" :label-col="formStyle.labelCol">
+      <Input v-model:value="formData.dbname" size="large" class="fix-auto-fill" />
+    </Form.Item>
+    <Form.Item name="schema" label="Schema" :label-col="formStyle.labelCol">
+      <Input v-model:value="formData.schema" size="large" class="fix-auto-fill" />
+    </Form.Item>
+    <Form.Item name="tableName" label="表名" :label-col="formStyle.labelCol">
+      <Input v-model:value="formData.tableName" size="large" class="fix-auto-fill" />
+    </Form.Item>
+    <Form.Item name="tableComment" label="表备注" :label-col="formStyle.labelCol">
+      <Input v-model:value="formData.tableComment" size="large" class="fix-auto-fill" />
+    </Form.Item>
+    <Form.Item name="ifNotExists" label="存在检查" :label-col="formStyle.labelCol">
+      <Switch
+        checked-children="是"
+        un-checked-children="否"
+        v-model:checked="formData.ifNotExists"
+      />
+    </Form.Item>
+    <Form.Item name="selectStatement" label="查询语句" :label-col="formStyle.labelCol">
+      <Input v-model:value="formData.selectStatement" size="large" class="fix-auto-fill" />
+    </Form.Item>
+    <Form.Item
+      name="likeStatement"
+      class="enter-x"
+      label="Like语句"
+      :label-col="formStyle.labelCol"
+    >
+      <Input v-model:value="formData.likeStatement" size="large" class="fix-auto-fill" />
+    </Form.Item>
+  </Form>
 </template>

@@ -41,22 +41,22 @@
     dbname: null,
     schema: null,
     ifNotExists: null,
-    tableName: null,
-    tableComment: null,
+    registerTableName: null,
+    registerTableComment: null,
   });
 
   const emits = defineEmits(['update:value']);
 
   // onMounted(() => {
-  //   const { catalogName, dbname, schema, ifNotExists, tableName, tableComment } =
+  //   const { catalogName, dbname, schema, ifNotExists, registerTableName, registerTableComment } =
   //     props.modelValue || {};
   //   Object.assign(formData, {
   //     catalogName,
   //     dbname,
   //     schema,
   //     ifNotExists,
-  //     tableName,
-  //     tableComment,
+  //     registerTableName,
+  //     registerTableComment,
   //   });
   // });
 
@@ -65,15 +65,15 @@
   //   (newValue) => {
   //     if (!newValue || !Object.keys(newValue).length) return;
   //     debugger;
-  //     const { catalogName, dbname, schema, ifNotExists, tableName, tableComment } =
+  //     const { catalogName, dbname, schema, ifNotExists, registerTableName, registerTableComment } =
   //       newValue.modelValue || {};
   //     Object.assign(formData, {
   //       catalogName,
   //       dbname,
   //       schema,
   //       ifNotExists,
-  //       tableName,
-  //       tableComment,
+  //       registerTableName,
+  //       registerTableComment,
   //     });
   //     console.log('formData000000000000', formData);
   //   },
@@ -103,11 +103,11 @@
     <Form.Item name="schema" label="Schema" :label-col="formStyle.labelCol">
       <Input v-model:value="formData.schema" size="large" class="fix-auto-fill" />
     </Form.Item>
-    <Form.Item name="tableName" label="表名" :label-col="formStyle.labelCol">
-      <Input v-model:value="formData.tableName" size="large" class="fix-auto-fill" />
+    <Form.Item name="tableName" label="注册表名" :label-col="formStyle.labelCol">
+      <Input v-model:value="formData.registerTableName" size="large" class="fix-auto-fill" />
     </Form.Item>
-    <Form.Item name="tableComment" label="表备注" :label-col="formStyle.labelCol">
-      <Input v-model:value="formData.tableComment" size="large" class="fix-auto-fill" />
+    <Form.Item name="tableComment" label="注册表备注" :label-col="formStyle.labelCol">
+      <Input v-model:value="formData.registerTableComment" size="large" class="fix-auto-fill" />
     </Form.Item>
     <Form.Item name="ifNotExists" label="存在检查" :label-col="formStyle.labelCol">
       <Switch

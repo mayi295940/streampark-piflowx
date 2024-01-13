@@ -1,67 +1,57 @@
 package org.apache.streampark.console.flow.component.flow.service;
 
+import java.util.List;
 import org.apache.streampark.console.flow.component.flow.entity.Property;
 import org.apache.streampark.console.flow.component.flow.request.UpdatePathRequest;
-import java.util.List;
 
 public interface IPropertyService {
 
   /**
    * Querying group attribute information based on stopPageId
    *
-   * @param stopPageId
-   * @return
+   * @param stopPageId stopPageId
    */
-  public String queryAll(String fid, String stopPageId);
+  String queryAll(String fid, String stopPageId);
 
   /**
    * Modify stops attribute information
    *
-   * @param content
-   * @return
+   * @param content content
    */
-  public String updatePropertyList(String username, String[] content);
+  String updatePropertyList(String username, String[] content);
 
   /**
    * Modify stops attribute information
    *
-   * @param id
-   * @param content
-   * @return
+   * @param id id
+   * @param content content
    */
-  public String updateProperty(String username, String content, String id);
+  String updateProperty(String username, String content, String id);
 
-  /**
-   * query All StopsProperty List;
-   *
-   * @return
-   */
-  public List<Property> getStopsPropertyList();
+  /** query All StopsProperty List; */
+  List<Property> getStopsPropertyList();
 
-  /**
-   * delete StopsProperty according to ID;
-   *
-   * @return
-   */
-  public int deleteStopsPropertyById(String id);
+  /** delete StopsProperty according to ID; */
+  int deleteStopsPropertyById(String id);
 
   /**
    * check stops template
    *
-   * @param username
-   * @param stopsId
+   * @param username username
+   * @param stopsId stopsId
    */
-  public void checkStopTemplateUpdate(String username, String stopsId);
+  void checkStopTemplateUpdate(String username, String stopsId);
 
-  public String saveOrUpdateRoutePath(String username, UpdatePathRequest updatePathRequest);
+  String saveOrUpdateRoutePath(String username, UpdatePathRequest updatePathRequest);
 
   /**
    * deleteLastReloadDataByStopsId
    *
-   * @param stopId
-   * @return
+   * @param stopId stopId
    */
-  public String deleteLastReloadDataByStopsId(String stopId);
+  String deleteLastReloadDataByStopsId(String stopId);
 
   String updateStopDisabled(String username, Boolean isAdmin, String id, Boolean enable);
+
+  String previewCreateSql(String fid, String stopPageId);
 }

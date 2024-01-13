@@ -15,24 +15,24 @@
  * limitations under the License.
  */
 
-export type TFlinkTableBaseInfo = {
+export interface TFlinkTableBaseInfo {
   catalogName?: string;
   dbname?: string;
   schema?: string;
   ifNotExists?: Boolean;
-  tableName?: string;
-  tableComment?: string;
-};
+  registerTableName?: string;
+  registerTableComment?: string;
+}
 
-export type TFlinkTableAsSelectStatement = {
+export interface TFlinkTableAsSelectStatement {
   selectStatement?: string;
-};
+}
 
-export type TFlinkTableLikeStatement = {
+export interface TFlinkTableLikeStatement {
   likeStatement?: string;
-};
+}
 
-export type TFlinkTablePhysicalColumn = {
+export interface TFlinkTablePhysicalColumn {
   columnName: string;
   columnType: string;
   length?: number;
@@ -42,33 +42,33 @@ export type TFlinkTablePhysicalColumn = {
   primaryKey?: Boolean;
   partitionKey?: Boolean;
   comment?: string;
-};
+}
 
-export type TFlinkTableMetadataColumn = {
+export interface TFlinkTableMetadataColumn {
   columnName: string;
   columnType: string;
   from: string;
   virtual?: Boolean;
-};
+}
 
-export type TFlinkTableComputedColumn = {
+export interface TFlinkTableComputedColumn {
   columnName: string;
   computedColumnExpression: string;
   comment: string;
-};
+}
 
-export type TFlinkTableWatermark = {
+export interface TFlinkTableWatermark {
   rowTimeColumnName: string;
   time: Date;
   timeUnit: string;
-};
+}
 
-export type TFlinkTableDefinition = {
-  tableBaseInfo: TFlinkTableBaseInfo;
-  asSelectStatement: TFlinkTableAsSelectStatement;
-  likeStatement: TFlinkTableLikeStatement;
+export interface TFlinkTableDefinition {
+  tableBaseInfo?: TFlinkTableBaseInfo;
+  asSelectStatement?: TFlinkTableAsSelectStatement;
+  likeStatement?: TFlinkTableLikeStatement;
   physicalColumnDefinition: Array<TFlinkTablePhysicalColumn>;
-  metadataColumnDefinition: Array<TFlinkTableMetadataColumn>;
-  computedColumnDefinition: Array<TFlinkTableComputedColumn>;
-  watermarkDefinition: TFlinkTableWatermark;
-};
+  metadataColumnDefinition?: Array<TFlinkTableMetadataColumn>;
+  computedColumnDefinition?: Array<TFlinkTableComputedColumn>;
+  watermarkDefinition?: TFlinkTableWatermark;
+}

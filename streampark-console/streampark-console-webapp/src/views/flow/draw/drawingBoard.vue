@@ -1,17 +1,9 @@
 <template>
   <div :style="{ height }">
     <iframe :src="src" id="bariframe" style="width: 100%; height: 100%" frameborder="0"></iframe>
-    <!-- <img id="piflow-bgc" src="../../../assets/img/hbbj.jpg" /> -->
 
     <!--The online programming-->
-    <Modal
-      :title="programming_Title"
-      :visible="programming_Modal"
-      centered
-      :width="1000"
-      @ok="updateStopsProperty"
-      @cancel="programming_Modal = false"
-    >
+    <Modal :title="programming_Title" :visible="showProgrammingModal" centered :width="1000">
       <div>
         <DataGenSchema
           ref="dataGenSchema"
@@ -37,6 +29,23 @@
           v-else
         />
       </div>
+      <template #footer>
+        <a-button @click="previewCreateSql">预览</a-button>
+        <a-button @click="showProgrammingModal = false">取消</a-button>
+        <a-button @click="updateStopsProperty(false)">暂存</a-button>
+        <a-button type="primary" @click="updateStopsProperty(true)">保存</a-button>
+      </template>
+    </Modal>
+
+    <Modal
+      title="预览"
+      :visible="showPreviewModal"
+      centered
+      :width="1000"
+      @ok="showPreviewModal = false"
+      @cancel="showPreviewModal = false"
+    >
+      <SqlEditor ref="previewFlinkSql" v-model:value="previewFlinkSql" />
     </Modal>
   </div>
 </template>
@@ -49,7 +58,7 @@
   import FlinkTableDefinition from './components/FlinkTableDefinition.vue';
   import { TFlinkTableDefinition } from '/@/api/model/flinkTableDefinition';
   import SqlEditor from './components/SqlEditor.vue';
-  import { updateStopsProperty } from '/@/api/flow/stop';
+  import { updateStopsProperty, previewCreateSql } from '/@/api/flow/stop';
   import { useDrawer } from '/@/components/Drawer';
   import { useI18n } from '/@/hooks/web/useI18n';
   const { t } = useI18n();
@@ -68,15 +77,17 @@
     },
     data() {
       return {
-        height: '100%',
+        height: '95%',
         src: '',
         parentsId: '',
         editorContent: '',
         readonly: false,
-        programming_Modal: false,
+        showProgrammingModal: false,
         stopLanguage: 'text',
         stopsId: '',
         programming_Title: 'Set Data For Each Port',
+        showPreviewModal: false,
+        previewFlinkSql: '',
 
         NeedSource_Modal: false,
         tableData: [],
@@ -266,7 +277,7 @@
       );
       //  接收可视化编程data
       window['openRightHelpPage'] = (val, id, language, name) => {
-        _this.programming_Modal = true;
+        _this.showProgrammingModal = true;
         _this.editorContent = val;
         _this.stopsId = id;
         _this.programming_Title = name;
@@ -374,7 +385,7 @@
         this.editorContent = JSON.stringify(table);
       },
       // 保存更改的flow配置信息
-      async updateStopsProperty() {
+      async updateStopsProperty(isExit: boolean) {
         let param = {};
         param.id = this.stopsId;
         param.content = this.editorContent;
@@ -390,9 +401,22 @@
             .setAttribute('data', `${data.value}`);
         }
         this.$refs?.programModal?.setContent('');
-        this.programming_Modal = false;
+        if (isExit) {
+          this.showProgrammingModal = false;
+        }
       },
-
+      getQueryString(url_string, name) {
+        const url = new URL(url_string);
+        return url.searchParams.get(name);
+      },
+      async previewCreateSql() {
+        const fid = this.getQueryString(this.src, 'load');
+        const { data } = await previewCreateSql(fid, '2');
+        if (data.code == 200) {
+          this.previewFlinkSql = data.data;
+          this.showPreviewModal = true;
+        }
+      },
       // run parameters
       runParameters() {
         // let data = this.$refs.parameters.getRadioRecord();
@@ -491,7 +515,6 @@
           }
         }
       },
-
       //获取表格数据
       getTableData() {
         let data = { page: this.page, limit: this.limit };
@@ -519,11 +542,9 @@
             });
           });
       },
-
       tabClick(name) {
         this.tabName = name;
       },
-
       //  选中
       selectChangeEvent({ row }) {
         let obj = {},

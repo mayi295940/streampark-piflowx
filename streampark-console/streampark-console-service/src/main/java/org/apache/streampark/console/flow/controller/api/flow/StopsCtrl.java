@@ -2,6 +2,7 @@ package org.apache.streampark.console.flow.controller.api.flow;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.streampark.console.base.domain.RestResponse;
 import org.apache.streampark.console.flow.base.utils.ReturnMapUtils;
 import org.apache.streampark.console.flow.base.utils.SessionUserUtil;
 import org.apache.streampark.console.flow.component.flow.service.IFlowStopsPublishingService;
@@ -11,8 +12,10 @@ import org.apache.streampark.console.flow.component.flow.vo.StopsCustomizedPrope
 import org.apache.streampark.console.flow.component.stopsComponent.service.IStopGroupService;
 import org.apache.streampark.console.flow.component.system.service.ILogHelperService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -82,6 +85,13 @@ public class StopsCtrl {
     String username = SessionUserUtil.getCurrentUsername();
     logHelperServiceImpl.logAuthSucceed("updateStopOne " + id, username);
     return propertyServiceImpl.updateProperty(username, content, id);
+  }
+
+  @GetMapping(value = "/previewCreateSql")
+  @ResponseBody
+  @ApiOperation(value = "previewCreateSql", notes = "preview create Sql")
+  public RestResponse previewCreateSql(String fid, String stopPageId) {
+    return  RestResponse.success(propertyServiceImpl.previewCreateSql(fid, stopPageId));
   }
 
   /** Get the usage of the current connection port */

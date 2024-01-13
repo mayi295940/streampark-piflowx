@@ -1,5 +1,8 @@
 package org.apache.streampark.console.flow.component.stopsComponent.domain;
 
+import java.util.Arrays;
+import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.console.flow.base.utils.LoggerUtil;
 import org.apache.streampark.console.flow.component.dataSource.mapper.DataSourceMapper;
 import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponent;
@@ -9,15 +12,13 @@ import org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsC
 import org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsComponentMapper;
 import org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsComponentPropertyMapper;
 import org.apache.streampark.console.flow.component.stopsComponent.vo.StopsComponentVo;
-import java.util.Arrays;
-import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 @Component
 @Transactional(
@@ -48,7 +49,7 @@ public class StopsComponentDomain {
   }
 
   public int addListStopsComponentAndChildren(List<StopsComponent> stopsComponentList) {
-    if (null == stopsComponentList || stopsComponentList.size() <= 0) {
+    if (CollectionUtils.isEmpty(stopsComponentList)) {
       return 0;
     }
     int insertRows = 0;
@@ -89,12 +90,6 @@ public class StopsComponentDomain {
     if (null == stopsComponent) {
       return 0;
     }
-    //        int affectedRows = 0;
-    //        List<StopsComponentProperty> properties = stopsComponent.getProperties();
-    //        if (null != properties && properties.size() > 0) {
-    //            affectedRows =
-    // stopsComponentPropertyMapper.deleteStopsComponentPropertyByStopId(stopsComponent.getId());
-    //        }
     int affectedRows =
         stopsComponentPropertyMapper.deleteStopsComponentPropertyByStopId(stopsComponent.getId());
 
@@ -296,16 +291,18 @@ public class StopsComponentDomain {
   }
 
   /**
-   * @Description update flow+stops_template @Param stopsComponent @Return int @Author TY @Date
-   * 16:32 2023/4/3
+   * update flow+stops_template
+   *
+   * @param stopsComponent stopsComponent
    */
   public int updateStopsComponent(StopsComponent stopsComponent) {
     return stopsComponentMapper.updateStopsComponent(stopsComponent);
   }
 
   /**
-   * @Description delete properties @Param stopsId flow_stops_template id @Return int @Author
-   * TY @Date 16:36 2023/4/3
+   * delete properties
+   *
+   * @param stopsId flow_stops_template id
    */
   public int deleteStopsComponentProperty(String stopsId) {
     return stopsComponentPropertyMapper.deleteStopsComponentPropertyByStopId(stopsId);

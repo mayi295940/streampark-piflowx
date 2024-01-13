@@ -42,7 +42,7 @@
         />
       </TabPane>
       <TabPane key="watermarkDefinition" tab="水印">
-        <FlinkTableWatermark v-model:modelValue="watermarkDefinition" />
+        <FlinkTableWatermark v-model="watermarkDefinition" @update:value="handleWatermarkEvent" />
       </TabPane>
     </Tabs>
   </div>
@@ -62,6 +62,8 @@
     TFlinkTableMetadataColumn,
     TFlinkTableComputedColumn,
     TFlinkTableWatermark,
+    TFlinkTableAsSelectStatement,
+    TFlinkTableLikeStatement,
   } from '/@/api/model/flinkTableDefinition';
   import FlinkTablePhysicalColumn from './FlinkTablePhysicalColumn.vue';
   import FlinkTableComputedColumn from './FlinkTableComputedColumn.vue';
@@ -73,21 +75,27 @@
 
   const props = defineProps<TFlinkTableDefinition>();
 
-  const tableBaseInfo = props.tableBaseInfo;
-  const selectStatement = computed(() => props.asSelectStatement);
-  const likeStatement = computed(() => props.likeStatement);
-  const physicalColumnDefinition = computed(() => props.physicalColumnDefinition);
-  const metadataColumnDefinition = computed(() => props.metadataColumnDefinition);
-  const computedColumnDefinition = computed(() => props.computedColumnDefinition);
-  const watermarkDefinition = computed(() => props.watermarkDefinition);
+  const tableBaseInfo = computed<TFlinkTableBaseInfo>(() => props.tableBaseInfo);
+  const selectStatement = computed<TFlinkTableAsSelectStatement>(() => props.asSelectStatement);
+  const likeStatement = computed<TFlinkTableLikeStatement>(() => props.likeStatement);
+  const physicalColumnDefinition = computed<Array<TFlinkTablePhysicalColumn>>(
+    () => props.physicalColumnDefinition,
+  );
+  const metadataColumnDefinition = computed<Array<TFlinkTableMetadataColumn>>(
+    () => props.metadataColumnDefinition,
+  );
+  const computedColumnDefinition = computed<Array<TFlinkTableComputedColumn>>(
+    () => props.computedColumnDefinition,
+  );
+  const watermarkDefinition = computed<TFlinkTableWatermark>(() => props.watermarkDefinition);
 
-  const updateTableBaseInfo = ref();
-  const updatePhysicalColumnDefinition = ref();
-  const updateMetadataColumnDefinition = ref();
-  const updateComputedColumnDefinition = ref();
-  const updateWatermarkDefinition = ref();
-  const updateAsSelectStatement = ref();
-  const updateLikeStatement = ref();
+  const updateTableBaseInfo = ref<TFlinkTableBaseInfo>();
+  const updatePhysicalColumnDefinition = ref<Array<TFlinkTablePhysicalColumn>>();
+  const updateMetadataColumnDefinition = ref<Array<TFlinkTableMetadataColumn>>();
+  const updateComputedColumnDefinition = ref<Array<TFlinkTableComputedColumn>>();
+  const updateWatermarkDefinition = ref<TFlinkTableWatermark>();
+  const updateAsSelectStatement = ref<TFlinkTableAsSelectStatement>();
+  const updateLikeStatement = ref<TFlinkTableLikeStatement>();
 
   const updateTableDefinition = ref({
     tableBaseInfo: updateTableBaseInfo,
@@ -103,8 +111,8 @@
 
   watch(
     () => updateTableDefinition,
-    (newValue) => {
-      const aaa = {
+    () => {
+      const result = {
         tableBaseInfo: updateTableBaseInfo.value,
         physicalColumnDefinition: updatePhysicalColumnDefinition.value,
         metadataColumnDefinition: updateMetadataColumnDefinition.value,
@@ -113,7 +121,7 @@
         asSelectStatement: updateAsSelectStatement.value,
         likeStatement: updateLikeStatement.value,
       };
-      emits('update:updateTableDefinition', aaa);
+      emits('update:updateTableDefinition', result);
     },
     { deep: true, immediate: true },
   );
@@ -134,8 +142,7 @@
     updateComputedColumnDefinition.value = event;
   }
 
-  defineExpose({
-    handleBaseInfoEvent,
-    handlePhysicalColumnEvent,
-  });
+  function handleWatermarkEvent(event: TFlinkTableWatermark) {
+    updateWatermarkDefinition.value = event;
+  }
 </script>

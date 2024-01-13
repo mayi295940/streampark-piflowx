@@ -1,6 +1,11 @@
 package org.apache.streampark.console.flow.component.flow.service.impl;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.console.flow.base.utils.CheckFiledUtils;
 import org.apache.streampark.console.flow.base.utils.LoggerUtil;
@@ -20,6 +25,7 @@ import org.apache.streampark.console.flow.component.flow.vo.StopsVo;
 import org.apache.streampark.console.flow.component.stopsComponent.domain.StopsComponentDomain;
 import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponent;
 import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentProperty;
+import org.apache.streampark.console.flow.utils.FlinkTableUtil;
 import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -151,7 +157,8 @@ public class PropertyServiceImpl implements IPropertyService {
       }
     // If the data of the template is larger than the current number of attributes of 'stop',
     // the same modification operation is performed, and the new 'stops' attribute is added.
-    if (propertiesTemplateList.size() > 0 && property.size() > 0) {
+    if (CollectionUtils.isNotEmpty(propertiesTemplateList)
+        && CollectionUtils.isNotEmpty(property)) {
       for (StopsComponentProperty pt : propertiesTemplateList) {
         if (null == pt) {
           continue;
@@ -175,7 +182,7 @@ public class PropertyServiceImpl implements IPropertyService {
           flowDomain.updateStopsProperty(update);
         } else {
           logger.info(
-              "===============The 'stop' attribute is inconsistent with the template and needs to be added=================");
+              "The 'stop' attribute is inconsistent with the template and needs to be added");
           Property newProperty = new Property();
           String displayName = pt.getDisplayName();
           String description = pt.getDescription();
@@ -195,8 +202,8 @@ public class PropertyServiceImpl implements IPropertyService {
       }
       // All the changes in ‘objectPathsMap’ that need to be modified, left for logical deletion.
       if (PropertyMap.size() > 0)
-        for (String pageid : PropertyMap.keySet()) {
-          Property deleteProperty = PropertyMap.get(pageid);
+        for (String pageId : PropertyMap.keySet()) {
+          Property deleteProperty = PropertyMap.get(pageId);
           if (null == deleteProperty) {
             continue;
           }
@@ -305,9 +312,7 @@ public class PropertyServiceImpl implements IPropertyService {
     flowDomain.updatePropertyCustomValue(username, (ports + sourcePortVal), propertySave.getId());
   }
 
-  /**
-   * deleteLastReloadDataByStopsId
-   */
+  /** deleteLastReloadDataByStopsId */
   @Override
   public String deleteLastReloadDataByStopsId(String stopId) {
     int i = flowDomain.deletePropertiesByIsOldDataAndStopsId(stopId);
@@ -360,5 +365,28 @@ public class PropertyServiceImpl implements IPropertyService {
       return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ERROR_MSG());
     }
     return ReturnMapUtils.setSucceededMsgRtnJsonStr(MessageConfig.SUCCEEDED_MSG());
+  }
+
+  @Override
+  public String previewCreateSql(String fid, String stopPageId) {
+    if (StringUtils.isBlank(fid)) {
+      throw new IllegalArgumentException(MessageConfig.PARAM_IS_NULL_MSG("fid"));
+    }
+    if (StringUtils.isBlank(stopPageId)) {
+      throw new IllegalArgumentException(MessageConfig.PARAM_IS_NULL_MSG("stopPageId"));
+    }
+    Stops stops = flowDomain.getStopsByPageId(fid, stopPageId);
+    if (null == stops) {
+      throw new RuntimeException(MessageConfig.NO_DATA_MSG());
+    }
+
+    StopsComponent stopsComponentByBundle =
+        stopsComponentDomain.getStopsComponentByBundle(stops.getBundle());
+    StopsVo stopsVo = StopsUtils.stopPoToVo(stops, stopsComponentByBundle);
+    if (null == stopsVo) {
+      throw new RuntimeException(MessageConfig.NO_DATA_MSG());
+    }
+
+    return FlinkTableUtil.getDDL(stopsVo.getPropertiesVo());
   }
 }

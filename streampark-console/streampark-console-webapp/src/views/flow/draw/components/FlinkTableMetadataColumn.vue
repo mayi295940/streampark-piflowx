@@ -108,7 +108,7 @@
   watch(
     () => columnList,
     (newVal) => {
-      emit('update:value', newVal);
+      emit('update:value', newVal.value);
     },
     { deep: true },
   );

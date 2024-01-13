@@ -19,7 +19,8 @@ import { Result } from '/#/axios';
 import { AxiosResponse } from 'axios';
 
 enum STOP_API {
-  UPDATESTOPSONE = '/stops/updateStopsOne',
+  UPDATE_STOPS_ONE = '/stops/updateStopsOne',
+  PREVIEW_CREATE_SQL = '/stops/previewCreateSql',
 }
 
 /**
@@ -27,5 +28,16 @@ enum STOP_API {
  * @returns {Promise<AxiosResponse<Result>>}
  */
 export function updateStopsProperty(data: Object): Promise<AxiosResponse<Result>> {
-  return defHttp.post({ url: STOP_API.UPDATESTOPSONE, data }, { isReturnNativeResponse: true });
+  return defHttp.post({ url: STOP_API.UPDATE_STOPS_ONE, data }, { isReturnNativeResponse: true });
+}
+
+/**
+ * previewCreateSql
+ * @returns {Promise<AxiosResponse<Result>>}
+ */
+export function previewCreateSql(fid: String, stopPageId: String): Promise<AxiosResponse<Result>> {
+  return defHttp.get(
+    { url: STOP_API.PREVIEW_CREATE_SQL, params: { fid, stopPageId } },
+    { isReturnNativeResponse: true },
+  );
 }

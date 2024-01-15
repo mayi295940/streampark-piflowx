@@ -6,8 +6,9 @@ import org.apache.streampark.console.flow.component.mxGraph.entity.MxGeometry;
 import org.apache.streampark.console.flow.component.mxGraph.entity.MxGraphModel;
 import org.apache.streampark.console.flow.component.mxGraph.vo.MxCellVo;
 import org.apache.streampark.console.flow.component.mxGraph.vo.MxGeometryVo;
-import java.util.*;
+
 import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.beans.BeanUtils;
 
 public class MxCellUtils {
@@ -110,8 +111,7 @@ public class MxCellUtils {
     MxCell defaultFlowMxCell = mxCellNewNoId(username);
     defaultFlowMxCell.setPageId(pageId);
     defaultFlowMxCell.setParent("1");
-    defaultFlowMxCell.setStyle(
-        "image;html=1;labelBackgroundColor=#ffffff00;image=/img/flow.png");
+    defaultFlowMxCell.setStyle("image;html=1;labelBackgroundColor=#ffffff00;image=/img/flow.png");
     defaultFlowMxCell.setValue(name);
     defaultFlowMxCell.setVertex("1");
     MxGeometry defaultFlowMxCellMxGeometry = MxGeometryUtils.mxGeometryNewNoId(username);
@@ -132,8 +132,7 @@ public class MxCellUtils {
     MxCell defaultFlowMxCell = mxCellNewNoId(username);
     defaultFlowMxCell.setPageId(pageId);
     defaultFlowMxCell.setParent("1");
-    defaultFlowMxCell.setStyle(
-        "image;html=1;labelBackgroundColor=#ffffff00;image=" + imgUrl);
+    defaultFlowMxCell.setStyle("image;html=1;labelBackgroundColor=#ffffff00;image=" + imgUrl);
     defaultFlowMxCell.setValue(name);
     defaultFlowMxCell.setVertex("1");
     MxGeometry defaultFlowMxCellMxGeometry = MxGeometryUtils.mxGeometryNewNoId(username);

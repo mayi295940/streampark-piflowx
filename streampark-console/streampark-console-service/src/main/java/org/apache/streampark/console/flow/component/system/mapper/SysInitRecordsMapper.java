@@ -2,11 +2,13 @@ package org.apache.streampark.console.flow.component.system.mapper;
 
 import org.apache.streampark.console.flow.component.system.entity.SysInitRecords;
 import org.apache.streampark.console.flow.component.system.mapper.provider.SysInitRecordsMapperProvider;
-import java.util.List;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 @Mapper
 public interface SysInitRecordsMapper {

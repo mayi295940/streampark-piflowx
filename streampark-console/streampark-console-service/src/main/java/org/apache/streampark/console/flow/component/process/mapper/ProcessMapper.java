@@ -1,6 +1,10 @@
 package org.apache.streampark.console.flow.component.process.mapper;
 
-import java.util.List;
+import org.apache.streampark.console.flow.common.Eunm.ProcessState;
+import org.apache.streampark.console.flow.common.Eunm.RunModeType;
+import org.apache.streampark.console.flow.component.process.entity.Process;
+import org.apache.streampark.console.flow.component.process.mapper.provider.ProcessMapperProvider;
+
 import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Many;
@@ -13,10 +17,8 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.mapping.FetchType;
-import org.apache.streampark.console.flow.common.Eunm.ProcessState;
-import org.apache.streampark.console.flow.common.Eunm.RunModeType;
-import org.apache.streampark.console.flow.component.process.entity.Process;
-import org.apache.streampark.console.flow.component.process.mapper.provider.ProcessMapperProvider;
+
+import java.util.List;
 
 @Mapper
 public interface ProcessMapper {
@@ -74,7 +76,8 @@ public interface ProcessMapper {
         property = "processGroup",
         one =
             @One(
-                select = "org.apache.streampark.console.flow.component.process.mapper.ProcessGroupMapper.getProcessGroupById",
+                select =
+                    "org.apache.streampark.console.flow.component.process.mapper.ProcessGroupMapper.getProcessGroupById",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",

@@ -3,7 +3,7 @@ package org.apache.streampark.console.flow.component.testData.mapper;
 import org.apache.streampark.console.flow.component.testData.entity.TestData;
 import org.apache.streampark.console.flow.component.testData.mapper.provider.TestDataMapperProvider;
 import org.apache.streampark.console.flow.component.testData.vo.TestDataVo;
-import java.util.List;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Many;
 import org.apache.ibatis.annotations.Mapper;
@@ -14,6 +14,8 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.mapping.FetchType;
+
+import java.util.List;
 
 @Mapper
 public interface TestDataMapper {

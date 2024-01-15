@@ -1,11 +1,13 @@
 package org.apache.streampark.console.flow.component.dataSource.vo;
 
 import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponent;
+
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 @Setter

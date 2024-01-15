@@ -3,7 +3,13 @@
     <iframe :src="src" id="bariframe" style="width: 100%; height: 100%" frameborder="0"></iframe>
 
     <!--The online programming-->
-    <Modal :title="programming_Title" :visible="showProgrammingModal" centered :width="1000">
+    <Modal
+      :title="programming_Title"
+      :visible="showProgrammingModal"
+      centered
+      :width="1000"
+      @cancel="showProgrammingModal = false"
+    >
       <div>
         <DataGenSchema
           ref="dataGenSchema"
@@ -410,8 +416,9 @@
         return url.searchParams.get(name);
       },
       async previewCreateSql() {
+        const stopPageId = localStorage.getItem('stopPageId');
         const fid = this.getQueryString(this.src, 'load');
-        const { data } = await previewCreateSql(fid, '2');
+        const { data } = await previewCreateSql(fid, stopPageId);
         if (data.code == 200) {
           this.previewFlinkSql = data.data;
           this.showPreviewModal = true;

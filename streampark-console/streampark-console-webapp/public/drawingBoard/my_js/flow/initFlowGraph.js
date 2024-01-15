@@ -571,6 +571,7 @@ function distributeDelete(publishingId){
 
 //query Flow path
 function queryPathInfo(stopPageId, loadId) {
+  debugger;
     ajaxRequest({
         type: "POST",
         url: "/path/queryPathInfo",
@@ -611,6 +612,7 @@ function queryPathInfo(stopPageId, loadId) {
 
 //query Stops info and property
 function queryStopsProperty(stopPageId, loadId) {
+    debugger;
     $("#div_datasource_html").hide();
     $("#div_propertiesVo_html").hide();
     $("#div_customized_html").hide();
@@ -619,7 +621,7 @@ function queryStopsProperty(stopPageId, loadId) {
     $("#div_del_last_reload").hide();
     $("#div_properties_example_html").hide();
     isShowUpdateStopsName(false);
-    nodeId=stopPageId;
+    nodeId = stopPageId;
     ajaxRequest({
         type: "POST",
         url: "/stops/queryIdInfo",
@@ -629,6 +631,8 @@ function queryStopsProperty(stopPageId, loadId) {
             var dataMap = JSON.parse(data);
             $('#process_property_inc_loading').hide();
             if (200 === dataMap.code) {
+                // 通过设置当前节点id,预览sql获取节点数据
+                localStorage.setItem('stopPageId', stopPageId);
                 var stopsVoData = dataMap.stopsVo;
                 stopsId = stopsVoData.id;
                 if (stopsVoData) {

@@ -1,9 +1,10 @@
 package org.apache.streampark.console.flow.base.utils;
 
+import sun.misc.BASE64Decoder;
+
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import sun.misc.BASE64Decoder;
 
 @SuppressWarnings("restriction")
 public class ImageUtils {

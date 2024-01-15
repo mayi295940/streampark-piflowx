@@ -2,6 +2,7 @@ package org.apache.streampark.console.flow.component.mxGraph.mapper;
 
 import org.apache.streampark.console.flow.component.mxGraph.entity.MxGeometry;
 import org.apache.streampark.console.flow.component.mxGraph.mapper.provider.MxGeometryMapperProvider;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Result;

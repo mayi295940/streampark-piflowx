@@ -1,8 +1,9 @@
 package org.apache.streampark.console.flow.component.process.vo;
 
-import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.Serializable;
 
 /** stop property */
 @Getter

@@ -2,12 +2,14 @@ package org.apache.streampark.console.flow.component.stopsComponent.domain;
 
 import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsHub;
 import org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsHubMapper;
-import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Component
 @Transactional(

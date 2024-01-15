@@ -9,11 +9,14 @@ import org.apache.streampark.console.flow.component.flow.entity.FlowGroupPaths;
 import org.apache.streampark.console.flow.component.flow.service.IFlowGroupPathsService;
 import org.apache.streampark.console.flow.component.flow.vo.FlowGroupPathsVo;
 import org.apache.streampark.console.flow.component.flow.vo.FlowGroupVo;
-import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class FlowGroupPathsServiceImpl implements IFlowGroupPathsService {

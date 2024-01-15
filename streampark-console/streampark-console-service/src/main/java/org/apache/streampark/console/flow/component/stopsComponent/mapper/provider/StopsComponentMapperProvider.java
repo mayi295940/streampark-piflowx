@@ -3,9 +3,11 @@ package org.apache.streampark.console.flow.component.stopsComponent.mapper.provi
 import org.apache.streampark.console.flow.base.utils.DateUtils;
 import org.apache.streampark.console.flow.base.utils.SqlUtils;
 import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponent;
-import java.util.Date;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
+
+import java.util.Date;
 
 public class StopsComponentMapperProvider {
 
@@ -194,9 +196,9 @@ public class StopsComponentMapperProvider {
       strBuf.append("( ");
       strBuf.append(SqlUtils.baseFieldName() + ", ");
       strBuf.append(
-          "bundle, engine_type, description, `groups`, name, owner, inports, in_port_type, " +
-                  "outports, out_port_type, is_customized, visualization_type, is_data_source,image_url," +
-                  "component_type,docker_images_name,stops_hub_id ");
+          "bundle, engine_type, description, `groups`, name, owner, inports, in_port_type, "
+              + "outports, out_port_type, is_customized, visualization_type, is_data_source,image_url,"
+              + "component_type,docker_images_name,stops_hub_id ");
 
       strBuf.append(") ");
 

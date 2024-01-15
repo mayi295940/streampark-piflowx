@@ -1,10 +1,11 @@
 package org.apache.streampark.console.flow.component.stopsComponent.vo;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
 
 /** Group name table */
 @Getter

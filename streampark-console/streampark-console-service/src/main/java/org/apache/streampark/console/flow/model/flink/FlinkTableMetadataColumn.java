@@ -1,8 +1,7 @@
 package org.apache.streampark.console.flow.model.flink;
 
 /**
- * <metadata_column_definition>:
- *   column_name column_type METADATA [ FROM metadata_key ] [ VIRTUAL ]
+ * <metadata_column_definition>: column_name column_type METADATA [ FROM metadata_key ] [ VIRTUAL ]
  */
 public class FlinkTableMetadataColumn {
 

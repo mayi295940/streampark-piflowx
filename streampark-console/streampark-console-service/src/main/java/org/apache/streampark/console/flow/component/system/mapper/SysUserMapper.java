@@ -3,7 +3,7 @@ package org.apache.streampark.console.flow.component.system.mapper;
 import org.apache.streampark.console.flow.component.system.entity.SysUser;
 import org.apache.streampark.console.flow.component.system.mapper.provider.SysUserMapperProvider;
 import org.apache.streampark.console.flow.component.system.vo.SysUserVo;
-import java.util.List;
+
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Many;
@@ -14,6 +14,8 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.mapping.FetchType;
+
+import java.util.List;
 
 @Mapper
 public interface SysUserMapper {
@@ -38,7 +40,8 @@ public interface SysUserMapper {
         property = "role",
         many =
             @Many(
-                select = "org.apache.streampark.console.flow.component.system.mapper.SysRoleMapper.getSysRoleBySysUserId",
+                select =
+                    "org.apache.streampark.console.flow.component.system.mapper.SysRoleMapper.getSysRoleBySysUserId",
                 fetchType = FetchType.EAGER))
   })
   List<SysUserVo> getSysUserVoList(boolean isAdmin, String username, String param);
@@ -57,7 +60,8 @@ public interface SysUserMapper {
         property = "roles",
         many =
             @Many(
-                select = "org.apache.streampark.console.flow.component.system.mapper.SysRoleMapper.getSysRoleListBySysUserId",
+                select =
+                    "org.apache.streampark.console.flow.component.system.mapper.SysRoleMapper.getSysRoleListBySysUserId",
                 fetchType = FetchType.EAGER))
   })
   SysUser findUserByUserName(String userName);

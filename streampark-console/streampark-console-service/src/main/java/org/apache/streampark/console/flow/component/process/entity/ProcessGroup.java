@@ -1,15 +1,17 @@
 package org.apache.streampark.console.flow.component.process.entity;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.streampark.console.flow.base.BaseModelUUIDNoCorpAgentId;
 import org.apache.streampark.console.flow.common.Eunm.ProcessParentType;
 import org.apache.streampark.console.flow.common.Eunm.ProcessState;
 import org.apache.streampark.console.flow.common.Eunm.RunModeType;
 import org.apache.streampark.console.flow.component.mxGraph.entity.MxGraphModel;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter

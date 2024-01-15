@@ -1,8 +1,9 @@
 package org.apache.streampark.console.flow.component.flow.service;
 
-import java.util.List;
 import org.apache.streampark.console.flow.component.flow.entity.Property;
 import org.apache.streampark.console.flow.component.flow.request.UpdatePathRequest;
+
+import java.util.List;
 
 public interface IPropertyService {
 

@@ -1,9 +1,11 @@
 package org.apache.streampark.console.flow.component.system.entity;
 
 import org.apache.streampark.console.flow.common.Eunm.SysRoleType;
-import java.io.Serializable;
+
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.Serializable;
 
 @Getter
 @Setter

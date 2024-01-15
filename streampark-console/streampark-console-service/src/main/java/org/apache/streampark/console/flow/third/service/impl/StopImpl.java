@@ -8,14 +8,17 @@ import org.apache.streampark.console.flow.third.utils.ThirdInterfaceReturnMsgUti
 import org.apache.streampark.console.flow.third.utils.ThirdStopsComponentUtils;
 import org.apache.streampark.console.flow.third.vo.stop.StopsHubVo;
 import org.apache.streampark.console.flow.third.vo.stop.ThirdStopsComponentVo;
+
+import org.apache.commons.lang3.StringUtils;
+
+import net.sf.json.JSONObject;
+import org.slf4j.Logger;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.sf.json.JSONObject;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.springframework.stereotype.Component;
 
 @Component
 public class StopImpl implements IStop {

@@ -4,7 +4,7 @@ import org.apache.streampark.console.flow.component.template.entity.PropertyTemp
 import org.apache.streampark.console.flow.component.template.entity.StopTemplateModel;
 import org.apache.streampark.console.flow.component.template.mapper.provider.FlowAndStopsTemplateVoMapperProvider;
 import org.apache.streampark.console.flow.component.template.vo.FlowTemplateModelVo;
-import java.util.List;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Many;
 import org.apache.ibatis.annotations.Mapper;
@@ -14,6 +14,8 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.mapping.FetchType;
+
+import java.util.List;
 
 /** Stop component table */
 @Mapper

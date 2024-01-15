@@ -2,10 +2,12 @@ package org.apache.streampark.console.flow.component.stopsComponent.mapper.provi
 
 import org.apache.streampark.console.flow.base.utils.SqlUtils;
 import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentProperty;
-import java.util.List;
-import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
+
+import java.util.List;
+import java.util.Map;
 
 public class StopsComponentPropertyMapperProvider {
 

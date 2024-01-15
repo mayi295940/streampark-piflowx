@@ -1,10 +1,12 @@
 package org.apache.streampark.console.flow.component.stopsComponent.entity;
 
 import org.apache.streampark.console.flow.base.BaseModelUUIDNoCorpAgentId;
-import java.util.ArrayList;
-import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /** Group name table */
 @Setter

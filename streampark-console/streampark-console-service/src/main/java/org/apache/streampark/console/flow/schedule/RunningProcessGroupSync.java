@@ -5,18 +5,20 @@ import org.apache.streampark.console.flow.base.utils.SpringContextUtil;
 import org.apache.streampark.console.flow.common.executor.ServicesExecutor;
 import org.apache.streampark.console.flow.component.process.mapper.ProcessGroupMapper;
 import org.apache.streampark.console.flow.third.service.IGroup;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.*;
-import lombok.SneakyThrows;
+
 import org.apache.commons.collections.CollectionUtils;
+
+import lombok.SneakyThrows;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class RunningProcessGroupSync extends QuartzJobBean {

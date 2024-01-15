@@ -1,11 +1,5 @@
 package org.apache.streampark.console.flow.controller.api.process;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.console.flow.base.utils.HttpUtils;
 import org.apache.streampark.console.flow.base.utils.SessionUserUtil;
 import org.apache.streampark.console.flow.common.constant.MessageConfig;
@@ -14,12 +8,21 @@ import org.apache.streampark.console.flow.component.process.service.IProcessServ
 import org.apache.streampark.console.flow.component.process.service.IProcessStopService;
 import org.apache.streampark.console.flow.component.process.vo.DebugDataRequest;
 import org.apache.streampark.console.flow.component.system.service.ILogHelperService;
+
+import org.apache.commons.lang3.StringUtils;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletResponse;
 
 @Api(value = "process api", tags = "process api")
 @Controller

@@ -3,9 +3,12 @@ package org.apache.streampark.console.flow.component.testData.utils;
 import org.apache.streampark.console.flow.base.utils.UUIDUtils;
 import org.apache.streampark.console.flow.component.testData.entity.TestDataSchema;
 import org.apache.streampark.console.flow.controller.requestVo.TestDataSchemaVoRequest;
-import java.util.Date;
+
 import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.beans.BeanUtils;
+
+import java.util.Date;
 
 public class TestDataSchemaUtils {
 

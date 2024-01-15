@@ -11,8 +11,9 @@ import org.apache.streampark.console.flow.component.mxGraph.entity.MxGraphModel;
 import org.apache.streampark.console.flow.component.mxGraph.vo.MxCellVo;
 import org.apache.streampark.console.flow.component.mxGraph.vo.MxGeometryVo;
 import org.apache.streampark.console.flow.component.mxGraph.vo.MxGraphModelVo;
-import java.util.*;
+
 import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.beans.BeanUtils;
 
 public class MxGraphModelUtils {

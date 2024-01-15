@@ -4,12 +4,14 @@ import org.apache.streampark.console.flow.base.utils.DateUtils;
 import org.apache.streampark.console.flow.common.Eunm.ProcessState;
 import org.apache.streampark.console.flow.common.Eunm.RunModeType;
 import org.apache.streampark.console.flow.component.mxGraph.vo.MxGraphModelVo;
+
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
 
 @Setter
 @Getter

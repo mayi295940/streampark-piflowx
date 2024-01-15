@@ -4,7 +4,7 @@ import org.apache.streampark.console.flow.component.flow.entity.Property;
 import org.apache.streampark.console.flow.component.flow.entity.Stops;
 import org.apache.streampark.console.flow.component.flow.mapper.provider.PropertyMapperProvider;
 import org.apache.streampark.console.flow.component.flow.vo.StopsPropertyVo;
-import java.util.List;
+
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Many;
@@ -16,6 +16,8 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.mapping.FetchType;
+
+import java.util.List;
 
 @Mapper
 public interface PropertyMapper {
@@ -51,14 +53,16 @@ public interface PropertyMapper {
         column = "fk_data_source_id",
         many =
             @Many(
-                select = "org.apache.streampark.console.flow.component.dataSource.mapper.DataSourceMapper.getDataSourceById",
+                select =
+                    "org.apache.streampark.console.flow.component.dataSource.mapper.DataSourceMapper.getDataSourceById",
                 fetchType = FetchType.LAZY)),
     @Result(
         property = "properties",
         column = "id",
         many =
             @Many(
-                select = "org.apache.streampark.console.flow.component.flow.mapper.PropertyMapper.getPropertyByStopsId",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.PropertyMapper.getPropertyByStopsId",
                 fetchType = FetchType.LAZY)),
     @Result(
         property = "customizedPropertyList",

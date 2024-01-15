@@ -3,12 +3,14 @@ package org.apache.streampark.console.flow.third.utils;
 import org.apache.streampark.console.flow.third.vo.stop.StopsHubVo;
 import org.apache.streampark.console.flow.third.vo.stop.ThirdStopsComponentPropertyVo;
 import org.apache.streampark.console.flow.third.vo.stop.ThirdStopsComponentVo;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 public class ThirdStopsComponentUtils {
 
@@ -20,7 +22,6 @@ public class ThirdStopsComponentUtils {
     // json string to a json object
     // Needed when there is a List in jsonObj
     @SuppressWarnings("rawtypes")
-
     Map<String, Class> classMap = new HashMap<>();
     // Key is the name of the List in jsonObj, and the value is a generic class of list
     classMap.put("properties", ThirdStopsComponentPropertyVo.class);

@@ -1,6 +1,5 @@
 package org.apache.streampark.console.flow.component.flow.service;
 
-
 import org.apache.streampark.console.flow.component.flow.vo.StopsCustomizedPropertyVo;
 import org.apache.streampark.console.flow.controller.requestVo.RunStopsVo;
 

@@ -2,10 +2,12 @@ package org.apache.streampark.console.flow.component.system.vo;
 
 import org.apache.streampark.console.flow.base.utils.DateUtils;
 import org.apache.streampark.console.flow.component.system.entity.SysRole;
-import java.io.Serializable;
-import java.util.Date;
+
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.Serializable;
+import java.util.Date;
 
 @Getter
 @Setter

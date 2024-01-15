@@ -2,7 +2,7 @@ package org.apache.streampark.console.flow.component.mxGraph.mapper;
 
 import org.apache.streampark.console.flow.component.mxGraph.entity.MxCell;
 import org.apache.streampark.console.flow.component.mxGraph.mapper.provider.MxCellMapperProvider;
-import java.util.List;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.One;
@@ -13,6 +13,8 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.mapping.FetchType;
+
+import java.util.List;
 
 @Mapper
 public interface MxCellMapper {

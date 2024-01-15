@@ -1,11 +1,13 @@
 package org.apache.streampark.console.flow.component.template.entity;
 
 import org.apache.streampark.console.flow.base.utils.DateUtils;
+
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import lombok.Getter;
-import lombok.Setter;
 
 /** Stop attribute */
 @Getter

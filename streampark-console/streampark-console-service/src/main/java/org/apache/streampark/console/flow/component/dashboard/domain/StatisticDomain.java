@@ -1,14 +1,15 @@
 package org.apache.streampark.console.flow.component.dashboard.domain;
 
 import org.apache.streampark.console.flow.component.dashboard.mapper.StatisticMapper;
-import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
 
 @Component
 @Transactional(

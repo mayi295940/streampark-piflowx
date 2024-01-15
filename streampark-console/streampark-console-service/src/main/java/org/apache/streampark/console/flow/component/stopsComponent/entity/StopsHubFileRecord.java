@@ -1,8 +1,9 @@
 package org.apache.streampark.console.flow.component.stopsComponent.entity;
 
-import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Date;
 
 /** 上传算法包的具体文件记录表（stops_hub_file_record） */
 @Setter

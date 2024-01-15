@@ -3,12 +3,14 @@ package org.apache.streampark.console.flow.component.dataSource.mapper;
 import org.apache.streampark.console.flow.component.dataSource.entity.DataSourceProperty;
 import org.apache.streampark.console.flow.component.dataSource.mapper.provider.DataSourcePropertyMapperProvider;
 import org.apache.streampark.console.flow.component.dataSource.vo.DataSourcePropertyVo;
-import java.util.List;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
+
+import java.util.List;
 
 @Mapper
 public interface DataSourcePropertyMapper {
@@ -30,7 +32,8 @@ public interface DataSourcePropertyMapper {
   @InsertProvider(
       type = DataSourcePropertyMapperProvider.class,
       method = "addDataSourcePropertyList")
-  int addDataSourcePropertyList(@Param("dataSourcePropertyList") List<DataSourceProperty> dataSourcePropertyList);
+  int addDataSourcePropertyList(
+      @Param("dataSourcePropertyList") List<DataSourceProperty> dataSourcePropertyList);
 
   /**
    * update dataSourceProperty

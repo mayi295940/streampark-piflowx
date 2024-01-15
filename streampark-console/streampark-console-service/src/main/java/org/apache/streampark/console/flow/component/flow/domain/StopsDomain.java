@@ -8,14 +8,17 @@ import org.apache.streampark.console.flow.component.flow.mapper.CustomizedProper
 import org.apache.streampark.console.flow.component.flow.mapper.PropertyMapper;
 import org.apache.streampark.console.flow.component.flow.mapper.StopsMapper;
 import org.apache.streampark.console.flow.third.vo.flow.ThirdFlowInfoStopVo;
-import java.util.List;
-import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
 
 @Component
 @Transactional(

@@ -3,7 +3,7 @@ package org.apache.streampark.console.flow.component.flow.mapper;
 import org.apache.streampark.console.flow.component.flow.entity.FlowStopsPublishing;
 import org.apache.streampark.console.flow.component.flow.mapper.provider.FlowStopsPublishingMapperProvider;
 import org.apache.streampark.console.flow.component.flow.vo.FlowStopsPublishingVo;
-import java.util.List;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.One;
@@ -14,6 +14,8 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.mapping.FetchType;
+
+import java.util.List;
 
 /** Flow Stops Publishing table */
 @Mapper
@@ -85,7 +87,8 @@ public interface FlowStopsPublishingMapper {
         property = "stopsVo",
         one =
             @One(
-                select = "org.apache.streampark.console.flow.component.flow.mapper.StopsMapper.getStopsVoById",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.StopsMapper.getStopsVoById",
                 fetchType = FetchType.LAZY))
   })
   List<FlowStopsPublishingVo> getFlowStopsPublishingVoByPublishingId(String publishingId);

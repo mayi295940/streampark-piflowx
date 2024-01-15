@@ -3,9 +3,11 @@ package org.apache.streampark.console.flow.component.sparkJar.mapper.provider;
 import org.apache.streampark.console.flow.base.utils.DateUtils;
 import org.apache.streampark.console.flow.base.utils.SqlUtils;
 import org.apache.streampark.console.flow.component.sparkJar.entity.SparkJarComponent;
-import java.util.Date;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
+
+import java.util.Date;
 
 public class SparkJarMapperProvider {
 
@@ -127,10 +129,7 @@ public class SparkJarMapperProvider {
     return sqlStr;
   }
 
-  /**
-   * Query all spark jars
-   *
-   */
+  /** Query all spark jars */
   public String getSparkJarList(String username, boolean isAdmin, String param) {
     String sqlStr = "SELECT 0";
     StringBuffer strBuf = new StringBuffer();

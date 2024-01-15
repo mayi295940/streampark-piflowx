@@ -13,10 +13,10 @@ import org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsH
 import org.apache.streampark.console.flow.component.stopsComponent.service.IStopsHubService;
 import org.apache.streampark.console.flow.component.system.entity.SysSchedule;
 import org.apache.streampark.console.flow.component.system.mapper.SysScheduleMapper;
-import java.util.*;
-import java.util.stream.Collectors;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.slf4j.Logger;
@@ -26,6 +26,8 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+
+import java.util.stream.Collectors;
 
 @Component
 @Order(value = 1)

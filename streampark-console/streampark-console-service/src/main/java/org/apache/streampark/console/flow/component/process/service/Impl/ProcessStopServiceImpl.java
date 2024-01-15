@@ -10,16 +10,20 @@ import org.apache.streampark.console.flow.component.process.vo.ProcessStopVo;
 import org.apache.streampark.console.flow.component.stopsComponent.domain.StopsComponentDomain;
 import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponent;
 import org.apache.streampark.console.flow.third.service.IVisualDataDirectory;
+
+import org.apache.commons.lang3.StringUtils;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletResponse;
+
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.Map;
-import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class ProcessStopServiceImpl implements IProcessStopService {

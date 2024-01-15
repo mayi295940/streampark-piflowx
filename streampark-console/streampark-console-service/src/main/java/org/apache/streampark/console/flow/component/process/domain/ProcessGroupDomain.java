@@ -1,8 +1,5 @@
 package org.apache.streampark.console.flow.component.process.domain;
 
-import java.util.List;
-import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.console.flow.base.utils.LoggerUtil;
 import org.apache.streampark.console.flow.base.utils.UUIDUtils;
 import org.apache.streampark.console.flow.component.mxGraph.domain.MxGraphModelDomain;
@@ -15,12 +12,18 @@ import org.apache.streampark.console.flow.component.process.mapper.ProcessGroupM
 import org.apache.streampark.console.flow.component.process.mapper.ProcessGroupPathMapper;
 import org.apache.streampark.console.flow.component.process.vo.ProcessAndProcessGroupVo;
 import org.apache.streampark.console.flow.component.process.vo.ProcessGroupVo;
+
+import org.apache.commons.lang3.StringUtils;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
 
 @Component
 @Transactional(
@@ -250,9 +253,7 @@ public class ProcessGroupDomain {
     return processGroupMapper.updateEnableFlagById(id, username);
   }
 
-  /**
-   * Paging query
-   */
+  /** Paging query */
   public List<ProcessGroupVo> getProcessGroupListPageByParam(
       String username, boolean isAdmin, String param) {
     return processGroupMapper.getProcessGroupListByParam(username, isAdmin, param);

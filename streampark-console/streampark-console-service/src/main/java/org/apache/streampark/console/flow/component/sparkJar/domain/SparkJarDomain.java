@@ -3,13 +3,16 @@ package org.apache.streampark.console.flow.component.sparkJar.domain;
 import org.apache.streampark.console.flow.component.sparkJar.entity.SparkJarComponent;
 import org.apache.streampark.console.flow.component.sparkJar.mapper.SparkJarMapper;
 import org.apache.streampark.console.flow.component.sparkJar.mapper.provider.SparkJarMapperProvider;
-import java.util.List;
+
 import org.apache.ibatis.annotations.SelectProvider;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Component
 @Transactional(

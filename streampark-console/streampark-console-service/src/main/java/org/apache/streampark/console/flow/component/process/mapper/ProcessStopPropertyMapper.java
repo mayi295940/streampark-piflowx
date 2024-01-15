@@ -2,13 +2,15 @@ package org.apache.streampark.console.flow.component.process.mapper;
 
 import org.apache.streampark.console.flow.component.process.entity.ProcessStopProperty;
 import org.apache.streampark.console.flow.component.process.mapper.provider.ProcessStopPropertyMapperProvider;
-import java.util.List;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
+
+import java.util.List;
 
 @Mapper
 public interface ProcessStopPropertyMapper {

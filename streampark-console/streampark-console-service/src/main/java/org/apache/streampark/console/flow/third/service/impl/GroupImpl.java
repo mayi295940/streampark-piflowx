@@ -15,14 +15,17 @@ import org.apache.streampark.console.flow.third.vo.flowGroup.ThirdFlowGroupInfoO
 import org.apache.streampark.console.flow.third.vo.flowGroup.ThirdFlowGroupInfoResponse;
 import org.apache.streampark.console.flow.third.vo.flowGroup.ThirdFlowInfoOutResponse;
 import org.apache.streampark.console.flow.third.vo.flowGroup.ThirdFlowStopInfoOutResponse;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import net.sf.json.JSONObject;
+
 import org.apache.commons.lang3.StringUtils;
+
+import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class GroupImpl implements IGroup {

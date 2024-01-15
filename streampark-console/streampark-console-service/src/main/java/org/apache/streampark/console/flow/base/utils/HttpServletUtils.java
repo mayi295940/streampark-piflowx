@@ -1,7 +1,8 @@
 package org.apache.streampark.console.flow.base.utils;
 
-import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.Map;
 
 public class HttpServletUtils {
 

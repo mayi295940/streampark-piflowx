@@ -3,7 +3,9 @@ package org.apache.streampark.console.flow.component.stopsComponent.domain;
 import org.apache.streampark.console.flow.base.utils.UUIDUtils;
 import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentManage;
 import org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsComponentManageMapper;
+
 import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;

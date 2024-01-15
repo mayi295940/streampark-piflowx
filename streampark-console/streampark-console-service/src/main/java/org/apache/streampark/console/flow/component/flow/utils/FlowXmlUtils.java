@@ -20,6 +20,17 @@ import org.apache.streampark.console.flow.component.mxGraph.utils.MxGraphUtils;
 import org.apache.streampark.console.flow.component.mxGraph.vo.MxCellVo;
 import org.apache.streampark.console.flow.component.mxGraph.vo.MxGeometryVo;
 import org.apache.streampark.console.flow.component.mxGraph.vo.MxGraphModelVo;
+
+import org.apache.commons.lang3.StringUtils;
+
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.xml.sax.InputSource;
+
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,14 +39,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
-import org.slf4j.Logger;
-import org.xml.sax.InputSource;
 
 @SuppressWarnings("rawtypes")
 public class FlowXmlUtils {

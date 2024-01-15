@@ -1,7 +1,5 @@
 package org.apache.streampark.console.flow.controller.api.flow;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.apache.streampark.console.flow.base.utils.SessionUserUtil;
 import org.apache.streampark.console.flow.common.Eunm.DrawingBoardType;
 import org.apache.streampark.console.flow.component.flow.service.IFlowGroupService;
@@ -9,6 +7,9 @@ import org.apache.streampark.console.flow.component.flow.service.IFlowService;
 import org.apache.streampark.console.flow.component.system.service.ILogHelperService;
 import org.apache.streampark.console.flow.controller.requestVo.FlowGroupInfoVoRequest;
 import org.apache.streampark.console.flow.controller.requestVo.FlowGroupInfoVoRequestUpDate;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

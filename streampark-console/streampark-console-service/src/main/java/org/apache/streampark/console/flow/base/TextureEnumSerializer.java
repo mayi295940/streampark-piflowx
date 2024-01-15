@@ -1,12 +1,14 @@
 package org.apache.streampark.console.flow.base;
 
 import org.apache.streampark.console.flow.base.utils.LoggerUtil;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import java.io.IOException;
 import org.slf4j.Logger;
+
+import java.io.IOException;
 
 public class TextureEnumSerializer extends JsonSerializer<Object> {
 

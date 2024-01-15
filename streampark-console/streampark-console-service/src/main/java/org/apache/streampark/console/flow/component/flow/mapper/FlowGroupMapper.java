@@ -3,7 +3,7 @@ package org.apache.streampark.console.flow.component.flow.mapper;
 import org.apache.streampark.console.flow.component.flow.entity.FlowGroup;
 import org.apache.streampark.console.flow.component.flow.mapper.provider.FlowGroupMapperProvider;
 import org.apache.streampark.console.flow.component.flow.vo.FlowGroupVo;
-import java.util.List;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Many;
 import org.apache.ibatis.annotations.Mapper;
@@ -15,6 +15,8 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.mapping.FetchType;
+
+import java.util.List;
 
 @Mapper
 public interface FlowGroupMapper {
@@ -52,7 +54,8 @@ public interface FlowGroupMapper {
         property = "flowList",
         many =
             @Many(
-                select = "org.apache.streampark.console.flow.component.flow.mapper.FlowMapper.getFlowListGroupId",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.FlowMapper.getFlowListGroupId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -75,7 +78,8 @@ public interface FlowGroupMapper {
         property = "flowGroup",
         one =
             @One(
-                select = "org.apache.streampark.console.flow.component.flow.mapper.FlowGroupMapper.getFlowGroupById",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.FlowGroupMapper.getFlowGroupById",
                 fetchType = FetchType.LAZY))
   })
   FlowGroup getFlowGroupById(String id);
@@ -101,7 +105,8 @@ public interface FlowGroupMapper {
         property = "flowList",
         many =
             @Many(
-                select = "org.apache.streampark.console.flow.component.flow.mapper.FlowMapper.getFlowListGroupId",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.FlowMapper.getFlowListGroupId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -165,5 +170,4 @@ public interface FlowGroupMapper {
   @Select(
       "SELECT name FROM flow_group WHERE enable_flag=1 AND fk_flow_group_id IS NULL AND is_example=0 AND name=#{flowGroupName} ")
   String getFlowGroupName(@Param("flowGroupName") String flowGroupName);
-
 }

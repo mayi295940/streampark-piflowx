@@ -3,7 +3,7 @@ package org.apache.streampark.console.flow.component.flow.mapper;
 import org.apache.streampark.console.flow.component.flow.entity.Flow;
 import org.apache.streampark.console.flow.component.flow.mapper.provider.FlowMapperProvider;
 import org.apache.streampark.console.flow.component.flow.vo.FlowVo;
-import java.util.List;
+
 import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Many;
@@ -16,6 +16,8 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.mapping.FetchType;
+
+import java.util.List;
 
 @Mapper
 public interface FlowMapper {
@@ -65,7 +67,8 @@ public interface FlowMapper {
         property = "flowGroup",
         one =
             @One(
-                select = "org.apache.streampark.console.flow.component.flow.mapper.FlowGroupMapper.getFlowGroupById",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.FlowGroupMapper.getFlowGroupById",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -80,14 +83,16 @@ public interface FlowMapper {
         property = "stopsList",
         many =
             @Many(
-                select = "org.apache.streampark.console.flow.component.flow.mapper.StopsMapper.getStopsListByFlowId",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.StopsMapper.getStopsListByFlowId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
         property = "pathsList",
         many =
             @Many(
-                select = "org.apache.streampark.console.flow.component.flow.mapper.PathsMapper.getPathsListByFlowId",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.PathsMapper.getPathsListByFlowId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -109,7 +114,8 @@ public interface FlowMapper {
         property = "flowGroup",
         one =
             @One(
-                select = "org.apache.streampark.console.flow.component.flow.mapper.FlowGroupMapper.getFlowGroupById",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.FlowGroupMapper.getFlowGroupById",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
@@ -124,14 +130,16 @@ public interface FlowMapper {
         property = "stopsList",
         many =
             @Many(
-                select = "org.apache.streampark.console.flow.component.flow.mapper.StopsMapper.getStopsListByFlowId",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.StopsMapper.getStopsListByFlowId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
         property = "pathsList",
         many =
             @Many(
-                select = "org.apache.streampark.console.flow.component.flow.mapper.PathsMapper.getPathsListByFlowId",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.PathsMapper.getPathsListByFlowId",
                 fetchType = FetchType.LAZY))
   })
   Flow getFlowByPageId(String fid, String pageId);
@@ -203,14 +211,16 @@ public interface FlowMapper {
         property = "stopsList",
         many =
             @Many(
-                select = "org.apache.streampark.console.flow.component.flow.mapper.StopsMapper.getStopsListByFlowId",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.StopsMapper.getStopsListByFlowId",
                 fetchType = FetchType.LAZY)),
     @Result(
         column = "id",
         property = "pathsList",
         many =
             @Many(
-                select = "org.apache.streampark.console.flow.component.flow.mapper.PathsMapper.getPathsListByFlowId",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.PathsMapper.getPathsListByFlowId",
                 fetchType = FetchType.LAZY))
   })
   List<Flow> getFlowListGroupId(String flowGroupId);

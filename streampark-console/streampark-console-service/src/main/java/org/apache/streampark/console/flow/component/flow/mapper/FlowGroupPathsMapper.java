@@ -2,7 +2,7 @@ package org.apache.streampark.console.flow.component.flow.mapper;
 
 import org.apache.streampark.console.flow.component.flow.entity.FlowGroupPaths;
 import org.apache.streampark.console.flow.component.flow.mapper.provider.FlowGroupPathsMapperProvider;
-import java.util.List;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Many;
 import org.apache.ibatis.annotations.Mapper;
@@ -13,6 +13,8 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.mapping.FetchType;
+
+import java.util.List;
 
 @Mapper
 public interface FlowGroupPathsMapper {
@@ -62,7 +64,8 @@ public interface FlowGroupPathsMapper {
         property = "flowGroup",
         many =
             @Many(
-                select = "org.apache.streampark.console.flow.component.flow.mapper.FlowGroupMapper.getFlowGroupById",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.FlowGroupMapper.getFlowGroupById",
                 fetchType = FetchType.LAZY))
   })
   List<FlowGroupPaths> getFlowGroupPaths(String flowGroupId, String pageId, String from, String to);

@@ -2,11 +2,13 @@ package org.apache.streampark.console.flow.component.stopsComponent.mapper;
 
 import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsHub;
 import org.apache.streampark.console.flow.component.stopsComponent.mapper.provider.StopsHubMapperProvider;
-import java.util.List;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
+
+import java.util.List;
 
 @Mapper
 public interface StopsHubMapper {

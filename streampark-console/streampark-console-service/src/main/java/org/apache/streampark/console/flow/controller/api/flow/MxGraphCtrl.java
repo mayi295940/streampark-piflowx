@@ -1,7 +1,5 @@
 package org.apache.streampark.console.flow.controller.api.flow;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.apache.streampark.console.flow.base.utils.ReturnMapUtils;
 import org.apache.streampark.console.flow.base.utils.SessionUserUtil;
 import org.apache.streampark.console.flow.component.flow.service.IFlowGroupService;
@@ -9,6 +7,9 @@ import org.apache.streampark.console.flow.component.mxGraph.service.IMxGraphMode
 import org.apache.streampark.console.flow.component.mxGraph.service.IMxNodeImageService;
 import org.apache.streampark.console.flow.component.mxGraph.vo.MxGraphVo;
 import org.apache.streampark.console.flow.component.system.service.ILogHelperService;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;

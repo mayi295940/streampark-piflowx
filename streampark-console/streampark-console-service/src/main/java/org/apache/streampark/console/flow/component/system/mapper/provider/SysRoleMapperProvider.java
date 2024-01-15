@@ -2,9 +2,11 @@ package org.apache.streampark.console.flow.component.system.mapper.provider;
 
 import org.apache.streampark.console.flow.base.utils.SqlUtils;
 import org.apache.streampark.console.flow.component.system.entity.SysRole;
+
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 
 public class SysRoleMapperProvider {
 

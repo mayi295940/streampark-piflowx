@@ -2,9 +2,11 @@ package org.apache.streampark.console.flow.component.process.mapper;
 
 import org.apache.streampark.console.flow.component.process.mapper.provider.ProcessAndProcessGroupMapperProvider;
 import org.apache.streampark.console.flow.component.process.vo.ProcessAndProcessGroupVo;
-import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.SelectProvider;
+
+import java.util.List;
 
 @Mapper
 public interface ProcessAndProcessGroupMapper {
@@ -19,5 +21,4 @@ public interface ProcessAndProcessGroupMapper {
       type = ProcessAndProcessGroupMapperProvider.class,
       method = "getProcessAndProcessGroupListByUser")
   List<ProcessAndProcessGroupVo> getProcessAndProcessGroupListByUser(String param, String username);
-
 }

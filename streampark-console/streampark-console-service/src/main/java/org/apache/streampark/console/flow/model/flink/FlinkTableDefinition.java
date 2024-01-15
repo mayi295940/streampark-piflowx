@@ -1,7 +1,8 @@
 package org.apache.streampark.console.flow.model.flink;
 
-import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
 
 /**
  * CREATE TABLE [IF NOT EXISTS] [catalog_name.][db_name.]table_name ( { <physical_column_definition>
@@ -146,7 +147,7 @@ public class FlinkTableDefinition {
               + getTableBaseInfo().getRegisterTableName()
               + "`";
     } else {
-      realTableName += getTableBaseInfo().getSchema();
+      realTableName += getTableBaseInfo().getRegisterTableName();
     }
 
     return realTableName;

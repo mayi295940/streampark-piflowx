@@ -1,8 +1,5 @@
 package org.apache.streampark.console.flow.component.stopsComponent.utils;
 
-import java.util.Date;
-import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.console.flow.base.utils.ImageUtils;
 import org.apache.streampark.console.flow.base.utils.UUIDUtils;
 import org.apache.streampark.console.flow.common.Eunm.PortType;
@@ -12,6 +9,11 @@ import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsC
 import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentGroup;
 import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentProperty;
 import org.apache.streampark.console.flow.third.vo.stop.ThirdStopsComponentVo;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Date;
+import java.util.List;
 
 public class StopsComponentUtils {
 
@@ -116,8 +118,10 @@ public class StopsComponentUtils {
 
     // todo  图片地址
     String imageUrl =
-         SysParamsCache.IMG_PATH_PREFIX +
-        "/images/" + thirdStopsComponentVo.getName() + "_128x128.png";
+        SysParamsCache.IMG_PATH_PREFIX
+            + "/images/"
+            + thirdStopsComponentVo.getName()
+            + "_128x128.png";
     stopsComponent.setImageUrl(imageUrl);
 
     List<StopsComponentProperty> listStopsComponentProperty =

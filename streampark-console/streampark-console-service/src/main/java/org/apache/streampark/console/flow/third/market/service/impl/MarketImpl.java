@@ -11,15 +11,18 @@ import org.apache.streampark.console.flow.component.process.domain.ProcessDomain
 import org.apache.streampark.console.flow.component.stopsComponent.vo.PublishComponentVo;
 import org.apache.streampark.console.flow.third.market.service.IMarket;
 import org.apache.streampark.console.flow.third.vo.flow.ThirdProgressVo;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import net.sf.json.JSONObject;
+
 import org.apache.commons.lang3.StringUtils;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class MarketImpl implements IMarket {

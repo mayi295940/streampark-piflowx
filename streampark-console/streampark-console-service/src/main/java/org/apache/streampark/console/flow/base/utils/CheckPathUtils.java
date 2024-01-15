@@ -1,7 +1,8 @@
 package org.apache.streampark.console.flow.base.utils;
 
-import java.io.File;
 import org.slf4j.Logger;
+
+import java.io.File;
 
 public class CheckPathUtils {
 

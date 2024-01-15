@@ -3,7 +3,7 @@ package org.apache.streampark.console.flow.component.dataSource.mapper;
 import org.apache.streampark.console.flow.component.dataSource.entity.DataSource;
 import org.apache.streampark.console.flow.component.dataSource.mapper.provider.DataSourceMapperProvider;
 import org.apache.streampark.console.flow.component.dataSource.vo.DataSourceVo;
-import java.util.List;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Many;
 import org.apache.ibatis.annotations.Mapper;
@@ -15,6 +15,8 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.mapping.FetchType;
+
+import java.util.List;
 
 @Mapper
 public interface DataSourceMapper {
@@ -87,9 +89,10 @@ public interface DataSourceMapper {
                     "org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsComponentMapper.getDataSourceStopsComponentByBundle",
                 fetchType = FetchType.LAZY))
   })
-  DataSource getDataSourceByIdAndUser(@Param("username") String username,
-                                      @Param("isAdmin") boolean isAdmin,
-                                      @Param("id") String id);
+  DataSource getDataSourceByIdAndUser(
+      @Param("username") String username,
+      @Param("isAdmin") boolean isAdmin,
+      @Param("id") String id);
 
   /**
    * query DataSource by DataSourceId

@@ -1,6 +1,8 @@
 package org.apache.streampark.console.flow.component.process.mapper;
 
-import java.util.List;
+import org.apache.streampark.console.flow.component.process.entity.ProcessStop;
+import org.apache.streampark.console.flow.component.process.mapper.provider.ProcessStopMapperProvider;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Many;
 import org.apache.ibatis.annotations.Mapper;
@@ -9,8 +11,8 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.mapping.FetchType;
-import org.apache.streampark.console.flow.component.process.entity.ProcessStop;
-import org.apache.streampark.console.flow.component.process.mapper.provider.ProcessStopMapperProvider;
+
+import java.util.List;
 
 @Mapper
 public interface ProcessStopMapper {

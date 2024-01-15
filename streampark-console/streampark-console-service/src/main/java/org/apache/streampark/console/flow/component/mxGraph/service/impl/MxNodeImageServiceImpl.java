@@ -11,14 +11,17 @@ import org.apache.streampark.console.flow.component.mxGraph.entity.MxNodeImage;
 import org.apache.streampark.console.flow.component.mxGraph.service.IMxNodeImageService;
 import org.apache.streampark.console.flow.component.mxGraph.utils.MxNodeImageUtils;
 import org.apache.streampark.console.flow.component.mxGraph.vo.MxNodeImageVo;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class MxNodeImageServiceImpl implements IMxNodeImageService {

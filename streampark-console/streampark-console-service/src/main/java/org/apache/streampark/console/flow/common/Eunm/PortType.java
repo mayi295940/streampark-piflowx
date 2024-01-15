@@ -1,8 +1,10 @@
 package org.apache.streampark.console.flow.common.Eunm;
 
 import org.apache.streampark.console.flow.base.TextureEnumSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import org.apache.commons.lang3.StringUtils;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonSerialize(using = TextureEnumSerializer.class)
 public enum PortType {

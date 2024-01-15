@@ -1,9 +1,5 @@
 package org.apache.streampark.console.flow.component.flow.utils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.streampark.console.flow.base.utils.UUIDUtils;
 import org.apache.streampark.console.flow.component.flow.entity.CustomizedProperty;
 import org.apache.streampark.console.flow.component.flow.entity.Flow;
@@ -16,7 +12,14 @@ import org.apache.streampark.console.flow.component.flow.vo.StopsVo;
 import org.apache.streampark.console.flow.component.mxGraph.entity.MxCell;
 import org.apache.streampark.console.flow.component.mxGraph.entity.MxGeometry;
 import org.apache.streampark.console.flow.component.mxGraph.entity.MxGraphModel;
+
+import org.apache.commons.collections.CollectionUtils;
+
 import org.springframework.beans.BeanUtils;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class FlowUtil {
 

@@ -1,8 +1,5 @@
 package org.apache.streampark.console.flow.component.mxGraph.service.impl;
 
-import java.util.*;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.console.flow.base.utils.LoggerUtil;
 import org.apache.streampark.console.flow.base.utils.ReturnMapUtils;
 import org.apache.streampark.console.flow.base.utils.UUIDUtils;
@@ -38,6 +35,10 @@ import org.apache.streampark.console.flow.component.mxGraph.vo.MxGraphVo;
 import org.apache.streampark.console.flow.component.stopsComponent.domain.StopsComponentDomain;
 import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponent;
 import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentProperty;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

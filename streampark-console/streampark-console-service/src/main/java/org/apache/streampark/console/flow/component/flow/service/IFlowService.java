@@ -1,11 +1,13 @@
 package org.apache.streampark.console.flow.component.flow.service;
 
-import com.github.pagehelper.Page;
-import java.util.List;
 import org.apache.streampark.console.flow.component.flow.entity.Flow;
 import org.apache.streampark.console.flow.component.flow.vo.FlowVo;
 import org.apache.streampark.console.flow.controller.requestVo.FlowInfoVoRequestAdd;
 import org.apache.streampark.console.flow.controller.requestVo.FlowInfoVoRequestUpdate;
+
+import com.github.pagehelper.Page;
+
+import java.util.List;
 
 public interface IFlowService {
 

@@ -2,10 +2,12 @@ package org.apache.streampark.console.flow.component.mxGraph.mapper;
 
 import org.apache.streampark.console.flow.component.mxGraph.entity.MxNodeImage;
 import org.apache.streampark.console.flow.component.mxGraph.mapper.provider.MxNodeImageMapperProvider;
-import java.util.List;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.SelectProvider;
+
+import java.util.List;
 
 @Mapper
 public interface MxNodeImageMapper {
@@ -22,5 +24,4 @@ public interface MxNodeImageMapper {
       type = MxNodeImageMapperProvider.class,
       method = "userGetMxNodeImageListByImageType")
   List<MxNodeImage> userGetMxNodeImageListByImageType(String username, String imageType);
-
 }

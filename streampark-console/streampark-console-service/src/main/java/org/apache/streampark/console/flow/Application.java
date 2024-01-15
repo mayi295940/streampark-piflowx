@@ -1,9 +1,8 @@
 package org.apache.streampark.console.flow;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import org.apache.streampark.console.flow.base.utils.LoggerUtil;
 import org.apache.streampark.console.flow.base.utils.SpringContextUtil;
+
 import org.slf4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -13,16 +12,19 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+
 @PropertySources({
   @PropertySource(value = "classpath:apiConfig.properties", encoding = "utf-8"),
   @PropertySource(value = "classpath:baseConfig.properties", encoding = "utf-8"),
   @PropertySource(value = "classpath:messageConfig.properties", encoding = "utf-8"),
   @PropertySource(value = "classpath:docker.properties", encoding = "utf-8")
 })
-//@MapperScan(basePackages = "cn.cnic.**.mapper.*.*")
-//@ComponentScan(basePackages = "cn.cnic,com.webank.wedatasphere")
-//@EnableTransactionManagement
-//@SpringBootApplication
+// @MapperScan(basePackages = "cn.cnic.**.mapper.*.*")
+// @ComponentScan(basePackages = "cn.cnic,com.webank.wedatasphere")
+// @EnableTransactionManagement
+// @SpringBootApplication
 public class Application extends SpringBootServletInitializer {
 
   /** Introducing logs, note that they are all packaged under "org.slf4j" */

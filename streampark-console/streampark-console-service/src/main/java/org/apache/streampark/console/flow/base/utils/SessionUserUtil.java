@@ -1,6 +1,7 @@
 package org.apache.streampark.console.flow.base.utils;
 
 import org.apache.streampark.console.system.entity.User;
+
 import org.slf4j.Logger;
 
 public class SessionUserUtil {

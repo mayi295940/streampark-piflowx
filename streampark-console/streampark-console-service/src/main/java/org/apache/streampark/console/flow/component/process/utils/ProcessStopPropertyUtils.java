@@ -1,6 +1,7 @@
 package org.apache.streampark.console.flow.component.process.utils;
 
 import org.apache.streampark.console.flow.component.process.entity.ProcessStopProperty;
+
 import java.util.Date;
 
 public class ProcessStopPropertyUtils {

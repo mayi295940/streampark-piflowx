@@ -3,7 +3,7 @@ package org.apache.streampark.console.flow.component.flow.mapper;
 import org.apache.streampark.console.flow.component.flow.entity.CustomizedProperty;
 import org.apache.streampark.console.flow.component.flow.mapper.provider.CustomizedPropertyMapperProvider;
 import org.apache.streampark.console.flow.component.flow.vo.StopsCustomizedPropertyVo;
-import java.util.List;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Many;
 import org.apache.ibatis.annotations.Mapper;
@@ -13,6 +13,8 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.mapping.FetchType;
+
+import java.util.List;
 
 @Mapper
 public interface CustomizedPropertyMapper {
@@ -39,7 +41,8 @@ public interface CustomizedPropertyMapper {
         property = "stops",
         many =
             @Many(
-                select = "org.apache.streampark.console.flow.component.flow.mapper.StopsMapper.getStopsById",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.StopsMapper.getStopsById",
                 fetchType = FetchType.LAZY))
   })
   CustomizedProperty getCustomizedPropertyById(@Param("id") String id);

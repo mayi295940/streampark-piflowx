@@ -11,13 +11,16 @@ import org.apache.streampark.console.flow.component.flow.service.IPathsService;
 import org.apache.streampark.console.flow.component.flow.utils.PathsUtil;
 import org.apache.streampark.console.flow.component.flow.vo.FlowVo;
 import org.apache.streampark.console.flow.component.flow.vo.PathsVo;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class PathsServiceImpl implements IPathsService {

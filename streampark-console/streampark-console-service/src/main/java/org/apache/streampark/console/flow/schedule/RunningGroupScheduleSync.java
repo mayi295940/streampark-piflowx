@@ -1,10 +1,5 @@
 package org.apache.streampark.console.flow.schedule;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.console.flow.base.utils.LoggerUtil;
 import org.apache.streampark.console.flow.base.utils.SpringContextUtil;
 import org.apache.streampark.console.flow.common.Eunm.RunModeType;
@@ -22,11 +17,19 @@ import org.apache.streampark.console.flow.component.schedule.vo.ScheduleVo;
 import org.apache.streampark.console.flow.third.service.ISchedule;
 import org.apache.streampark.console.flow.third.vo.schedule.ThirdScheduleEntryVo;
 import org.apache.streampark.console.flow.third.vo.schedule.ThirdScheduleVo;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class RunningGroupScheduleSync extends QuartzJobBean {

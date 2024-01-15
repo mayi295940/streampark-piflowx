@@ -3,7 +3,7 @@ package org.apache.streampark.console.flow.component.process.mapper;
 import org.apache.streampark.console.flow.component.process.entity.ProcessGroupPath;
 import org.apache.streampark.console.flow.component.process.entity.ProcessPath;
 import org.apache.streampark.console.flow.component.process.mapper.provider.ProcessGroupPathMapperProvider;
-import java.util.List;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -12,6 +12,8 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
+
+import java.util.List;
 
 @Mapper
 public interface ProcessGroupPathMapper {

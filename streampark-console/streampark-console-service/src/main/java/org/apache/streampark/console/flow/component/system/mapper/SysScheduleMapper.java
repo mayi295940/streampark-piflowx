@@ -4,10 +4,12 @@ import org.apache.streampark.console.flow.common.Eunm.ScheduleState;
 import org.apache.streampark.console.flow.component.system.entity.SysSchedule;
 import org.apache.streampark.console.flow.component.system.mapper.provider.SysScheduleMapperProvider;
 import org.apache.streampark.console.flow.component.system.vo.SysScheduleVo;
-import java.util.List;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.SelectProvider;
+
+import java.util.List;
 
 @Mapper
 public interface SysScheduleMapper {
@@ -40,5 +42,4 @@ public interface SysScheduleMapper {
 
   @SelectProvider(type = SysScheduleMapperProvider.class, method = "getSysScheduleById")
   SysScheduleVo getSysScheduleVoById(boolean isAdmin, String id);
-
 }

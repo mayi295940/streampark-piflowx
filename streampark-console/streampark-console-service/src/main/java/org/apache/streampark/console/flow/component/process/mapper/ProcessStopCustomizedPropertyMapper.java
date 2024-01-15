@@ -2,7 +2,7 @@ package org.apache.streampark.console.flow.component.process.mapper;
 
 import org.apache.streampark.console.flow.component.process.entity.ProcessStopCustomizedProperty;
 import org.apache.streampark.console.flow.component.process.mapper.provider.ProcessStopCustomizedPropertyMapperProvider;
-import java.util.List;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Many;
 import org.apache.ibatis.annotations.Mapper;
@@ -12,6 +12,8 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.mapping.FetchType;
+
+import java.util.List;
 
 @Mapper
 public interface ProcessStopCustomizedPropertyMapper {
@@ -44,7 +46,8 @@ public interface ProcessStopCustomizedPropertyMapper {
         property = "stops",
         many =
             @Many(
-                select = "org.apache.streampark.console.flow.component.flow.mapper.StopsMapper.getStopsById",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.StopsMapper.getStopsById",
                 fetchType = FetchType.LAZY))
   })
   ProcessStopCustomizedProperty getProcessStopCustomizedPropertyById(@Param("id") String id);

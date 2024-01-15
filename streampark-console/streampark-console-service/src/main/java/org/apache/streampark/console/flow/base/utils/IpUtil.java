@@ -1,10 +1,12 @@
 package org.apache.streampark.console.flow.base.utils;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import javax.servlet.http.HttpServletRequest;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /** IP地址相关工具类 */
 public class IpUtil {

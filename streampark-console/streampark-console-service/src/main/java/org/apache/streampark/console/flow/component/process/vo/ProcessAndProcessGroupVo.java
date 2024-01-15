@@ -1,9 +1,10 @@
 package org.apache.streampark.console.flow.component.process.vo;
 
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.Serializable;
+import java.util.Date;
 
 @Setter
 @Getter

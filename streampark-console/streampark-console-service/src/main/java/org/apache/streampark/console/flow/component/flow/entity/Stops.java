@@ -4,12 +4,14 @@ import org.apache.streampark.console.flow.base.BaseModelUUIDNoCorpAgentId;
 import org.apache.streampark.console.flow.base.utils.DateUtils;
 import org.apache.streampark.console.flow.common.Eunm.PortType;
 import org.apache.streampark.console.flow.component.dataSource.entity.DataSource;
+
+import lombok.Getter;
+import lombok.Setter;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
 
 /** stop component table */
 @Getter

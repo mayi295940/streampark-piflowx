@@ -1,9 +1,11 @@
 package org.apache.streampark.console.flow.component.stopsComponent.mapper.provider;
 
-import java.util.List;
+import org.apache.streampark.console.flow.base.utils.SqlUtils;
+
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.jdbc.SQL;
-import org.apache.streampark.console.flow.base.utils.SqlUtils;
+
+import java.util.List;
 
 public class StopsComponentGroupProvider {
 

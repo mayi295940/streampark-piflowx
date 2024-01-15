@@ -1,10 +1,11 @@
 package org.apache.streampark.console.flow.component.testData.vo;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
 
 @Setter
 @Getter

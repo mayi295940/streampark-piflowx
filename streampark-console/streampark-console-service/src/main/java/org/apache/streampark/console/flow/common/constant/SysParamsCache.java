@@ -1,8 +1,9 @@
 package org.apache.streampark.console.flow.common.constant;
 
-import java.util.concurrent.ThreadPoolExecutor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * System parameter cache class
@@ -92,7 +93,7 @@ public class SysParamsCache {
 
   @Value("${flow.images.path.prefix}")
   public void setImgPathPrefix(String imgPathPrefix) {
-      IMG_PATH_PREFIX = imgPathPrefix;
+    IMG_PATH_PREFIX = imgPathPrefix;
   }
 
   public static Boolean IS_IFRAME;

@@ -1,9 +1,11 @@
 package org.apache.streampark.console.flow.component.system.entity;
 
 import org.apache.streampark.console.flow.base.BaseModelUUIDNoCorpAgentId;
-import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 /**
  * Use JPA to define users. Implement the UserDetails interface, the user entity is the user used by

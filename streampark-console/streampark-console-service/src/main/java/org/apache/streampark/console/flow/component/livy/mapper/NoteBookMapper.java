@@ -2,11 +2,13 @@ package org.apache.streampark.console.flow.component.livy.mapper;
 
 import org.apache.streampark.console.flow.component.livy.entity.NoteBook;
 import org.apache.streampark.console.flow.component.livy.mapper.provider.NoteBookMapperProvider;
-import java.util.List;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
+
+import java.util.List;
 
 @Mapper
 public interface NoteBookMapper {

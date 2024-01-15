@@ -6,11 +6,12 @@ import org.apache.streampark.console.flow.component.process.entity.ProcessStopCu
 import org.apache.streampark.console.flow.component.process.entity.ProcessStopProperty;
 import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponent;
 import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentProperty;
+
+import org.springframework.beans.BeanUtils;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import org.springframework.beans.BeanUtils;
 
 public class ProcessStopUtils {
 

@@ -1,9 +1,10 @@
 package org.apache.streampark.console.flow.third.vo.stop;
 
-import java.io.Serializable;
-import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.Serializable;
+import java.util.List;
 
 @Getter
 @Setter

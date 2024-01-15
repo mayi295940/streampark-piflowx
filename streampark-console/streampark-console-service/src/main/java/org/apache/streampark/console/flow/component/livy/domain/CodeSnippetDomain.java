@@ -3,12 +3,15 @@ package org.apache.streampark.console.flow.component.livy.domain;
 import org.apache.streampark.console.flow.base.utils.UUIDUtils;
 import org.apache.streampark.console.flow.component.livy.entity.CodeSnippet;
 import org.apache.streampark.console.flow.component.livy.mapper.CodeSnippetMapper;
-import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Component
 @Transactional(

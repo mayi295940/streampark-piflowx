@@ -4,8 +4,10 @@ import org.apache.streampark.console.flow.base.utils.DateUtils;
 import org.apache.streampark.console.flow.base.utils.SqlUtils;
 import org.apache.streampark.console.flow.base.utils.UUIDUtils;
 import org.apache.streampark.console.flow.component.system.entity.SysInitRecords;
-import java.util.Date;
+
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.Date;
 
 public class SysInitRecordsMapperProvider {
 

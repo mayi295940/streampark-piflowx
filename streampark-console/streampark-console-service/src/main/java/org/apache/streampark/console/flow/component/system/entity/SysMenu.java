@@ -2,6 +2,7 @@ package org.apache.streampark.console.flow.component.system.entity;
 
 import org.apache.streampark.console.flow.base.BaseModelUUIDNoCorpAgentId;
 import org.apache.streampark.console.flow.common.Eunm.SysRoleType;
+
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,6 +1,7 @@
 package org.apache.streampark.console.flow.component.flow.entity;
 
 import org.apache.streampark.console.flow.base.BaseModelUUIDNoCorpAgentId;
+
 import lombok.Getter;
 import lombok.Setter;
 

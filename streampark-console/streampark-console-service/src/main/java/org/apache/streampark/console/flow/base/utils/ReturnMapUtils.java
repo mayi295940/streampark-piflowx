@@ -1,10 +1,13 @@
 package org.apache.streampark.console.flow.base.utils;
 
 import org.apache.streampark.console.flow.common.constant.MessageConfig;
+
+import org.apache.commons.lang3.StringUtils;
+
+import org.slf4j.Logger;
+
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
 
 public class ReturnMapUtils {
 

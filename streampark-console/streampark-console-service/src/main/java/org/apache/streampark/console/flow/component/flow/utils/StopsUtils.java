@@ -13,8 +13,9 @@ import org.apache.streampark.console.flow.component.flow.vo.StopsPropertyVo;
 import org.apache.streampark.console.flow.component.flow.vo.StopsVo;
 import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponent;
 import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentProperty;
-import java.util.*;
+
 import org.apache.commons.lang3.StringUtils;
+
 import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 

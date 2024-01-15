@@ -2,9 +2,11 @@ package org.apache.streampark.console.flow.component.system.mapper;
 
 import org.apache.streampark.console.flow.component.system.entity.SysMenu;
 import org.apache.streampark.console.flow.component.system.mapper.provider.SysMenuMapperProvider;
-import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.SelectProvider;
+
+import java.util.List;
 
 @Mapper
 public interface SysMenuMapper {
@@ -22,5 +24,4 @@ public interface SysMenuMapper {
 
   @SelectProvider(type = SysMenuMapperProvider.class, method = "deleteSampleMenuListByIds")
   List<SysMenu> deleteSampleMenuListByIds(String[] ids);
-
 }

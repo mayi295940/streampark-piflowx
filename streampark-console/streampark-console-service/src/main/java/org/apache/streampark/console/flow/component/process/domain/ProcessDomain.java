@@ -1,7 +1,5 @@
 package org.apache.streampark.console.flow.component.process.domain;
 
-import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.console.flow.base.utils.LoggerUtil;
 import org.apache.streampark.console.flow.base.utils.UUIDUtils;
 import org.apache.streampark.console.flow.common.Eunm.ProcessState;
@@ -18,12 +16,17 @@ import org.apache.streampark.console.flow.component.process.mapper.ProcessPathMa
 import org.apache.streampark.console.flow.component.process.mapper.ProcessStopCustomizedPropertyMapper;
 import org.apache.streampark.console.flow.component.process.mapper.ProcessStopMapper;
 import org.apache.streampark.console.flow.component.process.mapper.ProcessStopPropertyMapper;
+
+import org.apache.commons.lang3.StringUtils;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Component
 @Transactional(

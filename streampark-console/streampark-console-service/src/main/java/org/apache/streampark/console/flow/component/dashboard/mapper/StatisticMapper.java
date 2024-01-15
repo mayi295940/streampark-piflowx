@@ -1,10 +1,12 @@
 package org.apache.streampark.console.flow.component.dashboard.mapper;
 
 import org.apache.streampark.console.flow.component.dashboard.mapper.provider.StatisticProvider;
-import java.util.List;
-import java.util.Map;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.SelectProvider;
+
+import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface StatisticMapper {

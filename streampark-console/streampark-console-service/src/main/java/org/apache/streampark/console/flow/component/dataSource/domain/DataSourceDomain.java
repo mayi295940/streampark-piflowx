@@ -8,14 +8,17 @@ import org.apache.streampark.console.flow.component.dataSource.mapper.DataSource
 import org.apache.streampark.console.flow.component.dataSource.mapper.DataSourcePropertyMapper;
 import org.apache.streampark.console.flow.component.dataSource.vo.DataSourceVo;
 import org.apache.streampark.console.flow.component.stopsComponent.mapper.StopsComponentMapper;
-import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Component
 @Transactional(

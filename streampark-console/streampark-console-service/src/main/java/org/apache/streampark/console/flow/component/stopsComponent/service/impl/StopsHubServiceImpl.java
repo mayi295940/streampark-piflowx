@@ -1,18 +1,5 @@
 package org.apache.streampark.console.flow.component.stopsComponent.service.impl;
 
-import com.alibaba.fastjson2.JSON;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.dockerjava.api.DockerClient;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import java.io.*;
-import java.nio.charset.Charset;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.console.flow.base.utils.FileUtils;
 import org.apache.streampark.console.flow.base.utils.LoggerUtil;
 import org.apache.streampark.console.flow.base.utils.PageHelperUtils;
@@ -48,6 +35,15 @@ import org.apache.streampark.console.flow.third.market.service.IMarket;
 import org.apache.streampark.console.flow.third.service.IStop;
 import org.apache.streampark.console.flow.third.vo.stop.StopsHubVo;
 import org.apache.streampark.console.flow.third.vo.stop.ThirdStopsComponentVo;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import com.alibaba.fastjson2.JSON;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.dockerjava.api.DockerClient;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,6 +51,11 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.nio.charset.Charset;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 @Service
 public class StopsHubServiceImpl implements IStopsHubService {
@@ -168,9 +169,7 @@ public class StopsHubServiceImpl implements IStopsHubService {
     }
   }
 
-  /**
-   * mount scala.jar
-   */
+  /** mount scala.jar */
   private String mountScalaStopsHub(StopsHub stopsHub, String username) {
     StopsHubVo stopsHubVo = stopImpl.mountStopsHub(stopsHub.getJarName());
     if (stopsHubVo == null) {

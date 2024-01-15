@@ -36,17 +36,20 @@ import org.apache.streampark.console.flow.component.schedule.domain.ScheduleDoma
 import org.apache.streampark.console.flow.controller.requestVo.FlowGroupInfoVoRequest;
 import org.apache.streampark.console.flow.controller.requestVo.FlowGroupInfoVoRequestUpDate;
 import org.apache.streampark.console.flow.third.service.IGroup;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class FlowGroupServiceImpl implements IFlowGroupService {

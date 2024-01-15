@@ -7,6 +7,7 @@ import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsC
 import org.apache.streampark.console.flow.component.stopsComponent.service.IStopsComponentManageService;
 import org.apache.streampark.console.flow.component.stopsComponent.utils.StopsComponentManageUtils;
 import org.apache.streampark.console.flow.controller.requestVo.UpdatestopsComponentIsShow;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

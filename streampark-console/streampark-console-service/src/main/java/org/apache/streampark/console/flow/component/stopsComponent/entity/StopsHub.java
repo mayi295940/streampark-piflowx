@@ -3,6 +3,7 @@ package org.apache.streampark.console.flow.component.stopsComponent.entity;
 import org.apache.streampark.console.flow.base.BaseModelUUIDNoCorpAgentId;
 import org.apache.streampark.console.flow.common.Eunm.ComponentFileType;
 import org.apache.streampark.console.flow.common.Eunm.StopsHubState;
+
 import lombok.Getter;
 import lombok.Setter;
 

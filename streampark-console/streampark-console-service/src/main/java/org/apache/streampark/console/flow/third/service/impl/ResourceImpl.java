@@ -5,11 +5,14 @@ import org.apache.streampark.console.flow.base.utils.LoggerUtil;
 import org.apache.streampark.console.flow.common.constant.ApiConfig;
 import org.apache.streampark.console.flow.common.constant.MessageConfig;
 import org.apache.streampark.console.flow.third.service.IResource;
-import java.util.HashMap;
-import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
+
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class ResourceImpl implements IResource {

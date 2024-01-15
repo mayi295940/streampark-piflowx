@@ -2,7 +2,7 @@ package org.apache.streampark.console.flow.component.stopsComponent.mapper;
 
 import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsHubFileRecord;
 import org.apache.streampark.console.flow.component.stopsComponent.mapper.provider.StopsHubFileRecordMapperProvider;
-import java.util.List;
+
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Mapper;
@@ -12,6 +12,8 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.mapping.FetchType;
+
+import java.util.List;
 
 @Mapper
 public interface StopsHubFileRecordMapper {

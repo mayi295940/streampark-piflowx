@@ -1,6 +1,7 @@
 package org.apache.streampark.console.flow.component.stopsComponent.vo;
 
 import org.apache.streampark.console.flow.common.Eunm.PortType;
+
 import lombok.Getter;
 import lombok.Setter;
 

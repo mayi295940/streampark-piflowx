@@ -1,11 +1,12 @@
 package org.apache.streampark.console.flow.controller.api.flow;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.apache.streampark.console.flow.base.utils.SessionUserUtil;
 import org.apache.streampark.console.flow.component.flow.request.UpdatePathRequest;
 import org.apache.streampark.console.flow.component.flow.service.IPathsService;
 import org.apache.streampark.console.flow.component.flow.service.IPropertyService;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

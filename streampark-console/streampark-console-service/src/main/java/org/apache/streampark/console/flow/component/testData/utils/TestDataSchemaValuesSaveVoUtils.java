@@ -1,11 +1,14 @@
 package org.apache.streampark.console.flow.component.testData.utils;
 
 import org.apache.streampark.console.flow.controller.requestVo.TestDataSchemaValuesSaveVo;
+
+import org.apache.commons.lang3.StringUtils;
+
+import net.sf.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import net.sf.json.JSONObject;
-import org.apache.commons.lang3.StringUtils;
 
 public class TestDataSchemaValuesSaveVoUtils {
 

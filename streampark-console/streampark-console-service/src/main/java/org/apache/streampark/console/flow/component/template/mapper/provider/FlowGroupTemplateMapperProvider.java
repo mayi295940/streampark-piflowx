@@ -1,6 +1,7 @@
 package org.apache.streampark.console.flow.component.template.mapper.provider;
 
 import org.apache.streampark.console.flow.base.utils.SqlUtils;
+
 import org.apache.commons.lang3.StringUtils;
 
 public class FlowGroupTemplateMapperProvider {

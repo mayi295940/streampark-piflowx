@@ -3,7 +3,7 @@ package org.apache.streampark.console.flow.component.livy.mapper;
 import org.apache.streampark.console.flow.component.livy.entity.CodeSnippet;
 import org.apache.streampark.console.flow.component.livy.mapper.provider.CodeSnippetMapperProvider;
 import org.apache.streampark.console.flow.component.livy.vo.CodeSnippetVo;
-import java.util.List;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.One;
@@ -14,6 +14,8 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.mapping.FetchType;
+
+import java.util.List;
 
 @Mapper
 public interface CodeSnippetMapper {
@@ -61,7 +63,8 @@ public interface CodeSnippetMapper {
         property = "noteBook",
         one =
             @One(
-                select = "org.apache.streampark.console.flow.component.livy.mapper.NoteBookMapper.adminGetNoteBookById",
+                select =
+                    "org.apache.streampark.console.flow.component.livy.mapper.NoteBookMapper.adminGetNoteBookById",
                 fetchType = FetchType.LAZY))
   })
   CodeSnippet getCodeSnippetById(@Param("id") String id);

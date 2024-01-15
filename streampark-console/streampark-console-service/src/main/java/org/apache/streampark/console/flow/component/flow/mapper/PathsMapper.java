@@ -2,7 +2,7 @@ package org.apache.streampark.console.flow.component.flow.mapper;
 
 import org.apache.streampark.console.flow.component.flow.entity.Paths;
 import org.apache.streampark.console.flow.component.flow.mapper.provider.PathsMapperProvider;
-import java.util.List;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Many;
 import org.apache.ibatis.annotations.Mapper;
@@ -11,6 +11,8 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.mapping.FetchType;
+
+import java.util.List;
 
 @Mapper
 public interface PathsMapper {
@@ -74,7 +76,8 @@ public interface PathsMapper {
         property = "flow",
         many =
             @Many(
-                select = "org.apache.streampark.console.flow.component.flow.mapper.FlowMapper.getFlowById",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.FlowMapper.getFlowById",
                 fetchType = FetchType.LAZY))
   })
   List<Paths> getPaths(String flowId, String pageId, String from, String to);
@@ -99,7 +102,8 @@ public interface PathsMapper {
         property = "flow",
         many =
             @Many(
-                select = "org.apache.streampark.console.flow.component.flow.mapper.FlowMapper.getFlowById",
+                select =
+                    "org.apache.streampark.console.flow.component.flow.mapper.FlowMapper.getFlowById",
                 fetchType = FetchType.LAZY))
   })
   List<Paths> getPathsByFlowIdAndStopPageId(String flowId, String pageId, String from, String to);
@@ -131,5 +135,4 @@ public interface PathsMapper {
    */
   @UpdateProvider(type = PathsMapperProvider.class, method = "updateEnableFlagByFlowId")
   int updateEnableFlagByFlowId(String username, String flowId);
-
 }

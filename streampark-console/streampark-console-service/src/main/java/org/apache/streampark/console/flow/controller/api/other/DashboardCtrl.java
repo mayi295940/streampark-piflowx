@@ -3,15 +3,16 @@ package org.apache.streampark.console.flow.controller.api.other;
 import org.apache.streampark.console.flow.base.utils.ReturnMapUtils;
 import org.apache.streampark.console.flow.component.dashboard.service.IFlowResourceService;
 import org.apache.streampark.console.flow.component.dashboard.service.IStatisticService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 @Api(value = "dashboard api", tags = "dashboard api")
 @RestController
@@ -23,7 +24,7 @@ public class DashboardCtrl {
 
   @Autowired
   public DashboardCtrl(
-          IFlowResourceService resourceServiceImpl, IStatisticService statisticServiceImpl) {
+      IFlowResourceService resourceServiceImpl, IStatisticService statisticServiceImpl) {
     this.resourceServiceImpl = resourceServiceImpl;
     this.statisticServiceImpl = statisticServiceImpl;
   }

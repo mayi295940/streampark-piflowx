@@ -2,13 +2,15 @@ package org.apache.streampark.console.flow.component.template.entity;
 
 import org.apache.streampark.console.flow.base.utils.DateUtils;
 import org.apache.streampark.console.flow.common.Eunm.PortType;
+
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 @Setter

@@ -2,13 +2,14 @@ package org.apache.streampark.console.flow.component.dashboard.service.impl;
 
 import org.apache.streampark.console.flow.component.dashboard.domain.StatisticDomain;
 import org.apache.streampark.console.flow.component.dashboard.service.IStatisticService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class StatisticServiceImpl implements IStatisticService {

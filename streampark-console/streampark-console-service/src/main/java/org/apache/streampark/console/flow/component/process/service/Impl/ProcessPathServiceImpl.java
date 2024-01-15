@@ -1,8 +1,5 @@
 package org.apache.streampark.console.flow.component.process.service.Impl;
 
-import java.util.List;
-import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.console.flow.base.utils.ReturnMapUtils;
 import org.apache.streampark.console.flow.common.Eunm.PortType;
 import org.apache.streampark.console.flow.common.Eunm.RunModeType;
@@ -15,8 +12,14 @@ import org.apache.streampark.console.flow.component.process.mapper.ProcessPathMa
 import org.apache.streampark.console.flow.component.process.mapper.ProcessStopMapper;
 import org.apache.streampark.console.flow.component.process.service.IProcessPathService;
 import org.apache.streampark.console.flow.component.process.vo.ProcessPathVo;
+
+import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class ProcessPathServiceImpl implements IProcessPathService {

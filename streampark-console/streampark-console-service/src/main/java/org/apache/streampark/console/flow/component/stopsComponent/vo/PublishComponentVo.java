@@ -1,9 +1,10 @@
 package org.apache.streampark.console.flow.component.stopsComponent.vo;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import lombok.Data;
 
 @Data
 public class PublishComponentVo implements Serializable {

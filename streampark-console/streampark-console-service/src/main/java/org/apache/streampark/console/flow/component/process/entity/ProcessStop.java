@@ -4,11 +4,13 @@ import org.apache.streampark.console.flow.base.BaseModelUUIDNoCorpAgentId;
 import org.apache.streampark.console.flow.common.Eunm.ComponentFileType;
 import org.apache.streampark.console.flow.common.Eunm.PortType;
 import org.apache.streampark.console.flow.common.Eunm.StopState;
+
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
 
 @Setter
 @Getter

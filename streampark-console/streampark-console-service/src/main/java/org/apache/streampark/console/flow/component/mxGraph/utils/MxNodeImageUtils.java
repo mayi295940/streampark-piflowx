@@ -1,6 +1,7 @@
 package org.apache.streampark.console.flow.component.mxGraph.utils;
 
 import org.apache.streampark.console.flow.component.mxGraph.entity.MxNodeImage;
+
 import java.util.Date;
 
 public class MxNodeImageUtils {

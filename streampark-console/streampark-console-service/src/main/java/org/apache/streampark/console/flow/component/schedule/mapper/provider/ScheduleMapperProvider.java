@@ -1,12 +1,14 @@
 package org.apache.streampark.console.flow.component.schedule.mapper.provider;
 
-import java.util.Date;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.jdbc.SQL;
 import org.apache.streampark.console.flow.base.utils.DateUtils;
 import org.apache.streampark.console.flow.base.utils.SqlUtils;
 import org.apache.streampark.console.flow.component.schedule.entity.Schedule;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.jdbc.SQL;
+
+import java.util.Date;
 
 @Mapper
 public class ScheduleMapperProvider {
@@ -291,7 +293,9 @@ public class ScheduleMapperProvider {
     strBuf.append("where ");
     strBuf.append("enable_flag=1 ");
     strBuf.append("and ");
-    strBuf.append("schedule_run_template_id=").append(SqlUtils.preventSQLInjection(scheduleRunTemplateId));
+    strBuf
+        .append("schedule_run_template_id=")
+        .append(SqlUtils.preventSQLInjection(scheduleRunTemplateId));
     if (!isAdmin) {
       strBuf.append("and crt_user = ").append(SqlUtils.preventSQLInjection(username));
     }

@@ -1,13 +1,5 @@
 package org.apache.streampark.console.flow.component.system.service.Impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.console.flow.base.utils.DecimalFormatUtils;
 import org.apache.streampark.console.flow.base.utils.LoggerUtil;
 import org.apache.streampark.console.flow.base.utils.ReturnMapUtils;
@@ -32,10 +24,21 @@ import org.apache.streampark.console.flow.component.system.entity.SysInitRecords
 import org.apache.streampark.console.flow.component.system.service.ISysInitRecordsService;
 import org.apache.streampark.console.flow.third.service.IStop;
 import org.apache.streampark.console.flow.third.vo.stop.ThirdStopsComponentVo;
+
+import org.apache.commons.lang3.StringUtils;
+
 import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class SysInitRecordsServiceImpl implements ISysInitRecordsService {

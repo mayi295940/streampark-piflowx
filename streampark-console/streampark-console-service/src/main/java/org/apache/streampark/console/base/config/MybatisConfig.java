@@ -17,6 +17,11 @@
 
 package org.apache.streampark.console.base.config;
 
+import org.apache.streampark.console.base.mybatis.interceptor.PostgreSQLPrepareInterceptor;
+import org.apache.streampark.console.base.mybatis.interceptor.PostgreSQLQueryInterceptor;
+
+import org.apache.ibatis.type.JdbcType;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusPropertiesCustomizer;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
@@ -25,14 +30,12 @@ import com.baomidou.mybatisplus.core.toolkit.GlobalConfigUtils;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.github.pagehelper.PageHelper;
-import java.util.Properties;
-import org.apache.ibatis.type.JdbcType;
-import org.apache.streampark.console.base.mybatis.interceptor.PostgreSQLPrepareInterceptor;
-import org.apache.streampark.console.base.mybatis.interceptor.PostgreSQLQueryInterceptor;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.Properties;
 
 /** for MyBatis Configure management. */
 @Configuration

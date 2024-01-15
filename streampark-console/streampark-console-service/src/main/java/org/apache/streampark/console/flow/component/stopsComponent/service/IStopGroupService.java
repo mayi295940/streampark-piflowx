@@ -1,6 +1,7 @@
 package org.apache.streampark.console.flow.component.stopsComponent.service;
 
 import org.apache.streampark.console.flow.component.stopsComponent.vo.StopGroupVo;
+
 import java.util.List;
 
 public interface IStopGroupService {

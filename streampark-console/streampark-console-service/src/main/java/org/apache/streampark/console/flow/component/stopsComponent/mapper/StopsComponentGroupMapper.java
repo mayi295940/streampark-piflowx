@@ -1,6 +1,9 @@
 package org.apache.streampark.console.flow.component.stopsComponent.mapper;
 
-import java.util.List;
+import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentGroup;
+import org.apache.streampark.console.flow.component.stopsComponent.mapper.provider.StopsComponentGroupProvider;
+import org.apache.streampark.console.flow.component.stopsComponent.vo.StopsComponentGroupVo;
+
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Many;
@@ -11,9 +14,8 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
-import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsComponentGroup;
-import org.apache.streampark.console.flow.component.stopsComponent.mapper.provider.StopsComponentGroupProvider;
-import org.apache.streampark.console.flow.component.stopsComponent.vo.StopsComponentGroupVo;
+
+import java.util.List;
 
 @Mapper
 public interface StopsComponentGroupMapper {

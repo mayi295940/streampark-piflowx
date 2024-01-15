@@ -1,7 +1,10 @@
 package org.apache.streampark.console.flow.component.flow.mapper;
 
-import java.util.List;
-import java.util.Map;
+import org.apache.streampark.console.flow.component.flow.entity.Stops;
+import org.apache.streampark.console.flow.component.flow.mapper.provider.StopsMapperProvider;
+import org.apache.streampark.console.flow.component.flow.vo.StopsVo;
+import org.apache.streampark.console.flow.third.vo.flow.ThirdFlowInfoStopVo;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Many;
 import org.apache.ibatis.annotations.Mapper;
@@ -12,10 +15,9 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.mapping.FetchType;
-import org.apache.streampark.console.flow.component.flow.entity.Stops;
-import org.apache.streampark.console.flow.component.flow.mapper.provider.StopsMapperProvider;
-import org.apache.streampark.console.flow.component.flow.vo.StopsVo;
-import org.apache.streampark.console.flow.third.vo.flow.ThirdFlowInfoStopVo;
+
+import java.util.List;
+import java.util.Map;
 
 /** Stop component table */
 @Mapper

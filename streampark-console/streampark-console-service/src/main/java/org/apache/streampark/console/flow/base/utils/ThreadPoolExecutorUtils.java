@@ -4,9 +4,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author nature
- */
+/** @author nature */
 public class ThreadPoolExecutorUtils {
 
   public static ThreadPoolExecutor createThreadPoolExecutor(

@@ -1,6 +1,5 @@
 package org.apache.streampark.console.flow.model.flink;
 
-
 public class FlinkTableAsSelectStatement {
 
   private String selectStatement;

@@ -3,8 +3,10 @@ package org.apache.streampark.console.flow.component.stopsComponent.mapper.provi
 import org.apache.streampark.console.flow.base.utils.DateUtils;
 import org.apache.streampark.console.flow.base.utils.SqlUtils;
 import org.apache.streampark.console.flow.component.stopsComponent.entity.StopsHubFileRecord;
-import java.util.Date;
+
 import org.apache.ibatis.jdbc.SQL;
+
+import java.util.Date;
 
 public class StopsHubFileRecordMapperProvider {
   private String id;

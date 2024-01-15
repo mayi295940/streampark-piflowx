@@ -1,5 +1,10 @@
 package org.apache.streampark.console.flow.base.utils;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
+import org.apache.http.HttpVersion;
+import org.apache.http.NameValuePair;
+import org.apache.http.ParseException;
 import org.apache.streampark.console.flow.common.constant.MessageConfig;
 
 import org.apache.commons.lang3.StringUtils;

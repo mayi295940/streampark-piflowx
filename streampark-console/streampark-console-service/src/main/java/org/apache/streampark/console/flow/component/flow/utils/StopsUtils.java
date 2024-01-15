@@ -19,9 +19,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class StopsUtils {
 
-  private static Logger logger = LoggerUtil.getLogger();
+  private static final Logger logger = LoggerUtil.getLogger();
 
   public static Stops stopsNewNoId(String username) {
 
@@ -61,7 +67,7 @@ public class StopsUtils {
   public static List<StopsVo> stopsListPoToVo(List<Stops> stopsList) {
     List<StopsVo> stopsVoList = null;
     if (null != stopsList && stopsList.size() > 0) {
-      stopsVoList = new ArrayList<StopsVo>();
+      stopsVoList = new ArrayList<>();
       for (Stops stop : stopsList) {
         StopsVo stopsVo = stopPoToVo(stop, null);
         if (null != stopsVo) {
@@ -125,9 +131,6 @@ public class StopsUtils {
           property_map.put(stopsComponentProperty.getName(), stopsComponentProperty);
         }
         for (StopsPropertyVo propertyVo : propertiesVo) {
-          if (null == propertiesVo) {
-            continue;
-          }
           StopsComponentProperty stopsComponentProperty = property_map.get(propertyVo.getName());
           if (null == stopsComponentProperty) {
             continue;

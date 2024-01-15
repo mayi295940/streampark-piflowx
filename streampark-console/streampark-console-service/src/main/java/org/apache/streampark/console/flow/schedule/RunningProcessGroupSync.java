@@ -19,12 +19,14 @@ import org.springframework.stereotype.Component;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 @Component
 public class RunningProcessGroupSync extends QuartzJobBean {
 
   /** Introducing logs, note that they are all packaged under "org.slf4j" */
-  private Logger logger = LoggerUtil.getLogger();
+  private final Logger logger = LoggerUtil.getLogger();
 
   @Autowired private ProcessGroupMapper processGroupMapper;
 
@@ -39,7 +41,7 @@ public class RunningProcessGroupSync extends QuartzJobBean {
       for (String groupId : runningProcessGroup) {
         Future<?> future = ServicesExecutor.TASK_FUTURE.get(groupId);
         if (null != future) {
-          if (false == future.isDone()) {
+          if (!future.isDone()) {
             continue;
           }
           ServicesExecutor.TASK_FUTURE.remove(groupId);

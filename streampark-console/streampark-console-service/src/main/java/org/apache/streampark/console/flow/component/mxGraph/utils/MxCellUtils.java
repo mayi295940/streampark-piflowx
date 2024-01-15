@@ -11,6 +11,12 @@ import org.apache.commons.lang3.StringUtils;
 
 import org.springframework.beans.BeanUtils;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class MxCellUtils {
 
   public static MxCell mxCellNewNoId(String username) {
@@ -274,7 +280,7 @@ public class MxCellUtils {
       return new HashMap<>();
     }
     String[] paramDataArray = styleArray[1].split(";")[0].split("&");
-    if (paramDataArray.length <= 0) {
+    if (paramDataArray.length == 0) {
       return new HashMap<>();
     }
     Map<String, String> paramData = new HashMap<>();

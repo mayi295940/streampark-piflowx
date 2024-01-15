@@ -9,34 +9,36 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IOUtils;
-import org.apache.hadoop.util.Progressable;
 
 import org.slf4j.Logger;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class HdfsUtils {
 
   /** Introducing logs, note that they are all packaged under "org.slf4j" */
-  private static Logger logger = LoggerUtil.getLogger();
+  private static final Logger logger = LoggerUtil.getLogger();
 
   public static void closedIO(InputStreamReader isr, BufferedReader br) {
     try {
       br.close();
       isr.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (NullPointerException e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }
 
-  public static String readFlie(String hdfs) {
-    StringBuffer json = new StringBuffer();
+  public static String readFile(String hdfs) {
+    StringBuilder json = new StringBuilder();
     InputStreamReader isr = null;
     BufferedReader br = null;
     try {
@@ -44,7 +46,7 @@ public class HdfsUtils {
       Configuration conf = new Configuration();
       FileSystem fs = FileSystem.get(URI.create(hdfs), conf);
       FSDataInputStream hdfsInStream = fs.open(new Path(hdfs));
-      isr = new InputStreamReader(hdfsInStream, "utf-8");
+      isr = new InputStreamReader(hdfsInStream, StandardCharsets.UTF_8);
       br = new BufferedReader(isr);
       String line;
       // int k = 0;
@@ -106,7 +108,7 @@ public class HdfsUtils {
         }
         lastReadFileName = fileName;
         FSDataInputStream hdfsInStream = fs.open(file.getPath());
-        isr = new InputStreamReader(hdfsInStream, "utf-8");
+        isr = new InputStreamReader(hdfsInStream, StandardCharsets.UTF_8);
         br = new BufferedReader(isr);
 
         // first line data
@@ -163,11 +165,7 @@ public class HdfsUtils {
     OutputStream out =
         fs.create(
             new Path(hdfsUrl),
-            new Progressable() {
-              public void progress() {
-                System.out.print(".");
-              }
-            });
+            () -> System.out.print("."));
 
     IOUtils.copyBytes(in, out, 4096, true);
   }

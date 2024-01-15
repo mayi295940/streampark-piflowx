@@ -3,6 +3,17 @@ package org.apache.streampark.console.flow.component.stopsComponent.utils;
 import com.alibaba.fastjson2.JSON;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
+import com.github.dockerjava.api.command.BuildImageCmd;
+import com.github.dockerjava.api.command.BuildImageResultCallback;
+import com.github.dockerjava.api.command.LoadImageCmd;
+import com.github.dockerjava.api.command.PullImageCmd;
+import com.github.dockerjava.api.command.TagImageCmd;
+import com.github.dockerjava.api.model.BuildResponseItem;
+import com.github.dockerjava.api.model.Image;
+import com.github.dockerjava.api.model.Info;
+import com.github.dockerjava.api.model.PullResponseItem;
+import com.github.dockerjava.api.model.PushResponseItem;
+import com.github.dockerjava.api.model.ResponseItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,6 +21,11 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class DockerUtils {
@@ -245,7 +261,6 @@ public class DockerUtils {
    * @return
    */
   public static List<Image> imageList(DockerClient dockerClient) {
-    List<Image> imageList = dockerClient.listImagesCmd().withShowAll(true).exec();
-    return imageList;
+      return dockerClient.listImagesCmd().withShowAll(true).exec();
   }
 }

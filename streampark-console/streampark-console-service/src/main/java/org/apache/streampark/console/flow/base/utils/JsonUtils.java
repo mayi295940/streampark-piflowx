@@ -1,5 +1,13 @@
 package org.apache.streampark.console.flow.base.utils;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -20,7 +28,7 @@ import java.util.TimeZone;
 public class JsonUtils {
 
   /** Introducing logs, note that they are all packaged under "org.slf4j" */
-  private static Logger logger = LoggerUtil.getLogger();
+  private static final Logger logger = LoggerUtil.getLogger();
 
   private static final ObjectMapper objectMapper;
 

@@ -28,37 +28,24 @@ export default defineComponent({
         <div class="!text-left w-550px m-auto">
           <div class="mb-5 system_info pt-0">
             <div class="project_title fw-bold text-white mb-3">
-              <div
-                class="animated-gradient-text_background animated-gradient-text_background-1"
-                style={{
-                  '--content': '"Apache"',
-                  '--start-color': '#00DFD8',
-                  '--end-color': '#FFF',
-                }}
-              >
-                <span class="animated-gradient-text_foreground animated-gradient-text_foreground-1">
-                  Apache
-                </span>
-              </div>
               <div class="flex  items-start">
                 <div
                   class="animated-gradient-text_background animated-gradient-text_background-2"
                   style={{
-                    '--content': '"StreamPark"',
+                    '--content': '"PiflowX"',
                     '--start-color': '#FFF',
                     '--end-color': '#00DFD8',
                   }}
                 >
                   <span class="animated-gradient-text_foreground animated-gradient-text_foreground-2">
-                    StreamPark
+                  PiflowX
                   </span>
                 </div>
-                <span class="badge bg-secondary-home text-xl tag">Incubating</span>
               </div>
             </div>
             <p class=" text-light-200 leading-40px" style={{ fontSize: '18px' }}>
-              <div>Make stream processing easier!</div>
-              <div>easy-to-use streaming application development framework</div>
+              <div>Make data processing easier!</div>
+              <div>easy-to-use streaming and batch application development framework</div>
               <div>and operation platform</div>
             </p>
           </div>

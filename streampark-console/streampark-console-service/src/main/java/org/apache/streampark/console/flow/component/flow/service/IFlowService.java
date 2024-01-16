@@ -42,7 +42,7 @@ public interface IFlowService {
    */
   String addFlow(String username, FlowInfoVoRequestAdd flowVo) throws Exception;
 
-  String deleteFLowInfo(String username, boolean isAdmin, String id);
+  boolean deleteFLowInfo(String username, boolean isAdmin, String id);
 
   Integer getMaxStopPageId(String flowId);
 

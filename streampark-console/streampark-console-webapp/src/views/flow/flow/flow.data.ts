@@ -70,7 +70,7 @@ export const formSchema = (formType: string): FormSchema[] => {
           trigger: 'blur',
         },
       ],
-      componentProps: { id: 'formUserName', disabled: !isCreate },
+      componentProps: { id: 'name', disabled: isView },
     },
     {
       label: t('flow.flow.flow_columns.engine_type'),
@@ -79,13 +79,13 @@ export const formSchema = (formType: string): FormSchema[] => {
       render: ({ model }) => renderEngineType({ model }),
       defaultValue: EngineTypeEnum.FLINK,
       rules: [{ required: true }],
+      componentProps: { id: 'engineType', disabled: !isCreate },
     },
     {
       field: 'description',
       label: t('common.description'),
       component: 'InputTextArea',
       componentProps: { rows: 5 },
-      ifShow: isCreate,
     },
   ];
 };

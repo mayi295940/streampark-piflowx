@@ -137,10 +137,10 @@
       async function handleDelete(record: FlowListRecord) {
         const { data } = await fetchFlowDelete({ id: record.id });
         if (data.status === 'success') {
-          createMessage.success(t('system.member.deleteMember') + t('system.member.success'));
+          createMessage.success(t('flow.flow.flow_form.delete') + t('flow.flow.flow_form.success'));
           reload();
         } else {
-          createMessage.error(t('system.member.deleteMember') + t('system.member.fail'));
+          createMessage.error(t('flow.flow.flow_form.delete') + t('flow.flow.flow_form.fail'));
         }
       }
 
@@ -180,7 +180,7 @@
         }
       }
 
-      // add/edit user success
+      // add/edit flow success
       function handleSuccess() {
         createMessage.success('success');
         reload();

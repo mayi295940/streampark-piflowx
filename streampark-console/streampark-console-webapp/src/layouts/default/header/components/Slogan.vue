@@ -15,7 +15,7 @@
 <template>
   <div :class="slognClass">
     <span :class="`${prefixCls}-streampark`">
-      Apache StreamPark,&nbsp; Make&nbsp; stream processing&nbsp;easier!
+      PiflowX,&nbsp; Make&nbsp; data processing&nbsp;easier!
     </span>
   </div>
 </template>

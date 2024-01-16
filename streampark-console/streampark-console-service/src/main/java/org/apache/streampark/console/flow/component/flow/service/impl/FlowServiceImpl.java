@@ -1,5 +1,14 @@
 package org.apache.streampark.console.flow.component.flow.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.console.base.exception.ApiAlertException;
 import org.apache.streampark.console.flow.base.utils.LoggerUtil;
 import org.apache.streampark.console.flow.base.utils.ReturnMapUtils;
@@ -39,22 +48,10 @@ import org.apache.streampark.console.flow.component.stopsComponent.vo.StopGroupV
 import org.apache.streampark.console.flow.controller.requestVo.FlowInfoVoRequestAdd;
 import org.apache.streampark.console.flow.controller.requestVo.FlowInfoVoRequestUpdate;
 import org.apache.streampark.console.flow.third.service.IFlow;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class FlowServiceImpl implements IFlowService {
@@ -234,28 +231,21 @@ public class FlowServiceImpl implements IFlowService {
   }
 
   @Override
-  public String deleteFLowInfo(String username, boolean isAdmin, String id) {
-    if (StringUtils.isBlank(username)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
-    }
-    if (StringUtils.isBlank(id)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_IS_NULL_MSG("id"));
-    }
+  public boolean deleteFLowInfo(String username, boolean isAdmin, String id) {
+
     int scheduleIdListByScheduleRunTemplateId =
         scheduleDomain.getScheduleIdListByScheduleRunTemplateId(isAdmin, username, id);
     if (scheduleIdListByScheduleRunTemplateId > 0) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.DELETE_LINK_SCHEDULED_ERROR_MSG());
+      throw new RuntimeException(MessageConfig.DELETE_LINK_SCHEDULED_ERROR_MSG());
     }
+
     List<String> publishingNameList = flowStopsPublishingDomain.getPublishingNameListByFlowId(id);
     if (null != publishingNameList && publishingNameList.size() > 0) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(
+      throw new RuntimeException(
           MessageConfig.STOP_PUBLISHED_CANNOT_DEL_FLOW_MSG(
               publishingNameList.toString().replace("[", "'").replace("]", "'")));
     }
-    /*Flow flowById = this.getFlowById(username, isAdmin, id);
-    if (null == flowById) {
-        return ReturnMapUtils.setFailedMsgRtnJsonStr("Data does not exist");
-    }*/
+
     // remove FLow
     int deleteFLowInfo = 0;
     try {
@@ -263,11 +253,8 @@ public class FlowServiceImpl implements IFlowService {
     } catch (Exception e) {
       logger.error(e.getMessage());
     }
-    if (deleteFLowInfo > 0) {
-      return ReturnMapUtils.setSucceededMsgRtnJsonStr(MessageConfig.SUCCEEDED_MSG());
-    } else {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ERROR_MSG());
-    }
+
+    return deleteFLowInfo > 0;
   }
 
   @Override

@@ -1,5 +1,10 @@
 package org.apache.streampark.console.flow.controller.api.flow;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import javax.validation.constraints.NotBlank;
 import org.apache.streampark.console.base.domain.RestRequest;
 import org.apache.streampark.console.base.domain.RestResponse;
 import org.apache.streampark.console.flow.base.utils.SessionUserUtil;
@@ -7,12 +12,8 @@ import org.apache.streampark.console.flow.component.flow.service.IFlowService;
 import org.apache.streampark.console.flow.component.system.service.ILogHelperService;
 import org.apache.streampark.console.flow.controller.requestVo.FlowInfoVoRequestAdd;
 import org.apache.streampark.console.flow.controller.requestVo.FlowInfoVoRequestUpdate;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -85,13 +86,12 @@ public class FlowCtrl {
   }
 
   /** Delete flow association information according to flowId */
-  @GetMapping(value = "/deleteFlow")
+  @DeleteMapping(value = "/deleteFlow")
   @ApiOperation(value = "deleteFlow", notes = "delete Flow")
-  public String deleteFlow(String id) {
+  public RestResponse deleteFlow(@NotBlank(message = "{id}") String id) {
     String username = SessionUserUtil.getCurrentUsername();
     boolean isAdmin = SessionUserUtil.isAdmin();
-    logHelperServiceImpl.logAuthSucceed("delete flow " + id, username);
-    return flowServiceImpl.deleteFLowInfo(username, isAdmin, id);
+    return RestResponse.success(flowServiceImpl.deleteFLowInfo(username, isAdmin, id));
   }
 
   @PostMapping(value = "/updateFlowBaseInfo")

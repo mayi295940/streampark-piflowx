@@ -1,5 +1,12 @@
 package org.apache.streampark.console.flow.utils;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.console.flow.component.flow.vo.StopsPropertyVo;
 import org.apache.streampark.console.flow.model.flink.FlinkTableAsSelectStatement;
 import org.apache.streampark.console.flow.model.flink.FlinkTableBaseInfo;
@@ -9,17 +16,7 @@ import org.apache.streampark.console.flow.model.flink.FlinkTableLikeStatement;
 import org.apache.streampark.console.flow.model.flink.FlinkTableMetadataColumn;
 import org.apache.streampark.console.flow.model.flink.FlinkTablePhysicalColumn;
 import org.apache.streampark.console.flow.model.flink.FlinkTableWatermark;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.TypeReference;
 import org.springframework.util.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class FlinkTableUtil {
 
@@ -51,8 +48,11 @@ public class FlinkTableUtil {
                 propertiesVo.getCustomValue(), new TypeReference<HashMap<String, String>>() {});
       } else {
         if (StringUtils.isNotBlank(propertiesVo.getCustomValue())) {
-          configList.add(
-              String.format("'%s' = '%s'", propertiesVo.getName(), propertiesVo.getCustomValue()));
+          String value = propertiesVo.getCustomValue();
+          if (propertiesVo.getSensitive()) {
+            value = "********";
+          }
+          configList.add(String.format("'%s' = '%s'", propertiesVo.getName(), value));
         }
       }
     }

@@ -77,10 +77,7 @@ public class FlowUtil {
     flowNew.setLastUpdateUser(username);
     // copy flow
     flowNew.setName(flow.getName());
-    flowNew.setDriverMemory(flow.getDriverMemory());
-    flowNew.setExecutorNumber(flow.getExecutorNumber());
-    flowNew.setExecutorMemory(flow.getExecutorMemory());
-    flowNew.setExecutorCores(flow.getExecutorCores());
+    flowNew.setEnvironment(flow.getEnvironment());
     flowNew.setDescription(flow.getDescription());
     flowNew.setPageId(flow.getPageId());
     flowNew.setIsExample(flow.getIsExample());

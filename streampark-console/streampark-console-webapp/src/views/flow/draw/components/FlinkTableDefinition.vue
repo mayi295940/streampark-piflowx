@@ -128,6 +128,8 @@
 
   function handleBaseInfoEvent(event: TFlinkTableBaseInfo) {
     updateTableBaseInfo.value = event;
+    updateAsSelectStatement.value = { selectStatement: event.selectStatement };
+    updateLikeStatement.value = { likeStatement: event.likeStatement };
   }
 
   function handlePhysicalColumnEvent(event: Array<TFlinkTablePhysicalColumn>) {

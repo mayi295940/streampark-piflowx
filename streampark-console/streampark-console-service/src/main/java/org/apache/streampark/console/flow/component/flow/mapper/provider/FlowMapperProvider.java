@@ -20,10 +20,7 @@ public class FlowMapperProvider {
   private String name;
   private String engineType;
   private String uuid;
-  private String driverMemory;
-  private String executorCores;
-  private String executorMemory;
-  private String executorNumber;
+  private String environment;
   private Integer isExample;
   private String pageId;
   private String flowGroupId;
@@ -51,10 +48,7 @@ public class FlowMapperProvider {
     this.name = SqlUtils.preventSQLInjection(flow.getName());
     this.engineType = SqlUtils.preventSQLInjection(flow.getEngineType());
     this.uuid = SqlUtils.preventSQLInjection(flow.getUuid());
-    this.driverMemory = SqlUtils.preventSQLInjection(flow.getDriverMemory());
-    this.executorCores = SqlUtils.preventSQLInjection(flow.getExecutorCores());
-    this.executorMemory = SqlUtils.preventSQLInjection(flow.getExecutorMemory());
-    this.executorNumber = SqlUtils.preventSQLInjection(flow.getExecutorNumber());
+    this.environment = SqlUtils.preventSQLInjection(flow.getEnvironment());
     this.isExample = (null == flow.getIsExample() ? 0 : (flow.getIsExample() ? 1 : 0));
     this.pageId = SqlUtils.preventSQLInjection(flow.getPageId());
     String flowGroupId_str =
@@ -75,10 +69,7 @@ public class FlowMapperProvider {
     this.name = null;
     this.engineType = null;
     this.uuid = null;
-    this.driverMemory = null;
-    this.executorCores = null;
-    this.executorMemory = null;
-    this.executorNumber = null;
+    this.environment = null;
     this.isExample = null;
     this.pageId = null;
     this.flowGroupId = null;
@@ -101,10 +92,7 @@ public class FlowMapperProvider {
       stringBuffer.append("name, ");
       stringBuffer.append("engine_type, ");
       stringBuffer.append("uuid, ");
-      stringBuffer.append("driver_memory, ");
-      stringBuffer.append("executor_cores, ");
-      stringBuffer.append("executor_memory, ");
-      stringBuffer.append("executor_number, ");
+      stringBuffer.append("environment, ");
       stringBuffer.append("is_example, ");
       stringBuffer.append("page_id, ");
       stringBuffer.append("fk_flow_group_id ");
@@ -117,10 +105,7 @@ public class FlowMapperProvider {
       stringBuffer.append(this.name + ", ");
       stringBuffer.append(this.engineType + ", ");
       stringBuffer.append(this.uuid + ", ");
-      stringBuffer.append(this.driverMemory + ", ");
-      stringBuffer.append(this.executorCores + ", ");
-      stringBuffer.append(this.executorMemory + ", ");
-      stringBuffer.append(this.executorNumber + ", ");
+      stringBuffer.append(this.environment + ", ");
       stringBuffer.append(this.isExample + ", ");
       stringBuffer.append(this.pageId + ", ");
       stringBuffer.append(this.flowGroupId + " ");
@@ -133,9 +118,6 @@ public class FlowMapperProvider {
 
   /**
    * update Flow
-   *
-   * @param flow
-   * @return
    */
   public String updateFlow(Flow flow) {
 
@@ -158,10 +140,7 @@ public class FlowMapperProvider {
       sql.SET("name = " + name);
       sql.SET("engine_type = " + engineType);
       sql.SET("uuid = " + uuid);
-      sql.SET("driver_memory = " + driverMemory);
-      sql.SET("executor_cores = " + executorCores);
-      sql.SET("executor_memory = " + executorMemory);
-      sql.SET("executor_number = " + executorNumber);
+      sql.SET("environment = " + environment);
       sql.WHERE("version = " + version);
       sql.WHERE("id = " + id);
       sqlStr = sql.toString();
@@ -175,8 +154,6 @@ public class FlowMapperProvider {
 
   /**
    * get flow list
-   *
-   * @return
    */
   public String getFlowList() {
     String sqlStr = "";
@@ -193,9 +170,6 @@ public class FlowMapperProvider {
 
   /**
    * Query all flow paging queries
-   *
-   * @param param
-   * @return
    */
   public String getFlowListParam(String username, boolean isAdmin, String param) {
     String sqlStr = "SELECT 0";
@@ -223,8 +197,6 @@ public class FlowMapperProvider {
 
   /**
    * Query the sample flow list
-   *
-   * @return
    */
   public String getFlowExampleList() {
     String sqlStr = "";
@@ -240,9 +212,6 @@ public class FlowMapperProvider {
 
   /**
    * get flow by id
-   *
-   * @param id
-   * @return
    */
   public String getFlowById(String id) {
     String sqlStr = "";
@@ -259,10 +228,6 @@ public class FlowMapperProvider {
 
   /**
    * get flow by pageId
-   *
-   * @param fid
-   * @param pageId
-   * @return
    */
   public String getFlowByPageId(String fid, String pageId) {
     String sqlStr = "";
@@ -281,9 +246,6 @@ public class FlowMapperProvider {
 
   /**
    * Delete according to id logic, set to invalid
-   *
-   * @param id
-   * @return
    */
   public String updateEnableFlagById(String username, String id) {
     if (StringUtils.isBlank(username)) {
@@ -353,7 +315,7 @@ public class FlowMapperProvider {
   }
 
   public String unlinkGlobalParams(String flowId, String[] globalParamsIds) {
-    if (StringUtils.isBlank(flowId) || globalParamsIds.length <= 0) {
+    if (StringUtils.isBlank(flowId) || globalParamsIds.length == 0) {
       return "SELECT 0";
     }
     StringBuffer strBuf = new StringBuffer();
@@ -370,7 +332,6 @@ public class FlowMapperProvider {
       }
     }
     strBuf.append(") ");
-    String sqlStr = strBuf.toString();
-    return sqlStr;
+      return strBuf.toString();
   }
 }

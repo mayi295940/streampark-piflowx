@@ -21,10 +21,7 @@ public class ProcessMapperProvider {
   private long version;
   private String name;
   private String engineType;
-  private String driverMemory;
-  private String executorNumber;
-  private String executorMemory;
-  private String executorCores;
+  private String environment;
   private String description;
   private String appId;
   private String pageId;
@@ -58,10 +55,7 @@ public class ProcessMapperProvider {
 
     // Selection field
     this.name = SqlUtils.preventSQLInjection(process.getName());
-    this.driverMemory = SqlUtils.preventSQLInjection(process.getDriverMemory());
-    this.executorNumber = SqlUtils.preventSQLInjection(process.getExecutorNumber());
-    this.executorMemory = SqlUtils.preventSQLInjection(process.getExecutorMemory());
-    this.executorCores = SqlUtils.preventSQLInjection(process.getExecutorCores());
+    this.environment = SqlUtils.preventSQLInjection(process.getEnvironment());
     this.viewXml = SqlUtils.preventSQLInjection(process.getViewXml());
     this.description = SqlUtils.preventSQLInjection(process.getDescription());
     this.appId = SqlUtils.preventSQLInjection(process.getAppId());
@@ -101,10 +95,7 @@ public class ProcessMapperProvider {
     this.version = 0L;
     this.name = null;
     this.engineType = null;
-    this.driverMemory = null;
-    this.executorNumber = null;
-    this.executorMemory = null;
-    this.executorCores = null;
+    this.environment = null;
     this.description = null;
     this.appId = null;
     this.pageId = null;
@@ -137,10 +128,7 @@ public class ProcessMapperProvider {
               + ", "
               + "name, "
               + "engine_type, "
-              + "driver_memory, "
-              + "executor_number, "
-              + "executor_memory, "
-              + "executor_cores, "
+              + "environment, "
               + "description, "
               + "app_id, "
               + "page_id, "
@@ -165,13 +153,7 @@ public class ProcessMapperProvider {
               + ", "
               + engineType
               + ", "
-              + driverMemory
-              + ", "
-              + executorNumber
-              + ", "
-              + executorMemory
-              + ", "
-              + executorCores
+              + environment
               + ", "
               + description
               + ", "
@@ -230,10 +212,7 @@ public class ProcessMapperProvider {
       // handle other fields
       sql.SET("enable_flag=" + enableFlag);
       sql.SET("name=" + name);
-      sql.SET("driver_memory=" + driverMemory);
-      sql.SET("executor_number=" + executorNumber);
-      sql.SET("executor_memory=" + executorMemory);
-      sql.SET("executor_cores=" + executorCores);
+      sql.SET("environment=" + environment);
       sql.SET("view_xml=" + viewXml);
       sql.SET("description=" + description);
       sql.SET("app_id=" + appId);

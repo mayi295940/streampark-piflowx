@@ -20,6 +20,7 @@ import { EngineTypeEnum } from './flow.data';
 
 import flinkAppSvg from '/@/assets/icons/flink2.svg';
 import sparkSvg from '/@/assets/icons/spark.svg';
+import beamSvg from '/@/assets/icons/beam.svg';
 
 const { t } = useI18n();
 
@@ -29,6 +30,7 @@ export const renderEngineType = ({ model }) => {
     const options = [
       { label: 'Apache Flink', value: EngineTypeEnum.FLINK, disabled: false, src: flinkAppSvg },
       { label: 'Apache Spark', value: EngineTypeEnum.SPARK, disabled: false, src: sparkSvg },
+      { label: 'Apache Beam', value: EngineTypeEnum.BEAM, disabled: false, src: beamSvg },
     ];
     return options.map(({ label, value, disabled, src }) => {
       return (

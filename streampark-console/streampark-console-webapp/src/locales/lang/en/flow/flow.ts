@@ -66,6 +66,7 @@ export default {
     update_title: 'Update Flow',
     flow_name: 'FlowName',
     engine_type: 'EngineType',
+    runtimeMode: 'RuntimeMode',
     driverMemory: 'DriverMemory',
     executorNumber: 'ExecutorNumber',
     executorMemory: 'ExecutorMemory',

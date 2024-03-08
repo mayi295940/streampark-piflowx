@@ -68,6 +68,7 @@ export default {
     update_title: '更改流水线',
     flow_name: '流水线名称',
     engine_type: '引擎类型',
+    runtimeMode: '运行模式',
     driverMemory: 'Driver内存',
     executorNumber: 'Executor数量',
     executorMemory: 'Executor内存',

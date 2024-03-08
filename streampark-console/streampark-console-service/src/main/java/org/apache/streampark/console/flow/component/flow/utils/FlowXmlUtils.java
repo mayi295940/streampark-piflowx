@@ -44,7 +44,7 @@ import java.util.Map;
 public class FlowXmlUtils {
 
   /** Introducing logs, note that they are all packaged under "org.slf4j" */
-  private static Logger logger = LoggerUtil.getLogger();
+  private static final Logger logger = LoggerUtil.getLogger();
 
   private static String spliceStr(String key, Object value) {
     return key + "=\"" + value + "\" ";
@@ -113,10 +113,7 @@ public class FlowXmlUtils {
     String id = StringCustomUtils.replaceSpecialSymbolsXml(flow.getId());
     String name = StringCustomUtils.replaceSpecialSymbolsXml(flow.getName());
     String description = StringCustomUtils.replaceSpecialSymbolsXml(flow.getDescription());
-    String driverMemory = StringCustomUtils.replaceSpecialSymbolsXml(flow.getDriverMemory());
-    String executorCores = StringCustomUtils.replaceSpecialSymbolsXml(flow.getExecutorCores());
-    String executorMemory = StringCustomUtils.replaceSpecialSymbolsXml(flow.getExecutorMemory());
-    String executorNumber = StringCustomUtils.replaceSpecialSymbolsXml(flow.getExecutorNumber());
+    String environment = StringCustomUtils.replaceSpecialSymbolsXml(flow.getEnvironment());
     String flowPageId = StringCustomUtils.replaceSpecialSymbolsXml(flow.getPageId());
     xmlStrSb.append("<flow ");
     if (StringUtils.isNotBlank(id)) {
@@ -128,17 +125,8 @@ public class FlowXmlUtils {
     if (StringUtils.isNotBlank(description)) {
       xmlStrSb.append(spliceStr("description", description));
     }
-    if (StringUtils.isNotBlank(driverMemory)) {
-      xmlStrSb.append(spliceStr("driverMemory", driverMemory));
-    }
-    if (StringUtils.isNotBlank(executorCores)) {
-      xmlStrSb.append(spliceStr("executorCores", executorCores));
-    }
-    if (StringUtils.isNotBlank(executorMemory)) {
-      xmlStrSb.append(spliceStr("executorMemory", executorMemory));
-    }
-    if (StringUtils.isNotBlank(executorNumber)) {
-      xmlStrSb.append(spliceStr("executorNumber", executorNumber));
+    if (StringUtils.isNotBlank(environment)) {
+      xmlStrSb.append(spliceStr("environment", environment));
     }
     if (StringUtils.isNotBlank(flowPageId)) {
       xmlStrSb.append(spliceStr("pageId", flowPageId));
@@ -979,14 +967,8 @@ public class FlowXmlUtils {
       }
       String flowPageId =
           StringCustomUtils.recoverSpecialSymbolsXml(flowElement.attributeValue("pageId"));
-      String driverMemory =
-          StringCustomUtils.recoverSpecialSymbolsXml(flowElement.attributeValue("driverMemory"));
-      String executorCores =
-          StringCustomUtils.recoverSpecialSymbolsXml(flowElement.attributeValue("executorCores"));
-      String executorMemory =
-          StringCustomUtils.recoverSpecialSymbolsXml(flowElement.attributeValue("executorMemory"));
-      String executorNumber =
-          StringCustomUtils.recoverSpecialSymbolsXml(flowElement.attributeValue("executorNumber"));
+      String environment =
+          StringCustomUtils.recoverSpecialSymbolsXml(flowElement.attributeValue("environment"));
       String name = StringCustomUtils.recoverSpecialSymbolsXml(flowElement.attributeValue("name"));
       String description =
           StringCustomUtils.recoverSpecialSymbolsXml(flowElement.attributeValue("description"));
@@ -1000,10 +982,7 @@ public class FlowXmlUtils {
       flow.setVersion(0L);
       flow.setPageId(
           (null != flowPageId) ? ((Integer.parseInt(flowPageId) + maxPageId) + "") : null);
-      flow.setDriverMemory(driverMemory);
-      flow.setExecutorCores(executorCores);
-      flow.setExecutorMemory(executorMemory);
-      flow.setExecutorNumber(executorNumber);
+      flow.setEnvironment(environment);
       flow.setName(name);
       flow.setDescription(description);
       // mxGraphModel
@@ -1195,14 +1174,8 @@ public class FlowXmlUtils {
       if (null == flowElement) {
         return ReturnMapUtils.setFailedMsg(MessageConfig.NO_XXX_NODE_MSG("flow"));
       }
-      String driverMemory =
-          StringCustomUtils.recoverSpecialSymbolsXml(flowElement.attributeValue("driverMemory"));
-      String executorCores =
-          StringCustomUtils.recoverSpecialSymbolsXml(flowElement.attributeValue("executorCores"));
-      String executorMemory =
-          StringCustomUtils.recoverSpecialSymbolsXml(flowElement.attributeValue("executorMemory"));
-      String executorNumber =
-          StringCustomUtils.recoverSpecialSymbolsXml(flowElement.attributeValue("executorNumber"));
+      String environment =
+          StringCustomUtils.recoverSpecialSymbolsXml(flowElement.attributeValue("environment"));
       String name = StringCustomUtils.recoverSpecialSymbolsXml(flowElement.attributeValue("name"));
       String description =
           StringCustomUtils.recoverSpecialSymbolsXml(flowElement.attributeValue("description"));
@@ -1213,10 +1186,7 @@ public class FlowXmlUtils {
       }
       Flow flow = FlowUtil.setFlowBasicInformation(null, false, username);
       flow.setPageId(flowPageId);
-      flow.setDriverMemory(driverMemory);
-      flow.setExecutorCores(executorCores);
-      flow.setExecutorMemory(executorMemory);
-      flow.setExecutorNumber(executorNumber);
+      flow.setEnvironment(environment);
       flow.setName(name + System.currentTimeMillis());
       flow.setDescription(description);
 

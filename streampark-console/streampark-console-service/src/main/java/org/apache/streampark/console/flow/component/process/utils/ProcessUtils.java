@@ -143,8 +143,7 @@ public class ProcessUtils {
       processStopVo.setState((null != processStop.getState() ? processStop.getState().name() : ""));
       List<ProcessStopProperty> processStopPropertyList = processStop.getProcessStopPropertyList();
       if (null != processStopPropertyList && processStopPropertyList.size() > 0) {
-        List<ProcessStopPropertyVo> processStopPropertyVoList =
-            new ArrayList<ProcessStopPropertyVo>();
+        List<ProcessStopPropertyVo> processStopPropertyVoList = new ArrayList<>();
         for (ProcessStopProperty processStopProperty : processStopPropertyList) {
           if (null != processStopProperty) {
             ProcessStopPropertyVo processStopPropertyVo = new ProcessStopPropertyVo();
@@ -556,10 +555,7 @@ public class ProcessUtils {
       }
       flowVoMap.put("environmentVariable", environmentVariableMap);
     }
-    flowVoMap.put("driverMemory", process.getDriverMemory());
-    flowVoMap.put("executorMemory", process.getExecutorMemory());
-    flowVoMap.put("executorCores", process.getExecutorCores());
-    flowVoMap.put("executorNumber", process.getExecutorNumber());
+    flowVoMap.put("environment", process.getEnvironment());
     flowVoMap.put("name", process.getName());
     flowVoMap.put("engineType", process.getEngineType());
     flowVoMap.put("uuid", process.getId());

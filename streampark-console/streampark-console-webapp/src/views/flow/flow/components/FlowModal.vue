@@ -18,7 +18,7 @@
   <BasicModal :width="600" :show-cancel-btn="false" @register="registerModal" @ok="closeModal">
     <template #title>
       <Icon icon="ant-design:partition-outlined" />
-      {{ t('system.user.userInfo') }}
+      {{ t('flow.flow.flow_form.view') }}
     </template>
     <Description :column="1" :data="flowInfo" :schema="flowColumn" />
   </BasicModal>
@@ -35,6 +35,7 @@
   import Icon from '/@/components/Icon';
   import { useModalInner, BasicModal } from '/@/components/Modal';
   import { useI18n } from '/@/hooks/web/useI18n';
+  import { EngineTypeEnum } from '../flow.data';
 
   const flowInfo = ref<Recordable>({});
 
@@ -55,12 +56,37 @@
   const flowColumn: DescItem[] = [
     { label: generatedLabelIcon('user', t('flow.flow.flow_columns.name')), field: 'name' },
     {
-      label: generatedLabelIcon(`clock-circle`, t('common.createTime')),
+      label: generatedLabelIcon(`clock-circle`, t('flow.flow.flow_columns.engine_type')),
       field: 'engineType',
     },
     {
+      label: generatedLabelIcon(`clock-circle`, t('flow.flow.flow_columns.runtimeMode')),
+      field: 'runtimeMode',
+      show: (data) => data.engineType === EngineTypeEnum.FLINK,
+    },
+    {
+      label: generatedLabelIcon(`clock-circle`, t('flow.flow.flow_columns.driverMemory')),
+      field: 'driverMemory',
+      show: (data) => data.engineType === EngineTypeEnum.SPARK,
+    },
+    {
+      label: generatedLabelIcon(`clock-circle`, t('flow.flow.flow_columns.executorNumber')),
+      field: 'executorNumber',
+      show: (data) => data.engineType === EngineTypeEnum.SPARK,
+    },
+    {
+      label: generatedLabelIcon(`clock-circle`, t('flow.flow.flow_columns.executorMemory')),
+      field: 'executorMemory',
+      show: (data) => data.engineType === EngineTypeEnum.SPARK,
+    },
+    {
+      label: generatedLabelIcon(`clock-circle`, t('flow.flow.flow_columns.executorCores')),
+      field: 'executorCores',
+      show: (data) => data.engineType === EngineTypeEnum.SPARK,
+    },
+    {
       label: generatedLabelIcon(`clock-circle`, t('common.createTime')),
-      field: 'createTime',
+      field: 'crtDttm',
     },
     {
       label: generatedLabelIcon(`message`, t('common.description')),

@@ -43,6 +43,8 @@
     ifNotExists: null,
     registerTableName: null,
     registerTableComment: null,
+    selectStatement: null,
+    likeStatement: null,
   });
 
   const emits = defineEmits(['update:value']);

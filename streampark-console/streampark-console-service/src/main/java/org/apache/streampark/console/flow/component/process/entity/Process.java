@@ -23,10 +23,7 @@ public class Process extends BaseModelUUIDNoCorpAgentId {
 
   private String name;
   private String engineType;
-  private String driverMemory;
-  private String executorNumber;
-  private String executorMemory;
-  private String executorCores;
+  private String environment;
   private String viewXml;
   private String description;
   private String pageId;

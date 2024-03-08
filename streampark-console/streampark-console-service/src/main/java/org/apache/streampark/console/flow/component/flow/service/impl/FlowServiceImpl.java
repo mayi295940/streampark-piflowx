@@ -2,6 +2,7 @@ package org.apache.streampark.console.flow.component.flow.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -10,11 +11,13 @@ import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.console.base.exception.ApiAlertException;
+import org.apache.streampark.console.flow.base.utils.JsonUtils;
 import org.apache.streampark.console.flow.base.utils.LoggerUtil;
 import org.apache.streampark.console.flow.base.utils.ReturnMapUtils;
 import org.apache.streampark.console.flow.base.utils.UUIDUtils;
 import org.apache.streampark.console.flow.common.Eunm.ProcessState;
 import org.apache.streampark.console.flow.common.Eunm.RunModeType;
+import org.apache.streampark.console.flow.common.constant.Constants;
 import org.apache.streampark.console.flow.common.constant.MessageConfig;
 import org.apache.streampark.console.flow.component.dataSource.domain.DataSourceDomain;
 import org.apache.streampark.console.flow.component.dataSource.vo.DataSourceVo;
@@ -25,6 +28,9 @@ import org.apache.streampark.console.flow.component.flow.entity.Flow;
 import org.apache.streampark.console.flow.component.flow.entity.FlowGlobalParams;
 import org.apache.streampark.console.flow.component.flow.entity.FlowGroup;
 import org.apache.streampark.console.flow.component.flow.entity.Stops;
+import org.apache.streampark.console.flow.component.flow.env.BeamEnv;
+import org.apache.streampark.console.flow.component.flow.env.FlinkEnv;
+import org.apache.streampark.console.flow.component.flow.env.SparkEnv;
 import org.apache.streampark.console.flow.component.flow.service.IFlowService;
 import org.apache.streampark.console.flow.component.flow.utils.FlowGlobalParamsUtils;
 import org.apache.streampark.console.flow.component.flow.utils.PathsUtil;
@@ -202,6 +208,20 @@ public class FlowServiceImpl implements IFlowService {
         FlowGlobalParamsUtils.globalParamsIdToGlobalParams(flowVo.getGlobalParamsIds());
     flow.setFlowGlobalParamsList(globalParamsIdToGlobalParams);
 
+    if (Constants.ENGIN_FLINK.equalsIgnoreCase(flow.getEngineType())) {
+      FlinkEnv flinkEnv = new FlinkEnv();
+      BeanUtils.copyProperties(flowVo, flinkEnv);
+      flow.setEnvironment(JsonUtils.toJsonNoException(flinkEnv));
+    } else if (Constants.ENGIN_SPARK.equalsIgnoreCase(flow.getEngineType())) {
+      SparkEnv sparkEnv = new SparkEnv();
+      BeanUtils.copyProperties(flowVo, sparkEnv);
+      flow.setEnvironment(JsonUtils.toJsonNoException(sparkEnv));
+    } else if (Constants.ENGIN_BEAM.equalsIgnoreCase(flow.getEngineType())) {
+      BeamEnv beamEnv = new BeamEnv();
+      BeanUtils.copyProperties(flowVo, beamEnv);
+      flow.setEnvironment(JsonUtils.toJsonNoException(beamEnv));
+    }
+
     int addFlow = flowDomain.addFlow(flow);
     ApiAlertException.throwIfTrue(addFlow <= 0, MessageConfig.ADD_ERROR_MSG());
 
@@ -284,6 +304,27 @@ public class FlowServiceImpl implements IFlowService {
       String username, boolean isAdmin, int offset, int limit, String param) {
     Page<FlowVo> page = PageHelper.startPage(offset, limit, "crt_dttm desc");
     List<FlowVo> flowListParam = flowDomain.getFlowListParam(username, isAdmin, param);
+    flowListParam.forEach(
+        vo -> {
+          if (StringUtils.isNotBlank(vo.getEnvironment())) {
+            String engineType = vo.getEngineType();
+            try {
+              if (Constants.ENGIN_FLINK.equals(engineType)) {
+                FlinkEnv flinkEnv = JsonUtils.toObject(vo.getEnvironment(), FlinkEnv.class);
+                BeanUtils.copyProperties(flinkEnv, vo);
+              } else if (Constants.ENGIN_SPARK.equals(engineType)) {
+                SparkEnv sparkEnv = JsonUtils.toObject(vo.getEnvironment(), SparkEnv.class);
+                BeanUtils.copyProperties(sparkEnv, vo);
+              } else if (Constants.ENGIN_BEAM.equals(engineType)) {
+                BeamEnv beamEnv = JsonUtils.toObject(vo.getEnvironment(), BeamEnv.class);
+                BeanUtils.copyProperties(beamEnv, vo);
+              }
+            } catch (IOException e) {
+              logger.error("执行环境参数解析", e);
+            }
+          }
+        });
+
     page.addAll(flowListParam);
     return page;
   }
@@ -354,6 +395,7 @@ public class FlowServiceImpl implements IFlowService {
       processDomain.updateProcessEnableFlag(username, isAdmin, processId);
       return ReturnMapUtils.setFailedMsgRtnJsonStr((String) stringObjectMap.get("errorMsg"));
     }
+
     process = processDomain.getProcessById(username, isAdmin, processId);
     process.setLastUpdateDttm(new Date());
     process.setLastUpdateUser(username);
@@ -415,10 +457,21 @@ public class FlowServiceImpl implements IFlowService {
     }
 
     flowById.setDescription(flowVo.getDescription());
-    flowById.setDriverMemory(flowVo.getDriverMemory());
-    flowById.setExecutorCores(flowVo.getExecutorCores());
-    flowById.setExecutorMemory(flowVo.getExecutorMemory());
-    flowById.setExecutorNumber(flowVo.getExecutorNumber());
+
+    if (Constants.ENGIN_FLINK.equalsIgnoreCase(flowById.getEngineType())) {
+      FlinkEnv flinkEnv = new FlinkEnv();
+      BeanUtils.copyProperties(flowVo, flinkEnv);
+      flowById.setEnvironment(JsonUtils.toJsonNoException(flinkEnv));
+    } else if (Constants.ENGIN_SPARK.equalsIgnoreCase(flowById.getEngineType())) {
+      SparkEnv sparkEnv = new SparkEnv();
+      BeanUtils.copyProperties(flowVo, sparkEnv);
+      flowById.setEnvironment(JsonUtils.toJsonNoException(sparkEnv));
+    } else if (Constants.ENGIN_BEAM.equalsIgnoreCase(flowById.getEngineType())) {
+      BeamEnv beamEnv = new BeamEnv();
+      BeanUtils.copyProperties(flowVo, beamEnv);
+      flowById.setEnvironment(JsonUtils.toJsonNoException(beamEnv));
+    }
+
     flowById.setLastUpdateDttm(new Date());
     flowById.setLastUpdateUser(username);
     List<FlowGlobalParams> globalParamsIdToGlobalParams =

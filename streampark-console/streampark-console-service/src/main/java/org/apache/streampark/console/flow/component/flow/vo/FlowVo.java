@@ -1,16 +1,14 @@
 package org.apache.streampark.console.flow.component.flow.vo;
 
-import org.apache.streampark.console.flow.base.utils.DateUtils;
-import org.apache.streampark.console.flow.component.mxGraph.vo.MxGraphModelVo;
-
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.streampark.console.flow.base.utils.DateUtils;
+import org.apache.streampark.console.flow.component.mxGraph.vo.MxGraphModelVo;
 
 @Getter
 @Setter
@@ -23,10 +21,18 @@ public class FlowVo implements Serializable {
   private String engineType;
   private String uuid;
   private String description;
+
+  private String environment;
+
+  // spark env
   private String driverMemory;
   private String executorNumber;
   private String executorMemory;
   private String executorCores;
+
+  // flink env
+  private String runtimeMode;
+
   private Date crtDttm;
   private String pageId;
   private int stopQuantity;

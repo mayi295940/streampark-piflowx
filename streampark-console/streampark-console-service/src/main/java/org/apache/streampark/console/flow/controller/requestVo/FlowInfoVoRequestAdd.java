@@ -1,10 +1,9 @@
 package org.apache.streampark.console.flow.controller.requestVo;
 
 import io.swagger.annotations.ApiModelProperty;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.io.Serializable;
 
 @Getter
 @Setter
@@ -20,6 +19,9 @@ public class FlowInfoVoRequestAdd implements Serializable {
 
   @ApiModelProperty(value = "engine type", required = true)
   private String engineType;
+
+  @ApiModelProperty(value = "runtime mode", required = false)
+  private String runtimeMode;
 
   @ApiModelProperty(value = "flow description")
   private String description; // description

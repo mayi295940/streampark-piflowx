@@ -5,4 +5,5 @@ public class Constants {
   public static final String ENGIN_SPARK = "spark";
 
   public static final String ENGIN_FLINK = "flink";
+  public static final String ENGIN_BEAM = "beam";
 }

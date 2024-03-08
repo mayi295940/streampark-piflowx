@@ -1,5 +1,11 @@
 package org.apache.streampark.console.flow.third.service.impl;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.sf.json.JSONObject;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.console.flow.base.utils.HttpUtils;
 import org.apache.streampark.console.flow.base.utils.LoggerUtil;
 import org.apache.streampark.console.flow.base.utils.ReturnMapUtils;
@@ -18,18 +24,9 @@ import org.apache.streampark.console.flow.third.utils.ThirdFlowInfoVoUtils;
 import org.apache.streampark.console.flow.third.vo.flow.ThirdFlowInfoStopsVo;
 import org.apache.streampark.console.flow.third.vo.flow.ThirdFlowInfoVo;
 import org.apache.streampark.console.flow.third.vo.flow.ThirdProgressVo;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Component
 public class FlowImpl implements IFlow {
@@ -69,13 +66,11 @@ public class FlowImpl implements IFlow {
         }
       }
     }
-    //        logger.info("==========startFlow::process::"+ JSON.toJSONString(process));
+
     String formatJson =
         ProcessUtils.processToJson(
             process, checkpoint, runModeType, process.getFlowGlobalParamsList());
-    //        logger.info("====startFlow::formatJson::\n" + formatJson);
     String doPost = HttpUtils.doPost(ApiConfig.getFlowStartUrl(), formatJson, null);
-    //        logger.info("Return information：" + doPost);
     if (StringUtils.isBlank(doPost)) {
       return ReturnMapUtils.setFailedMsg(
           "Error : " + MessageConfig.INTERFACE_RETURN_VALUE_IS_NULL_MSG());

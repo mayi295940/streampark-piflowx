@@ -24,6 +24,7 @@ const { t } = useI18n();
 export enum EngineTypeEnum {
   FLINK = 'flink',
   SPARK = 'spark',
+  BEAM = 'beam',
 }
 
 export const columns: BasicColumn[] = [
@@ -80,6 +81,44 @@ export const formSchema = (formType: string): FormSchema[] => {
       defaultValue: EngineTypeEnum.FLINK,
       rules: [{ required: true }],
       componentProps: { id: 'engineType', disabled: !isCreate },
+    },
+    {
+      label: t('flow.flow.flow_columns.runtimeMode'),
+      field: 'runtimeMode',
+      component: 'Select',
+      componentProps: {
+        id: 'runtimeMode',
+        disabled: !isCreate,
+        options: [
+          { label: '批处理', value: 'batch' },
+          { label: '流处理', value: 'streaming' },
+        ],
+      },
+      ifShow: ({ values }) => values.engineType === EngineTypeEnum.FLINK,
+    },
+    {
+      label: t('flow.flow.flow_columns.driverMemory'),
+      field: 'driverMemory',
+      component: 'Input',
+      ifShow: ({ values }) => values.engineType === EngineTypeEnum.SPARK,
+    },
+    {
+      label: t('flow.flow.flow_columns.executorNumber'),
+      field: 'executorNumber',
+      component: 'Input',
+      ifShow: ({ values }) => values.engineType === EngineTypeEnum.SPARK,
+    },
+    {
+      label: t('flow.flow.flow_columns.executorMemory'),
+      field: 'executorMemory',
+      component: 'Input',
+      ifShow: ({ values }) => values.engineType === EngineTypeEnum.SPARK,
+    },
+    {
+      label: t('flow.flow.flow_columns.executorCores'),
+      field: 'executorCores',
+      component: 'Input',
+      ifShow: ({ values }) => values.engineType === EngineTypeEnum.SPARK,
     },
     {
       field: 'description',

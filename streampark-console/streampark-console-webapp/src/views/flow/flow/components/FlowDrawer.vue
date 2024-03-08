@@ -38,11 +38,10 @@
   import { fetchAddFlow, fetchUpdateFlow } from '/@/api/flow/flow';
   import Icon from '/@/components/Icon';
   import { useI18n } from '/@/hooks/web/useI18n';
-  import { Modal } from 'ant-design-vue';
 
   export default defineComponent({
     name: 'FlowDrawer',
-    components: { Modal, BasicDrawer, Icon, BasicForm },
+    components: { BasicDrawer, Icon, BasicForm },
     emits: ['success', 'register'],
     setup(_, { emit }) {
       const { t } = useI18n();

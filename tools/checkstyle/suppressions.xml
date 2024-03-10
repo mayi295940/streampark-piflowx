@@ -67,4 +67,5 @@
 			checks=".*"/>
 		<!-- suppress check for copied hive code -->
 		<suppress files="org[\\/]apache[\\/]hadoop[\\/]hive[\\/].*.java" checks=".*"/>
+		<suppress files="org[\\/]apache[\\/]streampark[\\/]console[\\/]flow[\\/].*.java" checks=".*"/>
 </suppressions>

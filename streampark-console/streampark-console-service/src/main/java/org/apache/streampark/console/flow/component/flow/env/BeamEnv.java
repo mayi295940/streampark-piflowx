@@ -5,6 +5,4 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class BeamEnv {
-
-}
+public class BeamEnv {}

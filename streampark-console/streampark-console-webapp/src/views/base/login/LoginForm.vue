@@ -199,6 +199,10 @@
           if (nickName) successText += `: ${nickName}`;
         }
 
+        if (data?.basePath) {
+          localStorage.setItem('basePath', data.basePath);
+        }
+
         const loginSuccess = await userStore.afterLoginAction(true);
         if (loginSuccess) {
           createMessage.success(`${t('sys.login.loginSuccessTitle')} ${successText}`);

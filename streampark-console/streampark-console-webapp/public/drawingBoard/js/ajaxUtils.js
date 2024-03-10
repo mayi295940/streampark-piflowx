@@ -22,17 +22,16 @@ if (document.cookie && document.cookie != '') {
             token = cookie.substring('token'.length + 2, cookie.length);
             // break
         }
-
-        if (!token) {
-          token = localStorage.getItem('token')
-        }
-     
     }
+
+    if (!token) {
+      token = localStorage.getItem('token')
+    }
+
 }
 
-var basePath = 'basic-api';
+var basePath = localStorage.getItem('basePath');
 var web_header_prefix = basePath.indexOf(window.location.origin) || basePath.indexOf('http') > -1 ? basePath : web_base_origin + basePath; //与 .env.production 内容同步
-var web_header_prefix2 = web_base_origin + 'basic-api';
 
 /**
  * ajax工具js
@@ -68,11 +67,7 @@ function ajaxRequest(param) {
         contentType = param.contentType
     }
 
-    if (url.indexOf(".") > -1) {
-      url = web_header_prefix2 + url;
-    } else {
-      url = "/" + basePath + "/" + param.url;
-    }
+    url = web_header_prefix + url;
 
     $.ajax({
         cache: cache,
@@ -192,15 +187,14 @@ function openLayerTypeIframeWindowLoadUrl(url, window_width, window_height, titl
     });
 }
 
+
 // window.location
 function window_location_href(url) {
-    window.top.location.href = window.location.origin + "/#/flow/drawingBoard?src=" + web_drawingBoard + url ;
-    // window.top.location.reload();
-    // window.open(window.location.origin + "/#/drawingBoard?src=" + web_drawingBoard + url,"_blank");
+    window.top.location.href = window.location.origin + "/index.html/#/flow/drawingBoard?src=" + web_drawingBoard + url ;
 }
 
 function new_window_open(url) {
-    var tempWindow = window.top.location.href = window.location.origin + "/#/flow/drawingBoard?src=" + web_drawingBoard + url;
+    var tempWindow = window.top.location.href = window.location.origin + "/index.html/#/flow/drawingBoard?src=" + web_drawingBoard + url;
 
     // var tempWindow = window.open(window.location.origin + "/#/drawingBoard?src=" + web_drawingBoard + url);
     if (tempWindow == null || typeof (tempWindow) == 'undefined') {

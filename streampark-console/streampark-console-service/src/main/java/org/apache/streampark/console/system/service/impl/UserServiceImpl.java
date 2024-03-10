@@ -50,12 +50,15 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Date;
@@ -81,6 +84,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   @Autowired private ResourceService resourceService;
 
   @Autowired private ShiroProperties shiroProperties;
+
+  @Value("${server.port}")
+  private String serverPort;
 
   @Override
   public User getByUsername(String username) {
@@ -261,6 +267,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     // 3) permissions
     Set<String> permissions = this.listPermissions(user.getUserId(), teamId);
     userInfo.put("permissions", permissions);
+
+    try {
+      String hostAddress = InetAddress.getLocalHost().getHostAddress();
+      userInfo.put("basePath", String.format("http://%s:%s/", hostAddress, serverPort));
+    } catch (UnknownHostException e) {
+      log.error("get host address failed", e);
+    }
 
     return userInfo;
   }

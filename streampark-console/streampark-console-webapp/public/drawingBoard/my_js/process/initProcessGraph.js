@@ -61,17 +61,19 @@ function initProcessDrawingBoardData(loadId, parentAccessPath, backFunc) {
                 processState = dataMap.processState;
                 progress = dataMap.percentage;
                 getCheckpointParam = "'" + (dataMap.pID ? dataMap.pID : "") + "','" + (dataMap.parentProcessId ? dataMap.parentProcessId : "") + "', '" + (dataMap.processId ? dataMap.processId : "") + "'";
-                top.document.getElementById('BreadcrumbProcess').style.display = 'block';
-                top.document.getElementById('BreadcrumbProcessGroup').style.display = 'none';
-                top.document.getElementById('BreadcrumbFlow').style.display = 'none';
-                top.document.getElementById('BreadcrumbGroup').style.display = 'none';
-                top.document.getElementById('BreadcrumbSchedule').style.display = 'none';
+                // top.document.getElementById('BreadcrumbProcess').style.display = 'block';
+                // top.document.getElementById('BreadcrumbProcessGroup').style.display = 'none';
+                // top.document.getElementById('BreadcrumbFlow').style.display = 'none';
+                // top.document.getElementById('BreadcrumbGroup').style.display = 'none';
+                // top.document.getElementById('BreadcrumbSchedule').style.display = 'none';
                 var link = top.document.getElementById('ProcessParents');
-                if (processGroupId !== 'null' && processGroupId !== undefined){
+                if (link) {
+                  if (processGroupId !== 'null' && processGroupId !== undefined){
                     link.style.display = 'inline-block';
                     link.href='#/flow/drawingBoard?src=/drawingBoard/page/processGroup/mxGraph/index.html?drawingBoardType=PROCESS&parentAccessPath=processGroupList&processType=PROCESS_GROUP&load='+processGroupId;
-                }else {
+                  } else {
                     link.style.display = 'none';
+                  }
                 }
             } else {
                 //window.location.href = (web_baseUrl + "/error/404");

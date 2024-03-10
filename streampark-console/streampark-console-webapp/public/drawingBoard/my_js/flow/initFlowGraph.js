@@ -336,7 +336,7 @@ function loadXml(loadStr, cells) {
         return;
     }
     loadStr = replaceImageHead(loadStr, 'img');
-    loadStr = replaceImageHead(loadStr, 'images');
+    //loadStr = replaceImageHead(loadStr, 'images');
     var xml = mxUtils.parseXml(loadStr);
     var node = xml.documentElement;
     var dec = new mxCodec(node.ownerDocument);

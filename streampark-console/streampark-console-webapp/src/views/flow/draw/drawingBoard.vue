@@ -617,4 +617,7 @@
   .mytable-scrollbar ::-webkit-scrollbar-corner {
     background-color: #ffffff;
   }
+  ::v-deep .ant-col-0 {
+    display: block;
+  }
 </style>

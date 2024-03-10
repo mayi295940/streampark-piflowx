@@ -145,3 +145,16 @@ ldap:
 sso:
   # If turn to true, please provide the sso properties the application-sso.yml
   enable: false
+
+piflowx:
+  server:
+    ip: 172.21.3.208
+    port: 8001
+
+syspara:
+  interfaceUrlHead: http://${piflowx.server.ip}:${piflowx.server.port}
+
+flow:
+  images:
+    path:
+      prefix: http://${piflowx.server.ip}:${server.port}

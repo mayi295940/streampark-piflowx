@@ -37,6 +37,7 @@ export interface LoginResultModel {
   roles: string[];
   token: string;
   user: GetUserInfoModel;
+  basePath: string;
 }
 
 /**

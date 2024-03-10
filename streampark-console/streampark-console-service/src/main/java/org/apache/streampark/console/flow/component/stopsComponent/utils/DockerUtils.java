@@ -261,6 +261,6 @@ public class DockerUtils {
    * @return
    */
   public static List<Image> imageList(DockerClient dockerClient) {
-      return dockerClient.listImagesCmd().withShowAll(true).exec();
+    return dockerClient.listImagesCmd().withShowAll(true).exec();
   }
 }

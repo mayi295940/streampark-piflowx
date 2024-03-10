@@ -11,5 +11,4 @@ public class SparkEnv {
   private String executorNumber = "1";
   private String executorMemory = "1g";
   private String executorCores = "1";
-
 }

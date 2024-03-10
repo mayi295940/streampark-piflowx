@@ -79,6 +79,13 @@ public class ShiroConfig {
     filterChainDefinitionMap.put("/*.jpg", ANON);
     filterChainDefinitionMap.put("/*.less", ANON);
     filterChainDefinitionMap.put("/*.ico", ANON);
+    filterChainDefinitionMap.put("/*.html", ANON);
+    filterChainDefinitionMap.put("/*.css", ANON);
+    filterChainDefinitionMap.put("/drawingBoard/**", ANON);
+    filterChainDefinitionMap.put("/config/*.css", ANON);
+    filterChainDefinitionMap.put("/flow/**", ANON);
+    filterChainDefinitionMap.put("/stops/**", ANON);
+    filterChainDefinitionMap.put("/mxGraph/**", ANON);
     filterChainDefinitionMap.put("/", ANON);
     filterChainDefinitionMap.put("/**", JWT);
 

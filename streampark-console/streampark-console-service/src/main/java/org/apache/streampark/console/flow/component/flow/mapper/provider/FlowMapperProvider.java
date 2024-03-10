@@ -116,9 +116,7 @@ public class FlowMapperProvider {
     return sqlStr;
   }
 
-  /**
-   * update Flow
-   */
+  /** update Flow */
   public String updateFlow(Flow flow) {
 
     String sqlStr = "";
@@ -152,9 +150,7 @@ public class FlowMapperProvider {
     return sqlStr;
   }
 
-  /**
-   * get flow list
-   */
+  /** get flow list */
   public String getFlowList() {
     String sqlStr = "";
     SQL sql = new SQL();
@@ -168,9 +164,7 @@ public class FlowMapperProvider {
     return sqlStr;
   }
 
-  /**
-   * Query all flow paging queries
-   */
+  /** Query all flow paging queries */
   public String getFlowListParam(String username, boolean isAdmin, String param) {
     String sqlStr = "SELECT 0";
     StringBuffer strBuf = new StringBuffer();
@@ -195,9 +189,7 @@ public class FlowMapperProvider {
     return sqlStr;
   }
 
-  /**
-   * Query the sample flow list
-   */
+  /** Query the sample flow list */
   public String getFlowExampleList() {
     String sqlStr = "";
     SQL sql = new SQL();
@@ -210,9 +202,7 @@ public class FlowMapperProvider {
     return sqlStr;
   }
 
-  /**
-   * get flow by id
-   */
+  /** get flow by id */
   public String getFlowById(String id) {
     String sqlStr = "";
     if (StringUtils.isNotBlank(id)) {
@@ -226,9 +216,7 @@ public class FlowMapperProvider {
     return sqlStr;
   }
 
-  /**
-   * get flow by pageId
-   */
+  /** get flow by pageId */
   public String getFlowByPageId(String fid, String pageId) {
     String sqlStr = "";
     if (StringUtils.isBlank(fid) || StringUtils.isBlank(pageId)) {
@@ -244,9 +232,7 @@ public class FlowMapperProvider {
     return sqlStr;
   }
 
-  /**
-   * Delete according to id logic, set to invalid
-   */
+  /** Delete according to id logic, set to invalid */
   public String updateEnableFlagById(String username, String id) {
     if (StringUtils.isBlank(username)) {
       return "SELECT 0";
@@ -332,6 +318,6 @@ public class FlowMapperProvider {
       }
     }
     strBuf.append(") ");
-      return strBuf.toString();
+    return strBuf.toString();
   }
 }

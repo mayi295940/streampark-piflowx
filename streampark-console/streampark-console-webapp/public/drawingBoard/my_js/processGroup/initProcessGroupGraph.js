@@ -70,11 +70,11 @@ function initProcessGroupDrawingBoardData(loadId, parentAccessPath, backFunc) {
                 } else {
                     parentsId = 'null';
                 }
-                top.document.getElementById('BreadcrumbProcessGroup').style.display = 'block';
-                top.document.getElementById('BreadcrumbProcess').style.display = 'none';
-                top.document.getElementById('BreadcrumbFlow').style.display = 'none';
-                top.document.getElementById('BreadcrumbGroup').style.display = 'none';
-                top.document.getElementById('BreadcrumbSchedule').style.display = 'none';
+                // top.document.getElementById('BreadcrumbProcessGroup').style.display = 'block';
+                // top.document.getElementById('BreadcrumbProcess').style.display = 'none';
+                // top.document.getElementById('BreadcrumbFlow').style.display = 'none';
+                // top.document.getElementById('BreadcrumbGroup').style.display = 'none';
+                // top.document.getElementById('BreadcrumbSchedule').style.display = 'none';
                 var link = top.document.getElementById('ProcessGroupParents');
                 if (parentsId !== 'null') {
                     link.style.display = 'inline-block';

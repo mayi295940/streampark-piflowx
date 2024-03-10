@@ -27,17 +27,17 @@ function initFlowGroupDrawingBoardData(loadId, parentAccessPath, backFunc) {
                 } else {
                     parentsId = 'null';
                 }
-                let herf = top.window.location.href.split("src=")[1];
-                if (herf.indexOf('BreadcrumbSchedule') !== -1) {
-                    top.document.getElementById('BreadcrumbSchedule').style.display = 'block';
-                    top.document.getElementById('BreadcrumbGroup').style.display = 'none';
-                } else {
-                    top.document.getElementById('BreadcrumbGroup').style.display = 'block';
-                    top.document.getElementById('BreadcrumbSchedule').style.display = 'none';
-                }
-                top.document.getElementById('BreadcrumbFlow').style.display = 'none';
-                top.document.getElementById('BreadcrumbProcess').style.display = 'none';
-                top.document.getElementById('BreadcrumbProcessGroup').style.display = 'none';
+                // let herf = top.window.location.href.split("src=")[1];
+                // if (herf.indexOf('BreadcrumbSchedule') !== -1) {
+                //     top.document.getElementById('BreadcrumbSchedule').style.display = 'block';
+                //     top.document.getElementById('BreadcrumbGroup').style.display = 'none';
+                // } else {
+                //     top.document.getElementById('BreadcrumbGroup').style.display = 'block';
+                //     top.document.getElementById('BreadcrumbSchedule').style.display = 'none';
+                // }
+                // top.document.getElementById('BreadcrumbFlow').style.display = 'none';
+                // top.document.getElementById('BreadcrumbProcess').style.display = 'none';
+                // top.document.getElementById('BreadcrumbProcessGroup').style.display = 'none';
                 var link = top.document.getElementById('GroupParents');
                 if (parentsId !== 'null') {
                     link.style.display = 'inline-block';

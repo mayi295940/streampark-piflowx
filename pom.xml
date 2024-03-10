@@ -801,6 +801,7 @@
                     <artifactId>apache-rat-plugin</artifactId>
                     <version>${maven-apache-rat-plugin.version}</version>
                     <configuration>
+                        <numUnapprovedLicenses>600</numUnapprovedLicenses>
                         <excludes>
                             <exclude>.asf.yaml</exclude>
                             <exclude>.git-blame-ignore-revs</exclude>

@@ -1,12 +1,5 @@
 package org.apache.streampark.console.flow.utils;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.TypeReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.console.flow.component.flow.vo.StopsPropertyVo;
 import org.apache.streampark.console.flow.model.flink.FlinkTableAsSelectStatement;
 import org.apache.streampark.console.flow.model.flink.FlinkTableBaseInfo;
@@ -16,7 +9,17 @@ import org.apache.streampark.console.flow.model.flink.FlinkTableLikeStatement;
 import org.apache.streampark.console.flow.model.flink.FlinkTableMetadataColumn;
 import org.apache.streampark.console.flow.model.flink.FlinkTablePhysicalColumn;
 import org.apache.streampark.console.flow.model.flink.FlinkTableWatermark;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
 import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FlinkTableUtil {
 

@@ -122,6 +122,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
             Arrays.asList(
                 "/flink/app/upload",
                 "/resource/upload",
+                "/drawingBoard/**",
                 "/components/**",
                 "/js/**",
                 "/css/**",

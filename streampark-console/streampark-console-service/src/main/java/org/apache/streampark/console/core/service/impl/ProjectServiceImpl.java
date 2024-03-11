@@ -33,7 +33,6 @@ import org.apache.streampark.console.base.util.GZipUtils;
 import org.apache.streampark.console.core.entity.Application;
 import org.apache.streampark.console.core.entity.Project;
 import org.apache.streampark.console.core.enums.BuildStateEnum;
-import org.apache.streampark.console.core.enums.GitCredentialEnum;
 import org.apache.streampark.console.core.enums.ReleaseStateEnum;
 import org.apache.streampark.console.core.mapper.ProjectMapper;
 import org.apache.streampark.console.core.service.ProjectService;
@@ -96,7 +95,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project>
 
     ApiAlertException.throwIfTrue(count > 0, "project name already exists, add project failed");
 
-    project.setCreateTime(new Date());
+    Date date = new Date();
+    project.setCreateTime(date);
+    project.setModifyTime(date);
     boolean status = save(project);
 
     if (status) {
@@ -115,17 +116,8 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project>
     ApiAlertException.throwIfFalse(
         !project.getBuildState().equals(BuildStateEnum.BUILDING.get()),
         "The project is being built, update project failed.");
-    project.setName(projectParam.getName());
-    project.setUrl(projectParam.getUrl());
-    project.setBranches(projectParam.getBranches());
-    project.setGitCredential(projectParam.getGitCredential());
-    project.setPrvkeyPath(projectParam.getPrvkeyPath());
-    project.setUserName(projectParam.getUserName());
-    project.setPassword(projectParam.getPassword());
-    project.setPom(projectParam.getPom());
-    project.setDescription(projectParam.getDescription());
-    project.setBuildArgs(projectParam.getBuildArgs());
-    if (GitCredentialEnum.isSSH(project.getGitCredential())) {
+    updateInternal(projectParam, project);
+    if (project.isSshRepositoryUrl()) {
       project.setUserName(null);
     } else {
       project.setPrvkeyPath(null);
@@ -146,6 +138,18 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project>
     }
     baseMapper.updateById(project);
     return true;
+  }
+
+  private static void updateInternal(Project projectParam, Project project) {
+    project.setName(projectParam.getName());
+    project.setUrl(projectParam.getUrl());
+    project.setBranches(projectParam.getBranches());
+    project.setPrvkeyPath(projectParam.getPrvkeyPath());
+    project.setUserName(projectParam.getUserName());
+    project.setPassword(projectParam.getPassword());
+    project.setPom(projectParam.getPom());
+    project.setDescription(projectParam.getDescription());
+    project.setBuildArgs(projectParam.getBuildArgs());
   }
 
   @Override

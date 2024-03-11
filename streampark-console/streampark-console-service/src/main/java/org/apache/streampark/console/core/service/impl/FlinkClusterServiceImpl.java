@@ -123,6 +123,7 @@ public class FlinkClusterServiceImpl extends ServiceImpl<FlinkClusterMapper, Fli
 
     // 3) Check connection
     if (FlinkExecutionMode.isRemoteMode(cluster.getFlinkExecutionModeEnum())
+        && cluster.getClusterId() != null
         && !flinkClusterWatcher.verifyClusterConnection(cluster)) {
       result.setMsg("The remote cluster connection failed, please check!");
       result.setStatus(3);
@@ -214,29 +215,39 @@ public class FlinkClusterServiceImpl extends ServiceImpl<FlinkClusterMapper, Fli
     flinkCluster.setAlertId(paramOfCluster.getAlertId());
     flinkCluster.setDescription(paramOfCluster.getDescription());
     if (FlinkExecutionMode.isRemoteMode(flinkCluster.getFlinkExecutionModeEnum())) {
-      flinkCluster.setAddress(paramOfCluster.getAddress());
-      flinkCluster.setClusterState(ClusterState.RUNNING.getState());
-      flinkCluster.setStartTime(new Date());
-      flinkCluster.setEndTime(null);
+      updateFlinkClusterForRemoteMode(paramOfCluster, flinkCluster);
       FlinkClusterWatcher.addWatching(flinkCluster);
     } else {
-      flinkCluster.setClusterId(paramOfCluster.getClusterId());
-      flinkCluster.setVersionId(paramOfCluster.getVersionId());
-      flinkCluster.setDynamicProperties(paramOfCluster.getDynamicProperties());
-      flinkCluster.setOptions(paramOfCluster.getOptions());
-      flinkCluster.setResolveOrder(paramOfCluster.getResolveOrder());
-      flinkCluster.setK8sHadoopIntegration(paramOfCluster.getK8sHadoopIntegration());
-      flinkCluster.setK8sConf(paramOfCluster.getK8sConf());
-      flinkCluster.setK8sNamespace(paramOfCluster.getK8sNamespace());
-      flinkCluster.setK8sRestExposedType(paramOfCluster.getK8sRestExposedType());
-      flinkCluster.setServiceAccount(paramOfCluster.getServiceAccount());
-      flinkCluster.setFlinkImage(paramOfCluster.getFlinkImage());
-      flinkCluster.setYarnQueue(paramOfCluster.getYarnQueue());
+      updateFlinkClusterForNonRemoteModes(paramOfCluster, flinkCluster);
     }
     if (shouldWatchForK8s(flinkCluster)) {
       flinkK8sObserver.watchFlinkCluster(flinkCluster);
     }
     updateById(flinkCluster);
+  }
+
+  private void updateFlinkClusterForNonRemoteModes(
+      FlinkCluster paramOfCluster, FlinkCluster flinkCluster) {
+    flinkCluster.setClusterId(paramOfCluster.getClusterId());
+    flinkCluster.setVersionId(paramOfCluster.getVersionId());
+    flinkCluster.setDynamicProperties(paramOfCluster.getDynamicProperties());
+    flinkCluster.setOptions(paramOfCluster.getOptions());
+    flinkCluster.setResolveOrder(paramOfCluster.getResolveOrder());
+    flinkCluster.setK8sHadoopIntegration(paramOfCluster.getK8sHadoopIntegration());
+    flinkCluster.setK8sConf(paramOfCluster.getK8sConf());
+    flinkCluster.setK8sNamespace(paramOfCluster.getK8sNamespace());
+    flinkCluster.setK8sRestExposedType(paramOfCluster.getK8sRestExposedType());
+    flinkCluster.setServiceAccount(paramOfCluster.getServiceAccount());
+    flinkCluster.setFlinkImage(paramOfCluster.getFlinkImage());
+    flinkCluster.setYarnQueue(paramOfCluster.getYarnQueue());
+  }
+
+  private void updateFlinkClusterForRemoteMode(
+      FlinkCluster paramOfCluster, FlinkCluster flinkCluster) {
+    flinkCluster.setAddress(paramOfCluster.getAddress());
+    flinkCluster.setClusterState(ClusterState.RUNNING.getState());
+    flinkCluster.setStartTime(new Date());
+    flinkCluster.setEndTime(null);
   }
 
   @Override
@@ -341,8 +352,7 @@ public class FlinkClusterServiceImpl extends ServiceImpl<FlinkClusterMapper, Fli
   }
 
   @Override
-  public void remove(FlinkCluster cluster) {
-    Long id = cluster.getId();
+  public void remove(Long id) {
     FlinkCluster flinkCluster = getById(id);
     ApiAlertException.throwIfNull(flinkCluster, "Flink cluster not exist, please check.");
 

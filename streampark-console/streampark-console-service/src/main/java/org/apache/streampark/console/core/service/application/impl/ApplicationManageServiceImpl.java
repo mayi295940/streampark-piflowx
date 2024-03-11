@@ -183,9 +183,9 @@ public class ApplicationManageServiceImpl extends ServiceImpl<ApplicationMapper,
   }
 
   @Override
-  public Boolean remove(Application appParam) {
+  public Boolean remove(Long appId) {
 
-    Application application = getById(appParam.getId());
+    Application application = getById(appId);
 
     // 1) remove flink sql
     flinkSqlService.removeByAppId(application.getId());
@@ -217,7 +217,7 @@ public class ApplicationManageServiceImpl extends ServiceImpl<ApplicationMapper,
         flinkK8sObserver.unWatchById(application.getId());
       }
     } else {
-      FlinkAppHttpWatcher.unWatching(appParam.getId());
+      FlinkAppHttpWatcher.unWatching(appId);
     }
     return true;
   }
@@ -275,34 +275,36 @@ public class ApplicationManageServiceImpl extends ServiceImpl<ApplicationMapper,
                     // set duration
                     String restUrl = k8SFlinkTrackMonitor.getRemoteRestUrl(toTrackId(record));
                     record.setFlinkRestUrl(restUrl);
-                    if (record.getTracking() == 1
-                        && record.getStartTime() != null
-                        && record.getStartTime().getTime() > 0) {
-                      record.setDuration(now - record.getStartTime().getTime());
-                    }
+                    setAppDurationIfNeeded(record, now);
                   }
                   if (pipeStates.containsKey(record.getId())) {
                     record.setBuildStatus(pipeStates.get(record.getId()).getCode());
                   }
-
-                  AppControl appControl =
-                      new AppControl()
-                          .setAllowBuild(
-                              record.getBuildStatus() == null
-                                  || !PipelineStatusEnum.running
-                                      .getCode()
-                                      .equals(record.getBuildStatus()))
-                          .setAllowStart(
-                              !record.shouldTracking()
-                                  && PipelineStatusEnum.success
-                                      .getCode()
-                                      .equals(record.getBuildStatus()))
-                          .setAllowStop(record.isRunning());
+                  AppControl appControl = getAppControl(record);
                   record.setAppControl(appControl);
                 })
             .collect(Collectors.toList());
     page.setRecords(newRecords);
     return page;
+  }
+
+  private void setAppDurationIfNeeded(Application record, long now) {
+    if (record.getTracking() == 1
+        && record.getStartTime() != null
+        && record.getStartTime().getTime() > 0) {
+      record.setDuration(now - record.getStartTime().getTime());
+    }
+  }
+
+  private AppControl getAppControl(Application record) {
+    return new AppControl()
+        .setAllowBuild(
+            record.getBuildStatus() == null
+                || !PipelineStatusEnum.running.getCode().equals(record.getBuildStatus()))
+        .setAllowStart(
+            !record.shouldTracking()
+                && PipelineStatusEnum.success.getCode().equals(record.getBuildStatus()))
+        .setAllowStop(record.isRunning());
   }
 
   @Override
@@ -323,8 +325,9 @@ public class ApplicationManageServiceImpl extends ServiceImpl<ApplicationMapper,
     appParam.setState(FlinkAppStateEnum.ADDED.getValue());
     appParam.setRelease(ReleaseStateEnum.NEED_RELEASE.get());
     appParam.setOptionState(OptionStateEnum.NONE.getValue());
-    appParam.setCreateTime(new Date());
-    appParam.setModifyTime(new Date());
+    Date date = new Date();
+    appParam.setCreateTime(date);
+    appParam.setModifyTime(date);
     appParam.setDefaultModeIngress(settingService.getIngressModeDefault());
 
     boolean success = validateQueueIfNeeded(appParam);
@@ -432,8 +435,9 @@ public class ApplicationManageServiceImpl extends ServiceImpl<ApplicationMapper,
     newApp.setState(FlinkAppStateEnum.ADDED.getValue());
     newApp.setRelease(ReleaseStateEnum.NEED_RELEASE.get());
     newApp.setOptionState(OptionStateEnum.NONE.getValue());
-    newApp.setCreateTime(new Date());
-    newApp.setModifyTime(new Date());
+    Date date = new Date();
+    newApp.setCreateTime(date);
+    newApp.setModifyTime(date);
     newApp.setHotParams(oldApp.getHotParams());
 
     newApp.setJar(oldApp.getJar());
@@ -762,10 +766,10 @@ public class ApplicationManageServiceImpl extends ServiceImpl<ApplicationMapper,
   }
 
   @Override
-  public Application getApp(Application appParam) {
-    Application application = this.baseMapper.selectApp(appParam);
-    ApplicationConfig config = configService.getEffective(appParam.getId());
-    config = config == null ? configService.getLatest(appParam.getId()) : config;
+  public Application getApp(Long id) {
+    Application application = this.baseMapper.selectApp(id);
+    ApplicationConfig config = configService.getEffective(id);
+    config = config == null ? configService.getLatest(id) : config;
     if (config != null) {
       config.setToApplication(application);
     }
@@ -790,11 +794,7 @@ public class ApplicationManageServiceImpl extends ServiceImpl<ApplicationMapper,
 
       // set duration
       long now = System.currentTimeMillis();
-      if (application.getTracking() == 1
-          && application.getStartTime() != null
-          && application.getStartTime().getTime() > 0) {
-        application.setDuration(now - application.getStartTime().getTime());
-      }
+      setAppDurationIfNeeded(application, now);
     }
 
     application.setYarnQueueByHotParams();

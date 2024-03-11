@@ -83,7 +83,7 @@ public class EnvInitializer implements ApplicationRunner {
     boolean isTest = Arrays.asList(context.getEnvironment().getActiveProfiles()).contains("test");
     if (!isTest) {
       // initialize local file system resources
-      storageInitialize(LFS);
+      //storageInitialize(LFS);
       // Launch the embedded http file server.
       ZIOExt.unsafeRun(EmbeddedFileServer.launch());
     }
@@ -118,7 +118,7 @@ public class EnvInitializer implements ApplicationRunner {
 
   public synchronized void storageInitialize(StorageType storageType) {
 
-    checkAppHome();
+     checkAppHome();
 
     if (initialized.contains(storageType)) {
       return;

@@ -148,7 +148,7 @@ insert into `t_menu` values (150504, 150500, 'member delete', null, null, 'membe
 
 
 insert into `t_menu` values (150601, 160000, 'flow.flow', '/flow/flow', 'flow/flow/View', null, null, '0', 1, 1, now(), now());
-insert into `t_menu` values (150602, 160000, 'flow.group', '/flow/group', 'flow/group/View', null, null, '0', 1, 2, now(), now());
+-- insert into `t_menu` values (150602, 160000, 'flow.group', '/flow/group', 'flow/group/View', null, null, '0', 1, 2, now(), now());
 
 insert into `t_menu` values (150701, 150601, 'flow view', null, null, 'flow:view', null, '1', 1, null, now(), now());
 insert into `t_menu` values (150702, 150601, 'flow add', null, null, 'flow:add', null, '1', 1, null, now(), now());
@@ -280,7 +280,7 @@ insert into `t_role_menu` values (100110, 100002, 150504);
 
 insert into `t_role_menu` values (100111, 100001, 160000);
 insert into `t_role_menu` values (100112, 100001, 150601);
-insert into `t_role_menu` values (100113, 100001, 150602);
+-- insert into `t_role_menu` values (100113, 100001, 150602);
 insert into `t_role_menu` values (100114, 100001, 150701);
 insert into `t_role_menu` values (100115, 100001, 150702);
 insert into `t_role_menu` values (100116, 100001, 150703);

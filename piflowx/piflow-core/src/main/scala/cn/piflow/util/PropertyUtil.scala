@@ -15,9 +15,9 @@ object PropertyUtil {
   val EXIST_FLAG = 1
 
   try {
-    val path = Thread.currentThread().getContextClassLoader.getResource("config.properties").getPath
+    // val path = Thread.currentThread().getContextClassLoader.getResource("config.properties").getPath
     val userDir = System.getProperty("user.dir")
-    // path = userDir + "/config.properties"
+    path = userDir + "/config.properties"
     prop.load(new FileInputStream(path))
     classPath = userDir + "/classpath/"
     scalaPath = userDir + "/scala/"

@@ -1,0 +1,65 @@
+{
+  "flow": {
+    "name": "test",
+    "uuid": "1234",
+    "stops": [
+      {
+        "uuid": "0000",
+        "name": "CsvStringParser1",
+        "bundle": "cn.piflow.bundle.flink.csv.CsvStringParser",
+        "properties": {
+          "string": "1,zs,13112345678,1000.12344,180.12,false,2023-12-15 21:41:29,2023-12-15 21:41:29\n2,ls,13112345678,1000.12344,180.12,false,2023-12-15 21:41:29,2023-12-15 21:41:29",
+          "delimiter": ",",
+          "schema": "id:int,name:string,phone:long,salary:double,height:float,sex:boolean,birthdate:date,birthdate2:timestamp"
+        }
+      },
+      {
+        "uuid": "1111",
+        "name": "CsvStringParser2",
+        "bundle": "cn.piflow.bundle.flink.csv.CsvStringParser",
+        "properties": {
+          "string": "1,zs1,13112345678,1000.12344,180.12,false,2023-12-15 21:41:29,2023-12-15 21:41:29\n3,ls,13112345678,1000.12344,180.12,false,2023-12-15 21:41:29,2023-12-15 21:41:29",
+          "delimiter": ",",
+          "schema": "id:int,name:string,phone:long,salary:double,height:float,sex:boolean,birthdate:date,birthdate2:timestamp"
+        }
+      },
+      {
+        "uuid": "2222",
+        "name": "Join1",
+        "bundle": "cn.piflow.bundle.flink.common.Join",
+        "properties": {
+          "correlationColumn": "id,id",
+          "joinMode": "inner"
+        }
+      },
+      {
+        "uuid": "3333",
+        "name": "ShowData1",
+        "bundle": "cn.piflow.bundle.flink.common.ShowData",
+        "properties": {
+          "showNumber": "5000"
+        }
+      }
+    ],
+    "paths": [
+      {
+        "from": "CsvStringParser1",
+        "outport": "",
+        "inport": "Left",
+        "to": "Join1"
+      },
+      {
+        "from": "CsvStringParser2",
+        "outport": "",
+        "inport": "Right",
+        "to": "Join1"
+      },
+      {
+        "from": "Join1",
+        "outport": "",
+        "inport": "",
+        "to": "ShowData1"
+      }
+    ]
+  }
+}

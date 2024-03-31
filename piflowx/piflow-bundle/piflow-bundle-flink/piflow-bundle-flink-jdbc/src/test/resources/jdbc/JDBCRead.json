@@ -1,0 +1,37 @@
+{
+  "flow": {
+    "name": "JDBCReadTest",
+    "uuid": "1234",
+    "stops": [
+      {
+        "uuid": "0000",
+        "name": "JDBCRead1",
+        "bundle": "cn.piflow.bundle.flink.jdbc.JDBCRead",
+        "properties": {
+          "url": "jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8&useSSL=false&allowMultiQueries=true",
+          "username": "root",
+          "password": "123456",
+          "tableName": "test",
+          "tableDefinition": "{\"catalogName\":null,\"dbname\":null,\"tableName\":\"\",\"ifNotExists\":true,\"physicalColumnDefinition\":[{\"columnName\":\"id\",\"columnType\":\"INT\",\"comment\":\"id\"},{\"columnName\":\"name\",\"columnType\":\"STRING\",\"comment\":\"name\"},{\"columnName\":\"age\",\"columnType\":\"INT\"}],\"metadataColumnDefinition\":null,\"computedColumnDefinition\":null,\"watermarkDefinition\":null}",
+          "properties": "{}"
+        }
+      },
+      {
+        "uuid": "2222",
+        "name": "ShowData1",
+        "bundle": "cn.piflow.bundle.flink.common.ShowData",
+        "properties": {
+          "showNumber": "100"
+        }
+      }
+    ],
+    "paths": [
+      {
+        "from": "JDBCRead1",
+        "outport": "",
+        "inport": "",
+        "to": "ShowData1"
+      }
+    ]
+  }
+}

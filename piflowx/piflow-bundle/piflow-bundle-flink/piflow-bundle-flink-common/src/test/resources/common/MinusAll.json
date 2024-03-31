@@ -1,0 +1,65 @@
+{
+  "flow": {
+    "name": "test",
+    "uuid": "1234",
+    "stops": [
+      {
+        "uuid": "0000",
+        "name": "CsvParser1",
+        "bundle": "cn.piflow.bundle.flink.csv.CsvParser",
+        "properties": {
+          "csvPath": "src/test/resources/csv/user.csv",
+          "header": "true",
+          "delimiter": ",",
+          "schema": "name:string,age:int"
+        }
+      },
+      {
+        "uuid": "1111",
+        "name": "CsvParser2",
+        "bundle": "cn.piflow.bundle.flink.csv.CsvParser",
+        "properties": {
+          "csvPath": "src/test/resources/csv/user2.csv",
+          "header": "true",
+          "delimiter": ",",
+          "schema": "name:string,age:int"
+        }
+      },
+      {
+        "uuid": "2222",
+        "name": "Subtract",
+        "bundle": "cn.piflow.bundle.flink.common.MinusAll",
+        "properties": {
+        }
+      },
+      {
+        "uuid": "3333",
+        "name": "ShowData1",
+        "bundle": "cn.piflow.bundle.flink.common.ShowData",
+        "properties": {
+          "showNumber": "100"
+        }
+      }
+    ],
+    "paths": [
+      {
+        "from": "CsvParser1",
+        "outport": "",
+        "inport": "Left",
+        "to": "Subtract"
+      },
+      {
+        "from": "CsvParser2",
+        "outport": "",
+        "inport": "Right",
+        "to": "Subtract"
+      },
+      {
+        "from": "Subtract",
+        "outport": "",
+        "inport": "",
+        "to": "ShowData1"
+      }
+    ]
+  }
+}

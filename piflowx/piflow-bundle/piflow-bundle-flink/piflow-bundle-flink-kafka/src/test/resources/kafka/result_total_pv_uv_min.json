@@ -1,0 +1,52 @@
+{
+  "catalogName": null,
+  "dbname": null,
+  "tableName": "result_total_pv_uv_min",
+  "ifNotExists": true,
+  "physicalColumnDefinition": [
+    {
+      "columnName": "do_date",
+      "columnType": "STRING",
+      "nullable": false,
+      "primaryKey": true,
+      "partitionKey": false,
+      "comment": "统计日期"
+    },
+    {
+      "columnName": "do_min",
+      "columnType": "STRING",
+      "nullable": false,
+      "primaryKey": true,
+      "partitionKey": false,
+      "comment": "统计分钟"
+    },
+    {
+      "columnName": "pv",
+      "columnType": "BIGINT",
+      "nullable": false,
+      "primaryKey": false,
+      "partitionKey": false,
+      "comment": "点击量"
+    },
+    {
+      "columnName": "uv",
+      "columnType": "BIGINT",
+      "nullable": false,
+      "primaryKey": false,
+      "partitionKey": false,
+      "comment": "一天内同个访客多次访问仅计算一个UV"
+    },
+    {
+      "columnName": "currenttime",
+      "columnType": "TIMESTAMP",
+      "nullable": false,
+      "primaryKey": false,
+      "partitionKey": false,
+      "comment": "当前时间"
+    }
+  ],
+  "metadataColumnDefinition": null,
+  "computedColumnDefinition": null,
+  "watermarkDefinition": null,
+  "asSelectStatement": "SELECT  do_date,cast(DATE_FORMAT(access_time,'HH:mm') AS STRING) AS do_min,pv,uv,NOW() AS currenttime from view_total_pv_uv_min"
+}

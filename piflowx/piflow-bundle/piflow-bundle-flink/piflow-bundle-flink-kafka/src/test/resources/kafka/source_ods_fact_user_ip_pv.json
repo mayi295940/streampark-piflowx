@@ -1,0 +1,64 @@
+{
+  "catalogName": null,
+  "dbname": null,
+  "tableName": "source_ods_fact_user_ip_pv",
+  "ifNotExists": true,
+  "physicalColumnDefinition": [
+    {
+      "columnName": "user_id",
+      "columnType": "STRING",
+      "nullable": false,
+      "primaryKey": false,
+      "partitionKey": false,
+      "comment": "用户ID"
+    },
+    {
+      "columnName": "client_ip",
+      "columnType": "STRING",
+      "nullable": false,
+      "primaryKey": false,
+      "partitionKey": false,
+      "comment": "客户端IP"
+    },
+    {
+      "columnName": "client_info",
+      "columnType": "STRING",
+      "nullable": false,
+      "primaryKey": false,
+      "partitionKey": false,
+      "comment": "设备机型信息"
+    },
+    {
+      "columnName": "page_code",
+      "columnType": "STRING",
+      "nullable": false,
+      "primaryKey": false,
+      "partitionKey": false,
+      "comment": "页面代码"
+    },
+    {
+      "columnName": "access_time",
+      "columnType": "TIMESTAMP",
+      "length": 3,
+      "nullable": false,
+      "primaryKey": false,
+      "partitionKey": false,
+      "comment": "请求时间"
+    },
+    {
+      "columnName": "dt",
+      "columnType": "STRING",
+      "nullable": false,
+      "primaryKey": false,
+      "partitionKey": false,
+      "comment": "时间分区天"
+    }
+  ],
+  "metadataColumnDefinition": null,
+  "computedColumnDefinition": null,
+  "watermarkDefinition": {
+    "rowTimeColumnName": "access_time",
+    "time": 5,
+    "timeUnit": "SECOND"
+  }
+}

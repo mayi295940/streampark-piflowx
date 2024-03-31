@@ -1,0 +1,71 @@
+{
+  "flow": {
+    "name": "UnionTest",
+    "engineType": "flink",
+    "environment": {
+      "runtimeMode": "batch"
+    },
+    "paths": [
+      {
+        "inport": "1",
+        "from": "CsvStringParser1",
+        "to": "Union",
+        "outport": ""
+      },
+      {
+        "inport": "2",
+        "from": "CsvStringParser2",
+        "to": "Union",
+        "outport": ""
+      },
+      {
+        "inport": "",
+        "from": "Union",
+        "to": "ShowData",
+        "outport": ""
+      }
+    ],
+    "stops": [
+      {
+        "uuid": "0000",
+        "name": "CsvStringParser1",
+        "bundle": "cn.piflow.bundle.flink.file.CsvStringParser",
+        "properties": {
+          "content": "1,zs\n2,ls",
+          "delimiter": ",",
+          "schema": "id:int,name:string"
+        }
+      },
+      {
+        "uuid": "0000",
+        "name": "CsvStringParser2",
+        "bundle": "cn.piflow.bundle.flink.file.CsvStringParser",
+        "properties": {
+          "content": "1,zs\n3,ww",
+          "delimiter": ",",
+          "schema": "id:int,name:string"
+        }
+      },
+      {
+        "customizedProperties": {},
+        "name": "Union",
+        "uuid": "0f0cf231dbf64852b17ac3ee2064134d",
+        "bundle": "cn.piflow.bundle.flink.common.Union",
+        "properties": {
+          "inports": "1,2"
+        }
+      },
+      {
+        "customizedProperties": {},
+        "name": "ShowData",
+        "uuid": "c2a84707d76b4083a74e46e6ea8cd5e3",
+        "bundle": "cn.piflow.bundle.flink.common.ShowData",
+        "properties": {
+          "showNumber": "1000"
+        }
+      }
+    ],
+    "uuid": "7a5d97d288224a358a2d30ae8a229230",
+    "runMode": "DEBUG"
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "flow": {
+    "name": "UpsertKafkaTest",
+    "uuid": "1234",
+    "stops": [
+      {
+        "uuid": "0000",
+        "name": "JsonStringParser1",
+        "bundle": "cn.piflow.bundle.flink.json.JsonStringParser",
+        "properties": {
+          "content": "[{\"user_id\":\"1\",\"client_ip\":\"192.168.12.1\",\"client_info\":\"phone\",\"page_code\":\"1001\",\"access_time\":\"2021-01-08 11:32:24\",\"dt\":\"2021-01-08\"},{\"user_id\":\"1\",\"client_ip\":\"192.168.12.1\",\"client_info\":\"phone\",\"page_code\":\"1201\",\"access_time\":\"2021-01-08 11:32:55\",\"dt\":\"2021-01-08\"},{\"user_id\":\"2\",\"client_ip\":\"192.165.12.1\",\"client_info\":\"pc\",\"page_code\":\"1031\",\"access_time\":\"2021-01-08 11:32:59\",\"dt\":\"2021-01-08\"},{\"user_id\":\"1\",\"client_ip\":\"192.168.12.1\",\"client_info\":\"phone\",\"page_code\":\"1101\",\"access_time\":\"2021-01-08 11:33:24\",\"dt\":\"2021-01-08\"},{\"user_id\":\"3\",\"client_ip\":\"192.168.10.3\",\"client_info\":\"pc\",\"page_code\":\"1001\",\"access_time\":\"2021-01-08 11:33:30\",\"dt\":\"2021-01-08\"},{\"user_id\":\"1\",\"client_ip\":\"192.168.12.1\",\"client_info\":\"phone\",\"page_code\":\"1001\",\"access_time\":\"2021-01-08 11:34:24\",\"dt\":\"2021-01-08\"}]",
+          "schema": "user_id:STRING,client_ip:STRING,client_info:STRING,page_code:STRING,access_time:TIMESTAMP,dt:STRING"
+        }
+      },
+      {
+        "uuid": "1111",
+        "name": "WriteToKafka1",
+        "bundle": "cn.piflow.bundle.flink.kafka.WriteToKafka",
+        "properties": {
+          "kafka_host": "hadoop01:9092",
+          "topic": "user_ip_pv",
+          "tableDefinition": "{\"catalogName\":null,\"dbname\":null,\"tableName\":\"source_ods_fact_user_ip_pv\",\"ifNotExists\":true,\"physicalColumnDefinition\":[{\"columnName\":\"user_id\",\"columnType\":\"STRING\",\"comment\":\"用户ID\"},{\"columnName\":\"client_ip\",\"columnType\":\"STRING\",\"comment\":\"客户端IP\"},{\"columnName\":\"client_info\",\"columnType\":\"STRING\",\"comment\":\"设备机型信息\"},{\"columnName\":\"page_code\",\"columnType\":\"STRING\",\"comment\":\"页面代码\"},{\"columnName\":\"access_time\",\"columnType\":\"TIMESTAMP\",\"comment\":\"请求时间\"},{\"columnName\":\"dt\",\"columnType\":\"STRING\",\"comment\":\"时间分区天\"}],\"metadataColumnDefinition\":null,\"computedColumnDefinition\":null,\"watermarkDefinition\":null}",
+          "format": "json",
+          "properties": "{\"json.ignore-parse-errors\":\"true\"}"
+        }
+      },
+      {
+        "uuid": "2222",
+        "name": "ReadFromKafka1",
+        "bundle": "cn.piflow.bundle.flink.kafka.ReadFromKafka",
+        "properties": {
+          "kafka_host": "hadoop01:9092",
+          "topic": "user_ip_pv",
+          "group": "test",
+          "startup_mode": "earliest-offset",
+          "tableDefinition": "{\"catalogName\":null,\"dbname\":null,\"tableName\":\"source_ods_fact_user_ip_pv2\",\"ifNotExists\":true,\"physicalColumnDefinition\":[{\"columnName\":\"user_id\",\"columnType\":\"STRING\",\"comment\":\"用户ID\"},{\"columnName\":\"client_ip\",\"columnType\":\"STRING\",\"comment\":\"客户端IP\"},{\"columnName\":\"client_info\",\"columnType\":\"STRING\",\"comment\":\"设备机型信息\"},{\"columnName\":\"page_code\",\"columnType\":\"STRING\",\"comment\":\"页面代码\"},{\"columnName\":\"access_time\",\"columnType\":\"TIMESTAMP\",\"comment\":\"请求时间\"},{\"columnName\":\"dt\",\"columnType\":\"STRING\",\"comment\":\"时间分区天\"}],\"metadataColumnDefinition\":null,\"computedColumnDefinition\":null,\"watermarkDefinition\":null}",
+          "format": "json",
+          "properties": "{}"
+        }
+      },
+      {
+        "uuid": "6666",
+        "name": "ShowData1",
+        "bundle": "cn.piflow.bundle.flink.common.ShowData",
+        "properties": {
+          "showNumber": "5000"
+        }
+      }
+    ],
+    "paths": [
+      {
+        "from": "JsonStringParser1",
+        "outport": "",
+        "inport": "",
+        "to": "WriteToKafka1"
+      },
+      {
+        "from": "WriteToKafka1",
+        "outport": "",
+        "inport": "",
+        "to": "ReadFromKafka1"
+      },
+      {
+        "from": "ReadFromKafka1",
+        "outport": "",
+        "inport": "",
+        "to": "ShowData1"
+      }
+    ]
+  }
+}

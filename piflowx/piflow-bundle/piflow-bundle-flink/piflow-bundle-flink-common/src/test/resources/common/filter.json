@@ -1,0 +1,48 @@
+{
+  "flow": {
+    "name": "FilterTest",
+    "uuid": "1234",
+    "stops": [
+      {
+        "uuid": "0000",
+        "name": "MockData1",
+        "bundle": "cn.piflow.bundle.flink.common.DataGen",
+        "properties": {
+          "schema": "[{\"filedName\":\"id\",\"filedType\":\"INT\",\"kind\":\"sequence\",\"start\":1,\"end\":10000},{\"filedName\":\"name\",\"filedType\":\"STRING\",\"kind\":\"random\",\"length\":15},{\"filedName\":\"age\",\"filedType\":\"INT\",\"kind\":\"random\",\"max\":100,\"min\":1}]",
+          "count": "500",
+          "ratio": "1"
+        }
+      },
+      {
+        "uuid": "2222",
+        "name": "Filter1",
+        "bundle": "cn.piflow.bundle.flink.common.Filter",
+        "properties": {
+          "condition": "age >= 50 or age < 20"
+        }
+      },
+      {
+        "uuid": "3333",
+        "name": "ShowData1",
+        "bundle": "cn.piflow.bundle.flink.common.ShowData",
+        "properties": {
+          "showNumber": "100"
+        }
+      }
+    ],
+    "paths": [
+      {
+        "from": "MockData1",
+        "outport": "",
+        "inport": "",
+        "to": "Filter1"
+      },
+      {
+        "from": "Filter1",
+        "outport": "",
+        "inport": "",
+        "to": "ShowData1"
+      }
+    ]
+  }
+}

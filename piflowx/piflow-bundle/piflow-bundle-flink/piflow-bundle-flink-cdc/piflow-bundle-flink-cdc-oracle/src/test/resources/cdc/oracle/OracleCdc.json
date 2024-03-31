@@ -1,0 +1,156 @@
+{
+  "flow": {
+    "name": "test",
+    "uuid": "49d1894f3ab84b35b30b7d23294c3e0b",
+    "paths": [
+      {
+        "inport": "",
+        "from": "orders",
+        "to": "Elasticsearch7Write",
+        "outport": ""
+      },
+      {
+        "inport": "",
+        "from": "products",
+        "to": "Elasticsearch7Write",
+        "outport": ""
+      }
+    ],
+    "engineType": "flink",
+    "stops": [
+      {
+        "name": "orders",
+        "bundle": "cn.piflow.bundle.flink.cdc.oracle.OracleCdc",
+        "uuid": "efe1f29512f04a778db4b6d3ae74f58c",
+        "properties": {
+          "hostname": "192.168.186.102",
+          "url": "",
+          "username": "dbzuser",
+          "port": "1521",
+          "properties": {
+          },
+          "schemaName": "DEBEZIUM",
+          "tableName": "orders",
+          "tableDefinition": {
+            "tableBaseInfo": {
+              "ifNotExists": true,
+              "registerTableName": "orders"
+            },
+            "physicalColumnDefinition": [
+              {
+                "columnName": "ID",
+                "columnType": "INT"
+              },
+              {
+                "columnName": "ORDER_DATE",
+                "columnType": "TIMESTAMP",
+                "length": 3
+              },
+              {
+                "columnName": "PURCHASER",
+                "columnType": "STRING"
+              },
+              {
+                "columnName": "QUANTITY",
+                "columnType": "INT"
+              },
+              {
+                "columnName": "PRODUCT_ID",
+                "columnType": "INT"
+              },
+              {
+                "columnName": "ORDER_STATUS",
+                "columnType": "BOOLEAN"
+              }
+            ],
+            "asSelectStatement": {
+            },
+            "likeStatement": {
+            }
+          },
+          "databaseName": "ORCLCDB",
+          "password": "dbz"
+        },
+        "customizedProperties": {
+        }
+      },
+      {
+        "name": "products",
+        "bundle": "cn.piflow.bundle.flink.cdc.oracle.OracleCdc",
+        "uuid": "d89352b6d03c4f6a8f80dd6a615db5ef",
+        "properties": {
+          "hostname": "192.168.186.102",
+          "url": "",
+          "username": "dbzuser",
+          "port": "1521",
+          "properties": {
+          },
+          "schemaName": "DEBEZIUM",
+          "tableName": "products",
+          "tableDefinition": {
+            "tableBaseInfo": {
+              "registerTableName": "products",
+              "selectStatement": ""
+            },
+            "physicalColumnDefinition": [
+              {
+                "columnName": "ID",
+                "columnType": "INT",
+                "primaryKey": true
+              },
+              {
+                "columnName": "NAME",
+                "columnType": "STRING"
+              },
+              {
+                "columnName": "DESCRIPTION",
+                "columnType": "STRING"
+              }
+            ],
+            "asSelectStatement": {
+              "selectStatement": ""
+            },
+            "likeStatement": {
+            }
+          },
+          "databaseName": "ORCLCDB",
+          "password": "dbz"
+        },
+        "customizedProperties": {
+        }
+      },
+      {
+        "name": "Elasticsearch7Write",
+        "bundle": "cn.piflow.bundle.flink.es7.Elasticsearch7Write",
+        "uuid": "f5bfa5d8dd8541dcabdd1736d244c9f4",
+        "properties": {
+          "username": "",
+          "properties": {
+          },
+          "hosts": "http://192.168.186.102:9200",
+          "tableDefinition": {
+            "tableBaseInfo": {
+              "registerTableName": "enriched_orders",
+              "selectStatement": " SELECT orders.ID,orders.ORDER_DATE,orders.PURCHASER,orders.QUANTITY,products.NAME, products.DESCRIPTION  FROM orders  LEFT JOIN products ON orders.PRODUCT_ID = products.ID;"
+            },
+            "physicalColumnDefinition": [
+              {
+                "columnName": "",
+                "columnType": ""
+              }
+            ],
+            "asSelectStatement": {
+              "selectStatement": " SELECT orders.ID,orders.ORDER_DATE,orders.PURCHASER,orders.QUANTITY,products.NAME, products.DESCRIPTION  FROM orders  LEFT JOIN products ON orders.PRODUCT_ID = products.ID;"
+            },
+            "likeStatement": {
+            }
+          },
+          "index": "enriched_orders_1",
+          "password": ""
+        },
+        "customizedProperties": {
+        }
+      }
+    ]
+  }
+}

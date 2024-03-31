@@ -68,4 +68,7 @@
 		<!-- suppress check for copied hive code -->
 		<suppress files="org[\\/]apache[\\/]hadoop[\\/]hive[\\/].*.java" checks=".*"/>
 		<suppress files="org[\\/]apache[\\/]streampark[\\/]console[\\/]flow[\\/].*.java" checks=".*"/>
+		<suppress files="cn[\\/]piflow[\\/].*.java" checks=".*"/>
+		<suppress files="cn[\\/]piflow[\\/].*.scala" checks=".*"/>
+        <suppress files="com[\\/]cscd[\\/]webservice[\\/].*.java" checks=".*"/>
 </suppressions>

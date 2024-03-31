@@ -1,0 +1,91 @@
+{
+  "flow": {
+    "name": "FakerTest",
+    "uuid": "1234",
+    "stops": [
+      {
+        "uuid": "0000",
+        "name": "Faker",
+        "bundle": "cn.piflow.bundle.flink.common.Faker",
+        "properties": {
+          "count": "100",
+          "ratio": "5",
+          "schema": [
+            {
+              "filedName": "name",
+              "filedType": "STRING",
+              "expression": "<superhero.name>",
+              "comment": "姓名"
+            },
+            {
+              "filedName": "power",
+              "filedType": "STRING",
+              "expression": "<superhero.power>",
+              "nullRate": 0.5
+            },
+            {
+              "filedName": "age",
+              "filedType": "INT",
+              "expression": "<number.numberBetween ''0'',''1000''>"
+            },
+            {
+              "filedName": "timeField",
+              "computedColumnExpression": "PROCTIME()"
+            },
+            {
+              "filedName": "timestamp1",
+              "filedType": "TIMESTAMP(3)",
+              "expression": "<date.past ''15'',''SECONDS''>"
+            },
+            {
+              "filedName": "timestamp2",
+              "filedType": "TIMESTAMP(3)",
+              "expression": "<date.past ''15'',''5'',''SECONDS''>"
+            },
+            {
+              "filedName": "timestamp3",
+              "filedType": "TIMESTAMP(3)",
+              "expression": "<date.future ''15'',''5'',''SECONDS''>"
+            },
+            {
+              "filedName": "time",
+              "filedType": "TIME",
+              "expression": "<time.future ''15'',''5'',''SECONDS''>"
+            },
+            {
+              "filedName": "date1",
+              "filedType": "DATE",
+              "expression": "<date.birthday>"
+            },
+            {
+              "filedName": "date2",
+              "filedType": "DATE",
+              "expression": "<date.birthday ''1'',''100''>"
+            },
+            {
+              "filedName": "order_status",
+              "filedType": "STRING",
+              "expression": "<Options.option ''RECEIVED'',''SHIPPED'',''CANCELLED'')>"
+            }
+          ]
+        }
+      },
+      {
+        "uuid": "2222",
+        "name": "ShowData1",
+        "bundle": "cn.piflow.bundle.flink.common.ShowData",
+        "properties": {
+          "showNumber": "100"
+        }
+      }
+    ],
+    "paths": [
+      {
+        "from": "Faker",
+        "outport": "",
+        "inport": "",
+        "to": "ShowData1"
+      }
+    ]
+  }
+}

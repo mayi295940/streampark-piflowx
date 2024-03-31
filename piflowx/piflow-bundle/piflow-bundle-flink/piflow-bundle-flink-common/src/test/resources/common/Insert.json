@@ -1,0 +1,49 @@
+{
+  "flow": {
+    "name": "MockDataTest",
+    "uuid": "1234",
+    "stops": [
+      {
+        "uuid": "0000",
+        "name": "SQLExecute1",
+        "bundle": "cn.piflow.bundle.flink.common.SQLExecute",
+        "properties": {
+          "sql": "CREATE TABLE test (id STRING, name STRING) WITH ('connector' = 'jdbc', 'url' = 'jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8&useSSL=false&allowMultiQueries=true','password'='123456','username'='root','table-name'='test')"
+        }
+      },
+      {
+        "uuid": "1111",
+        "name": "MockData1",
+        "bundle": "cn.piflow.bundle.flink.common.DataGen",
+        "properties": {
+          "schema": "id:String,name:String",
+          "count": "10",
+          "ratio": "1"
+        }
+      },
+      {
+        "uuid": "2222",
+        "name": "Insert1",
+        "bundle": "cn.piflow.bundle.flink.common.Insert",
+        "properties": {
+          "inputTableName": "",
+          "outputTableName": "test"
+        }
+      }
+    ],
+    "paths": [
+      {
+        "from": "SQLExecute1",
+        "outport": "",
+        "inport": "",
+        "to": "MockData1"
+      },
+      {
+        "from": "MockData1",
+        "outport": "",
+        "inport": "",
+        "to": "Insert1"
+      }
+    ]
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "flow": {
+    "name": "test",
+    "engineType": "flink",
+    "uuid": "18f37694f6a0438fa920db1a8cbafc5e",
+    "paths": [
+      {
+        "inport": "",
+        "from": "JdbcCatalog",
+        "to": "SQLQuery",
+        "outport": ""
+      },
+      {
+        "inport": "",
+        "from": "SQLQuery",
+        "to": "ShowData",
+        "outport": ""
+      }
+    ],
+    "stops": [
+      {
+        "name": "JdbcCatalog",
+        "bundle": "cn.piflow.bundle.flink.catalog.JdbcCatalog",
+        "uuid": "22ffe6f153fd4322a83de5462bd92a40",
+        "properties": {
+          "defaultDatabase": "test",
+          "ip": "127.0.0.1",
+          "username": "root",
+          "catalogName": "mysql_catalog",
+          "port": "3306",
+          "databaseType": "mysql",
+          "password": "123456"
+        },
+        "customizedProperties": {
+        }
+      },
+      {
+        "name": "SQLQuery",
+        "bundle": "cn.piflow.bundle.flink.common.SQLQuery",
+        "uuid": "b42fc07d326440b0a224c55d40b0b17c",
+        "properties": {
+          "registerSourceViewName": "",
+          "registerResultViewName": "",
+          "sql": "select\n  *\nfrom\n  mysql_catalog.test.test"
+        },
+        "customizedProperties": {
+        }
+      },
+      {
+        "name": "ShowData",
+        "bundle": "cn.piflow.bundle.flink.common.ShowData",
+        "uuid": "ed7c46b4552c4bc0960b91fdd0721d7e",
+        "properties": {
+          "showNumber": "100"
+        },
+        "customizedProperties": {
+        }
+      }
+    ]
+  }
+}

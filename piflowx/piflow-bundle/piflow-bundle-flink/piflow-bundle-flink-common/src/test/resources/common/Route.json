@@ -1,0 +1,65 @@
+{
+  "flow":{
+    "name":"RouteTest",
+    "uuid":"1234",
+    "checkpoint":"Merge",
+    "stops":[
+      {
+        "uuid": "0000",
+        "name": "MockData1",
+        "bundle": "cn.piflow.bundle.flink.common.DataGen",
+        "properties": {
+          "schema": "id:String,name:string,age:int,salary:double,time:date",
+          "count": "50000",
+          "ratio": "1"
+        }
+      },
+      {
+        "uuid":"222",
+        "name":"Route",
+        "bundle":"cn.piflow.bundle.flink.common.Route",
+        "properties":{},
+        "customizedProperties":{
+          "port1":"age > 10",
+          "port2":"age < 5"
+        }
+      },
+      {
+        "uuid": "3333",
+        "name": "ShowData1",
+        "bundle": "cn.piflow.bundle.flink.common.ShowData",
+        "properties": {
+          "showNumber": "100"
+        }
+      },
+      {
+        "uuid": "4444",
+        "name": "ShowData2",
+        "bundle": "cn.piflow.bundle.flink.common.ShowData",
+        "properties": {
+          "showNumber": "100"
+        }
+      }
+    ],
+    "paths":[
+      {
+        "from":"MockData1",
+        "outport":"",
+        "inport":"",
+        "to":"Route"
+      },
+      {
+        "from":"Route",
+        "outport":"port1",
+        "inport":"",
+        "to":"ShowData1"
+      },
+      {
+        "from":"Route",
+        "outport":"port2",
+        "inport":"",
+        "to":"ShowData2"
+      }
+    ]
+  }
+}

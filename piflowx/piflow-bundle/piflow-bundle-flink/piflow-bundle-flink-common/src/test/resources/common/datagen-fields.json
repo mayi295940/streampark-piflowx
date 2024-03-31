@@ -1,0 +1,26 @@
+[
+  {
+    "filedName": "id",
+    "filedType": "INT",
+    "kind": "sequence",
+    "start": 1,
+    "end": 10000
+  },
+  {
+    "filedName": "name",
+    "filedType": "STRING",
+    "kind": "random",
+    "length": 15
+  },
+  {
+    "filedName": "age",
+    "filedType": "INT",
+    "kind": "random",
+    "max": 100,
+    "min": 1
+  },
+  {
+    "filedName": "timeField",
+    "computedColumnExpression": "PROCTIME()"
+  }
+]

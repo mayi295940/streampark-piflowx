@@ -1,0 +1,35 @@
+{
+  "flow": {
+    "name": "FileReadTest",
+    "uuid": "1234",
+    "stops": [
+      {
+        "uuid": "1111",
+        "name": "FileRead",
+        "bundle": "cn.piflow.bundle.flink.file.FileRead",
+        "properties": {
+          "path": "src/test/resources/file/user.csv",
+          "format": "csv",
+          "tableDefinition": "{\"catalogName\":null,\"dbname\":null,\"tableName\":\"\",\"ifNotExists\":true,\"physicalColumnDefinition\":[{\"columnName\":\"name\",\"columnType\":\"STRING\",\"comment\":\"name\"},{\"columnName\":\"age\",\"columnType\":\"INT\"}],\"metadataColumnDefinition\":null,\"computedColumnDefinition\":null,\"watermarkDefinition\":null}",
+          "properties": "{'csv.field-delimiter':',','csv.ignore-parse-errors':'true'}"
+        }
+      },
+      {
+        "uuid": "2222",
+        "name": "ShowData1",
+        "bundle": "cn.piflow.bundle.flink.common.ShowData",
+        "properties": {
+          "showNumber": "100"
+        }
+      }
+    ],
+    "paths": [
+      {
+        "from": "FileRead",
+        "outport": "",
+        "inport": "",
+        "to": "ShowData1"
+      }
+    ]
+  }
+}

@@ -1,0 +1,103 @@
+{
+	"flow":{
+		"name":"topDemo",
+		"uuid":"59e583d074b44985aee2ad70a2547a77",
+		"runMode":"DEBUG",
+		"paths":[
+			{
+				"inport":"",
+				"from":"JDBCRead",
+				"to":"TopN",
+				"outport":""
+			},
+			{
+				"inport":"",
+				"from":"TopN",
+				"to":"ShowChangeLogData",
+				"outport":""
+			}
+		],
+		"environment":{
+			"runtimeMode":"batch"
+		},
+		"engineType":"flink",
+		"stops":[
+			{
+				"name":"JDBCRead",
+				"bundle":"cn.piflow.bundle.flink.jdbc.JDBCRead",
+				"uuid":"31998ca1fbea45b5a6799a6150300cf6",
+				"properties":{
+					"url":"jdbc:mysql://192.168.186.100:3306/test",
+					"username":"root",
+					"fetchSize":"100",
+					"driver":"",
+					"properties":{
+						
+					},
+					"tableName":"source_table",
+					"tableDefinition":{
+						"tableBaseInfo":{
+							"registerTableName":"source_table"
+						},
+						"physicalColumnDefinition":[
+							{
+								"columnName":"name",
+								"columnType":"STRING"
+							},
+							{
+								"columnName":"search_cnt",
+								"columnType":"BIGINT"
+							},
+							{
+								"columnName":"key",
+								"columnType":"STRING"
+							},
+							{
+								"columnName":"row_time",
+								"columnType":"TIMESTAMP"
+							}
+						],
+						"asSelectStatement":{
+							
+						},
+						"likeStatement":{
+							
+						}
+					},
+					"password":"123456"
+				},
+				"customizedProperties":{
+					
+				}
+			},
+			{
+				"name":"TopN",
+				"bundle":"cn.piflow.bundle.flink.common.TopN",
+				"uuid":"08726631225d4dcca00dc532a83c7344",
+				"properties":{
+					"partition_list":"key",
+					"conditions":"",
+					"order_list":"search_cnt->desc",
+					"column_list":"key, name, search_cnt, row_time",
+					"tableName":"source_table",
+					"topNum":"10",
+					"isWindow":"false"
+				},
+				"customizedProperties":{
+					
+				}
+			},
+			{
+				"name":"ShowChangeLogData",
+				"bundle":"cn.piflow.bundle.flink.common.ShowChangeLogData",
+				"uuid":"6225e5ac18704ed0aa1c95e3fbe1ce28",
+				"properties":{
+					"showNumber":"100"
+				},
+				"customizedProperties":{
+					
+				}
+			}
+		]
+	}
+}

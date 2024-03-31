@@ -1,0 +1,91 @@
+{
+  "flow": {
+    "name": "UpsertKafkaTest",
+    "uuid": "1234",
+    "stops": [
+      {
+        "uuid": "0000",
+        "name": "JsonStringParser1",
+        "bundle": "cn.piflow.bundle.flink.json.JsonStringParser",
+        "properties": {
+          "content": "[{\"user_id\":\"1\",\"client_ip\":\"192.168.12.1\",\"client_info\":\"phone\",\"page_code\":\"1001\",\"access_time\":\"2021-01-08 11:32:24\",\"dt\":\"2021-01-08\"},{\"user_id\":\"1\",\"client_ip\":\"192.168.12.1\",\"client_info\":\"phone\",\"page_code\":\"1201\",\"access_time\":\"2021-01-08 11:32:55\",\"dt\":\"2021-01-08\"},{\"user_id\":\"2\",\"client_ip\":\"192.165.12.1\",\"client_info\":\"pc\",\"page_code\":\"1031\",\"access_time\":\"2021-01-08 11:32:59\",\"dt\":\"2021-01-08\"},{\"user_id\":\"1\",\"client_ip\":\"192.168.12.1\",\"client_info\":\"phone\",\"page_code\":\"1101\",\"access_time\":\"2021-01-08 11:33:24\",\"dt\":\"2021-01-08\"},{\"user_id\":\"3\",\"client_ip\":\"192.168.10.3\",\"client_info\":\"pc\",\"page_code\":\"1001\",\"access_time\":\"2021-01-08 11:33:30\",\"dt\":\"2021-01-08\"},{\"user_id\":\"1\",\"client_ip\":\"192.168.12.1\",\"client_info\":\"phone\",\"page_code\":\"1001\",\"access_time\":\"2021-01-08 11:34:24\",\"dt\":\"2021-01-08\"}]",
+          "schema": "user_id:STRING,client_ip:STRING,client_info:STRING,page_code:STRING,access_time:TIMESTAMP,dt:STRING"
+        }
+      },
+      {
+        "uuid": "1111",
+        "name": "WriteToKafka1",
+        "bundle": "cn.piflow.bundle.flink.kafka.WriteToKafka",
+        "properties": {
+          "kafka_host": "hadoop01:9092",
+          "topic": "user_ip_pv",
+          "tableDefinition": "{\"catalogName\":null,\"dbname\":null,\"tableName\":null,\"ifNotExists\":true,\"physicalColumnDefinition\":[{\"columnName\":\"user_id\",\"columnType\":\"STRING\",\"comment\":\"用户ID\"},{\"columnName\":\"client_ip\",\"columnType\":\"STRING\",\"comment\":\"客户端IP\"},{\"columnName\":\"client_info\",\"columnType\":\"STRING\",\"comment\":\"设备机型信息\"},{\"columnName\":\"page_code\",\"columnType\":\"STRING\",\"comment\":\"页面代码\"},{\"columnName\":\"access_time\",\"columnType\":\"TIMESTAMP\",\"comment\":\"请求时间\"},{\"columnName\":\"dt\",\"columnType\":\"STRING\",\"comment\":\"时间分区天\"}],\"metadataColumnDefinition\":null,\"computedColumnDefinition\":null,\"watermarkDefinition\":null}",
+          "format": "json",
+          "properties": "{\"json.ignore-parse-errors\":\"true\"}"
+        }
+      },
+      {
+        "uuid": "2222",
+        "name": "ReadFromKafka1",
+        "bundle": "cn.piflow.bundle.flink.kafka.ReadFromKafka",
+        "properties": {
+          "kafka_host": "hadoop01:9092",
+          "topic": "user_ip_pv",
+          "group": "test",
+          "startup_mode": "earliest-offset",
+          "tableDefinition": "{\"catalogName\":null,\"dbname\":null,\"tableName\":\"source_ods_fact_user_ip_pv\",\"ifNotExists\":true,\"physicalColumnDefinition\":[{\"columnName\":\"user_id\",\"columnType\":\"STRING\",\"comment\":\"用户ID\"},{\"columnName\":\"client_ip\",\"columnType\":\"STRING\",\"comment\":\"客户端IP\"},{\"columnName\":\"client_info\",\"columnType\":\"STRING\",\"comment\":\"设备机型信息\"},{\"columnName\":\"page_code\",\"columnType\":\"STRING\",\"comment\":\"页面代码\"},{\"columnName\":\"access_time\",\"columnType\":\"TIMESTAMP\",\"comment\":\"请求时间\"},{\"columnName\":\"dt\",\"columnType\":\"STRING\",\"comment\":\"时间分区天\"}],\"metadataColumnDefinition\":null,\"computedColumnDefinition\":null,\"watermarkDefinition\":null}",
+          "format": "json",
+          "properties": "{}"
+        }
+      },
+      {
+        "uuid": "3333",
+        "name": "SQLExecute1",
+        "bundle": "cn.piflow.bundle.flink.common.SQLExecute",
+        "properties": {
+          "sql": "CREATE VIEW view_total_pv_uv_min AS SELECT dt AS do_date, count(client_ip) AS pv, count(DISTINCT client_ip) AS uv,max(access_time) AS access_time FROM source_ods_fact_user_ip_pv GROUP BY dt;"
+        }
+      },
+      {
+        "uuid": "4444",
+        "name": "WriteToUpsertKafka1",
+        "bundle": "cn.piflow.bundle.flink.kafka.WriteToUpsertKafka",
+        "properties": {
+          "kafka_host": "hadoop01:9092",
+          "topic": "result_total_pv_uv_min",
+          "key_format": "json",
+          "value_format": "json",
+          "value_fields_include": "ALL",
+          "tableDefinition": "{\"catalogName\":null,\"dbname\":null,\"tableName\":\"result_total_pv_uv_min\",\"ifNotExists\":true,\"physicalColumnDefinition\":[{\"columnName\":\"do_date\",\"columnType\":\"STRING\",\"nullable\":false,\"primaryKey\":true,\"partitionKey\":false,\"comment\":\"统计日期\"},{\"columnName\":\"do_min\",\"columnType\":\"STRING\",\"nullable\":false,\"primaryKey\":true,\"partitionKey\":false,\"comment\":\"统计分钟\"},{\"columnName\":\"pv\",\"columnType\":\"BIGINT\",\"nullable\":false,\"primaryKey\":false,\"partitionKey\":false,\"comment\":\"点击量\"},{\"columnName\":\"uv\",\"columnType\":\"BIGINT\",\"nullable\":false,\"primaryKey\":false,\"partitionKey\":false,\"comment\":\"一天内同个访客多次访问仅计算一个UV\"},{\"columnName\":\"currenttime\",\"columnType\":\"TIMESTAMP\",\"nullable\":false,\"primaryKey\":false,\"partitionKey\":false,\"comment\":\"当前时间\"}],\"metadataColumnDefinition\":null,\"computedColumnDefinition\":null,\"watermarkDefinition\":null,\"asSelectStatement\":\"SELECT  do_date,cast(DATE_FORMAT(access_time,'HH:mm') AS STRING) AS do_min,pv,uv,NOW() AS currenttime from view_total_pv_uv_min\"}",
+          "properties": "{\"value.json.fail-on-missing-field\": false}"
+        }
+      }
+    ],
+    "paths": [
+      {
+        "from": "JsonStringParser1",
+        "outport": "",
+        "inport": "",
+        "to": "WriteToKafka1"
+      },
+      {
+        "from": "WriteToKafka1",
+        "outport": "",
+        "inport": "",
+        "to": "ReadFromKafka1"
+      },
+      {
+        "from": "ReadFromKafka1",
+        "outport": "",
+        "inport": "",
+        "to": "SQLExecute1"
+      },
+      {
+        "from": "SQLExecute1",
+        "outport": "",
+        "inport": "",
+        "to": "WriteToUpsertKafka1"
+      }
+    ]
+  }
+}

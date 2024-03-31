@@ -1,0 +1,79 @@
+{
+  "flow": {
+    "name": "FileWriteTest",
+    "uuid": "1234",
+    "stops": [
+      {
+        "uuid": "1111",
+        "name": "DataGen1",
+        "bundle": "cn.piflow.bundle.flink.common.DataGen",
+        "properties": {
+          "schema": "[{\"filedName\":\"id\",\"filedType\":\"INT\",\"kind\":\"sequence\",\"start\":1,\"end\":10000},{\"filedName\":\"name\",\"filedType\":\"STRING\",\"kind\":\"random\",\"length\":15},{\"filedName\":\"age\",\"filedType\":\"INT\",\"kind\":\"random\",\"max\":100,\"min\":1}]",
+          "count": "100",
+          "ratio": "50"
+        }
+      },
+      {
+        "uuid": "2222",
+        "name": "FileWrite1",
+        "bundle": "cn.piflow.bundle.flink.file.FileWrite",
+        "properties": {
+          "path": "src/test/resources/file/test",
+          "format": "json",
+          "tableDefinition": "{\"catalogName\":null,\"dbname\":null,\"tableName\":\"\",\"ifNotExists\":true,\"physicalColumnDefinition\":[{\"columnName\":\"id\",\"columnType\":\"INT\",\"comment\":\"id\"},{\"columnName\":\"name\",\"columnType\":\"STRING\",\"comment\":\"name\"},{\"columnName\":\"age\",\"columnType\":\"INT\"}],\"metadataColumnDefinition\":null,\"computedColumnDefinition\":null,\"watermarkDefinition\":null}",
+          "properties": "{}"
+        }
+      },
+      {
+        "uuid": "3333",
+        "name": "FileWrite1",
+        "bundle": "cn.piflow.bundle.flink.file.FileRead",
+        "properties": {
+          "path": "src/test/resources/file/test",
+          "format": "json",
+          "tableDefinition": "{\"catalogName\":null,\"dbname\":null,\"tableName\":\"\",\"ifNotExists\":true,\"physicalColumnDefinition\":[{\"columnName\":\"id\",\"columnType\":\"INT\",\"comment\":\"id\"},{\"columnName\":\"name\",\"columnType\":\"STRING\",\"comment\":\"name\"},{\"columnName\":\"age\",\"columnType\":\"INT\"}],\"metadataColumnDefinition\":null,\"computedColumnDefinition\":null,\"watermarkDefinition\":null}",
+          "properties": "{'csv.field-delimiter' = ',','csv.ignore-parse-errors' = 'true'}"
+        }
+      },
+      {
+        "uuid": "4444",
+        "name": "FileRead1",
+        "bundle": "cn.piflow.bundle.flink.file.FileRead",
+        "properties": {
+          "path": "src/test/resources/file/test",
+          "format": "json",
+          "tableDefinition": "{\"catalogName\":null,\"dbname\":null,\"tableName\":\"\",\"ifNotExists\":true,\"physicalColumnDefinition\":[{\"columnName\":\"id\",\"columnType\":\"INT\",\"comment\":\"id\"},{\"columnName\":\"name\",\"columnType\":\"STRING\",\"comment\":\"name\"},{\"columnName\":\"age\",\"columnType\":\"INT\"}],\"metadataColumnDefinition\":null,\"computedColumnDefinition\":null,\"watermarkDefinition\":null}",
+          "properties": "{}"
+        }
+      },
+      {
+        "uuid": "5555",
+        "name": "ShowData1",
+        "bundle": "cn.piflow.bundle.flink.common.ShowData",
+        "properties": {
+          "showNumber": "100"
+        }
+      }
+    ],
+    "paths": [
+      {
+        "from": "DataGen1",
+        "outport": "",
+        "inport": "",
+        "to": "FileWrite1"
+      },
+      {
+        "from": "FileWrite1",
+        "outport": "",
+        "inport": "",
+        "to": "FileRead1"
+      },
+      {
+        "from": "FileRead1",
+        "outport": "",
+        "inport": "",
+        "to": "ShowData1"
+      }
+    ]
+  }
+}

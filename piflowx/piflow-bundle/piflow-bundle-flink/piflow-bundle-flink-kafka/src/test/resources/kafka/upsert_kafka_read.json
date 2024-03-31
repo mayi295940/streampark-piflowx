@@ -1,0 +1,38 @@
+{
+  "flow": {
+    "name": "ReadFromUpsertKafkaTest",
+    "uuid": "1234",
+    "stops": [
+      {
+        "uuid": "5555",
+        "name": "ReadFromUpsertKafka1",
+        "bundle": "cn.piflow.bundle.flink.kafka.ReadFromUpsertKafka",
+        "properties": {
+          "kafka_host": "hadoop01:9092",
+          "topic": "result_total_pv_uv_min",
+          "key_format": "json",
+          "value_format": "json",
+          "value_fields_include": "ALL",
+          "tableDefinition": "{\"ifNotExists\":true,\"physicalColumnDefinition\":[{\"columnName\":\"do_date\",\"columnType\":\"STRING\",\"nullable\":false,\"primaryKey\":true,\"partitionKey\":false,\"comment\":\"统计日期\"},{\"columnName\":\"do_min\",\"columnType\":\"STRING\",\"nullable\":false,\"primaryKey\":true,\"partitionKey\":false,\"comment\":\"统计分钟\"},{\"columnName\":\"pv\",\"columnType\":\"BIGINT\",\"nullable\":false,\"primaryKey\":false,\"partitionKey\":false,\"comment\":\"点击量\"},{\"columnName\":\"uv\",\"columnType\":\"BIGINT\",\"nullable\":false,\"primaryKey\":false,\"partitionKey\":false,\"comment\":\"一天内同个访客多次访问仅计算一个UV\"},{\"columnName\":\"currenttime\",\"columnType\":\"TIMESTAMP\",\"nullable\":false,\"primaryKey\":false,\"partitionKey\":false,\"comment\":\"当前时间\"}],\"metadataColumnDefinition\":null,\"computedColumnDefinition\":null}",
+          "properties": "{\"value.json.fail-on-missing-field\": false,\"properties.group.id\": \"test\"}"
+        }
+      },
+      {
+        "uuid": "6666",
+        "name": "ShowChangeLogData1",
+        "bundle": "cn.piflow.bundle.flink.common.ShowChangeLogData",
+        "properties": {
+          "showNumber": "5000"
+        }
+      }
+    ],
+    "paths": [
+      {
+        "from": "ReadFromUpsertKafka1",
+        "outport": "",
+        "inport": "",
+        "to": "ShowChangeLogData1"
+      }
+    ]
+  }
+}

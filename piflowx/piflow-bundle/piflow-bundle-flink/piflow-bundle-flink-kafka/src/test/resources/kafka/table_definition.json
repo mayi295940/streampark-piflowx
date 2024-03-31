@@ -1,0 +1,25 @@
+{
+  "catalogName": null,
+  "dbname": null,
+  "tableName": "",
+  "ifNotExists": true,
+  "physicalColumnDefinition": [
+    {
+      "columnName": "id",
+      "columnType": "INT",
+      "comment": "id"
+    },
+    {
+      "columnName": "name",
+      "columnType": "STRING",
+      "comment": "name"
+    },
+    {
+      "columnName": "age",
+      "columnType": "INT"
+    }
+  ],
+  "metadataColumnDefinition": null,
+  "computedColumnDefinition": null,
+  "watermarkDefinition": null
+}

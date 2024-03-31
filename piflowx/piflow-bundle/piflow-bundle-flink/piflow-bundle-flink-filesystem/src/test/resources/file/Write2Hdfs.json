@@ -1,0 +1,75 @@
+{
+  "flow": {
+    "name": "file write",
+    "executorMemory": "1g",
+    "executorNumber": "1",
+    "uuid": "bf651f2e3f9340d29bfb737a0808bc31",
+    "paths": [
+      {
+        "inport": "",
+        "from": "DataGen",
+        "to": "FileWrite",
+        "outport": ""
+      }
+    ],
+    "engineType": "flink",
+    "stops": [
+      {
+        "name": "DataGen",
+        "bundle": "cn.piflow.bundle.flink.common.DataGen",
+        "uuid": "878a23d54e754efd914c71e4a6536b31",
+        "properties": {
+          "schema": [
+            {
+              "filedName": "id",
+              "end": 10000,
+              "kind": "sequence",
+              "start": 1,
+              "filedType": "INT"
+            },
+            {
+              "filedName": "name",
+              "filedType": "STRING",
+              "kind": "random",
+              "length": 15
+            },
+            {
+              "min": 1,
+              "filedName": "age",
+              "max": 100,
+              "kind": "random",
+              "filedType": "INT"
+            }
+          ],
+          "count": "100",
+          "ratio": "10"
+        },
+        "customizedProperties": {
+        }
+      },
+      {
+        "name": "FileWrite",
+        "bundle": "cn.piflow.bundle.flink.file.FileWrite",
+        "uuid": "e137b3d1b82045249d717d88f7449f68",
+        "properties": {
+          "path": "hdfs://hadoop01:8020/test2/",
+          "tableDefinition": {
+            "tableBaseInfo": {
+              "ifNotExists": true,
+              "registerTableName": "hdfswrite"
+            },
+            "asSelectStatement": {
+            },
+            "likeStatement": {
+            }
+          },
+          "format": "json",
+          "properties": {
+          }
+        },
+        "customizedProperties": {
+        }
+      }
+    ]
+  }
+}

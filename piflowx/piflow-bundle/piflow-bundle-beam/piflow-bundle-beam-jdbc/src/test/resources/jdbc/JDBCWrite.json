@@ -1,0 +1,42 @@
+{
+  "flow": {
+    "name": "JDBCWriteTest",
+    "uuid": "1234",
+    "stops": [
+      {
+        "uuid": "1111",
+        "name": "JDBCRead",
+        "bundle": "cn.piflow.bundle.beam.jdbc.JDBCRead",
+        "properties": {
+          "jdbcUrl": "jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8&useSSL=false&allowMultiQueries=true",
+          "driver": "com.mysql.cj.jdbc.Driver",
+          "username": "root",
+          "password": "123456",
+          "table": "test",
+          "query": "",
+          "fetchSize": "500"
+        }
+      },
+      {
+        "uuid": "2222",
+        "name": "JDBCWrite",
+        "bundle": "cn.piflow.bundle.beam.jdbc.JDBCWrite",
+        "properties": {
+          "jdbcUrl": "jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8&useSSL=false&allowMultiQueries=true",
+          "driver": "com.mysql.cj.jdbc.Driver",
+          "username": "root",
+          "password": "123456",
+          "table": "test2"
+        }
+      }
+    ],
+    "paths": [
+      {
+        "from": "JDBCRead",
+        "outport": "",
+        "inport": "",
+        "to": "JDBCWrite"
+      }
+    ]
+  }
+}

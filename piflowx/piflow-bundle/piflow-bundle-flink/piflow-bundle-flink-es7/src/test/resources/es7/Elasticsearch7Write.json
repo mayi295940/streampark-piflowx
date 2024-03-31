@@ -1,0 +1,51 @@
+{
+  "flow": {
+    "name": "Elasticsearch7WriteTest",
+    "uuid": "1234",
+    "stops": [
+      {
+        "uuid": "1111",
+        "name": "DataGen1",
+        "bundle": "cn.piflow.bundle.flink.common.DataGen",
+        "properties": {
+          "schema": "[{\"filedName\":\"id\",\"filedType\":\"INT\",\"kind\":\"sequence\",\"start\":1,\"end\":10000},{\"filedName\":\"name\",\"filedType\":\"STRING\",\"kind\":\"random\",\"length\":15},{\"filedName\":\"age\",\"filedType\":\"INT\",\"kind\":\"random\",\"max\":100,\"min\":1}]",
+          "count": "100",
+          "ratio": "50"
+        }
+      },
+      {
+        "uuid": "2222",
+        "name": "Elasticsearch7Write1",
+        "bundle": "cn.piflow.bundle.flink.es7.Elasticsearch7Write",
+        "properties": {
+          "hosts": "192.168.186.102:9200",
+          "index": "test",
+          "tableDefinition": "{\"catalogName\":null,\"dbname\":null,\"tableName\":\"\",\"ifNotExists\":true,\"physicalColumnDefinition\":[{\"columnName\":\"id\",\"columnType\":\"INT\",\"comment\":\"id\"},{\"columnName\":\"name\",\"columnType\":\"STRING\",\"comment\":\"name\"},{\"columnName\":\"age\",\"columnType\":\"INT\"}],\"metadataColumnDefinition\":null,\"computedColumnDefinition\":null,\"watermarkDefinition\":null}",
+          "properties": "{}"
+        }
+      },
+      {
+        "uuid": "3333",
+        "name": "ShowData1",
+        "bundle": "cn.piflow.bundle.flink.common.ShowData",
+        "properties": {
+          "showNumber": "100"
+        }
+      }
+    ],
+    "paths": [
+      {
+        "from": "DataGen1",
+        "outport": "",
+        "inport": "",
+        "to": "Elasticsearch7Write1"
+      },
+      {
+        "from": "DataGen1",
+        "outport": "",
+        "inport": "",
+        "to": "ShowData1"
+      }
+    ]
+  }
+}

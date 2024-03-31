@@ -1,0 +1,210 @@
+{
+  "flow": {
+    "name": "pgcdc",
+    "uuid": "273553c2ece043c29fba179df6826c5a",
+    "paths": [
+      {
+        "inport": "",
+        "from": "products",
+        "to": "SQLQuery",
+        "outport": ""
+      },
+      {
+        "inport": "",
+        "from": "orders",
+        "to": "SQLQuery",
+        "outport": ""
+      },
+      {
+        "inport": "",
+        "from": "shipments",
+        "to": "SQLQuery",
+        "outport": ""
+      },
+      {
+        "inport": "",
+        "from": "SQLQuery",
+        "to": "ShowChangeLogData",
+        "outport": ""
+      }
+    ],
+    "engineType": "flink",
+    "stops": [
+      {
+        "name": "shipments",
+        "bundle": "cn.piflow.bundle.flink.cdc.postgres.PostgresCdc",
+        "uuid": "13ac002a8a4d404e8dda77c9a1d8360f",
+        "properties": {
+          "hostname": "192.168.186.102",
+          "username": "postgres",
+          "port": "5432",
+          "properties": {
+          },
+          "schemaName": "public",
+          "tableName": "shipments",
+          "tableDefinition": {
+            "tableBaseInfo": {
+              "ifNotExists": true,
+              "registerTableName": "shipments"
+            },
+            "physicalColumnDefinition": [
+              {
+                "columnName": "shipment_id",
+                "columnType": "INT",
+                "primaryKey": true
+              },
+              {
+                "columnName": "order_id",
+                "columnType": "INT"
+              },
+              {
+                "columnName": "origin",
+                "columnType": "STRING"
+              },
+              {
+                "columnName": "destination",
+                "columnType": "STRING"
+              },
+              {
+                "columnName": "is_arrived",
+                "columnType": "BOOLEAN"
+              }
+            ],
+            "asSelectStatement": {
+            },
+            "likeStatement": {
+            }
+          },
+          "databaseName": "postgres",
+          "slotName": "flink",
+          "password": "postgres"
+        },
+        "customizedProperties": {
+        }
+      },
+      {
+        "name": "SQLQuery",
+        "bundle": "cn.piflow.bundle.flink.common.SQLQuery",
+        "uuid": "a5afa1368e1e4e348950bb2eda2011a8",
+        "properties": {
+          "viewName": "temp",
+          "sql": "SELECT\n  o.*,\n  p.name,\n  p.description,\n  s.shipment_id,\n  s.origin,\n  s.destination,\n  s.is_arrived\nFROM\n  orders AS o\n  LEFT JOIN products AS p ON o.product_id = p.id\n  LEFT JOIN shipments AS s ON o.order_id = s.order_id"
+        },
+        "customizedProperties": {
+        }
+      },
+      {
+        "name": "ShowChangeLogData",
+        "bundle": "cn.piflow.bundle.flink.common.ShowChangeLogData",
+        "uuid": "c6604e600aa645d29264f4be5ce4e2eb",
+        "properties": {
+          "showNumber": "10"
+        },
+        "customizedProperties": {
+        }
+      },
+      {
+        "name": "products",
+        "bundle": "cn.piflow.bundle.flink.cdc.mysql.MysqlCdc",
+        "uuid": "ab91c42f26cb4e119e34830178611293",
+        "properties": {
+          "hostname": "192.168.186.102",
+          "username": "root",
+          "serverId": "5400",
+          "port": "3306",
+          "properties": {
+            "server-time-zone": "UTC"
+          },
+          "tableName": "products",
+          "tableDefinition": {
+            "tableBaseInfo": {
+              "registerTableName": "products"
+            },
+            "physicalColumnDefinition": [
+              {
+                "columnName": "id",
+                "columnType": "INT",
+                "primaryKey": true
+              },
+              {
+                "columnName": "name",
+                "columnType": "STRING"
+              },
+              {
+                "columnName": "description",
+                "columnType": "STRING"
+              }
+            ],
+            "asSelectStatement": {
+            },
+            "likeStatement": {
+            }
+          },
+          "databaseName": "mydb",
+          "password": "123456"
+        },
+        "customizedProperties": {
+        }
+      },
+      {
+        "name": "orders",
+        "bundle": "cn.piflow.bundle.flink.cdc.mysql.MysqlCdc",
+        "uuid": "4ffa58f3db6144739f6b797fd3839025",
+        "properties": {
+          "hostname": "192.168.186.102",
+          "username": "root",
+          "serverId": "5410",
+          "port": "3306",
+          "properties": {
+            "scan.incremental.snapshot.chunk.key-column": "order_id",
+            "server-time-zone": "UTC"
+          },
+          "tableName": "orders",
+          "tableDefinition": {
+            "tableBaseInfo": {
+              "ifNotExists": true,
+              "registerTableName": "orders"
+            },
+            "physicalColumnDefinition": [
+              {
+                "columnName": "order_id",
+                "columnType": "INT"
+              },
+              {
+                "columnName": "order_date",
+                "columnType": "TIMESTAMP",
+                "length": 0
+              },
+              {
+                "columnName": "customer_name",
+                "columnType": "STRING"
+              },
+              {
+                "columnName": "price",
+                "columnType": "DECIMAL",
+                "precision": 10,
+                "scale": 5
+              },
+              {
+                "columnName": "product_id",
+                "columnType": "INT"
+              },
+              {
+                "columnName": "order_status",
+                "columnType": "BOOLEAN"
+              }
+            ],
+            "asSelectStatement": {
+            },
+            "likeStatement": {
+            }
+          },
+          "databaseName": "mydb",
+          "password": "123456"
+        },
+        "customizedProperties": {
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "flow": {
+    "name": "DorisWriteTest",
+    "uuid": "1234",
+    "stops": [
+      {
+        "uuid": "1111",
+        "name": "DataGen1",
+        "bundle": "cn.piflow.bundle.flink.common.DataGen",
+        "properties": {
+          "schema": "[{\"filedName\":\"id\",\"filedType\":\"INT\",\"kind\":\"sequence\",\"start\":1,\"end\":10000},{\"filedName\":\"name\",\"filedType\":\"STRING\",\"kind\":\"random\",\"length\":15},{\"filedName\":\"age\",\"filedType\":\"INT\",\"kind\":\"random\",\"max\":100,\"min\":1}]",
+          "count": "100",
+          "ratio": "50"
+        }
+      },
+      {
+        "uuid": "2222",
+        "name": "DorisWrite1",
+        "bundle": "cn.piflow.bundle.flink.doris.DorisWrite",
+        "properties": {
+          "fenodes": "192.168.186.102:8030",
+          "username": "root",
+          "password": "",
+          "sinkLabelPrefix": "doris_label2",
+          "tableIdentifier": "demo.test",
+          "tableDefinition": "{\"catalogName\":null,\"dbname\":null,\"tableName\":\"\",\"ifNotExists\":true,\"physicalColumnDefinition\":[{\"columnName\":\"id\",\"columnType\":\"INT\",\"comment\":\"id\"},{\"columnName\":\"name\",\"columnType\":\"STRING\",\"comment\":\"name\"},{\"columnName\":\"age\",\"columnType\":\"INT\"}],\"metadataColumnDefinition\":null,\"computedColumnDefinition\":null,\"watermarkDefinition\":null}",
+          "properties": "{}"
+        }
+      },
+      {
+        "uuid": "3333",
+        "name": "DorisRead1",
+        "bundle": "cn.piflow.bundle.flink.doris.DorisRead",
+        "properties": {
+          "fenodes": "192.168.186.102:8030",
+          "username": "root",
+          "password": "",
+          "tableIdentifier": "demo.test",
+          "tableDefinition": "{\"catalogName\":null,\"dbname\":null,\"tableName\":\"\",\"ifNotExists\":true,\"physicalColumnDefinition\":[{\"columnName\":\"id\",\"columnType\":\"INT\",\"comment\":\"id\"},{\"columnName\":\"name\",\"columnType\":\"STRING\",\"comment\":\"name\"},{\"columnName\":\"age\",\"columnType\":\"INT\"}],\"metadataColumnDefinition\":null,\"computedColumnDefinition\":null,\"watermarkDefinition\":null}",
+          "properties": "{}"
+        }
+      },
+      {
+        "uuid": "4444",
+        "name": "ShowData1",
+        "bundle": "cn.piflow.bundle.flink.common.ShowData",
+        "properties": {
+          "showNumber": "100"
+        }
+      }
+    ],
+    "paths": [
+      {
+        "from": "DataGen1",
+        "outport": "",
+        "inport": "",
+        "to": "DorisWrite1"
+      },
+      {
+        "from": "DorisWrite1",
+        "outport": "",
+        "inport": "",
+        "to": "DorisRead1"
+      },
+      {
+        "from": "DorisRead1",
+        "outport": "",
+        "inport": "",
+        "to": "ShowData1"
+      }
+    ]
+  }
+}

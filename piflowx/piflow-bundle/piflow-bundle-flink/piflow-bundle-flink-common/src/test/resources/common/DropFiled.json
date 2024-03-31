@@ -1,0 +1,48 @@
+{
+  "flow": {
+    "name": "MockDataTest",
+    "uuid": "1234",
+    "stops": [
+      {
+        "uuid": "0000",
+        "name": "MockData1",
+        "bundle": "cn.piflow.bundle.flink.common.DataGen",
+        "properties": {
+          "schema": "id:String,name:string,age:int,salary:double,time:date",
+          "count": "50000",
+          "ratio": "1"
+        }
+      },
+      {
+        "uuid": "2222",
+        "name": "DropField1",
+        "bundle": "cn.piflow.bundle.flink.common.DropField",
+        "properties": {
+          "columnNames": "id,name"
+        }
+      },
+      {
+        "uuid": "2222",
+        "name": "ShowData1",
+        "bundle": "cn.piflow.bundle.flink.common.ShowData",
+        "properties": {
+          "showNumber": "100"
+        }
+      }
+    ],
+    "paths": [
+      {
+        "from": "MockData1",
+        "outport": "",
+        "inport": "",
+        "to": "DropField1"
+      },
+      {
+        "from": "DropField1",
+        "outport": "",
+        "inport": "",
+        "to": "ShowData1"
+      }
+    ]
+  }
+}

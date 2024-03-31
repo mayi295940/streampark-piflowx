@@ -1,0 +1,48 @@
+{
+  "flow": {
+    "name": "test",
+    "uuid": "1234",
+    "stops": [
+      {
+        "uuid": "0000",
+        "name": "MockData1",
+        "bundle": "cn.piflow.bundle.flink.common.DataGen",
+        "properties": {
+          "schema": "age:int",
+          "count": "50000",
+          "ratio": "1"
+        }
+      },
+      {
+        "uuid": "1111",
+        "name": "AddUUIDStop1",
+        "bundle": "cn.piflow.bundle.flink.common.AddUUIDStop",
+        "properties": {
+          "column": "uuid"
+        }
+      },
+      {
+        "uuid": "2222",
+        "name": "ShowData1",
+        "bundle": "cn.piflow.bundle.flink.common.ShowData",
+        "properties": {
+          "showNumber": "100"
+        }
+      }
+    ],
+    "paths": [
+      {
+        "from": "MockData1",
+        "outport": "",
+        "inport": "",
+        "to": "AddUUIDStop1"
+      },
+      {
+        "from": "AddUUIDStop1",
+        "outport": "",
+        "inport": "",
+        "to": "ShowData1"
+      }
+    ]
+  }
+}

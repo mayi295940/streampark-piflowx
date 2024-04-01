@@ -22,7 +22,7 @@
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-parquet</artifactId>
-            <version>${flink.version}</version>
+            <version>${flink18.version}</version>
         </dependency>
 
         <dependency>

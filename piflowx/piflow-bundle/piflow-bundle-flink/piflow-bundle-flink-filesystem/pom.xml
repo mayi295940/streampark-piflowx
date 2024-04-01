@@ -49,7 +49,7 @@
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-json</artifactId>
-            <version>${flink.version}</version>
+            <version>${flink18.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -62,7 +62,7 @@
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-files</artifactId>
-            <version>${flink.version}</version>
+            <version>${flink18.version}</version>
             <scope>test</scope>
         </dependency>
 

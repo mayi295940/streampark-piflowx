@@ -90,7 +90,7 @@ object ConfigureUtil {
     getJarFile(path).foreach(
       x => {
 
-        if (x.getName == "piflow-server-0.9.jar")
+        if (x.getName == "piflow-server.jar")
           piflowBundleList = x.getAbsolutePath +: piflowBundleList
 
       })

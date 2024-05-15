@@ -127,7 +127,7 @@ class FlinkK8sApplicationBuildPipeline(request: FlinkK8sApplicationBuildRequest)
     val dockerConf = request.dockerConfig
     val baseImageTag = request.flinkBaseImage.trim
     val pushImageTag = {
-      val expectedImageTag = s"streampark flinkjob-${request.k8sNamespace}-${request.clusterId}"
+      val expectedImageTag = s"streampark-flinkjob-${request.k8sNamespace}-${request.clusterId}"
       compileTag(expectedImageTag, dockerConf.registerAddress, dockerConf.imageNamespace)
     }
 
@@ -138,10 +138,9 @@ class FlinkK8sApplicationBuildPipeline(request: FlinkK8sApplicationBuildRequest)
           val pullImageCmd = {
             // when the register address prefix is explicitly identified on base image tag,
             // the user's pre-saved docker register auth info would be used.
-            if (
-              dockerConf.registerAddress != null && !baseImageTag.startsWith(
-                dockerConf.registerAddress)
-            ) {
+            val pullImageCmdState = dockerConf.registerAddress != null && !baseImageTag.startsWith(
+              dockerConf.registerAddress)
+            if (pullImageCmdState) {
               dockerClient.pullImageCmd(baseImageTag)
             } else {
               dockerClient.pullImageCmd(baseImageTag).withAuthConfig(dockerConf.toAuthConf)
@@ -229,7 +228,9 @@ class FlinkK8sApplicationBuildPipeline(request: FlinkK8sApplicationBuildRequest)
       registerAddress: String,
       imageNamespace: String): String = {
     var tagName = if (tag.contains("/")) tag else s"$imageNamespace/$tag"
-    if (StringUtils.isNotBlank(registerAddress) && !tagName.startsWith(registerAddress)) {
+    val addRegisterAddressState =
+      StringUtils.isNotBlank(registerAddress) && !tagName.startsWith(registerAddress)
+    if (addRegisterAddressState) {
       tagName = s"$registerAddress/$tagName"
     }
     tagName.toLowerCase

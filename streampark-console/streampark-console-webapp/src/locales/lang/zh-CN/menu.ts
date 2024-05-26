@@ -42,8 +42,4 @@ export default {
     yarnQueue: 'Yarn 队列',
     flinkGateway: 'FLink 网关',
   },
-  flow: {
-    flow: 'Flow',
-    group: 'Group',
-  },
 };

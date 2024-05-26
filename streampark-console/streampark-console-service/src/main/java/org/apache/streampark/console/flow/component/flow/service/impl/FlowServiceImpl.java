@@ -1,5 +1,15 @@
 package org.apache.streampark.console.flow.component.flow.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.console.base.exception.ApiAlertException;
 import org.apache.streampark.console.flow.base.utils.JsonUtils;
 import org.apache.streampark.console.flow.base.utils.LoggerUtil;
@@ -44,23 +54,11 @@ import org.apache.streampark.console.flow.component.stopsComponent.vo.StopGroupV
 import org.apache.streampark.console.flow.controller.requestVo.FlowInfoVoRequestAdd;
 import org.apache.streampark.console.flow.controller.requestVo.FlowInfoVoRequestUpdate;
 import org.apache.streampark.console.flow.third.service.IFlow;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import scala.annotation.meta.param;
 
 @Service
 public class FlowServiceImpl implements IFlowService {
@@ -199,14 +197,22 @@ public class FlowServiceImpl implements IFlowService {
 
     Flow flow = new Flow();
     BeanUtils.copyProperties(flowVo, flow);
-    String id = UUIDUtils.getUUID32();
-    flow.setId(id);
+
+    if (StringUtils.isNotBlank(flowVo.getId())) {
+      flow.setId(flowVo.getId());
+      flow.setUuid(flowVo.getId());
+    } else {
+      String id = UUIDUtils.getUUID32();
+      flow.setId(id);
+      flow.setUuid(id);
+    }
+
     flow.setCrtDttm(new Date());
     flow.setCrtUser(username);
     flow.setLastUpdateDttm(new Date());
     flow.setLastUpdateUser(username);
     flow.setEnableFlag(true);
-    flow.setUuid(id);
+
     List<FlowGlobalParams> globalParamsIdToGlobalParams =
         FlowGlobalParamsUtils.globalParamsIdToGlobalParams(flowVo.getGlobalParamsIds());
     flow.setFlowGlobalParamsList(globalParamsIdToGlobalParams);
@@ -247,7 +253,7 @@ public class FlowServiceImpl implements IFlowService {
     // todo
 
     if (optDataCount > 0) {
-      return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("flowId", id);
+      return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("flowId", flow.getId());
     } else {
       return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ADD_ERROR_MSG());
     }
@@ -618,7 +624,9 @@ public class FlowServiceImpl implements IFlowService {
       rtnMap.put("parentsId", parentsId);
     }
     // Group on the left and 'stops'
-    List<StopGroupVo> groupsVoList = stopGroupServiceImpl.getStopGroupAll(flowById.getEngineType());
+    // todo engintype
+    List<StopGroupVo> groupsVoList =
+        stopGroupServiceImpl.getStopGroupAll(flowById.getEngineType());
     rtnMap.put("groupsVoList", groupsVoList);
     // DataSource the left
     List<DataSourceVo> dataSourceVoList =

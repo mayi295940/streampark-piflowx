@@ -17,6 +17,26 @@
 
 package org.apache.streampark.console.core.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import lombok.Data;
+import lombok.Getter;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.common.Constant;
 import org.apache.streampark.common.conf.ConfigKeys;
 import org.apache.streampark.common.conf.Workspace;
@@ -37,29 +57,6 @@ import org.apache.streampark.console.core.utils.YarnQueueLabelExpression;
 import org.apache.streampark.flink.kubernetes.model.K8sPodTemplates;
 import org.apache.streampark.flink.packer.maven.DependencyInfo;
 
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import com.baomidou.mybatisplus.annotation.FieldStrategy;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import lombok.Getter;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-
 @Data
 @TableName("t_flink_app")
 @Slf4j
@@ -74,6 +71,7 @@ public class Application implements Serializable {
   private Integer jobType;
 
   private Long projectId;
+
   /** creator */
   private Long userId;
 
@@ -107,6 +105,7 @@ public class Application implements Serializable {
 
   /** The exposed type of the rest service of K8s(kubernetes.rest-service.exposed.type) */
   private Integer k8sRestExposedType;
+
   /** flink kubernetes pod template */
   private String k8sPodTemplate;
 
@@ -120,6 +119,7 @@ public class Application implements Serializable {
   private Boolean k8sHadoopIntegration;
 
   private Integer state;
+
   /** task release status */
   @TableField("`release`")
   private Integer release;
@@ -141,6 +141,7 @@ public class Application implements Serializable {
   private Long alertId;
 
   private String args;
+
   /** application module */
   private String module;
 
@@ -481,8 +482,15 @@ public class Application implements Serializable {
         && ResourceFromEnum.CICD.getValue().equals(this.getResourceFrom());
   }
 
+  @JsonIgnore
   public boolean isStreamParkJob() {
-    return this.getAppType() == ApplicationType.STREAMPARK_FLINK.getType();
+    return this.getAppType() != null
+        && this.getAppType() == ApplicationType.STREAMPARK_FLINK.getType();
+  }
+
+  @JsonIgnore
+  public boolean isPipelineJob() {
+    return FlinkDevelopmentMode.PIPELINE.getMode().equals(this.getJobType());
   }
 
   @JsonIgnore

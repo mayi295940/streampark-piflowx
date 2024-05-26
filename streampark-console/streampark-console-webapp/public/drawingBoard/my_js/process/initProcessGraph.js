@@ -70,7 +70,7 @@ function initProcessDrawingBoardData(loadId, parentAccessPath, backFunc) {
                 if (link) {
                   if (processGroupId !== 'null' && processGroupId !== undefined){
                     link.style.display = 'inline-block';
-                    link.href='#/flow/drawingBoard?src=/drawingBoard/page/processGroup/mxGraph/index.html?drawingBoardType=PROCESS&parentAccessPath=processGroupList&processType=PROCESS_GROUP&load='+processGroupId;
+                    link.href='#/flow/dag?src=/drawingBoard/page/processGroup/mxGraph/index.html?drawingBoardType=PROCESS&parentAccessPath=processGroupList&processType=PROCESS_GROUP&load='+processGroupId;
                   } else {
                     link.style.display = 'none';
                   }

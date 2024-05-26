@@ -152,7 +152,7 @@
               { name: 'drawingBoard', path: '/drawingBoard' },
             ]);
             router.push({
-              path: '/flow/drawingBoard',
+              path: '/flow/dag',
               query: {
                 src: '/drawingBoard/page/flow/mxGraph/index.html?load=' + record.id,
               },

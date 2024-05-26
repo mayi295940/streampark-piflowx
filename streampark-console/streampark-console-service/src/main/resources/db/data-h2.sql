@@ -49,7 +49,7 @@ insert into `t_menu` values (120000, 0, 'Apache Spark', '/spark', 'PageView', nu
 insert into `t_menu` values (130000, 0, 'resource.menu', '/resource', 'PageView', null, 0, '0', 1, 3, now(), now());
 insert into `t_menu` values (140000, 0, 'setting.menu', '/setting', 'PageView', null, 0, '0', 1, 4, now(), now());
 insert into `t_menu` values (150000, 0, 'system.menu', '/system', 'PageView', null, 0, '0', 1, 5, now(), now());
-insert into `t_menu` values (160000, 0, 'Flow', '/flow', 'PageView', null, 0, '0', 1, 6, now(), now());
+--insert into `t_menu` values (160000, 0, 'Flow', '/flow', 'PageView', null, 0, '0', 1, 6, now(), now());
 
 insert into `t_menu` values (110100, 110000, 'flink.application', '/flink/app', 'flink/app/View', null, null, '0', 1, 2, now(), now());
 insert into `t_menu` values (110200, 110000, 'flink.flinkHome', '/flink/home', 'flink/home/View', null, null, '0', 1, 3, now(), now());
@@ -73,6 +73,8 @@ insert into `t_menu` values (110115, 110100, 'app delete', null, null, 'app:dele
 insert into `t_menu` values (110116, 110100, 'app copy', null, null, 'app:copy', null, '1', 1, null, now(), now());
 insert into `t_menu` values (110117, 110100, 'app savepoint trigger', null, null, 'savepoint:trigger', null, '1', 1, null, now(), now());
 insert into `t_menu` values (110118, 110100, 'app sql delete', null, null, 'sql:delete', null, '1', 1, null, now(), now());
+
+insert into `t_menu` values (110119, 110100, 'app dag', '/flow/dag', 'flow/dag/index', 'app:create', '', '0', 0, null, now(), now());
 
 insert into `t_menu` values (110301, 110300, 'cluster add', '/flink/add_cluster', 'flink/cluster/Add', 'cluster:create', '', '0', 0, null, now(), now());
 insert into `t_menu` values (110302, 110300, 'cluster edit', '/flink/edit_cluster', 'flink/cluster/Edit', 'cluster:update', '', '0', 0, null, now(), now());
@@ -99,10 +101,10 @@ insert into `t_menu` values (130301, 130300, 'resource add', NULL, NULL, 'resour
 insert into `t_menu` values (130302, 130300, 'resource update', NULL, NULL, 'resource:update', NULL, '1', 1, NULL, now(), now());
 insert into `t_menu` values (130303, 130300, 'resource delete', NULL, NULL, 'resource:delete', NULL, '1', 1, NULL, now(), now());
 
-insert into `t_menu` values (140100, 140000, 'setting.system', '/setting/system', 'setting/System/View', null, null, '0', 1, 1, now(), now());
-insert into `t_menu` values (140200, 140000, 'setting.alarm', '/setting/alarm', 'setting/Alarm/View', null, null, '0', 1, 2, now(), now());
+insert into `t_menu` values (140100, 140000, 'setting.system', '/setting/system', 'setting/system/View', null, null, '0', 1, 1, now(), now());
+insert into `t_menu` values (140200, 140000, 'setting.alarm', '/setting/alarm', 'setting/alarm/View', null, null, '0', 1, 2, now(), now());
 insert into `t_menu` values (140300, 140000, 'setting.externalLink', '/setting/extlink', 'setting/extlink/View', 'menu:view', null, '0', 1, 5, now(), now());
-insert into `t_menu` values (140400, 140000, 'setting.yarnQueue', '/setting/yarnqueue', 'setting/YarnQueue/View', 'menu:view', null, '0', 1, 6, now(), now());
+insert into `t_menu` values (140400, 140000, 'setting.yarnQueue', '/setting/yarnqueue', 'setting/yarnqueue/View', 'menu:view', null, '0', 1, 6, now(), now());
 insert into `t_menu` values (140101, 140100, 'setting view', null, null, 'setting:view', null, '1', 1, null, now(), now());
 insert into `t_menu` values (140102, 140100, 'setting update', null, null, 'setting:update', null, '1', 1, null, now(), now());
 
@@ -147,15 +149,13 @@ insert into `t_menu` values (150503, 150500, 'member update', null, null, 'membe
 insert into `t_menu` values (150504, 150500, 'member delete', null, null, 'member:delete', null, '1', 1, null, now(), now());
 
 
-insert into `t_menu` values (150601, 160000, 'flow.flow', '/flow/flow', 'flow/flow/View', null, null, '0', 1, 1, now(), now());
--- insert into `t_menu` values (150602, 160000, 'flow.group', '/flow/group', 'flow/group/View', null, null, '0', 1, 2, now(), now());
+--insert into `t_menu` values (150601, 160000, 'flow.flow', '/flow/flow', 'flow/flow/View', null, null, '0', 1, 1, now(), now());
+--insert into `t_menu` values (150602, 160000, 'flow.group', '/flow/group', 'flow/group/View', null, null, '0', 1, 2, now(), now());
+--insert into `t_menu` values (150701, 150601, 'flow view', null, null, 'flow:view', null, '1', 1, null, now(), now());
+--insert into `t_menu` values (150702, 150601, 'flow add', null, null, 'flow:add', null, '1', 1, null, now(), now());
+--insert into `t_menu` values (150703, 150601, 'flow update', null, null, 'flow:update', null, '1', 1, null, now(), now());
+--insert into `t_menu` values (150704, 150601, 'flow delete', null, null, 'flow:delete', null, '1', 1, null, now(), now());
 
-insert into `t_menu` values (150701, 150601, 'flow view', null, null, 'flow:view', null, '1', 1, null, now(), now());
-insert into `t_menu` values (150702, 150601, 'flow add', null, null, 'flow:add', null, '1', 1, null, now(), now());
-insert into `t_menu` values (150703, 150601, 'flow update', null, null, 'flow:update', null, '1', 1, null, now(), now());
-insert into `t_menu` values (150704, 150601, 'flow delete', null, null, 'flow:delete', null, '1', 1, null, now(), now());
-
-insert into `t_menu` values (150801, 160000, 'flow.drawingBoard', '/flow/drawingBoard', 'flow/draw/drawingBoard', null, null, '0', 0, null, now(), now());
 
 -- ----------------------------
 -- Records of t_role
@@ -278,13 +278,15 @@ insert into `t_role_menu` values (100108, 100002, 150502);
 insert into `t_role_menu` values (100109, 100002, 150503);
 insert into `t_role_menu` values (100110, 100002, 150504);
 
-insert into `t_role_menu` values (100111, 100001, 160000);
-insert into `t_role_menu` values (100112, 100001, 150601);
--- insert into `t_role_menu` values (100113, 100001, 150602);
-insert into `t_role_menu` values (100114, 100001, 150701);
-insert into `t_role_menu` values (100115, 100001, 150702);
-insert into `t_role_menu` values (100116, 100001, 150703);
-insert into `t_role_menu` values (100117, 100001, 150801);
+insert into `t_role_menu` values (100019, 100001, 110119);
+
+--insert into `t_role_menu` values (100111, 100001, 160000);
+--insert into `t_role_menu` values (100112, 100001, 150601);
+--insert into `t_role_menu` values (100113, 100001, 150602);
+--insert into `t_role_menu` values (100114, 100001, 150701);
+--insert into `t_role_menu` values (100115, 100001, 150702);
+--insert into `t_role_menu` values (100116, 100001, 150703);
+--insert into `t_role_menu` values (100117, 100001, 150801);
 
 -- ----------------------------
 -- Records of t_setting

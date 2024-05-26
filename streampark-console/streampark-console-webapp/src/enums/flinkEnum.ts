@@ -153,6 +153,7 @@ export enum JobTypeEnum {
   JAR = 1,
   SQL = 2,
   PYFLINK = 3,
+  PIPELINE = 4,
 }
 
 export enum ConfigTypeEnum {

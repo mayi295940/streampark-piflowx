@@ -53,10 +53,12 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
         StringUtils.splitByWholeSeparatorPreserveAllTokens(
             properties.getAnonUrl(), StringPool.COMMA);
 
-    for (String url : anonUrl) {
-      if (pathMatcher.match(url.trim(), httpServletRequest.getRequestURI())) {
-        return true;
-      }
+    if (anonUrl != null) {
+        for (String url : anonUrl) {
+            if (pathMatcher.match(url.trim(), httpServletRequest.getRequestURI())) {
+                return true;
+            }
+        }
     }
 
     if (isLoginAttempt(request, response)) {

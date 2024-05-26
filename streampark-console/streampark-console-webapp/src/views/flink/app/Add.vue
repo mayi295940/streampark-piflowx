@@ -22,7 +22,7 @@
 <script setup lang="ts" name="AppCreate">
   import { useGo } from '/@/hooks/web/usePage';
   import ProgramArgs from './components/ProgramArgs.vue';
-  import { Switch } from 'ant-design-vue';
+  import { Button, Switch, Steps, Step } from 'ant-design-vue';
   import { onMounted, reactive, ref, unref } from 'vue';
   import { PageWrapper } from '/@/components/Page';
   import { createAsyncComponent } from '/@/utils/factory/createAsyncComponent';
@@ -82,7 +82,7 @@
   const { flinkEnvs, flinkClusters, getCreateFormSchema, suggestions } =
     useCreateSchema(dependencyRef);
 
-  const [registerAppForm, { setFieldsValue, getFieldsValue, submit }] = useForm({
+  const [registerAppForm, { setFieldsValue, getFieldsValue, submit, validate }] = useForm({
     labelCol: { lg: { span: 5, offset: 0 }, sm: { span: 7, offset: 0 } },
     wrapperCol: { lg: { span: 16, offset: 0 }, sm: { span: 17, offset: 0 } },
     baseColProps: { span: 24 },
@@ -302,70 +302,112 @@
     }
   }
 
+  const stepCurrent = ref<number>(0);
+  const next = async () => {
+    await validate();
+    submitLoading.value = false;
+    stepCurrent.value++;
+    setFieldsValue({ stepCurrent: stepCurrent.value });
+  };
+  const prev = () => {
+    submitLoading.value = false;
+    stepCurrent.value--;
+    setFieldsValue({ stepCurrent: stepCurrent.value });
+  };
+  const steps = [
+    {
+      title: 'First',
+    },
+    {
+      title: 'Second',
+    },
+    {
+      title: 'Last',
+    },
+  ];
+
   onMounted(async () => {
     handleInitForm();
+    setFieldsValue({ stepCurrent: stepCurrent.value });
   });
 </script>
 
 <template>
   <PageWrapper contentFullHeight contentBackground contentClass="p-26px app_controller">
-    <BasicForm @register="registerAppForm" @submit="handleAppCreate" :schemas="getCreateFormSchema">
-      <template #flinkSql="{ model, field }">
-        <FlinkSqlEditor
-          ref="flinkSql"
-          v-model:value="model[field]"
-          :versionId="model['versionId']"
-          :suggestions="suggestions"
-          @preview="(value) => openReviewDrawer(true, { value, suggestions })"
-        />
-      </template>
-      <template #dependency="{ model, field }">
-        <Dependency
-          ref="dependencyRef"
-          v-model:value="model[field]"
-          :form-model="model"
-          :flink-envs="flinkEnvs"
-        />
-      </template>
-      <template #isSetConfig="{ model, field }">
-        <Switch checked-children="ON" un-checked-children="OFF" v-model:checked="model[field]" />
-        <SettingTwoTone
-          v-if="model[field]"
-          class="ml-10px"
-          two-tone-color="#4a9ff5"
-          @click="handleSQLConf(true, model)"
-        />
-      </template>
-      <template #podTemplate>
-        <PomTemplateTab
-          v-model:podTemplate="k8sTemplate.podTemplate"
-          v-model:jmPodTemplate="k8sTemplate.jmPodTemplate"
-          v-model:tmPodTemplate="k8sTemplate.tmPodTemplate"
-        />
-      </template>
-      <template #args="{ model }">
-        <template v-if="model.args !== undefined">
-          <ProgramArgs
-            v-model:value="model.args"
+    <Steps :current="stepCurrent">
+      <Step v-for="item in steps" :key="item.title" :title="item.title" />
+    </Steps>
+    <div class="steps-content">
+      <BasicForm
+        @register="registerAppForm"
+        @submit="handleAppCreate"
+        :schemas="getCreateFormSchema"
+      >
+        <template #flinkSql="{ model, field }">
+          <FlinkSqlEditor
+            ref="flinkSql"
+            v-model:value="model[field]"
+            :versionId="model['versionId']"
             :suggestions="suggestions"
             @preview="(value) => openReviewDrawer(true, { value, suggestions })"
           />
         </template>
-      </template>
-      <template #useSysHadoopConf="{ model, field }">
-        <UseSysHadoopConf v-model:hadoopConf="model[field]" />
-      </template>
-      <template #formFooter>
-        <div class="flex items-center w-full justify-center">
-          <a-button @click="go('/flink/app')">
-            {{ t('common.cancelText') }}
-          </a-button>
-          <a-button class="ml-4" :loading="submitLoading" type="primary" @click="submit()">
-            {{ t('common.submitText') }}
-          </a-button>
-        </div>
-      </template>
-    </BasicForm>
+        <template #dependency="{ model, field }">
+          <Dependency
+            ref="dependencyRef"
+            v-model:value="model[field]"
+            :form-model="model"
+            :flink-envs="flinkEnvs"
+          />
+        </template>
+        <template #isSetConfig="{ model, field }">
+          <Switch checked-children="ON" un-checked-children="OFF" v-model:checked="model[field]" />
+          <SettingTwoTone
+            v-if="model[field]"
+            class="ml-10px"
+            two-tone-color="#4a9ff5"
+            @click="handleSQLConf(true, model)"
+          />
+        </template>
+        <template #podTemplate>
+          <PomTemplateTab
+            v-model:podTemplate="k8sTemplate.podTemplate"
+            v-model:jmPodTemplate="k8sTemplate.jmPodTemplate"
+            v-model:tmPodTemplate="k8sTemplate.tmPodTemplate"
+          />
+        </template>
+        <template #args="{ model }">
+          <template v-if="model.args !== undefined">
+            <ProgramArgs
+              v-model:value="model.args"
+              :suggestions="suggestions"
+              @preview="(value) => openReviewDrawer(true, { value, suggestions })"
+            />
+          </template>
+        </template>
+        <template #useSysHadoopConf="{ model, field }">
+          <UseSysHadoopConf v-model:hadoopConf="model[field]" />
+        </template>
+      </BasicForm>
+    </div>
+    <div class="steps-action flex items-center w-full justify-center">
+      <Button v-if="stepCurrent > 0" @click="prev">Previous</Button>
+      <Button class="ml-4" v-if="stepCurrent < steps.length - 1" type="primary" @click="next"
+        >Next</Button
+      >
+      <Button
+        class="ml-4"
+        :loading="submitLoading"
+        type="primary"
+        @click="submit()"
+        v-if="stepCurrent == steps.length - 1"
+      >
+        {{ t('common.submitText') }}
+      </Button>
+      <Button class="ml-4" @click="go('/flink/app')">
+        {{ t('common.cancelText') }}
+      </Button>
+    </div>
     <Mergely
       @ok="(data) => setFieldsValue(data)"
       @close="handleEditConfClose"
@@ -376,4 +418,16 @@
 </template>
 <style lang="less">
   @import url('./styles/Add.less');
+  .steps-content {
+    margin-top: 16px;
+    border: 1px dashed #e9e9e9;
+    border-radius: 6px;
+    background-color: #fafafa;
+    height: 460px;
+    overflow: auto;
+    padding-top: 10px;
+  }
+  .steps-action {
+    margin-top: 15px;
+  }
 </style>

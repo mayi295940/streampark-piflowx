@@ -265,6 +265,9 @@
           <span class="app_type app_py" v-if="record['jobType'] == JobTypeEnum.PYFLINK">
             PyFlink
           </span>
+          <span class="app_type app_py" v-if="record['jobType'] == JobTypeEnum.PIPELINE">
+            Flink Pipeline
+          </span>
           <span
             class="link"
             :class="{
@@ -286,6 +289,7 @@
                     <span v-if="record['jobType'] == JobTypeEnum.JAR"> JAR </span>
                     <span v-if="record['jobType'] == JobTypeEnum.SQL"> SQL </span>
                     <span v-if="record['jobType'] == JobTypeEnum.PYFLINK"> PyFlink </span>
+                    <span v-if="record['jobType'] == JobTypeEnum.PIPELINE"> Flink Pipeline </span>
                   </Tag>
                 </div>
                 <div class="pt-2px flex">

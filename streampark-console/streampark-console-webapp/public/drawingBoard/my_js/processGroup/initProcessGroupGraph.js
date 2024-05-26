@@ -78,7 +78,7 @@ function initProcessGroupDrawingBoardData(loadId, parentAccessPath, backFunc) {
                 var link = top.document.getElementById('ProcessGroupParents');
                 if (parentsId !== 'null') {
                     link.style.display = 'inline-block';
-                    link.href = '#/flow/drawingBoard?src=/drawingBoard/page/processGroup/mxGraph/index.html?drawingBoardType=PROCESS&parentAccessPath=processGroupList&processType=PROCESS_GROUP&load=' + parentsId;
+                    link.href = '#/flow/dag?src=/drawingBoard/page/processGroup/mxGraph/index.html?drawingBoardType=PROCESS&parentAccessPath=processGroupList&processType=PROCESS_GROUP&load=' + parentsId;
                 } else {
                     link.style.display = 'none';
                 }

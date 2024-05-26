@@ -65,6 +65,13 @@ export const useAppTableAction = (
   function getActionList(record: AppListRecord, currentPageNo: number): ActionItem[] {
     return [
       {
+        tooltip: { title: t('flow.flow.flow_table.enter') },
+        icon: 'fluent:hand-draw-28-regular',
+        auth: 'flow:update',
+        onClick: handleDesignPipeline.bind(null, record),
+        ifShow: record.jobType == JobTypeEnum.PIPELINE,
+      },
+      {
         tooltip: { title: t('flink.app.operation.edit') },
         auth: 'app:update',
         icon: 'clarity:note-edit-line',
@@ -353,6 +360,19 @@ export const useAppTableAction = (
       });
     });
   }
+
+  /**
+   * pipeline design
+   */
+  function handleDesignPipeline(app: AppListRecord) {
+    router.push({
+      path: '/flow/dag',
+      query: {
+        src: '/drawingBoard/page/flow/mxGraph/index.html?load=' + app.id,
+      },
+    });
+  }
+
   onMounted(() => {
     handleInitTagsOptions();
   });

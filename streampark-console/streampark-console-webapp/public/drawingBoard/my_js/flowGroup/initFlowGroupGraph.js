@@ -41,7 +41,7 @@ function initFlowGroupDrawingBoardData(loadId, parentAccessPath, backFunc) {
                 var link = top.document.getElementById('GroupParents');
                 if (parentsId !== 'null') {
                     link.style.display = 'inline-block';
-                    link.href = '#/flow/drawingBoard?src=/drawingBoard/page/flowGroup/mxGraph/index.html?drawingBoardType=GROUP&parentAccessPath=flowGroupList&load=' + parentsId;
+                    link.href = '#/flow/dag?src=/drawingBoard/page/flowGroup/mxGraph/index.html?drawingBoardType=GROUP&parentAccessPath=flowGroupList&load=' + parentsId;
                 } else {
                     link.style.display = 'none';
                 }

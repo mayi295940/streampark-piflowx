@@ -11,6 +11,8 @@ public interface IFlow {
 
   Map<String, Object> startFlow(Process process, String checkpoint, RunModeType runModeType);
 
+  String getProcessJson(Process process, String checkpoint, RunModeType runModeType);
+
   String stopFlow(String appId);
 
   ThirdProgressVo getFlowProgress(String appId);

@@ -114,7 +114,7 @@ export const useCreateAndEditSchema = (
         label: 'Flink SQL',
         component: 'Input',
         slot: 'flinkSql',
-        ifShow: ({ values }) => values?.jobType == JobTypeEnum.SQL && values?.stepCurrent == 1,
+        show: ({ values }) => values?.jobType == JobTypeEnum.SQL && values?.stepCurrent == 1,
         rules: [{ required: true, message: t('flink.app.addAppTips.flinkSqlIsRequiredMessage') }],
       },
       {
@@ -122,21 +122,21 @@ export const useCreateAndEditSchema = (
         label: t('flink.app.resource'),
         component: 'Select',
         render: ({ model }) => renderStreamParkResource({ model, resources: unref(teamResource) }),
-        ifShow: ({ values }) => values.jobType == JobTypeEnum.SQL && values?.stepCurrent == 1,
+        show: ({ values }) => values.jobType == JobTypeEnum.SQL && values?.stepCurrent == 1,
       },
       {
         field: 'dependency',
         label: t('flink.app.dependency'),
         component: 'Input',
         slot: 'dependency',
-        ifShow: ({ values }) => values.jobType != JobTypeEnum.JAR && values?.stepCurrent == 1,
+        show: ({ values }) => values.jobType != JobTypeEnum.JAR && values?.stepCurrent == 1,
       },
       { field: 'configOverride', label: '', component: 'Input', show: false },
       {
         field: 'isSetConfig',
         label: t('flink.app.appConf'),
         component: 'Switch',
-        ifShow: ({ values }) =>
+        show: ({ values }) =>
           values?.jobType == JobTypeEnum.SQL &&
           !isK8sExecMode(values.executionMode) &&
           values?.stepCurrent == 1,
@@ -216,7 +216,7 @@ export const useCreateAndEditSchema = (
           placeholder: t('flink.app.flinkCluster'),
           options: getExecutionCluster(ExecModeEnum.REMOTE, 'id'),
         },
-        ifShow: ({ values }) =>
+        show: ({ values }) =>
           values.executionMode == ExecModeEnum.REMOTE && values?.stepCurrent == 0,
         rules: [
           { required: true, message: t('flink.app.addAppTips.flinkClusterIsRequiredMessage') },
@@ -230,7 +230,7 @@ export const useCreateAndEditSchema = (
           placeholder: t('flink.app.flinkCluster'),
           options: getExecutionCluster(ExecModeEnum.YARN_SESSION, 'id'),
         },
-        ifShow: ({ values }) =>
+        show: ({ values }) =>
           values.executionMode == ExecModeEnum.YARN_SESSION && values?.stepCurrent == 0,
         rules: [
           { required: true, message: t('flink.app.addAppTips.flinkClusterIsRequiredMessage') },
@@ -240,7 +240,7 @@ export const useCreateAndEditSchema = (
         field: 'k8sNamespace',
         label: t('flink.app.kubernetesNamespace'),
         component: 'Input',
-        ifShow: ({ values }) => isK8sExecMode(values.executionMode) && values?.stepCurrent == 0,
+        show: ({ values }) => isK8sExecMode(values.executionMode) && values?.stepCurrent == 0,
         render: ({ model, field }) =>
           renderInputDropdown(model, field, {
             placeholder: t('flink.app.addAppTips.kubernetesNamespacePlaceholder'),
@@ -257,7 +257,7 @@ export const useCreateAndEditSchema = (
             onChange: (e: ChangeEvent) => (formModel.jobName = e.target.value),
           };
         },
-        ifShow: ({ values }) =>
+        show: ({ values }) =>
           values.executionMode == ExecModeEnum.KUBERNETES_APPLICATION && values?.stepCurrent == 0,
         rules: [
           {
@@ -271,7 +271,7 @@ export const useCreateAndEditSchema = (
         field: 'flinkClusterId',
         label: t('flink.app.kubernetesClusterId'),
         component: 'Select',
-        ifShow: ({ values }) =>
+        show: ({ values }) =>
           values.executionMode == ExecModeEnum.KUBERNETES_SESSION && values?.stepCurrent == 0,
         componentProps: {
           placeholder: t('flink.app.addAppTips.kubernetesClusterIdPlaceholder'),
@@ -288,7 +288,7 @@ export const useCreateAndEditSchema = (
         field: 'flinkImage',
         label: t('flink.app.flinkBaseDockerImage'),
         component: 'Input',
-        ifShow: ({ values }) =>
+        show: ({ values }) =>
           values.executionMode == ExecModeEnum.KUBERNETES_APPLICATION && values?.stepCurrent == 0,
         render: ({ model, field }) =>
           renderInputDropdown(model, field, {
@@ -300,7 +300,7 @@ export const useCreateAndEditSchema = (
       {
         field: 'k8sRestExposedType',
         label: t('flink.app.restServiceExposedType'),
-        ifShow: ({ values }) =>
+        show: ({ values }) =>
           values.executionMode == ExecModeEnum.KUBERNETES_APPLICATION && values?.stepCurrent == 0,
         component: 'Select',
         componentProps: {
@@ -346,10 +346,8 @@ export const useCreateAndEditSchema = (
         label: t('flink.app.appName'),
         component: 'Input',
         componentProps: { placeholder: t('flink.app.addAppTips.appNamePlaceholder') },
-        dynamicRules: () => {
-          return [{ required: true, trigger: 'blur', validator: getJobNameCheck }];
-        },
-        ifShow: ({ values }) => values?.stepCurrent == 2,
+        rules: [{ required: true, trigger: 'blur', validator: getJobNameCheck }],
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       {
         field: 'tags',
@@ -358,7 +356,7 @@ export const useCreateAndEditSchema = (
         componentProps: {
           placeholder: t('flink.app.addAppTips.tagsPlaceholder'),
         },
-        ifShow: ({ values }) => values?.stepCurrent == 2,
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       {
         field: 'resolveOrder',
@@ -366,7 +364,7 @@ export const useCreateAndEditSchema = (
         component: 'Select',
         componentProps: { placeholder: 'classloader.resolve-order', options: resolveOrder },
         rules: [{ required: true, message: 'Resolve Order is required', type: 'number' }],
-        ifShow: ({ values }) => values?.stepCurrent == 2,
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       {
         field: 'parallelism',
@@ -376,7 +374,7 @@ export const useCreateAndEditSchema = (
           placeholder: t('flink.app.addAppTips.parallelismPlaceholder'),
           ...commonInputNum,
         },
-        ifShow: ({ values }) => values?.stepCurrent == 2,
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       {
         field: 'slot',
@@ -386,12 +384,12 @@ export const useCreateAndEditSchema = (
           placeholder: t('flink.app.addAppTips.slotsOfPerTaskManagerPlaceholder'),
           ...commonInputNum,
         },
-        ifShow: ({ values }) => values?.stepCurrent == 2,
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       {
         field: 'restartSize',
         label: t('flink.app.restartSize'),
-        ifShow: ({ values }) =>
+        show: ({ values }) =>
           edit?.mode == 'flink'
             ? true
             : !isK8sExecMode(values.executionMode) && values?.stepCurrent == 2,
@@ -410,7 +408,7 @@ export const useCreateAndEditSchema = (
           options: unref(alerts),
           fieldNames: { label: 'alertName', value: 'id', options: 'options' },
         },
-        ifShow: ({ values }) => values?.stepCurrent == 2,
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       {
         field: 'checkPointFailure',
@@ -427,7 +425,7 @@ export const useCreateAndEditSchema = (
         label: t('flink.app.totalMemoryOptions'),
         component: 'Select',
         render: renderTotalMemory,
-        ifShow: ({ values }) => values?.stepCurrent == 2,
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       {
         field: 'totalItem',
@@ -435,7 +433,7 @@ export const useCreateAndEditSchema = (
         component: 'Select',
         renderColContent: ({ model, field }) =>
           renderOptionsItems(model, 'totalOptions', field, '.memory', true),
-        ifShow: ({ values }) => values?.stepCurrent == 2,
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       {
         field: 'jmOptions',
@@ -450,7 +448,7 @@ export const useCreateAndEditSchema = (
           fieldNames: { label: 'name', value: 'key', options: 'options' },
           options: optionData.filter((x) => x.group === 'jobmanager-memory'),
         },
-        ifShow: ({ values }) => values?.stepCurrent == 2,
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       {
         field: 'jmOptionsItem',
@@ -458,7 +456,7 @@ export const useCreateAndEditSchema = (
         component: 'Select',
         renderColContent: ({ model, field }) =>
           renderOptionsItems(model, 'jmOptions', field, 'jobmanager.memory.'),
-        ifShow: ({ values }) => values?.stepCurrent == 2,
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       {
         field: 'tmOptions',
@@ -473,7 +471,7 @@ export const useCreateAndEditSchema = (
           fieldNames: { label: 'name', value: 'key', options: 'options' },
           options: optionData.filter((x) => x.group === 'taskmanager-memory'),
         },
-        ifShow: ({ values }) => values?.stepCurrent == 2,
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       {
         field: 'tmOptionsItem',
@@ -481,13 +479,13 @@ export const useCreateAndEditSchema = (
         component: 'Select',
         renderColContent: ({ model, field }) =>
           renderOptionsItems(model, 'tmOptions', field, 'taskmanager.memory.'),
-        ifShow: ({ values }) => values?.stepCurrent == 2,
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       {
         field: 'yarnQueue',
         label: t('flink.app.yarnQueue'),
         component: 'Input',
-        ifShow: ({ values }) =>
+        show: ({ values }) =>
           (values.executionMode == ExecModeEnum.YARN_APPLICATION ||
             values.executionMode == ExecModeEnum.YARN_PER_JOB) &&
           values?.stepCurrent == 2,
@@ -498,7 +496,7 @@ export const useCreateAndEditSchema = (
         label: t('flink.app.podTemplate'),
         component: 'Input',
         slot: 'podTemplate',
-        ifShow: ({ values }) =>
+        show: ({ values }) =>
           values.executionMode == ExecModeEnum.KUBERNETES_APPLICATION && values?.stepCurrent == 2,
       },
       {
@@ -506,7 +504,7 @@ export const useCreateAndEditSchema = (
         label: t('flink.app.dynamicProperties'),
         component: 'Input',
         render: (renderCallbackParams) => renderDynamicProperties(renderCallbackParams),
-        ifShow: ({ values }) => values?.stepCurrent == 2,
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       {
         field: 'args',
@@ -514,21 +512,21 @@ export const useCreateAndEditSchema = (
         component: 'InputTextArea',
         defaultValue: '',
         slot: 'args',
-        ifShow: ({ values }) =>
+        show: ({ values }) =>
           (edit?.mode ? true : values.jobType != JobTypeEnum.SQL) && values?.stepCurrent == 2,
       },
       {
         field: 'hadoopUser',
         label: t('flink.app.hadoopUser'),
         component: 'Input',
-        ifShow: ({ values }) => values?.stepCurrent == 2,
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       {
         field: 'description',
         label: t('common.description'),
         component: 'InputTextArea',
         componentProps: { rows: 4, placeholder: t('flink.app.addAppTips.descriptionPlaceholder') },
-        ifShow: ({ values }) => values?.stepCurrent == 2,
+        show: ({ values }) => values?.stepCurrent == 2,
       },
     ];
   });
@@ -563,6 +561,7 @@ export const useCreateAndEditSchema = (
           }
           return '';
         },
+        show: ({ values }) => values?.stepCurrent == 0,
       },
       {
         field: 'appType',
@@ -580,6 +579,7 @@ export const useCreateAndEditSchema = (
           }
           return '';
         },
+        show: ({ values }) => values?.jobType != JobTypeEnum.PIPELINE && values?.stepCurrent == 0,
       },
     ];
   });

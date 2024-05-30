@@ -146,7 +146,7 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource>
       String resourcePath = jars.get(0);
       resource.setResourcePath(resourcePath);
       // copy jar to team upload directory
-      String upFile = resourcePath.split(":")[1];
+      String upFile = resourcePath.split("->")[1];
       transferTeamResource(resource.getTeamId(), upFile);
     }
 
@@ -203,7 +203,7 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource>
 
       Dependency dependency = Dependency.toDependency(resource.getResource());
       if (!dependency.getJar().isEmpty()) {
-        String jarFile = dependency.getJar().get(0).split(":")[1];
+        String jarFile = dependency.getJar().get(0).split("->")[1];
         transferTeamResource(findResource.getTeamId(), jarFile);
       }
     }
@@ -354,10 +354,14 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource>
     if (jarFile.getName().endsWith(Constant.PYTHON_SUFFIX)) {
       return RestResponse.success().data(resp);
     }
-    String mainClass = Utils.getJarManClass(jarFile);
-    if (mainClass == null) {
-      // main class is null
-      return buildExceptResponse(new RuntimeException("main class is null"), 2);
+
+    // jarFile may not contain a main class, or it may contain multiple main classes for different
+    // type job
+    if (StringUtils.isEmpty(resourceParam.getMainClass())) {
+      if (Utils.getJarManClass(jarFile) == null) {
+        // main class is null
+        return buildExceptResponse(new RuntimeException("main class is null"), 2);
+      }
     }
     return RestResponse.success().data(resp);
   }
@@ -425,7 +429,8 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource>
       return null;
     }
     if (!dependency.getJar().isEmpty()) {
-      String jar = dependency.getJar().get(0).split(":")[1];
+      // split by ':' on windows server could not work
+      String jar = dependency.getJar().get(0).split("->")[1];
       return new File(jar);
     } else {
       Artifact artifact = dependency.toArtifact().get(0);

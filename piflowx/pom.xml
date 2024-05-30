@@ -185,6 +185,7 @@
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-scala_${scala.binary.version}</artifactId>
                 <version>${flink18.version}</version>
+                <scope>provided</scope>
                 <exclusions>
                     <exclusion>
                         <artifactId>chill-java</artifactId>
@@ -235,6 +236,7 @@
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-runtime</artifactId>
                 <version>${flink18.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <!-- flink核心API -->

@@ -68,6 +68,9 @@ import org.apache.streampark.console.core.service.application.ApplicationManageS
 import org.apache.streampark.console.core.utils.FlinkK8sDataTypeConverterStub;
 import org.apache.streampark.console.core.watcher.FlinkAppHttpWatcher;
 import org.apache.streampark.console.core.watcher.FlinkClusterWatcher;
+import org.apache.streampark.console.flow.base.utils.SessionUserUtil;
+import org.apache.streampark.console.flow.common.Eunm.RunModeType;
+import org.apache.streampark.console.flow.component.flow.service.IFlowService;
 import org.apache.streampark.flink.client.FlinkClient;
 import org.apache.streampark.flink.client.bean.CancelRequest;
 import org.apache.streampark.flink.client.bean.CancelResponse;
@@ -166,6 +169,8 @@ public class ApplicationActionServiceImpl extends ServiceImpl<ApplicationMapper,
   @Autowired private FlinkK8sDataTypeConverterStub flinkK8sDataTypeConverter;
 
   @Autowired private FlinkClusterWatcher flinkClusterWatcher;
+
+  @Autowired private IFlowService flowService;
 
   private final Map<Long, CompletableFuture<SubmitResponse>> startFutureMap =
       new ConcurrentHashMap<>();
@@ -412,8 +417,10 @@ public class ApplicationActionServiceImpl extends ServiceImpl<ApplicationMapper,
       appParam.setSavePointed(true);
       application.setRestartCount(application.getRestartCount() + 1);
     }
+
     // 2) update app state to starting...
     starting(application);
+
     ApplicationLog applicationLog = constructAppLog(application);
     // set the latest to Effective, (it will only become the current effective at this time)
     applicationManageService.toEffective(application);
@@ -425,6 +432,14 @@ public class ApplicationActionServiceImpl extends ServiceImpl<ApplicationMapper,
       String realSql = variableService.replaceVariable(application.getTeamId(), flinkSql.getSql());
       flinkSql.setSql(DeflaterUtils.zipString(realSql));
       extraParameter.put(ConfigKeys.KEY_FLINK_SQL(null), flinkSql.getSql());
+    } else if (application.isPipelineJob()) {
+      // TODO 将流水线作业的定义json存放到数据库表
+      String username = SessionUserUtil.getCurrentUsername();
+      boolean isAdmin = SessionUserUtil.isAdmin();
+      String flowJson =
+          flowService.startFlowAndGetProcessJson(
+              username, isAdmin, application.getId().toString(), RunModeType.RUN.getValue());
+      extraParameter.put(ConfigKeys.KEY_FLINK_PIPELINE_JSON(null), flowJson);
     }
 
     // TODO Need to display more K8s submission parameters in the front-end UI.
@@ -786,6 +801,11 @@ public class ApplicationActionServiceImpl extends ServiceImpl<ApplicationMapper,
     ResolveOrder resolveOrder = ResolveOrder.of(application.getResolveOrder());
     if (resolveOrder != null) {
       properties.put(CoreOptions.CLASSLOADER_RESOLVE_ORDER.key(), resolveOrder.getName());
+    }
+
+    // todo why not use application's mainClass?
+    if (application.isPipelineJob()) {
+      properties.put(ConfigKeys.KEY_FLINK_APPLICATION_MAIN_CLASS(), application.getMainClass());
     }
 
     return properties;

@@ -71,6 +71,9 @@ object ConfigKeys {
 
   def KEY_FLINK_SQL(prefix: String = null): String = s"${Option(prefix).getOrElse("")}sql"
 
+  def KEY_FLINK_PIPELINE_JSON(prefix: String = null): String =
+    s"${Option(prefix).getOrElse("")}pipeline.json"
+
   def KEY_FLINK_PARALLELISM(prefix: String = null): String =
     s"${Option(prefix).getOrElse("")}parallelism.default"
 

@@ -231,8 +231,8 @@ export const useAppTableAction = (
     if (app.appType == AppTypeEnum.STREAMPARK_FLINK) {
       // jobType( 1 custom code 2: flinkSQL)
       router.push({ path: '/flink/app/edit_streampark', query: { appId: app.id } });
-    } else if (app.appType == AppTypeEnum.APACHE_FLINK) {
-      //Apache Flink
+    } else if (app.appType == AppTypeEnum.APACHE_FLINK || app.jobType == JobTypeEnum.PIPELINE) {
+      //Apache Flink or Apache Flink pipeline
       router.push({ path: '/flink/app/edit_flink', query: { appId: app.id } });
     }
   }

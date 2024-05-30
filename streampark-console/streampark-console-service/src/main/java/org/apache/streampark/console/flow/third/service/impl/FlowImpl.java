@@ -51,8 +51,6 @@ public class FlowImpl implements IFlow {
     if (null == process) {
       return ReturnMapUtils.setFailedMsg(MessageConfig.PARAM_ERROR_MSG());
     }
-    // String json = ProcessUtil.processToJson(process, checkpoint, runModeType);
-    // String formatJson = JsonFormatTool.formatJson(json);
     List<ProcessStop> processStopList = process.getProcessStopList();
     if (processStopList == null || processStopList.size() == 0) {
       return ReturnMapUtils.setFailedMsg(MessageConfig.PARAM_IS_NULL_MSG("Stop"));
@@ -94,6 +92,32 @@ public class FlowImpl implements IFlow {
       logger.error("error: ", e);
       return ReturnMapUtils.setFailedMsg(MessageConfig.CONVERSION_FAILED_MSG());
     }
+  }
+
+  @Override
+  public String getProcessJson(Process process, String checkpoint, RunModeType runModeType) {
+    if (null == process) {
+      throw new RuntimeException(MessageConfig.PARAM_ERROR_MSG());
+    }
+    List<ProcessStop> processStopList = process.getProcessStopList();
+    if (processStopList == null || processStopList.size() == 0) {
+      throw new RuntimeException(MessageConfig.PARAM_IS_NULL_MSG("Stop"));
+    } else {
+      for (ProcessStop processStop : processStopList) {
+        StopsComponent stops =
+            stopsComponentDomain.getOnlyStopsComponentByBundle(processStop.getBundle());
+        if (stops == null) {
+          throw new RuntimeException(MessageConfig.DATA_ERROR_MSG());
+        }
+        processStop.setComponentType(stops.getComponentType());
+        if (ComponentFileType.PYTHON == processStop.getComponentType()) {
+          processStop.setDockerImagesName(stops.getDockerImagesName());
+        }
+      }
+    }
+
+    return ProcessUtils.processToJson(
+        process, checkpoint, runModeType, process.getFlowGlobalParamsList());
   }
 
   @Override

@@ -1,15 +1,5 @@
 package org.apache.streampark.console.flow.component.flow.service.impl;
 
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.console.base.exception.ApiAlertException;
 import org.apache.streampark.console.flow.base.utils.JsonUtils;
 import org.apache.streampark.console.flow.base.utils.LoggerUtil;
@@ -54,13 +44,28 @@ import org.apache.streampark.console.flow.component.stopsComponent.vo.StopGroupV
 import org.apache.streampark.console.flow.controller.requestVo.FlowInfoVoRequestAdd;
 import org.apache.streampark.console.flow.controller.requestVo.FlowInfoVoRequestUpdate;
 import org.apache.streampark.console.flow.third.service.IFlow;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import scala.annotation.meta.param;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
+@Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
 public class FlowServiceImpl implements IFlowService {
 
   private final Logger logger = LoggerUtil.getLogger();
@@ -419,6 +424,51 @@ public class FlowServiceImpl implements IFlowService {
   }
 
   @Override
+  public String startFlowAndGetProcessJson(
+      String username, boolean isAdmin, String flowId, String runMode) throws Exception {
+
+    if (StringUtils.isBlank(username)) {
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+    }
+    if (StringUtils.isBlank(flowId)) {
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_IS_NULL_MSG("FlowId"));
+    }
+    // find flow by flowId
+    Flow flowById = this.getFlowById(username, isAdmin, flowId);
+    // addFlow is not empty and the value of ReqRtnStatus is true, then the save is successful.
+    if (null == flowById) {
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_BY_ID_XXX_MSG(flowId));
+    }
+    Process process = ProcessUtils.flowToProcess(flowById, username, false);
+    if (null == process) {
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.CONVERSION_FAILED_MSG());
+    }
+    RunModeType runModeType = RunModeType.RUN;
+    if (StringUtils.isNotBlank(runMode)) {
+      runModeType = RunModeType.selectGender(runMode);
+    }
+    process.setRunModeType(runModeType);
+    process.setId(UUIDUtils.getUUID32());
+    int updateProcess = processDomain.addProcess(process);
+    if (updateProcess <= 0) {
+      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.CONVERSION_FAILED_MSG());
+    }
+    StringBuffer checkpoint = new StringBuffer();
+    List<Stops> stopsList = flowById.getStopsList();
+    for (Stops stops : stopsList) {
+      if (null == stops.getIsCheckpoint() || !stops.getIsCheckpoint()) {
+        continue;
+      }
+      if (StringUtils.isNotBlank(checkpoint)) {
+        checkpoint.append(",");
+      }
+      checkpoint.append(stops.getName());
+    }
+
+    return flowImpl.getProcessJson(process, checkpoint.toString(), runModeType);
+  }
+
+  @Override
   public String runFlowByPublishingId(
       String username, boolean isAdmin, String publishingId, String runMode) throws Exception {
     if (StringUtils.isBlank(username)) {
@@ -625,8 +675,7 @@ public class FlowServiceImpl implements IFlowService {
     }
     // Group on the left and 'stops'
     // todo engintype
-    List<StopGroupVo> groupsVoList =
-        stopGroupServiceImpl.getStopGroupAll(flowById.getEngineType());
+    List<StopGroupVo> groupsVoList = stopGroupServiceImpl.getStopGroupAll(flowById.getEngineType());
     rtnMap.put("groupsVoList", groupsVoList);
     // DataSource the left
     List<DataSourceVo> dataSourceVoList =

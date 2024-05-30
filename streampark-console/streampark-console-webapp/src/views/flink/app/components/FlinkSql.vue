@@ -260,11 +260,11 @@
         </a-button>
       </div>
     </div>
+    <p class="conf-desc mt-10px" v-if="!fullScreenStatus">
+      <span class="text-red-600" v-if="vertifyRes.errorMsg"> {{ vertifyRes.errorMsg }} </span>
+      <span v-else class="text-green-700">
+        <span v-if="vertifyRes.verified"> {{ t('flink.app.flinkSql.successful') }} </span>
+      </span>
+    </p>
   </div>
-  <p class="conf-desc mt-10px" v-if="!fullScreenStatus">
-    <span class="text-red-600" v-if="vertifyRes.errorMsg"> {{ vertifyRes.errorMsg }} </span>
-    <span v-else class="text-green-700">
-      <span v-if="vertifyRes.verified"> {{ t('flink.app.flinkSql.successful') }} </span>
-    </span>
-  </p>
 </template>

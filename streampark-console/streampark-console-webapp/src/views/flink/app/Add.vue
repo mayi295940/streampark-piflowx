@@ -265,6 +265,7 @@
       submitLoading.value = true;
       if (formValue.jobType == JobTypeEnum.SQL) {
         if (formValue.flinkSql == null || formValue.flinkSql.trim() === '') {
+          submitLoading.value = false;
           createMessage.warning(t('flink.app.editStreamPark.flinkSqlRequired'));
         } else {
           const access = await flinkSql?.value?.handleVerifySql();
@@ -272,8 +273,8 @@
             createMessage.warning(t('flink.app.editStreamPark.sqlCheck'));
             throw new Error(access);
           }
+          handleSubmitSQL(formValue);
         }
-        handleSubmitSQL(formValue);
       } else {
         handleSubmitCustomJob(formValue);
       }
@@ -304,7 +305,7 @@
 
   const stepCurrent = ref<number>(0);
   const next = async () => {
-    await validate();
+    //await validate();
     submitLoading.value = false;
     stepCurrent.value++;
     setFieldsValue({ stepCurrent: stepCurrent.value });
@@ -418,16 +419,4 @@
 </template>
 <style lang="less">
   @import url('./styles/Add.less');
-  .steps-content {
-    margin-top: 16px;
-    border: 1px dashed #e9e9e9;
-    border-radius: 6px;
-    background-color: #fafafa;
-    height: 460px;
-    overflow: auto;
-    padding-top: 10px;
-  }
-  .steps-action {
-    margin-top: 15px;
-  }
 </style>

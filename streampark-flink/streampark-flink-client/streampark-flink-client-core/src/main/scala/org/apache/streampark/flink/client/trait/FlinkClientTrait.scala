@@ -39,10 +39,10 @@ import org.apache.flink.client.program.{ClusterClient, PackagedProgram, Packaged
 import org.apache.flink.configuration._
 import org.apache.flink.python.PythonOptions
 import org.apache.flink.runtime.jobgraph.{JobGraph, SavepointConfigOptions}
-import org.apache.flink.util.FlinkException
 import org.apache.flink.util.Preconditions.checkNotNull
 
-import java.util.{Collections, List => JavaList, Map => JavaMap}
+import java.io.File
+import java.util.{Collections, Date, List => JavaList, Map => JavaMap}
 
 import scala.collection.convert.ImplicitConversions._
 import scala.collection.mutable
@@ -57,6 +57,7 @@ trait FlinkClientTrait extends Logger {
   private[client] lazy val PARAM_KEY_APP_CONF = KEY_APP_CONF(PARAM_PREFIX)
   private[client] lazy val PARAM_KEY_APP_NAME = KEY_APP_NAME(PARAM_PREFIX)
   private[client] lazy val PARAM_KEY_FLINK_PARALLELISM = KEY_FLINK_PARALLELISM(PARAM_PREFIX)
+  private[client] lazy val PARAM_KEY_FLINK_PIPELINE = KEY_FLINK_PIPELINE_JSON(PARAM_PREFIX)
 
   private[this] lazy val javaEnvOpts = List(
     CoreOptions.FLINK_JVM_OPTIONS,
@@ -70,7 +71,7 @@ trait FlinkClientTrait extends Logger {
   def submit(submitRequest: SubmitRequest): SubmitResponse = {
     logInfo(
       s"""
-         |--------------------------------------- flink job start ---------------------------------------
+         |--------------------------------------- flink job start ----------------------------------
          |    userFlinkHome    : ${submitRequest.flinkVersion.flinkHome}
          |    flinkVersion     : ${submitRequest.flinkVersion.version}
          |    appName          : ${submitRequest.appName}
@@ -85,7 +86,7 @@ trait FlinkClientTrait extends Logger {
          |    args             : ${submitRequest.args}
          |    appConf          : ${submitRequest.appConf}
          |    flinkBuildResult : ${submitRequest.buildResult}
-         |-------------------------------------------------------------------------------------------
+         |------------------------------------------------------------------------------------------
          |""".stripMargin)
 
     val (commandLine, flinkConfig) = getCommandLineAndFlinkConfig(submitRequest)
@@ -102,7 +103,10 @@ trait FlinkClientTrait extends Logger {
         }
       case _ =>
         if (submitRequest.userJarFile != null) {
-          val uri = PackagedProgramUtils.resolveURI(submitRequest.userJarFile.getAbsolutePath)
+          var path = submitRequest.userJarFile.getAbsolutePath
+          // windows system path replace '\' into '/'
+          path = path.replaceAll("\\\\", "/")
+          val uri = PackagedProgramUtils.resolveURI(path)
           val programOptions = ProgramOptions.create(commandLine)
           val executionParameters = ExecutionConfigAccessor.fromProgramOptions(
             programOptions,
@@ -136,9 +140,9 @@ trait FlinkClientTrait extends Logger {
       flinkConfig.setBoolean(
         SavepointConfigOptions.SAVEPOINT_IGNORE_UNCLAIMED_STATE,
         submitRequest.allowNonRestoredState)
-      val eableRestoreModeState = submitRequest.flinkVersion.checkVersion(
+      val enableRestoreModeState = submitRequest.flinkVersion.checkVersion(
         FlinkRestoreMode.SINCE_FLINK_VERSION) && submitRequest.restoreMode != null
-      if (eableRestoreModeState) {
+      if (enableRestoreModeState) {
         flinkConfig.setString(FlinkRestoreMode.RESTORE_MODE, submitRequest.restoreMode.getName);
       }
     }
@@ -184,7 +188,7 @@ trait FlinkClientTrait extends Logger {
   def cancel(cancelRequest: CancelRequest): CancelResponse = {
     logInfo(
       s"""
-         |----------------------------------------- flink job cancel --------------------------------
+         |----------------------------------------- flink job cancel -------------------------------
          |     userFlinkHome     : ${cancelRequest.flinkVersion.flinkHome}
          |     flinkVersion      : ${cancelRequest.flinkVersion.version}
          |     clusterId         : ${cancelRequest.clusterId}
@@ -195,7 +199,7 @@ trait FlinkClientTrait extends Logger {
          |     k8sNamespace      : ${cancelRequest.kubernetesNamespace}
          |     appId             : ${cancelRequest.clusterId}
          |     jobId             : ${cancelRequest.jobId}
-         |-------------------------------------------------------------------------------------------
+         |------------------------------------------------------------------------------------------
          |""".stripMargin)
     val flinkConf = new Configuration()
     doCancel(cancelRequest, flinkConf)
@@ -468,6 +472,12 @@ trait FlinkClientTrait extends Logger {
           programArgs += PARAM_KEY_APP_CONF += submitRequest.appConf
       }
 
+    } else if (submitRequest.developmentMode == FlinkDevelopmentMode.FLINK_PIPELINE) {
+      val flowFileName = submitRequest.appName + new Date().getTime
+      val path = System.getProperty("user.dir") + "/flowFile/" + flowFileName + ".json"
+      val file = new File(path)
+      FileUtils.writeFile(submitRequest.pipelineJson, file)
+      programArgs += PARAM_KEY_FLINK_PIPELINE += flowFileName
     }
 
     // execution.runtime-mode
@@ -515,9 +525,11 @@ trait FlinkClientTrait extends Logger {
         case x => x
       }
     }
+
     def getOption[T](key: ConfigOption[T]): Option[T] = {
       Option(flinkConfig.get(key))
     }
+
     def remove[T](key: ConfigOption[T]): Configuration = {
       flinkConfig.removeConfig(key)
       flinkConfig

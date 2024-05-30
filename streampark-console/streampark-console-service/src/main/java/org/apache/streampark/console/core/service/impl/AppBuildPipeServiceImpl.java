@@ -17,28 +17,6 @@
 
 package org.apache.streampark.console.core.service.impl;
 
-import static org.apache.streampark.console.core.enums.OperationEnum.RELEASE;
-
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.common.Constant;
 import org.apache.streampark.common.conf.K8sFlinkConfig;
 import org.apache.streampark.common.conf.Workspace;
@@ -105,12 +83,38 @@ import org.apache.streampark.flink.packer.pipeline.impl.FlinkK8sApplicationBuild
 import org.apache.streampark.flink.packer.pipeline.impl.FlinkK8sSessionBuildPipeline;
 import org.apache.streampark.flink.packer.pipeline.impl.FlinkRemoteBuildPipeline;
 import org.apache.streampark.flink.packer.pipeline.impl.FlinkYarnApplicationBuildPipeline;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Nonnull;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import static org.apache.streampark.console.core.enums.OperationEnum.RELEASE;
 
 @Service
 @Slf4j
@@ -200,6 +204,7 @@ public class AppBuildPipeServiceImpl
 
     // clear history
     removeByAppId(app.getId());
+
     // register pipeline progress event watcher.
     // save snapshot of pipeline to db when status of pipeline was changed.
     pipeline.registerWatcher(
@@ -439,7 +444,12 @@ public class AppBuildPipeServiceImpl
     }
 
     FlinkExecutionMode executionModeEnum = app.getFlinkExecutionMode();
+
     String mainClass = Constant.STREAMPARK_FLINKSQL_CLIENT_CLASS;
+    if (app.isPipelineJob()) {
+      mainClass = app.getMainClass();
+    }
+
     switch (executionModeEnum) {
       case YARN_APPLICATION:
         String yarnProvidedPath = app.getAppLib();
@@ -583,6 +593,8 @@ public class AppBuildPipeServiceImpl
           return String.format("%s/%s", clientPath, sqlDistJar);
         }
         return Workspace.local().APP_CLIENT().concat("/").concat(sqlDistJar);
+      case FLINK_PIPELINE:
+        return "";
       default:
         throw new UnsupportedOperationException(
             "[StreamPark] unsupported JobType: " + app.getDevelopmentMode());

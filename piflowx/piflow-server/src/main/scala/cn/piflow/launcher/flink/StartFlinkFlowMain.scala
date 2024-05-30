@@ -4,7 +4,9 @@ import cn.piflow.Runner
 import cn.piflow.conf.bean.FlowBean
 import cn.piflow.conf.util.MapUtil
 import cn.piflow.util.{FlowFileUtil, JsonUtil}
+import org.apache.commons.lang3.StringUtils
 import org.apache.flink.api.common.RuntimeExecutionMode
+import org.apache.flink.api.java.utils.ParameterTool
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
 import org.apache.flink.table.api.Table
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
@@ -15,7 +17,15 @@ object StartFlinkFlowMain {
 
   def main(args: Array[String]): Unit = {
 
-    val flowFileName = args(0)
+    val parameter = ParameterTool.fromArgs(args)
+
+    val flowFileName = parameter.get("pipeline.json", args(0))
+
+    if (StringUtils.isEmpty(flowFileName)) {
+      throw new RuntimeException("pipeline.json is empty")
+    }
+
+    println(flowFileName)
 
     var flowFilePath = FlowFileUtil.getFlowFileInUserDir(flowFileName)
     val file = new File(flowFilePath)

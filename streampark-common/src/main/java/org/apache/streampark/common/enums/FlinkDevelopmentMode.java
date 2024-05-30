@@ -34,8 +34,10 @@ public enum FlinkDevelopmentMode {
 
   /** Py flink Mode */
   PYFLINK("Python Flink", 3),
+
   /** flink pipeline */
-  PIPELINE("Flink Pipeline", 4);
+  FLINK_PIPELINE("Flink Pipeline", 4);
+
   private final String name;
 
   private final Integer mode;

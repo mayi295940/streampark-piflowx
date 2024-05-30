@@ -154,7 +154,7 @@
       deps.push(dependency.pom[v]);
     });
     Object.keys(dependency.jar).forEach((v: string) => {
-      jars.push(v + ':' + dependency.jar[v]);
+      jars.push(v + '->' + dependency.jar[v]);
     });
     dependencyRecords.value = deps;
     uploadJars.value = jars;
@@ -162,7 +162,7 @@
 
   function handleRemoveJar(jar: string) {
     console.log(jar);
-    delete dependency.jar[jar.split(':')[0]];
+    delete dependency.jar[jar.split('->')[0]];
     handleUpdateDependency();
   }
 
@@ -237,7 +237,7 @@
         <template #message>
           <Space>
             <Tag class="tag-dependency" color="#108ee9">JAR</Tag>
-            {{ jar.split(':')[0] }}
+            {{ jar.split('->')[0] }}
             <Icon
               icon="ant-design:close-outlined"
               class="icon-close cursor-pointer"

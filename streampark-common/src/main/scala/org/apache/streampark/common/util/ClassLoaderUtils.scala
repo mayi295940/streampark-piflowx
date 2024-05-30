@@ -41,7 +41,9 @@ object ClassLoaderUtils extends Logger {
       Thread.currentThread.setContextClassLoader(targetClassLoader)
       func()
     } catch {
-      case e: Exception => throw e
+      case e: Exception =>
+        logError("Failed to execute with the specified classloader for scala API.", e)
+        throw e
     } finally {
       Thread.currentThread.setContextClassLoader(originalClassLoader)
     }
@@ -60,11 +62,14 @@ object ClassLoaderUtils extends Logger {
       Thread.currentThread.setContextClassLoader(targetClassLoader)
       supplier.get()
     } catch {
-      case e: Exception => throw e
+      case e: Exception =>
+        logError("Failed to execute with the specified classloader for java API.", e)
+        throw e
     } finally {
       Thread.currentThread.setContextClassLoader(originalClassLoader)
     }
   }
+
   @throws[IOException]
   def cloneClassLoader(): ClassLoader = {
     val urls = originalClassLoader.getResources(".")

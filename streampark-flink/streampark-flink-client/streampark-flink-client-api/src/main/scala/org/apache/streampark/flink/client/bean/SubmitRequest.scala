@@ -65,6 +65,8 @@ case class SubmitRequest(
   lazy val appMain: String = this.developmentMode match {
     case FlinkDevelopmentMode.FLINK_SQL => Constant.STREAMPARK_FLINKSQL_CLIENT_CLASS
     case FlinkDevelopmentMode.PYFLINK => Constant.PYTHON_FLINK_DRIVER_CLASS_NAME
+    case FlinkDevelopmentMode.FLINK_PIPELINE =>
+      properties.get(KEY_FLINK_APPLICATION_MAIN_CLASS).asInstanceOf[String]
     case _ => appProperties(KEY_FLINK_APPLICATION_MAIN_CLASS)
   }
 
@@ -79,6 +81,8 @@ case class SubmitRequest(
   lazy val classPaths: List[URL] = flinkVersion.flinkLibs ++ libs
 
   lazy val flinkSQL: String = extraParameter.get(KEY_FLINK_SQL()).toString
+
+  lazy val pipelineJson: String = extraParameter.get(KEY_FLINK_PIPELINE_JSON()).toString
 
   lazy val allowNonRestoredState: Boolean = Try(
     properties.get(SavepointConfigOptions.SAVEPOINT_IGNORE_UNCLAIMED_STATE.key).toString.toBoolean)

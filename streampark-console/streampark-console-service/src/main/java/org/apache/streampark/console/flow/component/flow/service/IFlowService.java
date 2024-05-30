@@ -69,6 +69,9 @@ public interface IFlowService {
    */
   String runFlow(String username, boolean isAdmin, String flowId, String runMode) throws Exception;
 
+  String startFlowAndGetProcessJson(String username, boolean isAdmin, String flowId, String runMode)
+      throws Exception;
+
   /**
    * Call the start interface and save the return information
    *

@@ -22,7 +22,7 @@ import { getAlertSvgIcon } from './useFlinkRender';
 import { Alert } from 'ant-design-vue';
 import { useRoute } from 'vue-router';
 import { fetchMain } from '/@/api/flink/app';
-import { ResourceFromEnum } from '/@/enums/flinkEnum';
+import { JobTypeEnum, ResourceFromEnum } from '/@/enums/flinkEnum';
 
 export const useEditFlinkSchema = (jars: Ref) => {
   const flinkSql = ref();
@@ -40,6 +40,12 @@ export const useEditFlinkSchema = (jars: Ref) => {
 
   const getEditFlinkFormSchema = computed((): FormSchema[] => {
     return [
+      {
+        field: 'stepCurrent',
+        label: 'stepCurrent',
+        component: 'Input',
+        show: false,
+      },
       ...getFlinkTypeSchema.value,
       ...getExecutionModeSchema.value,
       {
@@ -53,6 +59,7 @@ export const useEditFlinkSchema = (jars: Ref) => {
             return getAlertSvgIcon('upload', 'Upload (upload local job)');
           else return '';
         },
+        show: ({ values }) => values?.stepCurrent == 1,
       },
       ...getFlinkClusterSchemas.value,
       {
@@ -60,14 +67,22 @@ export const useEditFlinkSchema = (jars: Ref) => {
         label: 'Project',
         component: 'Input',
         render: ({ model }) => h(Alert, { message: model.projectName, type: 'info' }),
-        ifShow: ({ model }) => model.resourceFrom == ResourceFromEnum.PROJECT && model.projectName,
+        show: ({ model }) =>
+          model.resourceFrom == ResourceFromEnum.PROJECT &&
+          model.projectName &&
+          model?.jobType != JobTypeEnum.PIPELINE &&
+          model?.stepCurrent == 1,
       },
       {
         field: 'module',
         label: 'Module',
         component: 'Input',
         render: ({ model }) => h(Alert, { message: model.module, type: 'info' }),
-        ifShow: ({ model }) => model.resourceFrom == ResourceFromEnum.PROJECT && model.module,
+        show: ({ model }) =>
+          model.resourceFrom == ResourceFromEnum.PROJECT &&
+          model.module &&
+          model?.jobType != JobTypeEnum.PIPELINE &&
+          model?.stepCurrent == 1,
       },
       {
         field: 'jar',
@@ -88,22 +103,38 @@ export const useEditFlinkSchema = (jars: Ref) => {
             },
           };
         },
-        ifShow: ({ model }) => model.resourceFrom == ResourceFromEnum.PROJECT,
-        rules: [{ required: true, message: 'Please select jar' }],
+        show: ({ model }) =>
+          model.resourceFrom == ResourceFromEnum.PROJECT &&
+          model?.jobType != JobTypeEnum.PIPELINE &&
+          model?.stepCurrent == 1,
+        dynamicRules: ({ model }) => [
+          {
+            required:
+              model.resourceFrom == ResourceFromEnum.PROJECT &&
+              model?.jobType != JobTypeEnum.PIPELINE,
+            message: 'Please select jar',
+          },
+        ],
       },
       {
         field: 'uploadJobJar',
         label: 'Upload Job Jar',
         component: 'Select',
         slot: 'uploadJobJar',
-        ifShow: ({ model }) => model.resourceFrom != ResourceFromEnum.PROJECT,
+        show: ({ model }) =>
+          model.resourceFrom != ResourceFromEnum.PROJECT &&
+          model?.jobType != JobTypeEnum.PIPELINE &&
+          model?.stepCurrent == 1,
       },
       {
         field: 'jar',
         label: 'Program Jar',
         component: 'Input',
         dynamicDisabled: true,
-        ifShow: ({ model }) => model.resourceFrom != ResourceFromEnum.PROJECT,
+        show: ({ model }) =>
+          model.resourceFrom != ResourceFromEnum.PROJECT &&
+          model?.jobType != JobTypeEnum.PIPELINE &&
+          model?.stepCurrent == 1,
       },
       {
         field: 'mainClass',
@@ -114,6 +145,7 @@ export const useEditFlinkSchema = (jars: Ref) => {
           placeholder: 'Please enter Main class',
         },
         rules: [{ required: true, message: 'Program Main is required' }],
+        show: ({ model }) => model?.stepCurrent == 1,
       },
       ...getFlinkFormOtherSchemas.value,
     ];

@@ -17,6 +17,7 @@
 
 package org.apache.streampark.spark.connector.kafka.offset
 
+import org.apache.streampark.common.util.Implicits._
 import org.apache.streampark.common.util.Logger
 
 import org.apache.kafka.common.TopicPartition
@@ -24,7 +25,6 @@ import org.apache.spark.SparkConf
 
 import java.util.Properties
 
-import scala.collection.JavaConverters._
 import scala.language.implicitConversions
 import scala.util.Try
 
@@ -45,7 +45,8 @@ trait Offset extends Logger with Serializable {
     prop
   }
 
-  lazy val reset: String = sparkConf.get("spark.source.kafka.consume.auto.offset.reset", "largest")
+  lazy val reset: String =
+    sparkConf.get("spark.source.kafka.consume.auto.offset.reset", "largest")
 
   lazy val (host, port) = sparkConf
     .get("spark.source.kafka.consume.bootstrap.servers")
@@ -132,13 +133,16 @@ trait Offset extends Logger with Serializable {
       "org.apache.kafka.common.serialization.StringDeserializer")
     val consumer = new KafkaConsumer[String, String](props)
 
-    val partitions = topics.flatMap(
-      topic => {
-        consumer.partitionsFor(topic).asScala.map(x => new TopicPartition(x.topic(), x.partition()))
-      })
+    val partitions = topics.flatMap(topic => {
+      consumer
+        .partitionsFor(topic)
+        .asScala
+        .map(x => new TopicPartition(x.topic(), x.partition()))
+    })
 
     val offsetInfos = time match {
-      case EarliestTime => consumer.beginningOffsets(partitions.asJavaCollection)
+      case EarliestTime =>
+        consumer.beginningOffsets(partitions.asJavaCollection)
       case LatestTime => consumer.endOffsets(partitions.asJavaCollection)
     }
 

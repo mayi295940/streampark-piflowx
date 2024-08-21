@@ -26,7 +26,7 @@ enum SAVE_POINT_API {
 export function fetchLatest(data: Recordable) {
   return defHttp.post({ url: SAVE_POINT_API.LATEST, data });
 }
-export function fetchSavePonitHistory(data: Recordable) {
+export function fetchSavePointHistory(data: Recordable) {
   return defHttp.post({ url: SAVE_POINT_API.HISTORY, data });
 }
 /**
@@ -34,7 +34,7 @@ export function fetchSavePonitHistory(data: Recordable) {
  * @param data id
  * @returns {Promise<boolean>}
  */
-export function fetchRemoveSavePoint(data: { id: string }): Promise<boolean> {
+export function fetchRemoveSavePoint(data: { appId: any; id: any }): Promise<boolean> {
   return defHttp.post({
     url: SAVE_POINT_API.DELETE,
     data,

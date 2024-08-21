@@ -62,13 +62,14 @@
         block
         @click="handleLogin"
         :loading="loading"
+        classNames="login-button"
       >
         {{ loginText.buttonText }}
       </Button>
     </FormItem>
 
     <FormItem class="enter-x text-left">
-      <Button :href="BASE_ADDRESS+SSO_LOGIN_PATH" type="link" v-if="enableSSO">
+      <Button :href="BASE_ADDRESS + SSO_LOGIN_PATH" type="link" v-if="enableSSO">
         {{ t('sys.login.ssoSignIn') }}
       </Button>
       <Button type="link" class="float-right" @click="changeLoginType" v-if="enableLDAP">
@@ -117,7 +118,7 @@
     account: string;
     password: string;
   }
-  const BASE_ADDRESS= import.meta.env.VITE_BASE_ADDRESS;
+  const BASE_ADDRESS = import.meta.env.VITE_BASE_ADDRESS;
   const formRef = ref();
   const loading = ref(false);
   const userId = ref('');
@@ -177,12 +178,6 @@
               'SignIn failed,' +
               (code === 0 ? ' authentication error' : ' current User is locked.');
             createMessage.error(message);
-            return;
-          } else if (code == 403) {
-            userId.value = data as unknown as string;
-            const teamList = await fetchUserTeam({ userId: userId.value });
-            userStore.setTeamList(teamList.map((i) => ({ label: i.teamName, value: i.id })));
-            modelVisible.value = true;
             return;
           } else {
             console.log(data);

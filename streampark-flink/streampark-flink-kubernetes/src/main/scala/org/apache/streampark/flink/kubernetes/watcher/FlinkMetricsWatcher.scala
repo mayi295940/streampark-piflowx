@@ -24,14 +24,13 @@ import org.apache.streampark.flink.kubernetes.model.{ClusterKey, FlinkMetricCV, 
 
 import org.apache.flink.configuration.{JobManagerOptions, MemorySize, TaskManagerOptions}
 import org.apache.hc.client5.http.fluent.Request
-import org.apache.hc.core5.util.Timeout
 import org.json4s.{DefaultFormats, JArray}
 import org.json4s.jackson.JsonMethods.parse
 
 import javax.annotation.concurrent.ThreadSafe
 
 import java.nio.charset.StandardCharsets
-import java.util.concurrent.{Executors, ScheduledFuture, TimeUnit}
+import java.util.concurrent.{ScheduledFuture, TimeUnit}
 
 import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutorService, Future}
 import scala.concurrent.duration.DurationLong
@@ -45,30 +44,34 @@ class FlinkMetricWatcher(conf: MetricWatcherConfig = MetricWatcherConfig.default
   extends Logger
   with FlinkWatcher {
 
-  private val trackTaskExecPool = Executors.newWorkStealingPool()
   implicit private val trackTaskExecutor: ExecutionContextExecutorService =
-    ExecutionContext.fromExecutorService(trackTaskExecPool)
+    ExecutionContext.fromExecutorService(watchExecutor)
 
-  private val timerExec = Executors.newSingleThreadScheduledExecutor()
   private var timerSchedule: ScheduledFuture[_] = _
 
   /** start watcher process */
   override def doStart(): Unit = {
-    timerSchedule =
-      timerExec.scheduleAtFixedRate(() => doWatch(), 0, conf.requestIntervalSec, TimeUnit.SECONDS)
+    timerSchedule = watchExecutor.scheduleAtFixedRate(
+      () => doWatch(),
+      0,
+      conf.requestIntervalSec,
+      TimeUnit.SECONDS)
     logInfo("[flink-k8s] FlinkMetricWatcher started.")
   }
 
   /** stop watcher process */
   override def doStop(): Unit = {
-    timerSchedule.cancel(true)
+    if (!timerSchedule.isCancelled) {
+      timerSchedule.cancel(true)
+    }
     logInfo("[flink-k8s] FlinkMetricWatcher stopped.")
   }
 
   /** closes resource, relinquishing any underlying resources. */
   override def doClose(): Unit = {
-    timerExec.shutdownNow()
-    trackTaskExecutor.shutdownNow()
+    if (Option(timerSchedule).isDefined && !timerSchedule.isCancelled) {
+      timerSchedule.cancel(true)
+    }
     logInfo("[flink-k8s] FlinkMetricWatcher closed.")
   }
 
@@ -77,30 +80,30 @@ class FlinkMetricWatcher(conf: MetricWatcherConfig = MetricWatcherConfig.default
     // get all legal tracking cluster key
     val trackIds: Set[TrackId] = Try(watchController.getActiveWatchingIds())
       .filter(_.nonEmpty)
-      .getOrElse(return None)
+      .getOrElse(return
+      )
     // retrieve flink metrics in thread pool
     val futures: Set[Future[Option[FlinkMetricCV]]] =
-      trackIds.map(
-        id => {
-          val future = Future(collectMetrics(id))
-          future.onComplete(_.getOrElse(None) match {
-            case Some(metric) =>
-              val clusterKey = id.toClusterKey
-              // update current flink cluster metrics on cache
-              watchController.flinkMetrics.put(clusterKey, metric)
-              val isMetricChanged = {
-                val preMetric = watchController.flinkMetrics.get(clusterKey)
-                preMetric == null || !preMetric.equalsPayload(metric)
-              }
-              if (isMetricChanged) {
-                eventBus.postAsync(FlinkClusterMetricChangeEvent(id, metric))
-              }
-            case _ =>
-          })
-          future
+      trackIds.map(id => {
+        val future = Future(collectMetrics(id))
+        future.onComplete(_.getOrElse(None) match {
+          case Some(metric) =>
+            val clusterKey = id.toClusterKey
+            // update current flink cluster metrics on cache
+            watchController.flinkMetrics.put(clusterKey, metric)
+            val isMetricChanged = {
+              val preMetric = watchController.flinkMetrics.get(clusterKey)
+              preMetric == null || !preMetric.equalsPayload(metric)
+            }
+            if (isMetricChanged) {
+              eventBus.postAsync(FlinkClusterMetricChangeEvent(id, metric))
+            }
+          case _ =>
         })
+        future
+      })
     // blocking until all future are completed or timeout is reached
-    Try(Await.ready(Future.sequence(futures), conf.requestTimeoutSec seconds)).failed.map {
+    Try(Await.result(Future.sequence(futures), conf.requestTimeoutSec seconds)).failed.map {
       _ =>
         logError(
           s"[FlinkMetricWatcher] tracking flink metrics on kubernetes mode timeout," +
@@ -116,11 +119,14 @@ class FlinkMetricWatcher(conf: MetricWatcherConfig = MetricWatcherConfig.default
    * This method can be called directly from outside, without affecting the current cachePool
    * result.
    */
-  def collectMetrics(id: TrackId): Option[FlinkMetricCV] = {
+  private def collectMetrics(id: TrackId): Option[FlinkMetricCV] = {
     // get flink rest api
     val clusterKey: ClusterKey = ClusterKey.of(id)
     val flinkJmRestUrl =
-      watchController.getClusterRestUrl(clusterKey).filter(_.nonEmpty).getOrElse(return None)
+      watchController
+        .getClusterRestUrl(clusterKey)
+        .filter(_.nonEmpty)
+        .getOrElse(return None)
 
     // call flink rest overview api
     val flinkOverview: FlinkRestOverview = FlinkRestOverview
@@ -163,8 +169,7 @@ class FlinkMetricWatcher(conf: MetricWatcherConfig = MetricWatcherConfig.default
         finishedJob = flinkOverview.jobsFinished,
         cancelledJob = flinkOverview.jobsCancelled,
         failedJob = flinkOverview.jobsFailed,
-        pollAckTime = ackTime
-      )
+        pollAckTime = ackTime)
     }
     Some(flinkMetricCV)
   }
@@ -198,8 +203,7 @@ object FlinkRestOverview {
           (ok \ "jobs-finished").extractOpt[Integer].getOrElse(0),
           (ok \ "jobs-cancelled").extractOpt[Integer].getOrElse(0),
           (ok \ "jobs-failed").extractOpt[Integer].getOrElse(0),
-          (ok \ "flink-version").extractOpt[String].orNull
-        )
+          (ok \ "flink-version").extractOpt[String].orNull)
         Some(overview)
       case Failure(_) => None
     }
@@ -220,12 +224,11 @@ private[kubernetes] object FlinkRestJmConfigItem {
       case Success(ok) =>
         ok match {
           case JArray(arr) =>
-            arr.map(
-              x => {
-                FlinkRestJmConfigItem(
-                  (x \ "key").extractOpt[String].orNull,
-                  (x \ "value").extractOpt[String].orNull)
-              })
+            arr.map(x => {
+              FlinkRestJmConfigItem(
+                (x \ "key").extractOpt[String].orNull,
+                (x \ "value").extractOpt[String].orNull)
+            })
           case _ => null
         }
       case Failure(_) => null

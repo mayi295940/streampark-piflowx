@@ -20,7 +20,6 @@ import { Switch } from 'ant-design-vue';
 import { useMessage } from '/@/hooks/web/useMessage';
 import { fetTokenStatusToggle } from '/@/api/system/token';
 import { getNoTokenUserList } from '/@/api/system/user';
-import dayjs from 'dayjs';
 import { useI18n } from '/@/hooks/web/useI18n';
 const { t } = useI18n();
 
@@ -52,11 +51,6 @@ export const columns: BasicColumn[] = [
     dataIndex: 'createTime',
   },
   {
-    title: t('system.token.table.expireTime'),
-    dataIndex: 'expireTime',
-    sorter: true,
-  },
-  {
     title: t('system.token.table.status'),
     dataIndex: 'userStatus',
     width: 100,
@@ -65,7 +59,7 @@ export const columns: BasicColumn[] = [
         record.pendingStatus = false;
       }
       return h(Switch, {
-        checked: record.userStatus === StatusEnum.On,
+        checked: record.status == StatusEnum.On,
         checkedChildren: 'on',
         unCheckedChildren: 'off',
         loading: record.pendingStatus,
@@ -73,10 +67,9 @@ export const columns: BasicColumn[] = [
           record.pendingStatus = true;
           const newStatus = checked ? StatusEnum.On : StatusEnum.Off;
           const { createMessage } = useMessage();
-
           fetTokenStatusToggle({ tokenId: record.id })
             .then(() => {
-              record.userStatus = newStatus;
+              record.status = newStatus;
               createMessage.success(`success`);
             })
             .finally(() => {
@@ -116,14 +109,5 @@ export const formSchema: FormSchema[] = [
     field: 'description',
     label: t('common.description'),
     component: 'InputTextArea',
-  },
-  {
-    field: 'expireTime',
-    label: t('system.token.table.expireTime'),
-    component: 'DatePicker',
-    defaultValue: dayjs('9999-01-01'),
-    componentProps: {
-      disabled: true,
-    },
   },
 ];

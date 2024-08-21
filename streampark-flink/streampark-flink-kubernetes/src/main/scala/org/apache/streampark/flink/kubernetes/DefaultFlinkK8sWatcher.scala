@@ -17,12 +17,11 @@
 
 package org.apache.streampark.flink.kubernetes
 
-import org.apache.streampark.common.conf.K8sFlinkConfig
-import org.apache.streampark.flink.kubernetes.enums.FlinkJobStateEnum
-import org.apache.streampark.flink.kubernetes.enums.FlinkK8sExecuteModeEnum.{APPLICATION, SESSION}
+import org.apache.streampark.flink.kubernetes.enums.FlinkJobState
+import org.apache.streampark.flink.kubernetes.enums.FlinkK8sExecuteMode.{APPLICATION, SESSION}
 import org.apache.streampark.flink.kubernetes.event.{BuildInEvent, FlinkJobStateEvent, FlinkJobStatusChangeEvent}
 import org.apache.streampark.flink.kubernetes.model._
-import org.apache.streampark.flink.kubernetes.watcher.{FlinkCheckpointWatcher, FlinkJobStatusWatcher, FlinkK8sEventWatcher, FlinkMetricWatcher, FlinkWatcher}
+import org.apache.streampark.flink.kubernetes.watcher._
 
 import com.google.common.eventbus.{AllowConcurrentEvents, Subscribe}
 
@@ -33,7 +32,8 @@ class DefaultFlinkK8sWatcher(conf: FlinkTrackConfig = FlinkTrackConfig.defaultCo
   extends FlinkK8sWatcher {
 
   // cache pool for storage tracking result
-  implicit val watchController: FlinkK8sWatchController = new FlinkK8sWatchController()
+  implicit val watchController: FlinkK8sWatchController =
+    new FlinkK8sWatchController()
 
   // eventBus for change event
   implicit lazy val eventBus: ChangeEventBus = {
@@ -43,15 +43,16 @@ class DefaultFlinkK8sWatcher(conf: FlinkTrackConfig = FlinkTrackConfig.defaultCo
   }
 
   // remote server tracking watcher
-  val k8sEventWatcher = new FlinkK8sEventWatcher()
-  val jobStatusWatcher = new FlinkJobStatusWatcher(conf.jobStatusWatcherConf)
-  val metricsWatcher = new FlinkMetricWatcher(conf.metricWatcherConf)
-  val checkpointWatcher = new FlinkCheckpointWatcher(conf.metricWatcherConf)
+  private val k8sEventWatcher = new FlinkK8sEventWatcher()
+  private val jobStatusWatcher = new FlinkJobStatusWatcher(conf.jobStatusWatcherConf)
+  private val metricsWatcher = new FlinkMetricWatcher(conf.metricWatcherConf)
+  private val checkpointWatcher = new FlinkCheckpointWatcher(conf.metricWatcherConf)
 
   private[this] val allWatchers =
     Array[FlinkWatcher](k8sEventWatcher, jobStatusWatcher, metricsWatcher, checkpointWatcher)
 
-  override def registerListener(listener: AnyRef): Unit = eventBus.registerListener(listener)
+  override def registerListener(listener: AnyRef): Unit =
+    eventBus.registerListener(listener)
 
   override def start(): Unit = allWatchers.foreach(_.start())
 
@@ -65,18 +66,17 @@ class DefaultFlinkK8sWatcher(conf: FlinkTrackConfig = FlinkTrackConfig.defaultCo
   }
 
   def doWatching(trackId: TrackId): Unit = {
-    if (!K8sFlinkConfig.isV2Enabled && trackId.isLegal) {
+    if (trackId.isLegal) {
       watchController.trackIds.set(trackId)
     }
   }
 
   def unWatching(trackId: TrackId): Unit = {
-    if (!K8sFlinkConfig.isV2Enabled) {
-      watchController.canceling.set(trackId)
-    }
+    watchController.canceling.set(trackId)
   }
 
-  override def isInWatching(trackId: TrackId): Boolean = watchController.isInWatching(trackId)
+  override def isInWatching(trackId: TrackId): Boolean =
+    watchController.isInWatching(trackId)
 
   override def getJobStatus(trackId: TrackId): Option[JobStatusCV] = Option(
     watchController.jobStatuses.get(trackId))
@@ -84,7 +84,8 @@ class DefaultFlinkK8sWatcher(conf: FlinkTrackConfig = FlinkTrackConfig.defaultCo
   override def getJobStatus(trackIds: Set[TrackId]): Map[CacheKey, JobStatusCV] =
     watchController.jobStatuses.getAsMap(trackIds)
 
-  override def getAllJobStatus: Map[CacheKey, JobStatusCV] = watchController.jobStatuses.asMap()
+  override def getAllJobStatus: Map[CacheKey, JobStatusCV] =
+    watchController.jobStatuses.asMap()
 
   override def getAccGroupMetrics(groupId: String): FlinkMetricCV =
     watchController.collectAccGroupMetric(groupId)
@@ -92,18 +93,23 @@ class DefaultFlinkK8sWatcher(conf: FlinkTrackConfig = FlinkTrackConfig.defaultCo
   override def getClusterMetrics(clusterKey: ClusterKey): Option[FlinkMetricCV] = Option(
     watchController.flinkMetrics.get(clusterKey))
 
-  override def getAllWatchingIds: Set[TrackId] = watchController.getAllWatchingIds()
+  override def getAllWatchingIds: Set[TrackId] =
+    watchController.getAllWatchingIds()
 
   override def checkIsInRemoteCluster(trackId: TrackId): Boolean = {
     if (!trackId.isLegal) false;
     else {
-      val nonLost = (state: FlinkJobStateEnum.Value) =>
-        state != FlinkJobStateEnum.LOST || state != FlinkJobStateEnum.SILENT
+      val nonLost = (state: FlinkJobState.Value) =>
+        state != FlinkJobState.LOST || state != FlinkJobState.SILENT
       trackId.executeMode match {
         case SESSION =>
-          jobStatusWatcher.touchSessionJob(trackId).exists(e => nonLost(e.jobState))
+          jobStatusWatcher
+            .touchSessionJob(trackId)
+            .exists(e => nonLost(e.jobState))
         case APPLICATION =>
-          jobStatusWatcher.touchApplicationJob(trackId).exists(e => nonLost(e.jobState))
+          jobStatusWatcher
+            .touchApplicationJob(trackId)
+            .exists(e => nonLost(e.jobState))
         case _ => false
       }
     }
@@ -121,7 +127,7 @@ class DefaultFlinkK8sWatcher(conf: FlinkTrackConfig = FlinkTrackConfig.defaultCo
     watchController.endpoints.get(trackId.toClusterKey)
 
   /** Build-in Event Listener of K8sFlinkTrackMonitor. */
-  class BuildInEventListener {
+  private class BuildInEventListener {
 
     /**
      * Watch the FlinkJobOperaEvent, then update relevant cache record and trigger a new
@@ -139,7 +145,8 @@ class DefaultFlinkK8sWatcher(conf: FlinkTrackConfig = FlinkTrackConfig.defaultCo
           // discard current event when the job state is consistent
           case (preCache, event) if preCache.jobState == event.jobState => true
           // discard current event when current event is too late
-          case (preCache, event) if event.pollTime <= preCache.pollAckTime => true
+          case (preCache, event) if event.pollTime <= preCache.pollAckTime =>
+            true
           case _ => false
         }
         if (!shouldIgnore) {

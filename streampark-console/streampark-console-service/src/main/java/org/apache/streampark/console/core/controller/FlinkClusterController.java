@@ -23,11 +23,10 @@ import org.apache.streampark.console.base.exception.InternalException;
 import org.apache.streampark.console.core.bean.ResponseResult;
 import org.apache.streampark.console.core.entity.FlinkCluster;
 import org.apache.streampark.console.core.service.FlinkClusterService;
+import org.apache.streampark.console.core.util.ServiceHelper;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -37,88 +36,79 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Tag(name = "FLINK_CLUSTER_TAG")
 @Slf4j
 @Validated
 @RestController
 @RequestMapping("flink/cluster")
 public class FlinkClusterController {
 
-  @Autowired private FlinkClusterService flinkClusterService;
+    @Autowired
+    private FlinkClusterService flinkClusterService;
 
-  @Operation(summary = "List flink clusters that are eligible")
-  @PostMapping("availableList")
-  public RestResponse listAvailableCluster() {
-    List<FlinkCluster> flinkClusters = flinkClusterService.listAvailableCluster();
-    return RestResponse.success(flinkClusters);
-  }
-
-  @Operation(summary = "List flink clusters")
-  @PostMapping("list")
-  public RestResponse list() {
-    List<FlinkCluster> flinkClusters = flinkClusterService.list();
-    return RestResponse.success(flinkClusters);
-  }
-
-  @Operation(summary = "Get flink cluster remote address")
-  @PostMapping("remoteUrl")
-  public RestResponse remoteUrl(Long id) {
-    FlinkCluster cluster = flinkClusterService.getById(id);
-    return RestResponse.success(cluster.getAddress());
-  }
-
-  @Operation(summary = "Check the cluster status")
-  @PostMapping("check")
-  public RestResponse check(FlinkCluster cluster) {
-    ResponseResult checkResult = flinkClusterService.check(cluster);
-    return RestResponse.success(checkResult);
-  }
-
-  @Operation(summary = "Create flink cluster")
-  @PostMapping("create")
-  @RequiresPermissions("cluster:create")
-  public RestResponse create(FlinkCluster cluster) {
-    Boolean success = flinkClusterService.create(cluster);
-    return RestResponse.success(success);
-  }
-
-  @Operation(summary = "Update flink cluster")
-  @PostMapping("update")
-  @RequiresPermissions("cluster:update")
-  public RestResponse update(FlinkCluster cluster) {
-    flinkClusterService.update(cluster);
-    return RestResponse.success();
-  }
-
-  @Operation(summary = "Get flink cluster")
-  @PostMapping("get")
-  public RestResponse get(Long id) throws InternalException {
-    FlinkCluster cluster = flinkClusterService.getById(id);
-    return RestResponse.success(cluster);
-  }
-
-  @Operation(summary = "Start flink cluster")
-  @PostMapping("start")
-  public RestResponse start(FlinkCluster cluster) {
-    flinkClusterService.updateClusterState(cluster.getId(), ClusterState.STARTING);
-    flinkClusterService.start(cluster);
-    return RestResponse.success();
-  }
-
-  @Operation(summary = "Shutdown flink cluster")
-  @PostMapping("shutdown")
-  public RestResponse shutdown(FlinkCluster cluster) {
-    if (flinkClusterService.allowShutdownCluster(cluster)) {
-      flinkClusterService.updateClusterState(cluster.getId(), ClusterState.CANCELLING);
-      flinkClusterService.shutdown(cluster);
+    @PostMapping("alive")
+    public RestResponse listAvailableCluster() {
+        List<FlinkCluster> flinkClusters = flinkClusterService.listAvailableCluster();
+        return RestResponse.success(flinkClusters);
     }
-    return RestResponse.success();
-  }
 
-  @Operation(summary = "Delete flink cluster")
-  @PostMapping("delete")
-  public RestResponse delete(FlinkCluster cluster) {
-    flinkClusterService.remove(cluster.getId());
-    return RestResponse.success();
-  }
+    @PostMapping("list")
+    public RestResponse list() {
+        List<FlinkCluster> flinkClusters = flinkClusterService.list();
+        return RestResponse.success(flinkClusters);
+    }
+
+    @PostMapping("remote_url")
+    public RestResponse remoteUrl(Long id) {
+        FlinkCluster cluster = flinkClusterService.getById(id);
+        return RestResponse.success(cluster.getAddress());
+    }
+
+    @PostMapping("check")
+    public RestResponse check(FlinkCluster cluster) {
+        ResponseResult checkResult = flinkClusterService.check(cluster);
+        return RestResponse.success(checkResult);
+    }
+
+    @PostMapping("create")
+    @RequiresPermissions("cluster:create")
+    public RestResponse create(FlinkCluster cluster) {
+        Long userId = ServiceHelper.getUserId();
+        Boolean success = flinkClusterService.create(cluster, userId);
+        return RestResponse.success(success);
+    }
+
+    @PostMapping("update")
+    @RequiresPermissions("cluster:update")
+    public RestResponse update(FlinkCluster cluster) {
+        flinkClusterService.update(cluster);
+        return RestResponse.success();
+    }
+
+    @PostMapping("get")
+    public RestResponse get(Long id) throws InternalException {
+        FlinkCluster cluster = flinkClusterService.getById(id);
+        return RestResponse.success(cluster);
+    }
+
+    @PostMapping("start")
+    public RestResponse start(FlinkCluster cluster) {
+        flinkClusterService.updateClusterState(cluster.getId(), ClusterState.STARTING);
+        flinkClusterService.start(cluster);
+        return RestResponse.success();
+    }
+
+    @PostMapping("shutdown")
+    public RestResponse shutdown(FlinkCluster cluster) {
+        if (flinkClusterService.allowShutdownCluster(cluster)) {
+            flinkClusterService.updateClusterState(cluster.getId(), ClusterState.CANCELLING);
+            flinkClusterService.shutdown(cluster);
+        }
+        return RestResponse.success();
+    }
+
+    @PostMapping("delete")
+    public RestResponse delete(FlinkCluster cluster) {
+        flinkClusterService.remove(cluster.getId());
+        return RestResponse.success();
+    }
 }

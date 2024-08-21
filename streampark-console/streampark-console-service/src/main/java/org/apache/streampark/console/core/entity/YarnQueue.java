@@ -17,6 +17,8 @@
 
 package org.apache.streampark.console.core.entity;
 
+import org.apache.streampark.console.base.mybatis.entity.BaseEntity;
+
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -24,31 +26,26 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-
-import java.io.Serializable;
-import java.util.Date;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_yarn_queue")
-public class YarnQueue implements Serializable {
+public class YarnQueue extends BaseEntity {
 
-  @TableId(type = IdType.AUTO)
-  private Long id;
+    @TableId(type = IdType.AUTO)
+    private Long id;
 
-  @TableField(fill = FieldFill.INSERT, updateStrategy = FieldStrategy.NEVER)
-  private Long teamId;
+    @TableField(fill = FieldFill.INSERT, updateStrategy = FieldStrategy.NEVER)
+    private Long teamId;
 
-  /** yarn queue and label in format {queue} or {queue@label1} or {queue@label1,label2}. */
-  private String queueLabel;
+    /** yarn queue and label in format {queue} or {queue@label1} or {queue@label1,label2}. */
+    private String queueLabel;
 
-  @TableField(updateStrategy = FieldStrategy.IGNORED)
-  private String description;
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    private String description;
 
-  private Date createTime;
+    private transient String createTimeFrom;
 
-  private Date modifyTime;
-
-  private transient String createTimeFrom;
-
-  private transient String createTimeTo;
+    private transient String createTimeTo;
 }

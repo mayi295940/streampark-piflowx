@@ -23,122 +23,89 @@ import lombok.Getter;
 @Getter
 public enum SparkAppStateEnum {
 
-  /** Added new job to database. */
-  ADDED(0),
+    /** Added new job to database. */
+    ADDED(0),
 
-  /**
-   * The job has been received by the Dispatcher, and is waiting for the job manager to be created.
-   */
-  INITIALIZING(1),
+    /** (From Yarn)Application which was just created. */
+    NEW(1),
 
-  /** Job is newly created, no task has started to run. */
-  CREATED(2),
+    /** (From Yarn)Application which is being saved. */
+    NEW_SAVING(2),
 
-  /** Application which is currently running. */
-  STARTING(3),
+    /** Application which is currently running. */
+    STARTING(3),
 
-  /** Application which is currently running. */
-  RESTARTING(4),
+    /** (From Yarn)Application which has been submitted. */
+    SUBMITTED(4),
 
-  /** Some tasks are scheduled or running, some may be pending, some may be finished. */
-  RUNNING(5),
+    /** (From Yarn)Application has been accepted by the scheduler. */
+    ACCEPTED(5),
 
-  /** The job has failed and is currently waiting for the cleanup to complete. */
-  FAILING(6),
+    /** The job has failed and is currently waiting for the cleanup to complete. */
+    RUNNING(6),
 
-  /** The job has failed with a non-recoverable task failure. */
-  FAILED(7),
+    /** (From Yarn)Application which finished successfully. */
+    FINISHED(7),
 
-  /** Job is being cancelled. */
-  CANCELLING(8),
+    /** (From Yarn)Application which failed. */
+    FAILED(8),
 
-  /** Job has been cancelled. */
-  CANCELED(9),
+    /** Loss of mapping. */
+    LOST(9),
 
-  /** All the job's tasks have successfully finished. */
-  FINISHED(10),
+    /** Mapping. */
+    MAPPING(10),
 
-  /**
-   * The job has been suspended which means that it has been stopped but not been removed from a
-   * potential HA job store.
-   */
-  SUSPENDED(11),
+    /** Other statuses. */
+    OTHER(11),
 
-  /** The job is currently reconciling and waits for task execution report to recover state. */
-  RECONCILING(12),
+    /** Has rollback. */
+    REVOKED(12),
 
-  /** Loss of mapping. */
-  LOST(13),
+    /** Spark job has being cancelling(killing) by streampark */
+    STOPPING(13),
 
-  /** Mapping. */
-  MAPPING(14),
+    /** Job SUCCEEDED on yarn. */
+    SUCCEEDED(14),
 
-  /** Other statuses. */
-  OTHER(15),
+    /** Has killed in Yarn. */
+    KILLED(-9);
 
-  /** Has rollback. */
-  REVOKED(16),
+    private final int value;
 
-  /**
-   * Lost track of Spark job temporarily. A complete loss of Spark job tracking translates into LOST
-   * state.
-   */
-  @Deprecated
-  SILENT(17),
-
-  /** Spark job has terminated vaguely, maybe FINISHED, CANCELED or FAILED. */
-  TERMINATED(18),
-
-  /** Spark job has terminated vaguely, maybe FINISHED, CANCELED or FAILED. */
-  @Deprecated
-  POS_TERMINATED(19),
-
-  /** Job SUCCEEDED on yarn. */
-  SUCCEEDED(20),
-
-  /** Job auto Health probe */
-  PROBING(21),
-
-  /** Has killed in Yarn. */
-  KILLED(-9);
-
-  private final int value;
-
-  SparkAppStateEnum(int value) {
-    this.value = value;
-  }
-
-  public static SparkAppStateEnum of(Integer state) {
-    for (SparkAppStateEnum appState : values()) {
-      if (appState.value == state) {
-        return appState;
-      }
+    SparkAppStateEnum(int value) {
+        this.value = value;
     }
-    return SparkAppStateEnum.OTHER;
-  }
 
-  public static SparkAppStateEnum of(String name) {
-    for (SparkAppStateEnum appState : values()) {
-      if (appState.name().equals(name)) {
-        return appState;
-      }
+    public static SparkAppStateEnum of(Integer state) {
+        for (SparkAppStateEnum appState : values()) {
+            if (appState.value == state) {
+                return appState;
+            }
+        }
+        return SparkAppStateEnum.OTHER;
     }
-    return SparkAppStateEnum.OTHER;
-  }
 
-  public static boolean isEndState(Integer appState) {
-    SparkAppStateEnum sparkAppStateEnum = SparkAppStateEnum.of(appState);
-    return SparkAppStateEnum.CANCELED == sparkAppStateEnum
-        || SparkAppStateEnum.FAILED == sparkAppStateEnum
-        || SparkAppStateEnum.KILLED == sparkAppStateEnum
-        || SparkAppStateEnum.FINISHED == sparkAppStateEnum
-        || SparkAppStateEnum.SUCCEEDED == sparkAppStateEnum
-        || SparkAppStateEnum.LOST == sparkAppStateEnum
-        || SparkAppStateEnum.TERMINATED == sparkAppStateEnum;
-  }
+    public static SparkAppStateEnum of(String name) {
+        for (SparkAppStateEnum appState : values()) {
+            if (appState.name().equals(name)) {
+                return appState;
+            }
+        }
+        return SparkAppStateEnum.OTHER;
+    }
 
-  public static boolean isLost(Integer appState) {
-    SparkAppStateEnum sparkAppStateEnum = SparkAppStateEnum.of(appState);
-    return SparkAppStateEnum.LOST == sparkAppStateEnum;
-  }
+    public static boolean isEndState(Integer appState) {
+        SparkAppStateEnum sparkAppStateEnum = SparkAppStateEnum.of(appState);
+        return SparkAppStateEnum.FAILED == sparkAppStateEnum
+            || SparkAppStateEnum.KILLED == sparkAppStateEnum
+            || SparkAppStateEnum.FINISHED == sparkAppStateEnum
+            || SparkAppStateEnum.SUCCEEDED == sparkAppStateEnum
+            || SparkAppStateEnum.LOST == sparkAppStateEnum;
+    }
+
+    public static boolean isLost(Integer appState) {
+        SparkAppStateEnum sparkAppStateEnum = SparkAppStateEnum.of(appState);
+        return SparkAppStateEnum.LOST == sparkAppStateEnum;
+    }
 }

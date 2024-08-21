@@ -17,15 +17,14 @@
 
 package org.apache.streampark.flink.kubernetes
 
-import org.apache.commons.collections.{CollectionUtils, MapUtils}
+import org.apache.streampark.common.util.Implicits._
+
+import org.apache.commons.collections.CollectionUtils
 import org.apache.commons.lang3.StringUtils
 import org.yaml.snakeyaml.Yaml
 
 import java.util
-import java.util.{List => JList, Map => JMap}
 
-import scala.collection.JavaConverters._
-import scala.language.postfixOps
 import scala.util.Try
 import scala.util.control.Breaks.{break, breakable}
 
@@ -51,11 +50,11 @@ object PodTemplateParser {
    *   complemented pod template
    */
   def completeInitPodTemplate(podTemplateContent: String): String = {
-    if (StringUtils.isBlank(podTemplateContent)) {
+    if (podTemplateContent == null || podTemplateContent.trim.isEmpty) {
       return POD_TEMPLATE_INIT_CONTENT
     }
     val yaml = new Yaml
-    val root = yaml.load(podTemplateContent).asInstanceOf[JMap[String, Any]]
+    val root = yaml.load(podTemplateContent).asInstanceOf[JavaMap[String, Any]]
 
     val res = new util.LinkedHashMap[String, Any] {
       put("apiVersion", root.getOrDefault("apiVersion", "v1"))
@@ -70,9 +69,9 @@ object PodTemplateParser {
           }))
     }
 
-    val enableSpecState = root.containsKey("spec") && Try(
-      !root.get("spec").asInstanceOf[JMap[String, Any]].isEmpty).getOrElse(false)
-    if (enableSpecState) {
+    if (root.containsKey("spec")
+      && Try(!root.get("spec").asInstanceOf[JavaMap[String, Any]].isEmpty)
+        .getOrElse(false)) {
       res.put("spec", root.get("spec"))
     }
     yaml.dumpAsMap(res)
@@ -89,15 +88,15 @@ object PodTemplateParser {
    * @return
    *   pod template content
    */
-  def completeHostAliasSpec(hosts: JMap[String, String], podTemplateContent: String): String = {
-    if (MapUtils.isEmpty(hosts)) return podTemplateContent
+  def completeHostAliasSpec(hosts: JavaMap[String, String], podTemplateContent: String): String = {
+    if (hosts.isEmpty) return podTemplateContent
     try {
       val content = completeInitPodTemplate(podTemplateContent)
       // convert hosts map to host alias
       val hostAlias = covertHostsMapToHostAliasNode(hosts)
       // parse yaml
       val yaml = new Yaml
-      val root = yaml.load(content).asInstanceOf[JMap[String, Any]]
+      val root = yaml.load(content).asInstanceOf[JavaMap[String, Any]]
       // no exist spec
       if (!root.containsKey("spec")) {
         val spec = new util.LinkedHashMap[String, Any]()
@@ -106,7 +105,7 @@ object PodTemplateParser {
         return yaml.dumpAsMap(root)
       }
       // replace spec.hostAliases
-      val spec = root.get("spec").asInstanceOf[JMap[String, Any]]
+      val spec = root.get("spec").asInstanceOf[JavaMap[String, Any]]
       spec.put("hostAliases", hostAlias)
       yaml.dumpAsMap(root)
     } catch {
@@ -116,21 +115,19 @@ object PodTemplateParser {
 
   /** convert hosts map to host alias */
   private[this] def covertHostsMapToHostAliasNode(
-      hosts: JMap[String, String]): util.ArrayList[util.LinkedHashMap[String, Any]] =
+      hosts: JavaMap[String, String]): util.ArrayList[util.LinkedHashMap[String, Any]] =
     new util.ArrayList(
-      hosts.asScala
+      hosts
         .map(e => e._1.trim -> e._2.trim)
         .groupBy(_._2)
         .mapValues(_.keys)
         .toList
-        .map(
-          e => {
-            val map = new util.LinkedHashMap[String, Any]()
-            map.put("ip", e._1)
-            map.put("hostnames", new util.ArrayList(e._2.toList.asJava))
-            map
-          })
-        .asJava)
+        .map(e => {
+          val map = new util.LinkedHashMap[String, Any]()
+          map.put("ip", e._1)
+          map.put("hostnames", new util.ArrayList(e._2.toList))
+          map
+        }))
 
   /**
    * Extract host-ip map from pod template. When parser pod template error, it would return empty
@@ -141,32 +138,35 @@ object PodTemplateParser {
    * @return
    *   hostname -> ipv4
    */
-  def extractHostAliasMap(podTemplateContent: String): JMap[String, String] = {
+  def extractHostAliasMap(podTemplateContent: String): JavaMap[String, String] = {
     val hosts = new util.LinkedHashMap[String, String](0)
-    if (StringUtils.isBlank(podTemplateContent)) {
+    if (podTemplateContent == null || podTemplateContent.isEmpty) {
       return hosts
     }
     try {
       val yaml = new Yaml
-      val root = yaml.load(podTemplateContent).asInstanceOf[JMap[String, Any]]
+      val root =
+        yaml.load(podTemplateContent).asInstanceOf[JavaMap[String, Any]]
       if (!root.containsKey("spec")) {
         return hosts
       }
-      val spec = root.get("spec").asInstanceOf[JMap[String, Any]]
+      val spec = root.get("spec").asInstanceOf[JavaMap[String, Any]]
       if (!spec.containsKey("hostAliases")) {
         return hosts
       }
-      val hostAliases = spec.get("hostAliases").asInstanceOf[JList[JMap[String, Any]]]
+      val hostAliases =
+        spec.get("hostAliases").asInstanceOf[JavaList[JavaMap[String, Any]]]
       if (CollectionUtils.isEmpty(hostAliases)) {
         return hosts
       }
-      for (hostAlias <- hostAliases.asScala) {
+      for (hostAlias <- hostAliases) {
         breakable {
           if (!hostAlias.containsKey("ip") && !hostAlias.containsKey("hostnames")) break
           val ip = hostAlias.get("ip").asInstanceOf[String]
           if (StringUtils.isBlank(ip)) break
-          val hostnames = hostAlias.get("hostnames").asInstanceOf[JList[String]]
-          hostnames.asScala
+          val hostnames =
+            hostAlias.get("hostnames").asInstanceOf[JavaList[String]]
+          hostnames
             .filter(StringUtils.isNotBlank(_))
             .foreach(hosts.put(_, ip))
         }
@@ -185,7 +185,7 @@ object PodTemplateParser {
    * @return
    *   pod template content
    */
-  def previewHostAliasSpec(hosts: JMap[String, String]): String = {
+  def previewHostAliasSpec(hosts: JavaMap[String, String]): String = {
     val hostAlias = covertHostsMapToHostAliasNode(hosts)
     val root = new util.LinkedHashMap[String, Any]()
     root.put("hostAliases", hostAlias)

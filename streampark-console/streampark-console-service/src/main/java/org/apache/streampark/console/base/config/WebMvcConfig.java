@@ -33,112 +33,66 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.Arrays;
 import java.util.List;
 
 /** Customize the SpringMVC configuration */
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-  @Autowired private UploadFileTypeInterceptor uploadFileTypeInterceptor;
+    @Autowired
+    private UploadFileTypeInterceptor uploadFileTypeInterceptor;
 
-  private static final String[] CORS_MAPPINGS_ALLOWED_METHODS = {
-    HttpMethod.POST.name(),
-    HttpMethod.GET.name(),
-    HttpMethod.PUT.name(),
-    HttpMethod.OPTIONS.name(),
-    HttpMethod.DELETE.name()
-  };
+    private static final String[] CORS_MAPPINGS_ALLOWED_METHODS = {
+            HttpMethod.POST.name(),
+            HttpMethod.GET.name(),
+            HttpMethod.PUT.name(),
+            HttpMethod.OPTIONS.name(),
+            HttpMethod.DELETE.name()
+    };
 
-  @Override
-  public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-    converters.add(new ByteArrayHttpMessageConverter());
-    converters.add(new StringHttpMessageConverter());
-    converters.add(new ResourceHttpMessageConverter());
-    converters.add(new AllEncompassingFormHttpMessageConverter());
-  }
+    @Override
+    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+        converters.add(new ByteArrayHttpMessageConverter());
+        converters.add(new StringHttpMessageConverter());
+        converters.add(new ResourceHttpMessageConverter());
+        converters.add(new AllEncompassingFormHttpMessageConverter());
+    }
 
-  /**
-   * Used to solve cross-domain problems
-   *
-   * @param registry
-   */
-  @Override
-  public void addCorsMappings(CorsRegistry registry) {
-    registry
-        .addMapping("/**")
-        .allowedOriginPatterns("*")
-        .allowedMethods(CORS_MAPPINGS_ALLOWED_METHODS)
-        .allowedHeaders("*")
-        .allowCredentials(true)
-        .maxAge(3600);
+    /**
+     * Used to solve cross-domain problems
+     *
+     * @param registry
+     */
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry
+            .addMapping("/**")
+            .allowedOriginPatterns("*")
+            .allowedMethods(CORS_MAPPINGS_ALLOWED_METHODS)
+            .allowedHeaders("*")
+            .allowCredentials(true)
+            .maxAge(3600);
+    }
 
-    WebMvcConfigurer.super.addCorsMappings(registry);
-  }
+    @Bean
+    public Module jacksonModule() {
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(Long.class, ToStringSerializer.instance);
+        module.addSerializer(Long.TYPE, ToStringSerializer.instance);
+        return module;
+    }
 
-  @Bean
-  public Module jacksonModule() {
-    SimpleModule module = new SimpleModule();
-    module.addSerializer(Long.class, ToStringSerializer.instance);
-    module.addSerializer(Long.TYPE, ToStringSerializer.instance);
-    return module;
-  }
-
-  /**
-   * Add an interceptor.
-   *
-   * @param registry
-   */
-  @Override
-  public void addResourceHandlers(ResourceHandlerRegistry registry) {
-
-    String storagePathHead = System.getProperty("user.dir");
-
-    String imagesPathFlink = ("file:" + storagePathHead + "/storage/flink/image/");
-    String videosPathFlink = ("file:" + storagePathHead + "/storage/flink/video/");
-    String xmlPathFlink = ("file:" + storagePathHead + "/storage/flink/xml/");
-
-    String imagesPathSpark = ("file:" + storagePathHead + "/storage/spark/image/");
-    String videosPathSpark = ("file:" + storagePathHead + "/storage/spark/video/");
-    String xmlPathSpark = ("file:" + storagePathHead + "/storage/spark/xml/");
-
-    registry
-        .addResourceHandler("/images/**", "/videos/**", "/xml/**")
-        .addResourceLocations(
-            imagesPathFlink,
-            videosPathFlink,
-            xmlPathFlink,
-            imagesPathSpark,
-            videosPathSpark,
-            xmlPathSpark);
-
-    registry
-        .addResourceHandler("/**")
-        .addResourceLocations("classpath:/META-INF/resources/")
-        .addResourceLocations("classpath:/resources/")
-        .addResourceLocations("classpath:/static/")
-        .addResourceLocations("classpath:/public/");
-
-    WebMvcConfigurer.super.addResourceHandlers(registry);
-  }
-
-  @Override
-  public void addInterceptors(InterceptorRegistry registry) {
-    registry
-        .addInterceptor(uploadFileTypeInterceptor)
-        .excludePathPatterns(
-            Arrays.asList(
-                "/flink/app/upload",
-                "/resource/upload",
-                "/drawingBoard/**",
-                "/components/**",
-                "/js/**",
-                "/css/**",
-                "/img/**",
-                "/images/**",
-                "/img/*"));
-  }
+    /**
+     * Add an interceptor.
+     *
+     * @param registry
+     */
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry
+            .addInterceptor(uploadFileTypeInterceptor)
+            .addPathPatterns("/flink/app/upload", "/resource/upload");
+    }
 }

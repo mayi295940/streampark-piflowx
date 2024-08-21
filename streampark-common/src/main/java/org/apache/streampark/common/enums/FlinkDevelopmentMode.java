@@ -23,49 +23,49 @@ import javax.annotation.Nullable;
 /** The flink deployment mode enum. */
 public enum FlinkDevelopmentMode {
 
-  /** Unknown type replace null */
-  UNKNOWN("Unknown", -1),
+    /** Unknown type replace null */
+    UNKNOWN("Unknown", -1),
 
-  /** custom code */
-  CUSTOM_CODE("Custom Code", 1),
+    /** custom code */
+    CUSTOM_CODE("Custom Code", 1),
 
-  /** Flink SQL */
-  FLINK_SQL("Flink SQL", 2),
+    /** Flink SQL */
+    FLINK_SQL("Flink SQL", 2),
 
-  /** Py flink Mode */
-  PYFLINK("Python Flink", 3),
+    /** Py flink Mode */
+    PYFLINK("Python Flink", 3),
 
-  /** flink pipeline */
-  FLINK_PIPELINE("Flink Pipeline", 4);
+    /** flink pipeline */
+    FLINK_PIPELINE("Flink Pipeline", 4);
 
-  private final String name;
+    private final String name;
 
-  private final Integer mode;
+    private final Integer mode;
 
-  FlinkDevelopmentMode(@Nonnull String name, @Nonnull Integer mode) {
-    this.name = name;
-    this.mode = mode;
-  }
-
-  /**
-   * Try to resolve the mode value into {@link FlinkDevelopmentMode}.
-   *
-   * @param value The mode value of potential flink deployment mode.
-   * @return The parsed flink deployment mode.
-   */
-  @Nonnull
-  public static FlinkDevelopmentMode of(@Nullable Integer value) {
-    for (FlinkDevelopmentMode flinkDevelopmentMode : values()) {
-      if (flinkDevelopmentMode.mode.equals(value)) {
-        return flinkDevelopmentMode;
-      }
+    FlinkDevelopmentMode(@Nonnull String name, @Nonnull Integer mode) {
+        this.name = name;
+        this.mode = mode;
     }
-    return FlinkDevelopmentMode.UNKNOWN;
-  }
 
-  /** Get the mode value of the current {@link FlinkDevelopmentMode} enum. */
-  @Nonnull
-  public Integer getMode() {
-    return mode;
-  }
+    /**
+     * Try to resolve the mode value into {@link FlinkDevelopmentMode}.
+     *
+     * @param value The mode value of potential flink deployment mode.
+     * @return The parsed flink deployment mode.
+     */
+    @Nonnull
+    public static FlinkDevelopmentMode of(@Nullable Integer value) {
+        for (FlinkDevelopmentMode flinkDevelopmentMode : values()) {
+            if (flinkDevelopmentMode.mode.equals(value)) {
+                return flinkDevelopmentMode;
+            }
+        }
+        return FlinkDevelopmentMode.UNKNOWN;
+    }
+
+    /** Get the mode value of the current {@link FlinkDevelopmentMode} enum. */
+    @Nonnull
+    public Integer getMode() {
+        return mode;
+    }
 }

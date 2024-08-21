@@ -17,38 +17,36 @@
 
 package org.apache.streampark.console.core.entity;
 
+import org.apache.streampark.console.base.mybatis.entity.BaseEntity;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
 
-import java.io.Serializable;
-import java.util.Date;
-
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_external_link")
-public class ExternalLink implements Serializable {
-  @TableId(type = IdType.AUTO)
-  private Long id;
+public class ExternalLink extends BaseEntity {
 
-  private String badgeLabel;
+    @TableId(type = IdType.AUTO)
+    private Long id;
 
-  @NotBlank(message = "{required}")
-  private String badgeName;
+    private String badgeLabel;
 
-  @NotBlank(message = "{required}")
-  private String badgeColor;
+    @NotBlank(message = "{required}")
+    private String badgeName;
 
-  @NotBlank(message = "{required}")
-  private String linkUrl;
+    @NotBlank(message = "{required}")
+    private String badgeColor;
 
-  @TableField(exist = false)
-  private String renderedLinkUrl;
+    @NotBlank(message = "{required}")
+    private String linkUrl;
 
-  private Date createTime;
-
-  private Date modifyTime;
+    @TableField(exist = false)
+    private String renderedLinkUrl;
 }

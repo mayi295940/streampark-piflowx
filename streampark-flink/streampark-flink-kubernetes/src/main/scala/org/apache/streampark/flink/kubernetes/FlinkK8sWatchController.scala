@@ -17,14 +17,14 @@
 
 package org.apache.streampark.flink.kubernetes
 
-import org.apache.streampark.common.util.Logger
+import org.apache.streampark.common.util.{Logger, Utils}
+import org.apache.streampark.common.util.Implicits._
 import org.apache.streampark.flink.kubernetes.model._
 
 import com.github.benmanes.caffeine.cache.{Cache, Caffeine}
 
+import java.util.Objects
 import java.util.concurrent.TimeUnit
-
-import scala.collection.convert.ImplicitConversions._
 
 /** Tracking info cache pool on flink kubernetes mode. */
 class FlinkK8sWatchController extends Logger with AutoCloseable {
@@ -41,7 +41,8 @@ class FlinkK8sWatchController extends Logger with AutoCloseable {
   lazy val jobStatuses: JobStatusCache = JobStatusCache.build()
 
   // cache for tracking kubernetes events with Deployment kind
-  lazy val k8sDeploymentEvents: K8sDeploymentEventCache = K8sDeploymentEventCache.build()
+  lazy val k8sDeploymentEvents: K8sDeploymentEventCache =
+    K8sDeploymentEventCache.build()
 
   // cache for last each flink cluster metrics (such as a session cluster or a application cluster)
   lazy val flinkMetrics: MetricCache = MetricCache.build()
@@ -80,10 +81,12 @@ class FlinkK8sWatchController extends Logger with AutoCloseable {
   def collectAccGroupMetric(groupId: String): FlinkMetricCV = {
     // get cluster metrics that in tracking
     val empty = FlinkMetricCV.empty(groupId)
-    getActiveWatchingIds() match {
+    getActiveWatchingIds().filter(_.groupId == groupId) match {
       case k if k.isEmpty => empty
       case k =>
-        flinkMetrics.getAll(for (elem <- k) yield ClusterKey.of(elem)) match {
+        flinkMetrics.getAll(
+          for (elem <- k if elem.groupId == groupId)
+            yield ClusterKey.of(elem)) match {
           case m if m.isEmpty => empty
           case m => m.values.fold(empty)((x, y) => x + y)
         }
@@ -92,7 +95,9 @@ class FlinkK8sWatchController extends Logger with AutoCloseable {
 
   /** get flink job-manager rest url from cache which will auto refresh when it it empty. */
   def getClusterRestUrl(clusterKey: ClusterKey): Option[String] = {
-    Option(endpoints.get(clusterKey)).filter(_.nonEmpty).orElse(refreshClusterRestUrl(clusterKey))
+    Option(endpoints.get(clusterKey))
+      .filter(_.nonEmpty)
+      .orElse(refreshClusterRestUrl(clusterKey))
   }
 
   /** refresh flink job-manager rest url from remote flink cluster, and cache it. */
@@ -106,11 +111,24 @@ class FlinkK8sWatchController extends Logger with AutoCloseable {
 
 }
 
-//----cache----
-case class CacheKey(key: java.lang.Long) extends Serializable
+/**
+ * cache ======
+ */
+case class CacheKey(key: java.lang.Long) extends Serializable {
+  override def hashCode(): Int = Utils.hashCode(key)
+
+  override def equals(obj: Any): Boolean = {
+    obj match {
+      case that: CacheKey => Objects.equals(key, that.key)
+      case _ => false
+    }
+  }
+}
 
 class TrackIdCache {
-  private[this] lazy val cache: Cache[CacheKey, TrackId] = Caffeine.newBuilder.build()
+
+  private[this] lazy val cache: Cache[CacheKey, TrackId] =
+    Caffeine.newBuilder.build()
 
   def update(k: TrackId): Unit = {
     val key = CacheKey(k.appId)
@@ -153,7 +171,9 @@ class JobStatusCache {
   def getAsMap(trackIds: Set[TrackId]): Map[CacheKey, JobStatusCV] =
     cache.getAllPresent(trackIds.map(t => t.appId)).toMap
 
-  def get(k: TrackId): JobStatusCV = cache.getIfPresent(CacheKey(k.appId))
+  def get(k: TrackId): JobStatusCV = {
+    cache.getIfPresent(CacheKey(k.appId))
+  }
 
   def invalidate(k: TrackId): Unit = cache.invalidate(CacheKey(k.appId))
 
@@ -195,7 +215,8 @@ class K8sDeploymentEventCache {
 
   def cleanUp(): Unit = cache.cleanUp()
 
-  val cache: Cache[K8sEventKey, K8sDeploymentEventCV] = Caffeine.newBuilder.build()
+  val cache: Cache[K8sEventKey, K8sDeploymentEventCV] =
+    Caffeine.newBuilder.build()
 
 }
 
@@ -206,13 +227,15 @@ object K8sDeploymentEventCache {
 
 class MetricCache {
 
-  private[this] lazy val cache: Cache[ClusterKey, FlinkMetricCV] = Caffeine.newBuilder().build()
+  private[this] lazy val cache: Cache[ClusterKey, FlinkMetricCV] =
+    Caffeine.newBuilder().build()
 
   def put(k: ClusterKey, v: FlinkMetricCV): Unit = cache.put(k, v)
 
   def asMap(): Map[ClusterKey, FlinkMetricCV] = cache.asMap().toMap
 
-  def getAll(k: Set[ClusterKey]): Map[ClusterKey, FlinkMetricCV] = cache.getAllPresent(k).toMap
+  def getAll(k: Set[ClusterKey]): Map[ClusterKey, FlinkMetricCV] =
+    cache.getAllPresent(k).toMap
 
   def get(key: ClusterKey): FlinkMetricCV = cache.getIfPresent(key)
 

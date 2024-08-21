@@ -27,6 +27,7 @@
       <span class="menu-down-svg">
         <SvgIcon v-if="item.path === '/system'" name="management" size="25" />
         <SvgIcon v-if="item.path === '/flink'" name="flink3" size="25" />
+        <SvgIcon v-if="item.path === '/spark'" name="spark" size="25"/>
         <SvgIcon v-if="item.path === '/setting'" name="settings" size="25" />
         <SvgIcon v-if="item.path === '/resource'" name="resource" size="25" />
         <SvgIcon v-if="item.path === '/flow'" name="resource" size="25" />

@@ -17,13 +17,10 @@
 
 package org.apache.streampark.flink.packer.pipeline
 
+import org.apache.streampark.common.util.Implicits._
 import org.apache.streampark.common.util.Utils
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-
-import java.util.{List => JavaList}
-
-import scala.collection.JavaConverters._
 
 /** Snapshot for docker resolved progress */
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -39,13 +36,13 @@ case class DockerPullSnapshot(
     error: String,
     emitTime: Long,
     percent: Double) {
-  def detailAsJava: JavaList[DockerLayerProgress] = detail.asJava
+  def detailAsJava: JavaList[DockerLayerProgress] = detail
 }
 
 /** snapshot for building docker image progress. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 case class DockerBuildSnapshot(detail: Seq[String], emitTime: Long) {
-  def detailAsJava: JavaList[String] = detail.asJava
+  def detailAsJava: JavaList[String] = detail
 }
 
 /** snapshot for pushing docker image progress. */
@@ -55,7 +52,7 @@ case class DockerPushSnapshot(
     error: String,
     emitTime: Long,
     percent: Double) {
-  def detailAsJava: JavaList[DockerLayerProgress] = detail.asJava
+  def detailAsJava: JavaList[DockerLayerProgress] = detail
 }
 
 object DockerPullSnapshot {

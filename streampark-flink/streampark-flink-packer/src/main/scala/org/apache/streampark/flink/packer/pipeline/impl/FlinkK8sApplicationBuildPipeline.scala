@@ -17,7 +17,6 @@
 
 package org.apache.streampark.flink.packer.pipeline.impl
 
-import org.apache.streampark.common.enums.FlinkDevelopmentMode
 import org.apache.streampark.common.fs.LfsOperator
 import org.apache.streampark.common.util.ThreadUtils
 import org.apache.streampark.flink.kubernetes.PodTemplateTool
@@ -36,15 +35,16 @@ import java.io.File
 import java.util.concurrent.{LinkedBlockingQueue, ThreadPoolExecutor, TimeUnit}
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.language.postfixOps
 
 /** Building pipeline for flink kubernetes-native application mode */
 class FlinkK8sApplicationBuildPipeline(request: FlinkK8sApplicationBuildRequest)
   extends BuildPipeline {
 
-  override def pipeType: PipelineTypeEnum = PipelineTypeEnum.FLINK_NATIVE_K8S_APPLICATION
+  override def pipeType: PipelineTypeEnum =
+    PipelineTypeEnum.FLINK_NATIVE_K8S_APPLICATION
 
-  private var dockerProcessWatcher: DockerProgressWatcher = new SilentDockerProgressWatcher
+  private var dockerProcessWatcher: DockerProgressWatcher =
+    new SilentDockerProgressWatcher
 
   // non-thread-safe
   private val dockerProcess = new DockerResolveProgress(
@@ -52,7 +52,8 @@ class FlinkK8sApplicationBuildPipeline(request: FlinkK8sApplicationBuildRequest)
     DockerBuildProgress.empty(),
     DockerPushProgress.empty())
 
-  override protected def offerBuildParam: FlinkK8sApplicationBuildRequest = request
+  override protected def offerBuildParam: FlinkK8sApplicationBuildRequest =
+    request
 
   def registerDockerProgressWatcher(watcher: DockerProgressWatcher): Unit = {
     dockerProcessWatcher = watcher
@@ -65,7 +66,8 @@ class FlinkK8sApplicationBuildPipeline(request: FlinkK8sApplicationBuildRequest)
     // the sub workspace dir like: APP_WORKSPACE/k8s-clusterId@k8s-namespace/
     val buildWorkspace =
       execStep(1) {
-        val buildWorkspace = s"${request.workspace}/${request.clusterId}@${request.k8sNamespace}"
+        val buildWorkspace =
+          s"${request.workspace}/${request.clusterId}@${request.k8sNamespace}"
         LfsOperator.mkCleanDirs(buildWorkspace)
         logInfo(s"Recreate building workspace: $buildWorkspace")
         buildWorkspace
@@ -79,7 +81,9 @@ class FlinkK8sApplicationBuildPipeline(request: FlinkK8sApplicationBuildRequest)
       case podTemplate =>
         execStep(2) {
           val podTemplateFiles =
-            PodTemplateTool.preparePodTemplateFiles(buildWorkspace, podTemplate).tmplFiles
+            PodTemplateTool
+              .preparePodTemplateFiles(buildWorkspace, podTemplate)
+              .tmplFiles
           logInfo(s"Export flink podTemplates: ${podTemplateFiles.values.mkString(",")}")
           podTemplateFiles
         }.getOrElse(throw getError.exception)
@@ -90,14 +94,10 @@ class FlinkK8sApplicationBuildPipeline(request: FlinkK8sApplicationBuildRequest)
     val (shadedJar, extJarLibs) =
       execStep(3) {
         val shadedJarOutputPath = request.getShadedJarPath(buildWorkspace)
-        val extJarLibs = request.developmentMode match {
-          case FlinkDevelopmentMode.FLINK_SQL => request.dependencyInfo.extJarLibs
-          case FlinkDevelopmentMode.CUSTOM_CODE => Set[String]()
-        }
         val shadedJar =
           MavenTool.buildFatJar(request.mainClass, request.providedLibs, shadedJarOutputPath)
         logInfo(s"Output shaded flink job jar: ${shadedJar.getAbsolutePath}")
-        shadedJar -> extJarLibs
+        shadedJar -> request.dependencyInfo.extJarLibs
       }.getOrElse(throw getError.exception)
 
     // Step-4: generate and Export flink image dockerfiles
@@ -127,7 +127,11 @@ class FlinkK8sApplicationBuildPipeline(request: FlinkK8sApplicationBuildRequest)
     val dockerConf = request.dockerConfig
     val baseImageTag = request.flinkBaseImage.trim
     val pushImageTag = {
-      val expectedImageTag = s"streampark-flinkjob-${request.k8sNamespace}-${request.clusterId}"
+      if (request.k8sNamespace.isEmpty || request.clusterId.isEmpty) {
+        throw new IllegalArgumentException("k8sNamespace or clusterId cannot be empty")
+      }
+      val expectedImageTag =
+        s"streampark-flinkjob-${request.k8sNamespace}-${request.clusterId}"
       compileTag(expectedImageTag, dockerConf.registerAddress, dockerConf.imageNamespace)
     }
 
@@ -138,12 +142,15 @@ class FlinkK8sApplicationBuildPipeline(request: FlinkK8sApplicationBuildRequest)
           val pullImageCmd = {
             // when the register address prefix is explicitly identified on base image tag,
             // the user's pre-saved docker register auth info would be used.
-            val pullImageCmdState = dockerConf.registerAddress != null && !baseImageTag.startsWith(
-              dockerConf.registerAddress)
+            val pullImageCmdState =
+              dockerConf.registerAddress != null && !baseImageTag.startsWith(
+                dockerConf.registerAddress)
             if (pullImageCmdState) {
               dockerClient.pullImageCmd(baseImageTag)
             } else {
-              dockerClient.pullImageCmd(baseImageTag).withAuthConfig(dockerConf.toAuthConf)
+              dockerClient
+                .pullImageCmd(baseImageTag)
+                .withAuthConfig(dockerConf.toAuthConf)
             }
           }
           val pullCmdCallback = pullImageCmd
@@ -249,7 +256,8 @@ object FlinkK8sApplicationBuildPipeline {
     ThreadUtils.threadFactory("streampark-docker-progress-watcher-executor"),
     new ThreadPoolExecutor.DiscardOldestPolicy)
 
-  implicit val executor: ExecutionContext = ExecutionContext.fromExecutorService(execPool)
+  implicit val executor: ExecutionContext =
+    ExecutionContext.fromExecutorService(execPool)
 
   def of(request: FlinkK8sApplicationBuildRequest): FlinkK8sApplicationBuildPipeline =
     new FlinkK8sApplicationBuildPipeline(request)

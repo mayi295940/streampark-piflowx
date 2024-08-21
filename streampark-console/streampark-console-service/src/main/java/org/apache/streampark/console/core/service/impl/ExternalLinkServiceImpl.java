@@ -18,6 +18,7 @@
 package org.apache.streampark.console.core.service.impl;
 
 import org.apache.streampark.common.util.AssertUtils;
+import org.apache.streampark.console.base.exception.ApiAlertException;
 import org.apache.streampark.console.core.entity.Application;
 import org.apache.streampark.console.core.entity.ExternalLink;
 import org.apache.streampark.console.core.enums.PlaceholderTypeEnum;
@@ -34,7 +35,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.PropertyPlaceholderHelper;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,80 +44,76 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
 public class ExternalLinkServiceImpl extends ServiceImpl<ExternalLinkMapper, ExternalLink>
-    implements ExternalLinkService {
+    implements
+        ExternalLinkService {
 
-  private final ApplicationManageService applicationManageService;
+    private final ApplicationManageService applicationManageService;
 
-  @Override
-  public void create(ExternalLink externalLink) {
-    if (!this.check(externalLink)) {
-      return;
+    @Override
+    public void create(ExternalLink externalLink) {
+        if (!this.check(externalLink)) {
+            return;
+        }
+        externalLink.setId(null);
+        this.save(externalLink);
     }
-    Date date = new Date();
-    externalLink.setCreateTime(date);
-    externalLink.setModifyTime(date);
-    externalLink.setId(null);
-    this.save(externalLink);
-  }
 
-  @Override
-  public void update(ExternalLink externalLink) {
-    if (!this.check(externalLink)) {
-      return;
+    @Override
+    public void update(ExternalLink externalLink) {
+        if (!this.check(externalLink)) {
+            return;
+        }
+        baseMapper.updateById(externalLink);
     }
-    externalLink.setModifyTime(new Date());
-    baseMapper.updateById(externalLink);
-  }
 
-  @Override
-  public void removeById(Long linkId) {
-    baseMapper.deleteById(linkId);
-  }
-
-  @Override
-  public List<ExternalLink> render(Long appId) {
-    Application app = applicationManageService.getById(appId);
-    AssertUtils.notNull(app, "Application doesn't exist");
-    List<ExternalLink> externalLink = this.list();
-    if (externalLink != null && externalLink.size() > 0) {
-      // Render the placeholder
-      externalLink.forEach(link -> this.renderLinkUrl(link, app));
+    @Override
+    public void removeById(Long linkId) {
+        baseMapper.deleteById(linkId);
     }
-    return externalLink;
-  }
 
-  private void renderLinkUrl(ExternalLink link, Application app) {
-    Map<String, String> placeholderValueMap = new HashMap<>();
-    placeholderValueMap.put(PlaceholderTypeEnum.JOB_ID.get(), app.getJobId());
-    placeholderValueMap.put(PlaceholderTypeEnum.JOB_NAME.get(), app.getJobName());
-    placeholderValueMap.put(PlaceholderTypeEnum.YARN_ID.get(), app.getAppId());
-    PropertyPlaceholderHelper propertyPlaceholderHelper = new PropertyPlaceholderHelper("{", "}");
-    link.setRenderedLinkUrl(
-        propertyPlaceholderHelper.replacePlaceholders(
-            link.getLinkUrl().trim(), placeholderValueMap::get));
-  }
+    @Override
+    public List<ExternalLink> render(Long appId) {
+        Application app = applicationManageService.getById(appId);
+        AssertUtils.notNull(app, "Application doesn't exist");
+        List<ExternalLink> externalLink = this.list();
+        if (externalLink != null && externalLink.size() > 0) {
+            // Render the placeholder
+            externalLink.forEach(link -> this.renderLinkUrl(link, app));
+        }
+        return externalLink;
+    }
 
-  private boolean check(ExternalLink params) {
-    LambdaQueryWrapper<ExternalLink> queryWrapper = new LambdaQueryWrapper<ExternalLink>();
-    // badgeName and LinkUrl cannot be duplicated
-    queryWrapper.nested(
-        qw ->
-            qw.eq(ExternalLink::getBadgeName, params.getBadgeName())
+    private void renderLinkUrl(ExternalLink link, Application app) {
+        Map<String, String> placeholderValueMap = new HashMap<>();
+        placeholderValueMap.put(PlaceholderTypeEnum.ID.get(), String.valueOf(app.getId()));
+        placeholderValueMap.put(PlaceholderTypeEnum.JOB_ID.get(), app.getJobId());
+        placeholderValueMap.put(PlaceholderTypeEnum.JOB_NAME.get(), app.getJobName());
+        placeholderValueMap.put(PlaceholderTypeEnum.YARN_ID.get(), app.getClusterId());
+        PropertyPlaceholderHelper propertyPlaceholderHelper = new PropertyPlaceholderHelper("{", "}");
+        link.setRenderedLinkUrl(
+            propertyPlaceholderHelper.replacePlaceholders(
+                link.getLinkUrl().trim(), placeholderValueMap::get));
+    }
+
+    private boolean check(ExternalLink params) {
+        LambdaQueryWrapper<ExternalLink> queryWrapper = new LambdaQueryWrapper<ExternalLink>();
+        // badgeName and LinkUrl cannot be duplicated
+        queryWrapper.nested(
+            qw -> qw.eq(ExternalLink::getBadgeName, params.getBadgeName())
                 .or()
                 .eq(ExternalLink::getLinkUrl, params.getLinkUrl()));
-    if (params.getId() != null) {
-      queryWrapper.and(qw -> qw.ne(ExternalLink::getId, params.getId()));
+        if (params.getId() != null) {
+            queryWrapper.and(qw -> qw.ne(ExternalLink::getId, params.getId()));
+        }
+        ExternalLink result = this.getOne(queryWrapper);
+        if (result == null) {
+            return true;
+        }
+        ApiAlertException.throwIfTrue(result.getBadgeName().equals(params.getBadgeName()),
+            String.format("The name: %s is already existing.", result.getBadgeName()));
+        ApiAlertException.throwIfTrue(result.getLinkUrl().equals(params.getLinkUrl()),
+            String.format("The linkUrl: %s is already existing.", result.getLinkUrl()));
+
+        return false;
     }
-    ExternalLink result = this.getOne(queryWrapper);
-    if (result == null) {
-      return true;
-    }
-    AssertUtils.required(
-        !result.getBadgeName().equals(params.getBadgeName()),
-        String.format("The name: %s is already existing.", result.getBadgeName()));
-    AssertUtils.required(
-        !result.getLinkUrl().equals(params.getLinkUrl()),
-        String.format("The linkUrl: %s is already existing.", result.getLinkUrl()));
-    return false;
-  }
 }

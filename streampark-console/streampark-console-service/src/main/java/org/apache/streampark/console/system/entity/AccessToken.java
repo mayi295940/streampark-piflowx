@@ -17,58 +17,55 @@
 
 package org.apache.streampark.console.system.entity;
 
+import org.apache.streampark.console.base.mybatis.entity.BaseEntity;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import java.io.Serializable;
 import java.util.Date;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_access_token")
-public class AccessToken implements Serializable {
+public class AccessToken extends BaseEntity {
 
-  private static final long serialVersionUID = 1L;
-  public static final String DEFAULT_EXPIRE_TIME = "9999-01-01 00:00:00";
-  public static final String IS_API_TOKEN = "is_api_token";
+    public static final String IS_API_TOKEN = "is_api_token";
 
-  public static final Integer STATUS_ENABLE = 1;
-  public static final Integer STATUS_DISABLE = 0;
+    public static final Integer STATUS_ENABLE = 1;
+    public static final Integer STATUS_DISABLE = 0;
 
-  @TableId(type = IdType.AUTO)
-  private Long id;
+    @TableId(type = IdType.AUTO)
+    private Long id;
 
-  @NotBlank(message = "{required}")
-  private Long userId;
+    @NotBlank(message = "{required}")
+    private Long userId;
 
-  @NotBlank(message = "{required}")
-  private String token;
+    @NotBlank(message = "{required}")
+    private String token;
 
-  @NotNull(message = "{required}")
-  private Integer status;
+    @NotNull(message = "{required}")
+    private Integer status;
 
-  @NotNull(message = "{required}")
-  private Date expireTime;
+    @NotNull(message = "{required}")
+    private Date expireTime;
 
-  private String description;
+    private String description;
 
-  private Date createTime;
+    private transient String username;
 
-  private Date modifyTime;
+    private transient String userStatus;
 
-  private transient String username;
+    /** token final status, 1: available, 0: unavailable */
+    private transient Integer finalStatus;
 
-  private transient String userStatus;
-
-  /** token final status, 1: available, 0: unavailable */
-  private transient Integer finalStatus;
-
-  public AccessToken setStatus(Integer status) {
-    this.status = status;
-    return this;
-  }
+    public AccessToken setStatus(Integer status) {
+        this.status = status;
+        return this;
+    }
 }

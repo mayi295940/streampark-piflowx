@@ -17,6 +17,7 @@
 
 package org.apache.streampark.console.core.entity;
 
+import org.apache.streampark.console.base.mybatis.entity.BaseEntity;
 import org.apache.streampark.console.base.util.JacksonUtils;
 import org.apache.streampark.console.core.bean.AlertConfigParams;
 
@@ -25,81 +26,74 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 
-import java.io.Serializable;
-import java.util.Date;
-
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_alert_config")
 @Slf4j
-public class AlertConfig implements Serializable {
+public class AlertConfig extends BaseEntity {
 
-  @TableId(type = IdType.AUTO)
-  private Long id;
+    @TableId(type = IdType.AUTO)
+    private Long id;
 
-  private Long userId;
+    private Long userId;
 
-  /** alert name */
-  private String alertName;
+    /** alert name */
+    private String alertName;
 
-  /** alert type */
-  private Integer alertType;
+    /** alert type */
+    private Integer alertType;
 
-  /** email alert parameters */
-  private String emailParams;
+    /** email alert parameters */
+    private String emailParams;
 
-  /** ding alert parameters */
-  private String dingTalkParams;
+    /** ding alert parameters */
+    private String dingTalkParams;
 
-  /** wecom alert parameters */
-  private String weComParams;
+    /** wecom alert parameters */
+    private String weComParams;
 
-  /** alert http callback parameters */
-  private String httpCallbackParams;
+    /** alert http callback parameters */
+    private String httpCallbackParams;
 
-  /** lark alert parameters */
-  private String larkParams;
+    /** lark alert parameters */
+    private String larkParams;
 
-  /** create time */
-  private Date createTime;
-
-  /** modify time */
-  private Date modifyTime;
-
-  public static AlertConfig of(AlertConfigParams params) {
-    if (params == null) {
-      return null;
+    public static AlertConfig of(AlertConfigParams params) {
+        if (params == null) {
+            return null;
+        }
+        AlertConfig alertConfig = new AlertConfig();
+        BeanUtils.copyProperties(
+            params,
+            alertConfig,
+            "emailParams",
+            "dingTalkParams",
+            "weComParams",
+            "httpCallbackParams",
+            "larkParams");
+        try {
+            if (params.getEmailParams() != null) {
+                alertConfig.setEmailParams(JacksonUtils.write(params.getEmailParams()));
+            }
+            if (params.getDingTalkParams() != null) {
+                alertConfig.setDingTalkParams(JacksonUtils.write(params.getDingTalkParams()));
+            }
+            if (params.getWeComParams() != null) {
+                alertConfig.setWeComParams(JacksonUtils.write(params.getWeComParams()));
+            }
+            if (params.getHttpCallbackParams() != null) {
+                alertConfig.setHttpCallbackParams(JacksonUtils.write(params.getHttpCallbackParams()));
+            }
+            if (params.getLarkParams() != null) {
+                alertConfig.setLarkParams(JacksonUtils.write(params.getLarkParams()));
+            }
+        } catch (JsonProcessingException e) {
+            log.error("Json write failed", e);
+        }
+        return alertConfig;
     }
-    AlertConfig alertConfig = new AlertConfig();
-    BeanUtils.copyProperties(
-        params,
-        alertConfig,
-        "emailParams",
-        "dingTalkParams",
-        "weComParams",
-        "httpCallbackParams",
-        "larkParams");
-    try {
-      if (params.getEmailParams() != null) {
-        alertConfig.setEmailParams(JacksonUtils.write(params.getEmailParams()));
-      }
-      if (params.getDingTalkParams() != null) {
-        alertConfig.setDingTalkParams(JacksonUtils.write(params.getDingTalkParams()));
-      }
-      if (params.getWeComParams() != null) {
-        alertConfig.setWeComParams(JacksonUtils.write(params.getWeComParams()));
-      }
-      if (params.getHttpCallbackParams() != null) {
-        alertConfig.setHttpCallbackParams(JacksonUtils.write(params.getHttpCallbackParams()));
-      }
-      if (params.getLarkParams() != null) {
-        alertConfig.setLarkParams(JacksonUtils.write(params.getLarkParams()));
-      }
-    } catch (JsonProcessingException e) {
-      log.error("Json write failed", e);
-    }
-    return alertConfig;
-  }
 }

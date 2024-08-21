@@ -18,7 +18,7 @@
 package org.apache.streampark.flink.kubernetes.helper
 
 import org.apache.streampark.common.util.{Logger, SystemPropertyUtils}
-import org.apache.streampark.common.util.ImplicitsUtils._
+import org.apache.streampark.common.util.Implicits._
 import org.apache.streampark.flink.kubernetes.KubernetesRetriever
 
 import com.google.common.base.Charsets
@@ -28,7 +28,6 @@ import io.fabric8.kubernetes.client.DefaultKubernetesClient
 
 import java.io.File
 
-import scala.collection.convert.ImplicitConversions._
 import scala.util.{Success, Try}
 
 object KubernetesDeploymentHelper extends Logger {
@@ -36,59 +35,66 @@ object KubernetesDeploymentHelper extends Logger {
   private[this] def getPods(nameSpace: String, deploymentName: String): List[Pod] = {
     KubernetesRetriever
       .newK8sClient()
-      .autoClose(
-        client =>
-          Try {
-            client.pods
-              .inNamespace(nameSpace)
-              .withLabels {
-                client.apps.deployments
-                  .inNamespace(nameSpace)
-                  .withName(deploymentName)
-                  .get
-                  .getSpec
-                  .getSelector
-                  .getMatchLabels
-              }
-              .list
-              .getItems
-              .toList
-          }.getOrElse(List.empty[Pod]))
+      .autoClose(client => {
+        Try {
+          client.pods
+            .inNamespace(nameSpace)
+            .withLabels {
+              client.apps.deployments
+                .inNamespace(nameSpace)
+                .withName(deploymentName)
+                .get
+                .getSpec
+                .getSelector
+                .getMatchLabels
+            }
+            .list
+            .getItems
+            .toList
+        }.getOrElse(List.empty[Pod])
+      })
   }
 
-  def getDeploymentStatusChanges(nameSpace: String, deploymentName: String): Boolean = {
+  def isDeploymentError(nameSpace: String, deploymentName: String): Boolean = {
     Try {
       val pods = getPods(nameSpace, deploymentName)
       val podStatus = pods.head.getStatus
       podStatus.getPhase match {
-        case "Unknown" => return true
-        case "Failed" => return true
-        case "Pending" => return false
-        case _ => podStatus.getContainerStatuses.head.getLastState.getTerminated != null
+        case "Unknown" => true
+        case "Failed" => true
+        case "Pending" => false
+        case _ =>
+          podStatus.getContainerStatuses.head.getLastState.getTerminated != null
       }
     }.getOrElse(true)
   }
 
-  def getTheNumberOfTaskDeploymentRetries(nameSpace: String, deploymentName: String): Integer = {
-    val pods = getPods(nameSpace, deploymentName)
-    pods.head.getStatus.getContainerStatuses.head.getRestartCount
-  }
-
-  def deleteTaskDeployment(nameSpace: String, deploymentName: String): Boolean = {
+  private[this] def deleteDeployment(nameSpace: String, deploymentName: String): Unit = {
     KubernetesRetriever
       .newK8sClient()
-      .autoClose(
-        client =>
-          Try {
-            val r = client.apps.deployments
-              .inNamespace(nameSpace)
-              .withName(deploymentName)
-              .delete
-            Boolean.unbox(r)
-          }.getOrElse(false))
+      .autoClose(client => {
+        val map = client.apps.deployments.inNamespace(nameSpace)
+        map.withLabel("app", deploymentName).delete
+        map.withName(deploymentName).delete
+      })
   }
 
-  def isTheK8sConnectionNormal(): Boolean = {
+  private[this] def deleteConfigMap(nameSpace: String, deploymentName: String): Unit = {
+    KubernetesRetriever
+      .newK8sClient()
+      .autoClose(client => {
+        val map = client.configMaps().inNamespace(nameSpace)
+        map.withLabel("app", deploymentName).delete
+        map.withName(deploymentName).delete
+      })
+  }
+
+  def delete(nameSpace: String, deploymentName: String): Unit = {
+    deleteDeployment(nameSpace, deploymentName)
+    deleteConfigMap(nameSpace, deploymentName)
+  }
+
+  def checkConnection(): Boolean = {
     Try(new DefaultKubernetesClient) match {
       case Success(client) =>
         client.close()
@@ -100,49 +106,35 @@ object KubernetesDeploymentHelper extends Logger {
   def watchDeploymentLog(nameSpace: String, jobName: String, jobId: String): String = {
     KubernetesRetriever
       .newK8sClient()
-      .autoClose(
-        client => {
-          val path = KubernetesDeploymentHelper.getJobLog(jobId)
-          val file = new File(path)
-          val log = client.apps.deployments.inNamespace(nameSpace).withName(jobName).getLog
-          Files.asCharSink(file, Charsets.UTF_8).write(log)
-          path
-        })
+      .autoClose(client => {
+        val path = KubernetesDeploymentHelper.getJobLog(jobId)
+        val file = new File(path)
+        val log = client.apps.deployments
+          .inNamespace(nameSpace)
+          .withName(jobName)
+          .getLog
+        Files.asCharSink(file, Charsets.UTF_8).write(log)
+        path
+      })
   }
 
   def watchPodTerminatedLog(nameSpace: String, jobName: String, jobId: String): String = {
     KubernetesRetriever
       .newK8sClient()
-      .autoClose(
-        client =>
-          Try {
-            val podName = getPods(nameSpace, jobName).head.getMetadata.getName
-            val path = KubernetesDeploymentHelper.getJobErrorLog(jobId)
-            val file = new File(path)
-            val log = client.pods
-              .inNamespace(nameSpace)
-              .withName(podName)
-              .terminated()
-              .withPrettyOutput
-              .getLog
-            Files.asCharSink(file, Charsets.UTF_8).write(log)
-            path
-          }.getOrElse(null))(error => throw error)
-  }
-
-  def deleteTaskConfigMap(nameSpace: String, deploymentName: String): Boolean = {
-    KubernetesRetriever
-      .newK8sClient()
-      .autoClose(
-        client =>
-          Try {
-            val r = client
-              .configMaps()
-              .inNamespace(nameSpace)
-              .withLabel("app", deploymentName)
-              .delete
-            Boolean.unbox(r)
-          }.getOrElse(false))
+      .autoClose(client =>
+        Try {
+          val podName = getPods(nameSpace, jobName).head.getMetadata.getName
+          val path = KubernetesDeploymentHelper.getJobErrorLog(jobId)
+          val file = new File(path)
+          val log = client.pods
+            .inNamespace(nameSpace)
+            .withName(podName)
+            .terminated()
+            .withPrettyOutput
+            .getLog
+          Files.asCharSink(file, Charsets.UTF_8).write(log)
+          path
+        }.getOrElse(null))(error => throw error)
   }
 
   private[kubernetes] def getJobLog(jobId: String): String = {

@@ -23,8 +23,6 @@ import org.apache.streampark.console.core.entity.SparkEnv;
 import org.apache.streampark.console.core.enums.FlinkEnvCheckEnum;
 import org.apache.streampark.console.core.service.SparkEnvService;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -34,84 +32,75 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Tag(name = "SPARK_ENV_TAG")
 @Slf4j
 @Validated
 @RestController
 @RequestMapping("spark/env")
 public class SparkEnvController {
 
-  @Autowired private SparkEnvService sparkEnvService;
+    @Autowired
+    private SparkEnvService sparkEnvService;
 
-  @Operation(summary = "Get spark environment")
-  @PostMapping("list")
-  public RestResponse list() {
-    List<SparkEnv> sparkEnvList = sparkEnvService.list();
-    return RestResponse.success(sparkEnvList);
-  }
-
-  @Operation(summary = "Verify spark environment")
-  @PostMapping("check")
-  public RestResponse check(SparkEnv version) {
-    FlinkEnvCheckEnum checkResp = sparkEnvService.check(version);
-    return RestResponse.success(checkResp.getCode());
-  }
-
-  @Operation(summary = "Create spark environment")
-  @PostMapping("create")
-  public RestResponse create(SparkEnv version) {
-    try {
-      sparkEnvService.create(version);
-    } catch (Exception e) {
-      throw new ApiDetailException(e);
+    @PostMapping("list")
+    public RestResponse list() {
+        List<SparkEnv> sparkEnvList = sparkEnvService.list();
+        return RestResponse.success(sparkEnvList);
     }
-    return RestResponse.success(true);
-  }
 
-  @Operation(summary = "Get spark environment")
-  @PostMapping("get")
-  public RestResponse get(Long id) throws Exception {
-    SparkEnv sparkEnv = sparkEnvService.getById(id);
-    sparkEnv.unzipSparkConf();
-    return RestResponse.success(sparkEnv);
-  }
-
-  @Operation(summary = "Sync spark environment conf")
-  @PostMapping("sync")
-  public RestResponse sync(Long id) throws Exception {
-    sparkEnvService.syncConf(id);
-    return RestResponse.success();
-  }
-
-  @Operation(summary = "Update spark environment")
-  @PostMapping("update")
-  public RestResponse update(SparkEnv version) throws Exception {
-    try {
-      sparkEnvService.update(version);
-    } catch (Exception e) {
-      throw new ApiDetailException(e);
+    @PostMapping("check")
+    public RestResponse check(SparkEnv version) {
+        FlinkEnvCheckEnum checkResp = sparkEnvService.check(version);
+        return RestResponse.success(checkResp.getCode());
     }
-    return RestResponse.success(true);
-  }
 
-  @Operation(summary = "Delete spark environment")
-  @PostMapping("delete")
-  public RestResponse delete(Long id) {
-    sparkEnvService.removeById(id);
-    return RestResponse.success();
-  }
+    @PostMapping("create")
+    public RestResponse create(SparkEnv version) {
+        try {
+            sparkEnvService.create(version);
+        } catch (Exception e) {
+            throw new ApiDetailException(e);
+        }
+        return RestResponse.success(true);
+    }
 
-  @Operation(summary = "Check spark environment is valid, else throw exception")
-  @PostMapping("validity")
-  public RestResponse validity(SparkEnv version) {
-    sparkEnvService.validity(version.getId());
-    return RestResponse.success(true);
-  }
+    @PostMapping("get")
+    public RestResponse get(Long id) throws Exception {
+        SparkEnv sparkEnv = sparkEnvService.getById(id);
+        sparkEnv.unzipSparkConf();
+        return RestResponse.success(sparkEnv);
+    }
 
-  @Operation(summary = "Update spark environment as default")
-  @PostMapping("default")
-  public RestResponse setDefault(Long id) {
-    sparkEnvService.setDefault(id);
-    return RestResponse.success();
-  }
+    @PostMapping("sync")
+    public RestResponse sync(Long id) throws Exception {
+        sparkEnvService.syncConf(id);
+        return RestResponse.success();
+    }
+
+    @PostMapping("update")
+    public RestResponse update(SparkEnv version) throws Exception {
+        try {
+            sparkEnvService.update(version);
+        } catch (Exception e) {
+            throw new ApiDetailException(e);
+        }
+        return RestResponse.success(true);
+    }
+
+    @PostMapping("delete")
+    public RestResponse delete(Long id) {
+        sparkEnvService.removeById(id);
+        return RestResponse.success();
+    }
+
+    @PostMapping("validity")
+    public RestResponse validity(SparkEnv version) {
+        sparkEnvService.validity(version.getId());
+        return RestResponse.success(true);
+    }
+
+    @PostMapping("default")
+    public RestResponse setDefault(Long id) {
+        sparkEnvService.setDefault(id);
+        return RestResponse.success();
+    }
 }

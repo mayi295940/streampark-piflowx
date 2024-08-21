@@ -19,15 +19,12 @@ package org.apache.streampark.common.conf
 
 import org.apache.streampark.common.Constant
 import org.apache.streampark.common.util.{Logger, SystemPropertyUtils}
-import org.apache.streampark.common.util.ImplicitsUtils._
+import org.apache.streampark.common.util.Implicits._
 
 import javax.annotation.{Nonnull, Nullable}
 
 import java.util
 import java.util.concurrent.ConcurrentHashMap
-
-import scala.collection.convert.ImplicitConversions._
-import scala.language.postfixOps
 
 /**
  * Thread-safe configuration storage containers. All configurations will be automatically
@@ -41,7 +38,8 @@ object InternalConfigHolder extends Logger {
   private val confData = new ConcurrentHashMap[String, Any](initialCapacity)
 
   /** configuration key options storage (key -> ConfigOption) */
-  private val confOptions = new ConcurrentHashMap[String, InternalOption](initialCapacity)
+  private val confOptions =
+    new ConcurrentHashMap[String, InternalOption](initialCapacity)
 
   /** Initialize the ConfigHub. */
   Seq(CommonConfig, K8sFlinkConfig)
@@ -73,7 +71,7 @@ object InternalConfigHolder extends Logger {
           case v if v != null => v.cast[T](conf.classType)
           case _ => conf.defaultValue.asInstanceOf[T]
         }
-      case v: T => v
+      case v => v.asInstanceOf[T]
     }
   }
 
@@ -106,7 +104,7 @@ object InternalConfigHolder extends Logger {
             }
           case conf: InternalOption => conf.defaultValue.asInstanceOf[T]
         }
-      case v: T => v
+      case v => v.asInstanceOf[T]
     }
   }
 
@@ -123,7 +121,7 @@ object InternalConfigHolder extends Logger {
 
   /** Get keys of all registered ConfigOption. */
   @Nonnull
-  def keys(): util.Set[String] = {
+  def keys(): JavaSet[String] = {
     val map = new util.HashMap[String, InternalOption](confOptions.size())
     map.putAll(confOptions)
     map.keySet()
@@ -161,10 +159,9 @@ object InternalConfigHolder extends Logger {
     logInfo(s"""Registered configs:
                |ConfigHub collected configs: ${configKeys.size}
                |  ${configKeys
-                .map(
-                  key =>
-                    s"$key = ${if (key.contains("password")) Constant.DEFAULT_DATAMASK_STRING
-                      else get(key)}")
+                .map(key =>
+                  s"$key = ${if (key.contains("password")) Constant.DEFAULT_DATAMASK_STRING
+                    else get(key)}")
                 .mkString("\n  ")}""".stripMargin)
   }
 

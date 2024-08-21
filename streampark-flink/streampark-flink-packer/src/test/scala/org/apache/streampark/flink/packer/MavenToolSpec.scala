@@ -14,8 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.streampark.flink.packer
 
+import org.apache.streampark.common.util.Implicits._
 import org.apache.streampark.flink.packer.maven.{Artifact, DependencyInfo, MavenTool}
 
 import org.apache.commons.io.FileUtils
@@ -25,9 +27,6 @@ import org.scalatest.wordspec.AnyWordSpec
 
 import java.io.File
 import java.util.jar.JarFile
-
-import scala.collection.convert.ImplicitConversions._
-import scala.language.postfixOps
 
 class MavenToolSpec extends AnyWordSpec with BeforeAndAfterAll with Matchers {
 

@@ -19,19 +19,22 @@ package org.apache.streampark.console.core.enums;
 
 /** configFile Type enum */
 public enum PlaceholderTypeEnum {
-  JOB_ID("job_id"),
 
-  JOB_NAME("job_name"),
+    ID("id"),
 
-  YARN_ID("yarn_id");
+    JOB_ID("job_id"),
 
-  private final String name;
+    JOB_NAME("job_name"),
 
-  PlaceholderTypeEnum(String name) {
-    this.name = name;
-  }
+    YARN_ID("yarn_id");
 
-  public String get() {
-    return this.name;
-  }
+    private final String name;
+
+    PlaceholderTypeEnum(String name) {
+        this.name = name;
+    }
+
+    public String get() {
+        return this.name;
+    }
 }

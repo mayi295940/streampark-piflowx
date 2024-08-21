@@ -14,7 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.streampark.common.util
+
+import org.apache.streampark.common.util.Implicits._
 
 import com.typesafe.config.ConfigFactory
 import org.apache.commons.lang3.StringUtils
@@ -23,18 +26,22 @@ import org.yaml.snakeyaml.Yaml
 import javax.annotation.Nonnull
 
 import java.io._
-import java.util.{HashMap => JavaMap, LinkedHashMap => JavaLinkedMap, Properties, Scanner}
+import java.util.{Properties, Scanner}
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.regex.Pattern
 
-import scala.collection.JavaConverters._
-import scala.collection.convert.ImplicitConversions._
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, Map => MutableMap}
 
 object PropertiesUtils extends Logger {
 
   private[this] lazy val PROPERTY_PATTERN = Pattern.compile("(.*?)=(.*?)")
+
+  private[this] lazy val SPARK_PROPERTY_COMPLEX_PATTERN = Pattern.compile("^[\"']?(.*?)=(.*?)[\"']?$")
+
+  // scalastyle:off
+  private[this] lazy val SPARK_ARGUMENT_REGEXP = "\"?(\\s+|$)(?=(([^\"]*\"){2})*[^\"]*$)\"?"
+  // scalastyle:on
 
   private[this] lazy val MULTI_PROPERTY_REGEXP = "-D(.*?)\\s*=\\s*[\\\"|'](.*)[\\\"|']"
 
@@ -59,24 +66,23 @@ object PropertiesUtils extends Logger {
       prefix: String = "",
       proper: MutableMap[String, String] = MutableMap[String, String]()): Map[String, String] = {
     v match {
-      case map: JavaLinkedMap[String, Any] =>
+      case map: JavaLinkedMap[_, _] =>
         map
-          .flatMap(
-            x => {
-              prefix match {
-                case "" => eachYamlItem(x._1, x._2, k, proper)
-                case other => eachYamlItem(x._1, x._2, s"$other.$k", proper)
-              }
-            })
+          .flatMap(x => {
+            prefix match {
+              case "" => eachYamlItem(x._1.toString, x._2, k, proper)
+              case other =>
+                eachYamlItem(x._1.toString, x._2, s"$other.$k", proper)
+            }
+          })
           .toMap
       case text =>
-        val value = text match {
-          case null => ""
-          case other => other.toString
-        }
-        prefix match {
-          case "" => proper += k -> value
-          case other => proper += s"$other.$k" -> value
+        if (text != null) {
+          val value = text.toString.trim
+          prefix match {
+            case "" => proper += k -> value
+            case other => proper += s"$other.$k" -> value
+          }
         }
         proper.toMap
     }
@@ -204,31 +210,31 @@ object PropertiesUtils extends Logger {
   }
 
   def fromYamlTextAsJava(text: String): JavaMap[String, String] =
-    new JavaMap[String, String](fromYamlText(text).asJava)
+    new JavaHashMap[String, String](fromYamlText(text))
 
   def fromHoconTextAsJava(text: String): JavaMap[String, String] =
-    new JavaMap[String, String](fromHoconText(text).asJava)
+    new JavaHashMap[String, String](fromHoconText(text))
 
   def fromPropertiesTextAsJava(text: String): JavaMap[String, String] =
-    new JavaMap[String, String](fromPropertiesText(text).asJava)
+    new JavaHashMap[String, String](fromPropertiesText(text))
 
   def fromYamlFileAsJava(filename: String): JavaMap[String, String] =
-    new JavaMap[String, String](fromYamlFile(filename).asJava)
+    new JavaHashMap[String, String](fromYamlFile(filename))
 
   def fromHoconFileAsJava(filename: String): JavaMap[String, String] =
-    new JavaMap[String, String](fromHoconFile(filename).asJava)
+    new JavaHashMap[String, String](fromHoconFile(filename))
 
   def fromPropertiesFileAsJava(filename: String): JavaMap[String, String] =
-    new JavaMap[String, String](fromPropertiesFile(filename).asJava)
+    new JavaHashMap[String, String](fromPropertiesFile(filename))
 
   def fromYamlFileAsJava(inputStream: InputStream): JavaMap[String, String] =
-    new JavaMap[String, String](fromYamlFile(inputStream).asJava)
+    new JavaHashMap[String, String](fromYamlFile(inputStream))
 
   def fromHoconFileAsJava(inputStream: InputStream): JavaMap[String, String] =
-    new JavaMap[String, String](fromHoconFile(inputStream).asJava)
+    new JavaHashMap[String, String](fromHoconFile(inputStream))
 
   def fromPropertiesFileAsJava(inputStream: InputStream): JavaMap[String, String] =
-    new JavaMap[String, String](fromPropertiesFile(inputStream).asJava)
+    new JavaHashMap[String, String](fromPropertiesFile(inputStream))
 
   /**
    * @param file
@@ -243,7 +249,7 @@ object PropertiesUtils extends Logger {
 
   def loadFlinkConfYaml(yaml: String): JavaMap[String, String] = {
     require(yaml != null && yaml.nonEmpty, "[StreamPark] loadFlinkConfYaml: yaml must not be null")
-    val flinkConf = new JavaMap[String, String]()
+    val flinkConf = new JavaHashMap[String, String]()
     val scanner: Scanner = new Scanner(yaml)
     val lineNo: AtomicInteger = new AtomicInteger(0)
     while (scanner.hasNextLine) {
@@ -276,21 +282,20 @@ object PropertiesUtils extends Logger {
 
   /** extract flink configuration from application.properties */
   @Nonnull def extractDynamicProperties(properties: String): Map[String, String] = {
-    if (StringUtils.isBlank(properties)) Map.empty[String, String]
+    if (StringUtils.isEmpty(properties)) Map.empty[String, String]
     else {
       val map = mutable.Map[String, String]()
       val simple = properties.replaceAll(MULTI_PROPERTY_REGEXP, "")
       simple.split("\\s?-D") match {
         case d if Utils.isNotEmpty(d) =>
-          d.foreach(
-            x => {
-              if (x.nonEmpty) {
-                val p = PROPERTY_PATTERN.matcher(x.trim)
-                if (p.matches) {
-                  map += p.group(1).trim -> p.group(2).trim
-                }
+          d.foreach(x => {
+            if (x.nonEmpty) {
+              val p = PROPERTY_PATTERN.matcher(x.trim)
+              if (p.matches) {
+                map += p.group(1).trim -> p.group(2).trim
               }
-            })
+            }
+          })
         case _ =>
       }
       val matcher = MULTI_PROPERTY_PATTERN.matcher(properties)
@@ -298,7 +303,8 @@ object PropertiesUtils extends Logger {
         val opts = matcher.group()
         val index = opts.indexOf("=")
         val key = opts.substring(2, index).trim
-        val value = opts.substring(index + 1).trim.replaceAll("(^[\"|']|[\"|']$)", "")
+        val value =
+          opts.substring(index + 1).trim.replaceAll("(^[\"|']|[\"|']$)", "")
         map += key -> value
       }
       map.toMap
@@ -308,28 +314,120 @@ object PropertiesUtils extends Logger {
   @Nonnull def extractArguments(args: String): List[String] = {
     val programArgs = new ArrayBuffer[String]()
     if (StringUtils.isNotEmpty(args)) {
-      val array = args.split("\\s+")
-      val iter = array.iterator
-      while (iter.hasNext) {
-        val v = iter.next()
-        val p = v.take(1)
-        p match {
-          case "'" | "\"" =>
-            var value = v
-            if (!v.endsWith(p)) {
-              while (!value.endsWith(p) && iter.hasNext) {
-                value += s" ${iter.next()}"
-              }
+      return extractArguments(args.split("\\s+"))
+    }
+    programArgs.toList
+  }
+
+  def extractArguments(array: Array[String]): List[String] = {
+    val programArgs = new ArrayBuffer[String]()
+    val iter = array.iterator
+    while (iter.hasNext) {
+      val v = iter.next()
+      val p = v.take(1)
+      p match {
+        case "'" | "\"" =>
+          var value = v
+          if (!v.endsWith(p)) {
+            while (!value.endsWith(p) && iter.hasNext) {
+              value += s" ${iter.next()}"
             }
-            programArgs += value.substring(1, value.length - 1)
-          case _ => programArgs += v
-        }
+          }
+          programArgs += value.substring(1, value.length - 1)
+        case _ =>
+          val regexp = "(.*)='(.*)'$"
+          if (v.matches(regexp)) {
+            programArgs += v.replaceAll(regexp, "$1=$2")
+          } else {
+            val regexp = "(.*)=\"(.*)\"$"
+            if (v.matches(regexp)) {
+              programArgs += v.replaceAll(regexp, "$1=$2")
+            } else {
+              programArgs += v
+            }
+          }
       }
     }
     programArgs.toList
   }
 
-  @Nonnull def extractDynamicPropertiesAsJava(properties: String): JavaMap[String, String] =
-    new JavaMap[String, String](extractDynamicProperties(properties).asJava)
+  def extractMultipleArguments(array: Array[String]): Map[String, Map[String, String]] = {
+    val iter = array.iterator
+    val map = mutable.Map[String, mutable.Map[String, String]]()
+    while (iter.hasNext) {
+      val v = iter.next()
+      v.take(2) match {
+        case "--" =>
+          val kv = iter.next()
+          val regexp = "(.*)=(.*)"
+          if (kv.matches(regexp)) {
+            val values = kv.split("=")
+            val k1 = values(0).trim
+            val v1 = values(1).replaceAll("^['|\"]|['|\"]$", "")
+            val k = v.drop(2)
+            map.get(k) match {
+              case Some(m) => m += k1 -> v1
+              case _ => map += k -> mutable.Map(k1 -> v1)
+            }
+          }
+        case _ =>
+      }
+    }
+    map.map(x => x._1 -> x._2.toMap).toMap
+  }
 
+  @Nonnull def extractDynamicPropertiesAsJava(properties: String): JavaMap[String, String] =
+    new JavaHashMap[String, String](extractDynamicProperties(properties))
+
+  @Nonnull def extractMultipleArgumentsAsJava(
+      args: Array[String]): JavaMap[String, JavaMap[String, String]] = {
+    val map =
+      extractMultipleArguments(args).map(c => c._1 -> new JavaHashMap[String, String](c._2))
+    new JavaHashMap[String, JavaMap[String, String]](map)
+  }
+
+  /** extract spark configuration from sparkApplication.appProperties */
+  @Nonnull def extractSparkPropertiesAsJava(properties: String): JavaMap[String, String] =
+    new JavaHashMap[String, String](extractSparkProperties(properties))
+
+  @Nonnull def extractSparkProperties(properties: String): Map[String, String] = {
+    if (StringUtils.isEmpty(properties)) Map.empty[String, String]
+    else {
+      val map = mutable.Map[String, String]()
+      properties.split("(\\s)*(--conf|-c)(\\s)+") match {
+        case d if Utils.isNotEmpty(d) =>
+          d.foreach(x => {
+            if (x.nonEmpty) {
+              val p = SPARK_PROPERTY_COMPLEX_PATTERN.matcher(x)
+              if (p.matches) {
+                map += p.group(1).trim -> p.group(2).trim
+              }
+            }
+          })
+        case _ =>
+      }
+      map.toMap
+    }
+  }
+
+  /** extract spark configuration from sparkApplication.appArgs */
+  @Nonnull def extractSparkArgumentsAsJava(arguments: String): JavaList[String] =
+    new JavaArrayList[String](extractSparkArguments(arguments))
+
+  @Nonnull def extractSparkArguments(arguments: String): List[String] = {
+    if (StringUtils.isEmpty(arguments)) List.empty[String]
+    else {
+      val list = List[String]()
+      arguments.split(SPARK_ARGUMENT_REGEXP) match {
+        case d if Utils.isNotEmpty(d) =>
+          d.foreach(x => {
+            if (x.nonEmpty) {
+              list :+ x
+            }
+          })
+        case _ =>
+      }
+      list
+    }
+  }
 }

@@ -19,10 +19,9 @@ package org.apache.streampark.flink.client.bean
 
 import org.apache.streampark.common.conf.FlinkVersion
 import org.apache.streampark.common.enums.FlinkExecutionMode
+import org.apache.streampark.common.util.Implicits.JavaMap
 
 import javax.annotation.Nullable
-
-import java.util.{Map => JavaMap}
 
 case class ShutDownRequest(
     flinkVersion: FlinkVersion,
@@ -30,4 +29,5 @@ case class ShutDownRequest(
     @Nullable properties: JavaMap[String, Any],
     clusterId: String,
     id: Long,
-    @Nullable kubernetesDeployParam: KubernetesDeployParam)
+    @Nullable k8sParam: KubernetesDeployParam)
+  extends DeployRequestTrait

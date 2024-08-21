@@ -23,9 +23,9 @@ import org.apache.streampark.common.util.ConfigUtils
 import org.apache.http.HttpHost
 
 import java.net.InetSocketAddress
-import java.util.{Map => JavaMap, Properties}
+import java.util.Properties
 
-import scala.collection.JavaConverters._
+import org.apache.streampark.common.util.Implicits._
 
 object ES7SinkConfigOption {
 
@@ -163,7 +163,7 @@ class ES7SinkConfigOption(prefixStr: String, properties: Properties) extends Ser
     defaultValue = true)
 
   def getInternalConfig(): JavaMap[String, String] = {
-    ConfigUtils.getConf(prop.asScala.asJava, prefix)(alias = "").asScala.asJava
+    ConfigUtils.getConf(prop, prefix)(alias = "")
   }
 
 }

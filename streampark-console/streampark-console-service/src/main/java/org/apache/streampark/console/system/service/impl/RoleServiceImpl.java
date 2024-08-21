@@ -44,7 +44,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,77 +52,80 @@ import java.util.Optional;
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
 public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements RoleService {
 
-  @Autowired private RoleMenuMapper roleMenuMapper;
+    @Autowired
+    private RoleMenuMapper roleMenuMapper;
 
-  @Autowired private MemberService memberService;
+    @Autowired
+    private MemberService memberService;
 
-  @Autowired private RoleMenuService roleMenuService;
+    @Autowired
+    private RoleMenuService roleMenuService;
 
-  @Override
-  public IPage<Role> getPage(Role role, RestRequest request) {
-    Page<Role> page = MybatisPager.getPage(request);
-    return this.baseMapper.selectPage(page, role);
-  }
+    @Override
+    public IPage<Role> getPage(Role role, RestRequest request) {
+        Page<Role> page = MybatisPager.getPage(request);
+        return this.baseMapper.selectPage(page, role);
+    }
 
-  @Override
-  public Role getByName(String roleName) {
-    return baseMapper.selectOne(new LambdaQueryWrapper<Role>().eq(Role::getRoleName, roleName));
-  }
+    @Override
+    public Role getByName(String roleName) {
+        return baseMapper.selectOne(new LambdaQueryWrapper<Role>().eq(Role::getRoleName, roleName));
+    }
 
-  @Override
-  public void createRole(Role role) {
-    Date date = new Date();
-    role.setCreateTime(date);
-    role.setModifyTime(date);
-    this.save(role);
+    @Override
+    public void createRole(Role role) {
+        this.save(role);
 
-    String[] menuIds = role.getMenuId().split(StringPool.COMMA);
-    updateRoleMenus(role, menuIds);
-  }
+        String[] menuIds = role.getMenuId().split(StringPool.COMMA);
+        updateRoleMenus(role, menuIds);
+    }
 
-  @Override
-  public void removeById(Long roleId) {
-    Role role =
-        Optional.ofNullable(this.getById(roleId))
+    @Override
+    public void removeById(Long roleId) {
+        Role role = Optional.ofNullable(this.getById(roleId))
             .orElseThrow(
-                () ->
-                    new ApiAlertException(
-                        String.format("Role id [%s] not found. Delete role failed.", roleId)));
-    List<Long> userIdsByRoleId = memberService.listUserIdsByRoleId(roleId);
-    ApiAlertException.throwIfFalse(
-        CollectionUtils.isEmpty(userIdsByRoleId),
-        String.format(
-            "There are some users of role %s, delete role failed, please unbind it first.",
-            role.getRoleName()));
-    super.removeById(roleId);
-    this.roleMenuService.removeByRoleId(roleId);
-  }
-
-  @Override
-  public void updateRole(Role role) {
-    role.setModifyTime(new Date());
-    baseMapper.updateById(role);
-    LambdaQueryWrapper<RoleMenu> queryWrapper =
-        new LambdaQueryWrapper<RoleMenu>().eq(RoleMenu::getRoleId, role.getRoleId());
-    roleMenuMapper.delete(queryWrapper);
-
-    String menuId = role.getMenuId();
-    if (StringUtils.contains(menuId, Constant.APP_DETAIL_MENU_ID)
-        && !StringUtils.contains(menuId, Constant.APP_MENU_ID)) {
-      menuId = menuId + StringPool.COMMA + Constant.APP_MENU_ID;
+                () -> new ApiAlertException(
+                    String.format("Role id [%s] not found. Delete role failed.",
+                        roleId)));
+        List<Long> userIdsByRoleId = memberService.listUserIdsByRoleId(roleId);
+        ApiAlertException.throwIfFalse(
+            CollectionUtils.isEmpty(userIdsByRoleId),
+            String.format(
+                "There are some users of role %s, delete role failed, please unbind it first.",
+                role.getRoleName()));
+        super.removeById(roleId);
+        this.roleMenuService.removeByRoleId(roleId);
     }
-    String[] menuIds = menuId.split(StringPool.COMMA);
-    updateRoleMenus(role, menuIds);
-  }
 
-  private void updateRoleMenus(Role role, String[] menuIds) {
-    List<RoleMenu> roleMenus = new ArrayList<>();
-    for (String menuId : menuIds) {
-      RoleMenu rm = new RoleMenu();
-      rm.setMenuId(Long.valueOf(menuId));
-      rm.setRoleId(role.getRoleId());
-      roleMenus.add(rm);
+    @Override
+    public void updateRole(Role role) {
+        baseMapper.updateById(role);
+        LambdaQueryWrapper<RoleMenu> queryWrapper = new LambdaQueryWrapper<RoleMenu>().eq(RoleMenu::getRoleId,
+            role.getRoleId());
+        roleMenuMapper.delete(queryWrapper);
+
+        String menuId = role.getMenuId();
+        if (StringUtils.contains(menuId, Constant.APP_DETAIL_MENU_ID)
+            && !StringUtils.contains(menuId, Constant.APP_MENU_ID)) {
+            menuId = menuId + StringPool.COMMA + Constant.APP_MENU_ID;
+        }
+        String[] menuIds = menuId.split(StringPool.COMMA);
+        updateRoleMenus(role, menuIds);
     }
-    roleMenuService.saveBatch(roleMenus);
-  }
+
+    private void updateRoleMenus(Role role, String[] menuIds) {
+        List<RoleMenu> roleMenus = new ArrayList<>();
+        for (String menuId : menuIds) {
+            RoleMenu rm = new RoleMenu();
+            rm.setMenuId(Long.valueOf(menuId));
+            rm.setRoleId(role.getRoleId());
+            roleMenus.add(rm);
+        }
+        roleMenuService.saveBatch(roleMenus);
+    }
+
+    @Override
+    public Role getSysDefaultRole() {
+        return baseMapper.selectOne(new LambdaQueryWrapper<Role>().eq(Role::getRoleId, Constant.DEFAULT_ROLE_ID));
+    }
 }

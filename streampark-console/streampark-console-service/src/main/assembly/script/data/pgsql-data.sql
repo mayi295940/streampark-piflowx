@@ -25,7 +25,11 @@ insert into "public"."t_team" values (100000, 'default', null, now(), now());
 -- ----------------------------
 -- Records of t_flink_app
 -- ----------------------------
-insert into "public"."t_flink_app" values (100000, 100000, 2, 4, null, null, 'Flink SQL Demo', null, null, null, null, null, null , null, 100000, null, 1, null, null, null, null, null, null, null, null, 0, 0, null, null, null, null, null, null, 'Flink SQL Demo', 0, null, null, null, null, null, null, null, 0, 0, now(), now(), null, 1, true, null, null, null, null, null, null, false, null, null, null, 'streampark,test', false, null);
+INSERT INTO "public"."t_flink_app" (
+    "id", "team_id", "job_type", "execution_mode", "job_name", "user_id", "app_type", "state", "restart_size",
+    "description", "resolve_order", "option_state", "tracking", "create_time", "modify_time", "release", "build",
+    "k8s_hadoop_integration", "tags"
+) VALUES (100000, 100000, 2, 4, 'Flink SQL Demo', 100000, 1, 0, 0, 'Flink SQL Demo', 0, 0, 0, now(), now(), 1, true, false, 'streampark,test');
 
 -- ----------------------------
 -- Records of t_flink_effective
@@ -64,7 +68,7 @@ insert into "public"."t_menu" values (130200, 130000, 'setting.alarm', '/setting
 insert into "public"."t_menu" values (130300, 130000, 'setting.flinkHome', '/setting/flinkHome', 'setting/FlinkHome/index', null, 'desktop', '0', '1', 3, now(), now());
 insert into "public"."t_menu" values (130400, 130000, 'setting.flinkCluster', '/setting/flinkCluster', 'setting/FlinkCluster/index', 'menu:view', 'cluster', '0', '1', 4, now(), now());
 insert into "public"."t_menu" values (130500, 130000, 'setting.externalLink', '/setting/externalLink', 'setting/ExternalLink/index', 'menu:view', 'link', '0', '1', 5, now(), now());
-insert into "public"."t_menu" values (130600, 130000, 'setting.yarnQueue', '/setting/yarnQueue', 'setting/yarnQueue/View', 'menu:view', 'bars', '0', '1', 6, now(), now());
+insert into "public"."t_menu" values (130600, 130000, 'setting.yarnQueue', '/setting/yarn-queue', 'setting/yarn-queue/View', 'menu:view', 'bars', '0', '1', 6, now(), now());
 insert into "public"."t_menu" values (110101, 110100, 'add', null, null, 'user:add', null, '1', '1', null, now(), now());
 insert into "public"."t_menu" values (110102, 110100, 'update', null, null, 'user:update', null, '1', '1', null, now(), now());
 insert into "public"."t_menu" values (110103, 110100, 'delete', null, null, 'user:delete', null, '1', '1', null, now(), now());
@@ -113,7 +117,7 @@ insert into "public"."t_menu" values (120218, 120200, 'sql delete', null, null, 
 insert into "public"."t_menu" values (120301, 120300, 'add', NULL, NULL, 'variable:add', NULL, '1', '1', NULL, now(), now());
 insert into "public"."t_menu" values (120302, 120300, 'update', NULL, NULL, 'variable:update', NULL, '1', '1', NULL, now(), now());
 insert into "public"."t_menu" values (120303, 120300, 'delete', NULL, NULL, 'variable:delete', NULL, '1', '1', NULL, now(), now());
-insert into "public"."t_menu" values (120304, 120300, 'depend apps', '/flink/variable/depend_apps', 'flink/variable/DependApps', 'variable:depend_apps', '', '0', '0', NULL, now(), now());
+insert into "public"."t_menu" values (120304, 120300, 'depend apps', '/resource/variable/depend_apps', 'resource/variable/DependApps', 'variable:depend_apps', '', '0', '0', NULL, now(), now());
 insert into "public"."t_menu" values (120305, 120300, 'show original', NULL, NULL, 'variable:show_original', NULL, '1', '1', NULL, now(), now());
 insert into "public"."t_menu" values (120306, 120300, 'view', NULL, NULL, 'variable:view', NULL, '1', '1', null, now(), now());
 insert into "public"."t_menu" values (120307, 120300, 'depend view', null, null, 'variable:depend_apps', null, '1', '1', NULL, now(), now());
@@ -259,7 +263,7 @@ insert into "public"."t_setting" values (15, 'ingress.mode.default', null, 'Ingr
 -- ----------------------------
 -- Records of t_user
 -- ----------------------------
-insert into "public"."t_user" values (100000, 'admin', '', 'rh8b1ojwog777yrg0daesf04gk', '2513f3748847298ea324dffbf67fe68681dd92315bda830065facd8efe08f54f', null, 1, 0, null, '1', now(), now(), null, 0, null, null);
+insert into "public"."t_user" values (100000, 'admin', '', 'rh8b1ojwog777yrg0daesf04gk', '2513f3748847298ea324dffbf67fe68681dd92315bda830065facd8efe08f54f', null, 1, 0, 100000, '1', now(), now(), null, 0, null, null);
 
 -- ----------------------------
 -- Records of t_member

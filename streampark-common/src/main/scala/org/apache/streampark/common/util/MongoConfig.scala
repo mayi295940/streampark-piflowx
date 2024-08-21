@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.streampark.common.util
 
 import org.apache.streampark.common.conf.ConfigKeys._
+import org.apache.streampark.common.util.Implicits._
 
 import com.mongodb._
 
 import java.util.Properties
-
-import scala.collection.convert.ImplicitConversions._
 
 object MongoConfig {
 
@@ -63,11 +63,11 @@ object MongoConfig {
     properties
       .filter(_._1.startsWith(MONGO_PREFIX))
       .filter(_._2.nonEmpty)
-      .map(
-        x => {
-          val k = x._1.replaceAll(s"$MONGO_PREFIX$alias", "").replaceFirst("^\\.", "")
-          prop.put(k, x._2.trim)
-        })
+      .map(x => {
+        val k =
+          x._1.replaceAll(s"$MONGO_PREFIX$alias", "").replaceFirst("^\\.", "")
+        prop.put(k, x._2.trim)
+      })
     prop
   }
 
@@ -137,17 +137,19 @@ object MongoConfig {
       val mongoClientOptions = builder.build
       val serverAddresses = mongoParam(address)
         .split(",")
-        .map(
-          x => {
-            val hostAndPort = x.split(":")
-            val host = hostAndPort.head
-            val port = hostAndPort(1).toInt
-            new ServerAddress(host, port)
-          })
+        .map(x => {
+          val hostAndPort = x.split(":")
+          val host = hostAndPort.head
+          val port = hostAndPort(1).toInt
+          new ServerAddress(host, port)
+        })
       if (mongoParam.containsKey(username)) {
         val db =
-          if (mongoParam.containsKey(authentication_database)) mongoParam(authentication_database)
-          else mongoParam(database)
+          if (mongoParam.containsKey(authentication_database)) {
+            mongoParam(authentication_database)
+          } else {
+            mongoParam(database)
+          }
         val mongoCredential = MongoCredential.createScramSha1Credential(
           mongoParam(username),
           db,

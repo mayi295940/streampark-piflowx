@@ -17,58 +17,53 @@
 
 package org.apache.streampark.console.system.entity;
 
+import org.apache.streampark.console.base.mybatis.entity.BaseEntity;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-import java.io.Serializable;
-import java.util.Date;
-
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_menu")
-public class Menu implements Serializable {
+public class Menu extends BaseEntity {
 
-  private static final long serialVersionUID = 1L;
+    public static final String TYPE_MENU = "0";
 
-  public static final String TYPE_MENU = "0";
+    public static final String TYPE_BUTTON = "1";
 
-  public static final String TYPE_BUTTON = "1";
+    @TableId(type = IdType.AUTO)
+    private Long menuId;
 
-  @TableId(type = IdType.AUTO)
-  private Long menuId;
+    private Long parentId;
 
-  private Long parentId;
+    @NotBlank(message = "{required}")
+    @Size(max = 20, message = "{noMoreThan}")
+    private String menuName;
 
-  @NotBlank(message = "{required}")
-  @Size(max = 20, message = "{noMoreThan}")
-  private String menuName;
+    @Size(max = 50, message = "{noMoreThan}")
+    private String path;
 
-  @Size(max = 50, message = "{noMoreThan}")
-  private String path;
+    @Size(max = 100, message = "{noMoreThan}")
+    private String component;
 
-  @Size(max = 100, message = "{noMoreThan}")
-  private String component;
+    @Size(max = 50, message = "{noMoreThan}")
+    private String perms;
 
-  @Size(max = 50, message = "{noMoreThan}")
-  private String perms;
+    private String icon;
 
-  private String icon;
+    @NotBlank(message = "{required}")
+    private String type;
 
-  @NotBlank(message = "{required}")
-  private String type;
+    private Double orderNum;
 
-  private Double orderNum;
+    private boolean display;
 
-  private Date createTime;
-
-  private Date modifyTime;
-
-  private boolean display;
-
-  private transient String createTimeFrom;
-  private transient String createTimeTo;
+    private transient String createTimeFrom;
+    private transient String createTimeTo;
 }

@@ -22,7 +22,6 @@ import org.apache.streampark.common.util.Logger
 import org.apache.streampark.spark.client.bean._
 import org.apache.streampark.spark.client.proxy.SparkShimsProxy
 
-import scala.language.{implicitConversions, reflectiveCalls}
 import scala.reflect.ClassTag
 
 object SparkClient extends Logger {
@@ -33,15 +32,15 @@ object SparkClient extends Logger {
   private[this] val SUBMIT_REQUEST =
     "org.apache.streampark.spark.client.bean.SubmitRequest" -> "submit"
 
-  private[this] val CANCEL_REQUEST =
-    "org.apache.streampark.spark.client.bean.CancelRequest" -> "cancel"
+  private[this] val STOP_REQUEST =
+    "org.apache.streampark.spark.client.bean.StopRequest" -> "stop"
 
   def submit(submitRequest: SubmitRequest): SubmitResponse = {
     proxy[SubmitResponse](submitRequest, submitRequest.sparkVersion, SUBMIT_REQUEST)
   }
 
-  def cancel(stopRequest: CancelRequest): CancelResponse = {
-    proxy[CancelResponse](stopRequest, stopRequest.sparkVersion, CANCEL_REQUEST)
+  def stop(stopRequest: StopRequest): StopResponse = {
+    proxy[StopResponse](stopRequest, stopRequest.sparkVersion, STOP_REQUEST)
   }
 
   private[this] def proxy[T: ClassTag](
@@ -56,13 +55,13 @@ object SparkClient extends Logger {
         val requestClass = classLoader.loadClass(requestBody._1)
         val method = submitClass.getDeclaredMethod(requestBody._2, requestClass)
         method.setAccessible(true)
-        val obj = method.invoke(null, SparkShimsProxy.getObject(classLoader, request))
+        val obj =
+          method.invoke(null, SparkShimsProxy.getObject(classLoader, request))
         if (obj == null) null.asInstanceOf[T]
         else {
           SparkShimsProxy.getObject[T](this.getClass.getClassLoader, obj)
         }
-      }
-    )
+      })
   }
 
 }

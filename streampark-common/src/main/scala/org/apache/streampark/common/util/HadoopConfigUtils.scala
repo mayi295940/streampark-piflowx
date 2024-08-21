@@ -14,20 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.streampark.common.util
 
 import org.apache.streampark.common.conf.{CommonConfig, InternalConfigHolder}
 import org.apache.streampark.common.conf.ConfigKeys._
 import org.apache.streampark.common.fs.LfsOperator
+import org.apache.streampark.common.util.Implicits._
 
 import org.apache.commons.io.{FileUtils => ApacheFileUtils}
 
 import java.io.File
 import java.nio.charset.StandardCharsets
-import java.util.{Collections, Map => JavaMap, Optional}
+import java.util.{Collections, Optional}
 
-import scala.collection.JavaConverters._
-import scala.collection.convert.ImplicitConversions._
 import scala.collection.immutable.ListMap
 import scala.util.{Failure, Success, Try}
 
@@ -40,7 +40,8 @@ object HadoopConfigUtils {
   lazy val hadoopUserName: String =
     InternalConfigHolder.get(CommonConfig.STREAMPARK_HADOOP_USER_NAME)
 
-  lazy val kerberosDebug = kerberosConf.getOrElse(KEY_SECURITY_KERBEROS_DEBUG, "false")
+  lazy val kerberosDebug =
+    kerberosConf.getOrElse(KEY_SECURITY_KERBEROS_DEBUG, "false")
 
   lazy val kerberosEnable =
     kerberosConf.getOrElse(KEY_SECURITY_KERBEROS_ENABLE, "false").toBoolean
@@ -48,7 +49,8 @@ object HadoopConfigUtils {
   lazy val kerberosPrincipal =
     kerberosConf.getOrElse(KEY_SECURITY_KERBEROS_PRINCIPAL, "").trim
 
-  val kerberosKeytab = kerberosConf.getOrElse(KEY_SECURITY_KERBEROS_KEYTAB, "").trim
+  val kerberosKeytab =
+    kerberosConf.getOrElse(KEY_SECURITY_KERBEROS_KEYTAB, "").trim
 
   val kerberosKrb5 = kerberosConf.getOrElse(KEY_SECURITY_KERBEROS_KRB5_CONF, "")
 
@@ -131,27 +133,29 @@ object HadoopConfigUtils {
   /** Read system hadoop config to Map */
   def readSystemHadoopConf: JavaMap[String, String] =
     getSystemHadoopConfDir
-      .map(
-        confDir =>
-          LfsOperator
-            .listDir(confDir)
-            .filter(f => HADOOP_CLIENT_CONF_FILES.contains(f.getName))
-            .map(f => f.getName -> ApacheFileUtils.readFileToString(f, StandardCharsets.UTF_8))
-            .toMap
-            .asJava)
+      .map(confDir =>
+        LfsOperator
+          .listDir(confDir)
+          .filter(f => HADOOP_CLIENT_CONF_FILES.contains(f.getName))
+          .map(f =>
+            f.getName -> ApacheFileUtils
+              .readFileToString(f, StandardCharsets.UTF_8))
+          .toMap
+          .asJava)
       .getOrElse(Collections.emptyMap[String, String]())
 
   /** Read system hive config to Map */
   def readSystemHiveConf: JavaMap[String, String] = {
     getSystemHiveConfDir
-      .map(
-        confDir =>
-          LfsOperator
-            .listDir(confDir)
-            .filter(f => HIVE_CLIENT_CONF_FILES.contains(f.getName))
-            .map(f => f.getName -> ApacheFileUtils.readFileToString(f, StandardCharsets.UTF_8))
-            .toMap
-            .asJava)
+      .map(confDir =>
+        LfsOperator
+          .listDir(confDir)
+          .filter(f => HIVE_CLIENT_CONF_FILES.contains(f.getName))
+          .map(f =>
+            f.getName -> ApacheFileUtils
+              .readFileToString(f, StandardCharsets.UTF_8))
+          .toMap
+          .asJava)
       .getOrElse(Collections.emptyMap[String, String]())
 
   }

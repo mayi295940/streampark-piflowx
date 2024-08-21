@@ -19,14 +19,12 @@ package org.apache.streampark.console.system.controller;
 
 import org.apache.streampark.console.base.domain.RestResponse;
 import org.apache.streampark.console.base.domain.router.VueRouter;
-import org.apache.streampark.console.core.service.CommonService;
+import org.apache.streampark.console.core.util.ServiceHelper;
 import org.apache.streampark.console.system.entity.Menu;
 import org.apache.streampark.console.system.service.MenuService;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -37,30 +35,26 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
-@Tag(name = "MENU_TAG")
 @Slf4j
 @Validated
 @RestController
 @RequestMapping("/menu")
 public class MenuController {
 
-  @Autowired private MenuService menuService;
+    @Autowired
+    private MenuService menuService;
 
-  @Autowired private CommonService commonService;
+    @PostMapping("router")
+    public RestResponse getUserRouters(Long teamId) {
+        // TODO The teamId is required, get routers should be called after choose teamId.
+        List<VueRouter<Menu>> routers = this.menuService.listRouters(ServiceHelper.getUserId(), teamId);
+        return RestResponse.success(routers);
+    }
 
-  @Operation(summary = "List menu-routes")
-  @PostMapping("router")
-  public RestResponse getUserRouters(Long teamId) {
-    // TODO The teamId is required, get routers should be called after choose teamId.
-    List<VueRouter<Menu>> routers = this.menuService.listRouters(commonService.getUserId(), teamId);
-    return RestResponse.success(routers);
-  }
-
-  @Operation(summary = "List menus")
-  @PostMapping("list")
-  @RequiresPermissions("menu:view")
-  public RestResponse menuList(Menu menu) {
-    Map<String, Object> menuMap = this.menuService.listMenuMap(menu);
-    return RestResponse.success(menuMap);
-  }
+    @PostMapping("list")
+    @RequiresPermissions("menu:view")
+    public RestResponse menuList(Menu menu) {
+        Map<String, Object> menuMap = this.menuService.listMenuMap(menu);
+        return RestResponse.success(menuMap);
+    }
 }

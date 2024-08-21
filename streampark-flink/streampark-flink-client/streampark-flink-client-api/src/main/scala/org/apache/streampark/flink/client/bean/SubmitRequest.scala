@@ -21,11 +21,13 @@ import org.apache.streampark.common.Constant
 import org.apache.streampark.common.conf.{FlinkVersion, Workspace}
 import org.apache.streampark.common.conf.ConfigKeys._
 import org.apache.streampark.common.enums._
-import org.apache.streampark.common.util.{AssertUtils, DeflaterUtils, HdfsUtils, PropertiesUtils}
+import org.apache.streampark.common.util._
+import org.apache.streampark.common.util.Implicits._
 import org.apache.streampark.flink.packer.pipeline.{BuildResult, ShadedBuildResponse}
 import org.apache.streampark.flink.util.FlinkUtils
 import org.apache.streampark.shaded.com.fasterxml.jackson.databind.ObjectMapper
 
+import org.apache.commons.collections.MapUtils
 import org.apache.commons.io.FileUtils
 import org.apache.flink.runtime.jobgraph.{SavepointConfigOptions, SavepointRestoreSettings}
 
@@ -33,9 +35,7 @@ import javax.annotation.Nullable
 
 import java.io.File
 import java.net.URL
-import java.util.{Map => JavaMap}
 
-import scala.collection.convert.ImplicitConversions._
 import scala.util.Try
 
 case class SubmitRequest(
@@ -52,10 +52,12 @@ case class SubmitRequest(
     savePoint: String,
     restoreMode: FlinkRestoreMode,
     args: String,
+    @Nullable clusterId: String,
     @Nullable hadoopUser: String,
     @Nullable buildResult: BuildResult,
-    @Nullable k8sSubmitParam: KubernetesSubmitParam,
-    @Nullable extraParameter: JavaMap[String, Any]) {
+    @Nullable extraParameter: JavaMap[String, Any],
+    @Nullable kubernetesNamespace: String,
+    @Nullable flinkRestExposedType: FlinkK8sRestExposedType) {
 
   private[this] lazy val appProperties: Map[String, String] = getParameterMap(
     KEY_FLINK_PROPERTY_PREFIX)
@@ -63,7 +65,8 @@ case class SubmitRequest(
   lazy val appOption: Map[String, String] = getParameterMap(KEY_FLINK_OPTION_PREFIX)
 
   lazy val appMain: String = this.developmentMode match {
-    case FlinkDevelopmentMode.FLINK_SQL => Constant.STREAMPARK_FLINKSQL_CLIENT_CLASS
+    case FlinkDevelopmentMode.FLINK_SQL =>
+      Constant.STREAMPARK_FLINKSQL_CLIENT_CLASS
     case FlinkDevelopmentMode.PYFLINK => Constant.PYTHON_FLINK_DRIVER_CLASS_NAME
     case FlinkDevelopmentMode.FLINK_PIPELINE =>
       properties.get(KEY_FLINK_APPLICATION_MAIN_CLASS).asInstanceOf[String]
@@ -71,11 +74,13 @@ case class SubmitRequest(
   }
 
   lazy val effectiveAppName: String =
-    if (this.appName == null) appProperties(KEY_FLINK_APP_NAME) else this.appName
+    if (this.appName == null) appProperties(KEY_FLINK_APP_NAME)
+    else this.appName
 
   lazy val libs: List[URL] = {
     val path = s"${Workspace.local.APP_WORKSPACE}/$id/lib"
-    Try(new File(path).listFiles().map(_.toURI.toURL).toList).getOrElse(List.empty[URL])
+    Try(new File(path).listFiles().map(_.toURI.toURL).toList)
+      .getOrElse(List.empty[URL])
   }
 
   lazy val classPaths: List[URL] = flinkVersion.flinkLibs ++ libs
@@ -85,12 +90,16 @@ case class SubmitRequest(
   lazy val pipelineJson: String = extraParameter.get(KEY_FLINK_PIPELINE_JSON()).toString
 
   lazy val allowNonRestoredState: Boolean = Try(
-    properties.get(SavepointConfigOptions.SAVEPOINT_IGNORE_UNCLAIMED_STATE.key).toString.toBoolean)
+    properties
+      .get(SavepointConfigOptions.SAVEPOINT_IGNORE_UNCLAIMED_STATE.key)
+      .toString
+      .toBoolean)
     .getOrElse(false)
 
   lazy val savepointRestoreSettings: SavepointRestoreSettings = {
     savePoint match {
-      case sp if Try(sp.isEmpty).getOrElse(true) => SavepointRestoreSettings.none
+      case sp if Try(sp.isEmpty).getOrElse(true) =>
+        SavepointRestoreSettings.none
       case sp => SavepointRestoreSettings.forPath(sp, allowNonRestoredState)
     }
   }
@@ -112,6 +121,14 @@ case class SubmitRequest(
       case _ => false
     }
   }
+
+  def hasProp(key: String): Boolean = MapUtils.isNotEmpty(properties) && properties.containsKey(key)
+
+  def getProp(key: String): Any = properties.get(key)
+
+  def hasExtra(key: String): Boolean = MapUtils.isNotEmpty(extraParameter) && extraParameter.containsKey(key)
+
+  def getExtra(key: String): Any = extraParameter.get(key)
 
   private[this] def getParameterMap(prefix: String = ""): Map[String, String] = {
     if (this.appConf == null) {
@@ -176,9 +193,7 @@ case class SubmitRequest(
       flinkLib = s"$flinkHdfsHome/lib",
       flinkPlugins = s"$flinkHdfsHome/plugins",
       flinkDistJar = FlinkUtils.getFlinkDistJar(flinkHome),
-      appJars = workspace.APP_JARS,
-      appPlugins = workspace.APP_PLUGINS
-    )
+      appJars = workspace.APP_JARS)
   }
 
   @throws[Exception]
@@ -188,15 +203,13 @@ case class SubmitRequest(
         AssertUtils.required(
           buildResult != null,
           s"[flink-submit] current job: ${this.effectiveAppName} was not yet built, buildResult is empty" +
-            s",clusterId=${k8sSubmitParam.clusterId}," +
-            s",namespace=${k8sSubmitParam.kubernetesNamespace}"
-        )
+            s",clusterId=$clusterId," +
+            s",namespace=$kubernetesNamespace")
         AssertUtils.required(
           buildResult.pass,
           s"[flink-submit] current job ${this.effectiveAppName} build failed, clusterId" +
-            s",clusterId=${k8sSubmitParam.clusterId}," +
-            s",namespace=${k8sSubmitParam.kubernetesNamespace}"
-        )
+            s",clusterId=$clusterId," +
+            s",namespace=$kubernetesNamespace")
       case _ =>
         AssertUtils.required(
           this.buildResult != null,
@@ -224,5 +237,4 @@ case class HdfsWorkspace(
     flinkDistJar: String,
     flinkLib: String,
     flinkPlugins: String,
-    appJars: String,
-    appPlugins: String)
+    appJars: String)

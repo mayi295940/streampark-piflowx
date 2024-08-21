@@ -75,8 +75,8 @@
             <artifactId>HikariCP</artifactId>
             <exclusions>
                 <exclusion>
-                    <artifactId>slf4j-api</artifactId>
                     <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -129,7 +129,6 @@
             <optional>true</optional>
         </dependency>
 
-
         <!--logback -->
         <dependency>
             <groupId>org.apache.streampark</groupId>
@@ -142,34 +141,6 @@
             <artifactId>streampark-shaded-jackson</artifactId>
             <version>${streampark.shaded.version}</version>
         </dependency>
-
-
-        <!-- ZIO -->
-        <dependency>
-            <groupId>dev.zio</groupId>
-            <artifactId>zio-logging_${scala.binary.version}</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>dev.zio</groupId>
-            <artifactId>zio-streams_${scala.binary.version}</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>dev.zio</groupId>
-            <artifactId>zio-concurrent_${scala.binary.version}</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- pprint -->
-        <dependency>
-            <groupId>com.lihaoyi</groupId>
-            <artifactId>pprint_${scala.binary.version}</artifactId>
-            <optional>true</optional>
-        </dependency>
-
     </dependencies>
 
     <build>
@@ -190,17 +161,16 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                        <phase>package</phase>
                         <configuration>
                             <createDependencyReducedPom>true</createDependencyReducedPom>
                             <dependencyReducedPomLocation>${project.basedir}/target/dependency-reduced-pom.xml</dependencyReducedPomLocation>
                             <artifactSet>
                                 <includes>
                                     <include>com.beachape:*</include>
-                                    <include>com.lihaoyi:*</include>
                                     <include>io.netty:netty-resolver</include>
                                 </includes>
                             </artifactSet>

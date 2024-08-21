@@ -18,11 +18,11 @@
 package org.apache.streampark.flink.packer.pipeline
 
 import org.apache.streampark.common.util.{Logger, ThreadUtils}
+import org.apache.streampark.common.util.Implicits._
 import org.apache.streampark.flink.packer.pipeline.BuildPipeline.executor
 
 import java.util.concurrent.{Callable, LinkedBlockingQueue, ThreadPoolExecutor, TimeUnit}
 
-import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService}
 import scala.util.{Failure, Success, Try}
@@ -79,12 +79,12 @@ trait BuildPipeline extends BuildPipelineProcess with BuildPipelineExpose with L
 
   protected val stepsStatus: mutable.Map[Int, (PipelineStepStatusEnum, Long)] =
     mutable.Map(
-      pipeType.getSteps.asScala
+      pipeType.getSteps
         .map(e => e._1.toInt -> (PipelineStepStatusEnum.waiting -> System.currentTimeMillis))
         .toSeq: _*)
 
   /** use to identify the log record that belongs to which pipeline instance */
-  protected val logSuffix: String = s"appName=${offerBuildParam.appName}"
+  private val logSuffix: String = s"appName=${offerBuildParam.appName}"
 
   protected var watcher: PipeWatcher = new SilentPipeWatcher
 
@@ -110,7 +110,8 @@ trait BuildPipeline extends BuildPipelineProcess with BuildPipelineExpose with L
         stepsStatus(seq) = PipelineStepStatusEnum.failure -> System.currentTimeMillis
         pipeStatus = PipelineStatusEnum.failure
         error = PipeError.of(cause.getMessage, cause)
-        logInfo(s"Building pipeline step[$seq/$allSteps] failure => ${pipeType.getSteps.get(seq)}")
+        logInfo(s"Building pipeline step[$seq/$allSteps] failure => ${pipeType.getSteps
+            .get(seq)}")
         watcher.onStepStateChange(snapshot)
         None
     }
@@ -155,7 +156,8 @@ trait BuildPipeline extends BuildPipelineProcess with BuildPipelineExpose with L
 
   override def getError: PipeError = error.copy()
 
-  override def getStepsStatus: Map[Int, (PipelineStepStatusEnum, Long)] = stepsStatus.toMap
+  override def getStepsStatus: Map[Int, (PipelineStepStatusEnum, Long)] =
+    stepsStatus.toMap
 
   override def getCurStep: Int = curStep
 
@@ -171,7 +173,7 @@ trait BuildPipeline extends BuildPipelineProcess with BuildPipelineExpose with L
     super.logError(s"[streampark-packer] $msg | $logSuffix", throwable)
 
   /** intercept snapshot */
-  def snapshot: PipeSnapshot = PipeSnapshot(
+  def snapshot: PipelineSnapshot = PipelineSnapshot(
     offerBuildParam.appName,
     pipeType,
     getPipeStatus,

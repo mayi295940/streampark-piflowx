@@ -18,7 +18,7 @@
 package org.apache.streampark.common.util
 
 import org.apache.streampark.common.Constant
-import org.apache.streampark.common.conf.ConfigKeys
+import org.apache.streampark.common.util.Implicits._
 
 import redis.clients.jedis._
 import redis.clients.jedis.exceptions.JedisConnectionException
@@ -27,7 +27,6 @@ import java.util.concurrent.ConcurrentHashMap
 
 import scala.annotation.meta.getter
 import scala.annotation.tailrec
-import scala.collection.convert.ImplicitConversions._
 import scala.util.Random
 
 object RedisClient extends Logger {

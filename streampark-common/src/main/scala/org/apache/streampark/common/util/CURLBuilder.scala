@@ -14,25 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.streampark.common.util
+
+import org.apache.streampark.common.util.Implicits._
 
 import java.util
 
-import scala.collection.convert.ImplicitConversions._
-
 class CURLBuilder(val url: String) {
 
-  private[this] val headers: util.Map[String, String] = new util.HashMap[String, String]
+  private[this] val headers: util.Map[String, String] = new JavaHashMap[String, String]
 
-  private[this] val formData: util.Map[String, String] = new util.HashMap[String, String]
+  private[this] val formData: util.Map[String, String] = new JavaHashMap[String, String]
 
   def addHeader(k: String, v: String): CURLBuilder = {
     this.headers.put(k, v)
     this
   }
 
-  def addFormData(k: String, v: String): CURLBuilder = {
-    this.formData.put(k, v)
+  def addFormData(k: String, v: java.io.Serializable): CURLBuilder = {
+    this.formData.put(k, v.toString)
     this
   }
 
@@ -41,10 +42,9 @@ class CURLBuilder(val url: String) {
     val cURL = new StringBuilder("curl -X POST ")
     cURL.append(String.format("'%s' \\\n", url))
     headers.keySet.foreach(h => cURL.append(String.format("-H \'%s: %s\' \\\n", h, headers.get(h))))
-    formData.foreach(
-      k => cURL.append(String.format("--data-urlencode \'%s=%s\' \\\n", k, formData.get(k))))
-    cURL.append("-i")
-    cURL.toString
+    formData.foreach(k =>
+      cURL.append(String.format("--data-urlencode \'%s=%s\' \\\n", k._1, k._2)))
+    cURL.toString.trim.dropRight(1)
   }
 
 }

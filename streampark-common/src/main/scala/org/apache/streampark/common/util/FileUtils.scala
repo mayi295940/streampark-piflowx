@@ -14,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.streampark.common.util
 
-import org.apache.streampark.common.util.ImplicitsUtils._
+import org.apache.streampark.common.util.Implicits._
 
 import java.io._
 import java.net.URL
@@ -25,9 +26,9 @@ import java.nio.channels.Channels
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
 import java.util
+import java.util.Scanner
 import java.util.stream.Collectors
 
-import scala.collection.convert.ImplicitConversions._
 import scala.collection.mutable
 
 object FileUtils {
@@ -36,7 +37,7 @@ object FileUtils {
     val stringBuilder = new mutable.StringBuilder
     if (src == null || src.length <= 0) return null
     for (i <- src.indices) {
-      val v: Int = src(i) & 0xff
+      val v: Int = src(i) & 0xFF
       val hv: String = Integer.toHexString(v).toUpperCase
       if (hv.length < 2) {
         stringBuilder.append(0)
@@ -50,12 +51,11 @@ object FileUtils {
     if (input == null) {
       throw new RuntimeException("The inputStream can not be null")
     }
-    input.autoClose(
-      in => {
-        val b = new Array[Byte](4)
-        in.read(b, 0, b.length)
-        bytesToHexString(b)
-      }) == "504B0304"
+    input.autoClose(in => {
+      val b = new Array[Byte](4)
+      in.read(b, 0, b.length)
+      bytesToHexString(b)
+    }) == "504B0304"
   }
 
   def isJarFileType(file: File): Boolean = {
@@ -79,7 +79,7 @@ object FileUtils {
       s"[StreamPark] Failed to create directory within $TEMP_DIR_ATTEMPTS  attempts (tried $baseName 0 to $baseName ${TEMP_DIR_ATTEMPTS - 1})")
   }
 
-  def mkdir(dir: File) = {
+  def mkdir(dir: File): Unit = {
     if (dir.exists && !dir.isDirectory) {
       throw new IOException(s"File $dir exists and is not a directory. Unable to create directory.")
     } else if (!dir.mkdirs) {
@@ -94,8 +94,7 @@ object FileUtils {
     val path = Option(System.getenv(env)).getOrElse(System.getProperty(env))
     AssertUtils.notNull(
       path,
-      s"[StreamPark] FileUtils.getPathFromEnv: $env is not set on system env"
-    )
+      s"[StreamPark] FileUtils.getPathFromEnv: $env is not set on system env")
     val file = new File(path)
     require(file.exists(), s"[StreamPark] FileUtils.getPathFromEnv: $env is not exist!")
     file.getAbsolutePath
@@ -114,7 +113,7 @@ object FileUtils {
     filename.drop(filename.lastIndexOf("."))
   }
 
-  def listFileAsURL(dirPath: String): util.List[URL] = {
+  def listFileAsURL(dirPath: String): JavaList[URL] = {
     new File(dirPath) match {
       case x if x.exists() && x.isDirectory =>
         val files = x.listFiles()
@@ -139,7 +138,10 @@ object FileUtils {
     file match {
       case null => false
       case f: File => f.isDirectory && f.list().length > 0
-      case p => new File(p.toString).isDirectory && new File(p.toString).list().length > 0
+      case p =>
+        new File(p.toString).isDirectory && new File(p.toString)
+          .list()
+          .length > 0
     }
   }
 
@@ -172,18 +174,17 @@ object FileUtils {
 
   @throws[IOException]
   def readInputStream(in: InputStream, array: Array[Byte]): Unit = {
-    in.autoClose(
-      is => {
-        var toRead = array.length
-        var ret = 0
-        var off = 0
-        while (toRead > 0) {
-          ret = is.read(array, off, toRead)
-          if (ret < 0) throw new IOException("Bad inputStream, premature EOF")
-          toRead -= ret
-          off += ret
-        }
-      })
+    in.autoClose(is => {
+      var toRead = array.length
+      var ret = 0
+      var off = 0
+      while (toRead > 0) {
+        ret = is.read(array, off, toRead)
+        if (ret < 0) throw new IOException("Bad inputStream, premature EOF")
+        toRead -= ret
+        off += ret
+      }
+    })
   }
 
   @throws[IOException]
@@ -195,11 +196,10 @@ object FileUtils {
       val array = new Array[Byte](len.toInt)
       Files
         .newInputStream(file.toPath)
-        .autoClose(
-          is => {
-            readInputStream(is, array)
-            new String(array, StandardCharsets.UTF_8)
-          })
+        .autoClose(is => {
+          readInputStream(is, array)
+          new String(array, StandardCharsets.UTF_8)
+        })
     }
   }
 
@@ -215,17 +215,16 @@ object FileUtils {
   @throws[IOException]
   def readEndOfFile(file: File, maxSize: Long): Array[Byte] = {
     var readSize = maxSize
-    new RandomAccessFile(file, "r").autoClose(
-      raFile => {
-        if (raFile.length > maxSize) {
-          raFile.seek(raFile.length - maxSize)
-        } else if (raFile.length < maxSize) {
-          readSize = raFile.length.toInt
-        }
-        val fileContent = new Array[Byte](readSize.toInt)
-        raFile.read(fileContent)
-        fileContent
-      })
+    new RandomAccessFile(file, "r").autoClose(raFile => {
+      if (raFile.length > maxSize) {
+        raFile.seek(raFile.length - maxSize)
+      } else if (raFile.length < maxSize) {
+        readSize = raFile.length.toInt
+      }
+      val fileContent = new Array[Byte](readSize.toInt)
+      raFile.read(fileContent)
+      fileContent
+    })
   }
 
   /**
@@ -250,14 +249,13 @@ object FileUtils {
       throw new IllegalArgumentException(
         s"The startOffset $startOffset is great than the file length ${file.length}")
     }
-    new RandomAccessFile(file, "r").autoClose(
-      raFile => {
-        val readSize = Math.min(maxSize, file.length - startOffset)
-        raFile.seek(startOffset)
-        val fileContent = new Array[Byte](readSize.toInt)
-        raFile.read(fileContent)
-        fileContent
-      })
+    new RandomAccessFile(file, "r").autoClose(raFile => {
+      val readSize = Math.min(maxSize, file.length - startOffset)
+      raFile.seek(startOffset)
+      val fileContent = new Array[Byte](readSize.toInt)
+      raFile.read(fileContent)
+      fileContent
+    })
   }
 
   /**
@@ -272,14 +270,34 @@ object FileUtils {
    * @return
    *   The content of the file.
    */
-  def tailOf(path: String, offset: Int, limit: Int): String = try {
+  def tailOf(path: String, offset: Int, limit: Int): String = {
     val file = new File(path)
     if (file.exists && file.isFile) {
       Files
         .lines(Paths.get(path))
-        .autoClose(stream => stream.skip(offset).limit(limit).collect(Collectors.joining("\r\n")))
+        .autoClose(stream =>
+          stream
+            .skip(offset)
+            .limit(limit)
+            .collect(Collectors.joining("\r\n")))
+    } else null
+  }
+
+  @throws[IOException]
+  def readString(file: File): String = {
+    require(file != null && file.isFile)
+    val reader = new FileReader(file)
+    val scanner = new Scanner(reader)
+    val buffer = new mutable.StringBuilder()
+    if (scanner.hasNextLine) {
+      buffer.append(scanner.nextLine())
     }
-    null
+    while (scanner.hasNextLine) {
+      buffer.append("\r\n")
+      buffer.append(scanner.nextLine())
+    }
+    Utils.close(scanner, reader)
+    buffer.toString()
   }
 
 }

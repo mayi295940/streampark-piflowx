@@ -14,11 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.streampark.common.util
 
 import org.junit.jupiter.api.{Assertions, Test}
-
-import scala.language.postfixOps
 
 class PropertiesUtilsTestCase {
 
@@ -41,7 +40,7 @@ class PropertiesUtilsTestCase {
         "--sink-conf sink.label-prefix=label" +
         "--table-conf replication_num=1"
     val programArgs = PropertiesUtils.extractArguments(args)
-    println(programArgs)
+    Assertions.assertTrue(programArgs.contains("username=root"))
   }
 
   @Test def testDynamicProperties(): Unit = {

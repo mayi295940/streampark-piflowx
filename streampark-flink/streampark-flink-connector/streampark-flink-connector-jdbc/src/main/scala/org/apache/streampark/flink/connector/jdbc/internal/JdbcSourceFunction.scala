@@ -33,9 +33,7 @@ import org.apache.flink.streaming.api.functions.source.SourceFunction.SourceCont
 import java.lang
 import java.util.Properties
 
-import scala.collection.JavaConverters._
 import scala.collection.Map
-import scala.collection.convert.ImplicitConversions._
 import scala.util.{Success, Try}
 
 class JdbcSourceFunction[R: TypeInformation](apiType: ApiType = ApiType.scala, jdbc: Properties)
@@ -109,7 +107,7 @@ class JdbcSourceFunction[R: TypeInformation](apiType: ApiType = ApiType.scala, j
               val sql = javaSqlFunc.query(last)
               val result: List[Map[String, _]] = JdbcUtils.select(sql)(jdbc)
               javaResultFunc
-                .result(result.map(_.asJava))
+                .result(result.map(_))
                 .foreach(
                   x => {
                     last = x

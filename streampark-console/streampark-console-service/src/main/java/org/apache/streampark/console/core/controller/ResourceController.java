@@ -25,8 +25,6 @@ import org.apache.streampark.console.core.service.ResourceService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -42,64 +40,57 @@ import javax.validation.Valid;
 
 import java.util.List;
 
-@Tag(name = "RESOURCE_TAG")
 @Slf4j
 @Validated
 @RestController
 @RequestMapping("resource")
 public class ResourceController {
 
-  @Autowired private ResourceService resourceService;
+    @Autowired
+    private ResourceService resourceService;
 
-  @Operation(summary = "add resource")
-  @PostMapping("add")
-  @RequiresPermissions("resource:add")
-  public RestResponse addResource(@Valid Resource resource) throws Exception {
-    this.resourceService.addResource(resource);
-    return RestResponse.success();
-  }
+    @PostMapping("add")
+    @RequiresPermissions("resource:add")
+    public RestResponse addResource(@Valid Resource resource) throws Exception {
+        this.resourceService.addResource(resource);
+        return RestResponse.success();
+    }
 
-  @Operation(summary = "check resource")
-  @PostMapping("check")
-  public RestResponse checkResource(@Valid Resource resource) throws Exception {
-    return this.resourceService.checkResource(resource);
-  }
+    @PostMapping("check")
+    public RestResponse checkResource(@Valid Resource resource) throws Exception {
+        return this.resourceService.checkResource(resource);
+    }
 
-  @Operation(summary = "List resources")
-  @PostMapping("page")
-  public RestResponse page(RestRequest restRequest, Resource resource) {
-    IPage<Resource> page = resourceService.getPage(resource, restRequest);
-    return RestResponse.success(page);
-  }
+    @PostMapping("page")
+    public RestResponse page(RestRequest restRequest, Resource resource) {
+        IPage<Resource> page = resourceService.getPage(resource, restRequest);
+        return RestResponse.success(page);
+    }
 
-  @Operation(summary = "Update resource")
-  @PutMapping("update")
-  @RequiresPermissions("resource:update")
-  public RestResponse updateResource(@Valid Resource resource) {
-    resourceService.updateResource(resource);
-    return RestResponse.success();
-  }
+    @PutMapping("update")
+    @RequiresPermissions("resource:update")
+    public RestResponse updateResource(@Valid Resource resource) {
+        resourceService.updateResource(resource);
+        return RestResponse.success();
+    }
 
-  @Operation(summary = "Delete resource")
-  @DeleteMapping("delete")
-  @RequiresPermissions("resource:delete")
-  public RestResponse deleteResource(@Valid Resource resource) {
-    this.resourceService.remove(resource.getId());
-    return RestResponse.success();
-  }
+    @DeleteMapping("delete")
+    @RequiresPermissions("resource:delete")
+    public RestResponse deleteResource(@Valid Resource resource) {
+        this.resourceService.remove(resource.getId());
+        return RestResponse.success();
+    }
 
-  @Operation(summary = "List resource")
-  @PostMapping("list")
-  public RestResponse listResource(@RequestParam Long teamId) {
-    List<Resource> resourceList = resourceService.listByTeamId(teamId);
-    return RestResponse.success(resourceList);
-  }
+    @PostMapping("list")
+    public RestResponse listResource(@RequestParam Long teamId) {
+        List<Resource> resourceList = resourceService.listByTeamId(teamId);
+        return RestResponse.success(resourceList);
+    }
 
-  @Operation(summary = "Upload the resource jar")
-  @PostMapping("upload")
-  @RequiresPermissions("resource:add")
-  public RestResponse upload(MultipartFile file) throws Exception {
-    String uploadPath = resourceService.upload(file);
-    return RestResponse.success(uploadPath);
-  }
+    @PostMapping("upload")
+    @RequiresPermissions("resource:add")
+    public RestResponse upload(MultipartFile file) throws Exception {
+        String uploadPath = resourceService.upload(file);
+        return RestResponse.success(uploadPath);
+    }
 }

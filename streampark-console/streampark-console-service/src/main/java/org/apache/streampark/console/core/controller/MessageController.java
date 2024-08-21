@@ -24,8 +24,6 @@ import org.apache.streampark.console.core.enums.NoticeTypeEnum;
 import org.apache.streampark.console.core.service.MessageService;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -33,26 +31,24 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "MESSAGE_TAG")
 @Slf4j
 @Validated
 @RestController
 @RequestMapping("message")
 public class MessageController {
 
-  @Autowired private MessageService messageService;
+    @Autowired
+    private MessageService messageService;
 
-  @Operation(summary = "List notices")
-  @PostMapping("notice")
-  public RestResponse notice(Integer type, RestRequest request) {
-    NoticeTypeEnum noticeTypeEnum = NoticeTypeEnum.of(type);
-    IPage<Message> pages = messageService.getUnReadPage(noticeTypeEnum, request);
-    return RestResponse.success(pages);
-  }
+    @PostMapping("notice")
+    public RestResponse notice(Integer type, RestRequest request) {
+        NoticeTypeEnum noticeTypeEnum = NoticeTypeEnum.of(type);
+        IPage<Message> pages = messageService.getUnReadPage(noticeTypeEnum, request);
+        return RestResponse.success(pages);
+    }
 
-  @Operation(summary = "Delete notice")
-  @PostMapping("delnotice")
-  public RestResponse delNotice(Long id) {
-    return RestResponse.success(messageService.removeById(id));
-  }
+    @PostMapping("delete")
+    public RestResponse delete(Long id) {
+        return RestResponse.success(messageService.removeById(id));
+    }
 }

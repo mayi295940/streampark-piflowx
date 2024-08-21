@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.streampark.common.fs
 
 import org.apache.streampark.common.fs.LfsOperatorTest.withTempDir
@@ -25,8 +26,6 @@ import org.junit.jupiter.api.Test
 
 import java.io.{File, FileInputStream}
 import java.nio.file.{Files, Paths}
-
-import scala.language.implicitConversions
 
 object LfsOperatorTest {
 

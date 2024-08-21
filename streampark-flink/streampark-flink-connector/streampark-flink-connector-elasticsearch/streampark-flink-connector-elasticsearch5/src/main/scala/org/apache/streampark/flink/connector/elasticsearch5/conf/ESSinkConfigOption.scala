@@ -19,11 +19,10 @@ package org.apache.streampark.flink.connector.elasticsearch5.conf
 
 import org.apache.streampark.common.conf.ConfigOption
 import org.apache.streampark.common.util.ConfigUtils
+import org.apache.streampark.common.util.Implicits._
 
 import java.net.InetSocketAddress
-import java.util.{Map => JavaMap, Properties}
-
-import scala.collection.JavaConverters._
+import java.util.Properties
 
 object ESSinkConfigOption {
   val ES_SINK_PREFIX = "es.sink"
@@ -70,7 +69,7 @@ class ESSinkConfigOption(prefixStr: String, properties: Properties) extends Seri
   )
 
   def getInternalConfig(): JavaMap[String, String] = {
-    ConfigUtils.getConf(prop.asScala.asJava, prefix)(alias = "").asScala.asJava
+    ConfigUtils.getConf(prop, prefix)(alias = "")
   }
 
 }

@@ -14,7 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.streampark.common.util
+
+import org.apache.streampark.common.util.Implicits._
 
 import org.apache.hc.client5.http.auth.{AuthSchemeFactory, AuthScope, Credentials, StandardAuthScheme}
 import org.apache.hc.client5.http.classic.methods.{HttpGet, HttpPost, HttpUriRequestBase}
@@ -31,9 +34,6 @@ import org.apache.hc.core5.net.URIBuilder
 
 import java.nio.charset.{Charset, StandardCharsets}
 import java.security.Principal
-import java.util.{List => JavaList, Map => JavaMap}
-
-import scala.collection.convert.ImplicitConversions._
 
 object HttpClientUtils {
 
@@ -47,7 +47,8 @@ object HttpClientUtils {
   }
 
   /** Get HttpClient with connection manager */
-  private[this] def getHttpClient = HttpClients.custom.setConnectionManager(connectionManager).build
+  private[this] def getHttpClient =
+    HttpClients.custom.setConnectionManager(connectionManager).build
 
   private[this] def getHttpGet(
       url: String,
@@ -121,7 +122,9 @@ object HttpClientUtils {
 
   private[this] def paramsToNameValuePairs(
       params: JavaMap[String, AnyRef]): JavaList[NameValuePair] = {
-    params.entrySet.map(p => new BasicNameValuePair(p.getKey, p.getValue.toString)).toList
+    params.entrySet
+      .map(p => new BasicNameValuePair(p.getKey, p.getValue.toString))
+      .toList
   }
 
   def httpAuthGetRequest(url: String, config: RequestConfig): String = {

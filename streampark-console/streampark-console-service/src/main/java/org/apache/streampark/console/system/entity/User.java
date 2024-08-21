@@ -18,6 +18,7 @@
 package org.apache.streampark.console.system.entity;
 
 import org.apache.streampark.common.Constant;
+import org.apache.streampark.console.base.mybatis.entity.BaseEntity;
 import org.apache.streampark.console.core.enums.LoginTypeEnum;
 import org.apache.streampark.console.core.enums.UserTypeEnum;
 
@@ -25,80 +26,78 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-import java.io.Serializable;
 import java.util.Date;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("t_user")
-public class User implements Serializable {
+public class User extends BaseEntity {
 
-  private static final long serialVersionUID = 1L;
-  /** user status */
-  public static final String STATUS_VALID = "1";
+    /** user status */
+    public static final String STATUS_VALID = "1";
 
-  public static final String STATUS_LOCK = "0";
+    public static final String STATUS_LOCK = "0";
 
-  public static final String SEX_MALE = "0";
+    public static final String SEX_MALE = "0";
 
-  public static final String SEX_FEMALE = "1";
+    public static final String SEX_FEMALE = "1";
 
-  public static final String SEX_UNKNOWN = "2";
+    public static final String SEX_UNKNOWN = "2";
 
-  public static final Integer DEFAULT_PASSWORD_LENGTH = 8;
+    public static final Integer DEFAULT_PASSWORD_LENGTH = 8;
 
-  @TableId(type = IdType.AUTO)
-  private Long userId;
+    public static final String DEFAULT_SECRET = "streampark";
 
-  @Size(min = 4, max = 20, message = "{range}")
-  private String username;
+    @TableId(type = IdType.AUTO)
+    private Long userId;
 
-  private String password;
+    @Size(min = 4, max = 20, message = "{range}")
+    private String username;
 
-  @Size(max = 50, message = "{noMoreThan}")
-  @Email(message = "{email}")
-  private String email;
+    private String password;
 
-  private UserTypeEnum userType;
+    @Size(max = 50, message = "{noMoreThan}")
+    @Email(message = "{email}")
+    private String email;
 
-  private LoginTypeEnum loginType;
+    private UserTypeEnum userType;
 
-  @NotBlank(message = "{required}")
-  private String status;
+    private LoginTypeEnum loginType;
 
-  private Date createTime;
+    @NotBlank(message = "{required}")
+    private String status;
 
-  private Date modifyTime;
+    private Date lastLoginTime;
 
-  private Date lastLoginTime;
+    @NotBlank(message = "{required}")
+    private String sex;
 
-  @NotBlank(message = "{required}")
-  private String sex;
+    @Size(max = 100, message = "{noMoreThan}")
+    private String description;
 
-  @Size(max = 100, message = "{noMoreThan}")
-  private String description;
+    private transient String oldPassword;
 
-  private transient String oldPassword;
+    private transient String createTimeFrom;
+    private transient String createTimeTo;
 
-  private transient String createTimeFrom;
-  private transient String createTimeTo;
+    private transient String id;
 
-  private transient String id;
+    private String salt;
 
-  private String salt;
+    private String nickName;
 
-  private String nickName;
+    /** The last set teamId */
+    private Long lastTeamId;
 
-  /** The last set teamId */
-  private Long lastTeamId;
-
-  public void dataMasking() {
-    String dataMask = Constant.DEFAULT_DATAMASK_STRING;
-    this.setPassword(dataMask);
-    this.setSalt(dataMask);
-  }
+    public void dataMasking() {
+        String dataMask = Constant.DEFAULT_DATAMASK_STRING;
+        this.setPassword(dataMask);
+        this.setSalt(dataMask);
+    }
 }

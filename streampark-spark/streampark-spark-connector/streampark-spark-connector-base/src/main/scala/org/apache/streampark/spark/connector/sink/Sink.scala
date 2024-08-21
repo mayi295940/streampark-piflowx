@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.streampark.spark.connector.sink
 
 import org.apache.streampark.common.util.Logger
@@ -43,16 +44,17 @@ trait Sink[T] extends Serializable with Logger {
     case (k, v) if k.startsWith(prefix) && Try(v.nonEmpty).getOrElse(false) =>
       Some(k.substring(prefix.length) -> v)
     case _ => None
-  } toMap
+  }.toMap
 
   def filterProp(
       param: Map[String, String],
-      overrided: Map[String, String],
+      overrides: Map[String, String],
       prefix: String = "",
       replacement: String = ""): Properties = {
     val p = new Properties()
-    val map = param ++ overrided
-    val filtered = if (prefix.isEmpty) map else map.filter(_._1.startsWith(prefix))
+    val map = param ++ overrides
+    val filtered =
+      if (prefix.isEmpty) map else map.filter(_._1.startsWith(prefix))
     filtered.foreach(x => p.put(x._1.replace(prefix, replacement), x._2))
     p
   }

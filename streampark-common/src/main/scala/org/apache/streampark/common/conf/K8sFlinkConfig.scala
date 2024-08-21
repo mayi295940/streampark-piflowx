@@ -20,57 +20,41 @@ package org.apache.streampark.common.conf
 /** Flink kubernetes Configuration for v1 version */
 object K8sFlinkConfig {
 
-  lazy val isV2Enabled: Boolean = InternalConfigHolder.get(ENABLE_V2)
-
-  val ENABLE_V2: InternalOption = InternalOption(
-    key = "streampark.flink-k8s.enable-v2",
-    defaultValue = false,
-    classType = classOf[java.lang.Boolean],
-    description =
-      "Whether to enable the v2 version(base on flink-kubernetes-operator) of flink kubernetes operation"
-  )
-
   //  ======= deprecated =======
-
-  @Deprecated
+  @deprecated
   val jobStatusTrackTaskTimeoutSec: InternalOption = InternalOption(
     key = "streampark.flink-k8s.tracking.polling-task-timeout-sec.job-status",
     defaultValue = 120L,
     classType = classOf[java.lang.Long],
-    description = "run timeout seconds of single flink-k8s metrics tracking task"
-  )
+    description = "run timeout seconds of single flink-k8s metrics tracking task")
 
-  @Deprecated
+  @deprecated
   val metricTrackTaskTimeoutSec: InternalOption = InternalOption(
     key = "streampark.flink-k8s.tracking.polling-task-timeout-sec.cluster-metric",
     defaultValue = 120L,
     classType = classOf[java.lang.Long],
-    description = "run timeout seconds of single flink-k8s job status tracking task"
-  )
+    description = "run timeout seconds of single flink-k8s job status tracking task")
 
-  @Deprecated
+  @deprecated
   val jobStatueTrackTaskIntervalSec: InternalOption = InternalOption(
     key = "streampark.flink-k8s.tracking.polling-interval-sec.job-status",
     defaultValue = 5L,
     classType = classOf[java.lang.Long],
-    description = "interval seconds between two single flink-k8s metrics tracking task"
-  )
+    description = "interval seconds between two single flink-k8s metrics tracking task")
 
-  @Deprecated
+  @deprecated
   val metricTrackTaskIntervalSec: InternalOption = InternalOption(
     key = "streampark.flink-k8s.tracking.polling-interval-sec.cluster-metric",
     defaultValue = 5L,
     classType = classOf[java.lang.Long],
-    description = "interval seconds between two single flink-k8s metrics tracking task"
-  )
+    description = "interval seconds between two single flink-k8s metrics tracking task")
 
-  @Deprecated
+  @deprecated
   val silentStateJobKeepTrackingSec: InternalOption = InternalOption(
     key = "streampark.flink-k8s.tracking.silent-state-keep-sec",
     defaultValue = 60,
     classType = classOf[java.lang.Integer],
-    description = "retained tracking time for SILENT state flink tasks"
-  )
+    description = "retained tracking time for SILENT state flink tasks")
 
   /**
    * If an ingress controller is specified in the configuration, the ingress class
@@ -81,11 +65,10 @@ object K8sFlinkConfig {
     key = "streampark.flink-k8s.ingress.class",
     defaultValue = "nginx",
     classType = classOf[java.lang.String],
-    description = "Direct ingress to the ingress controller."
-  )
+    description = "Direct ingress to the ingress controller.")
 
   /** kubernetes default namespace */
-  @Deprecated
+  @deprecated
   val DEFAULT_KUBERNETES_NAMESPACE = "default"
 
 }

@@ -17,9 +17,11 @@
 
 package org.apache.streampark.flink.core
 
+import org.apache.streampark.common.util.Implicits.JavaList
+
 import org.apache.flink.api.java.utils.ParameterTool
 import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}
-import org.apache.flink.table.api.{CompiledPlan, ExplainDetail, ExplainFormat, PlanReference, Schema, Table, TableDescriptor, TableResult}
+import org.apache.flink.table.api._
 import org.apache.flink.table.api.bridge.scala.{StreamStatementSet, StreamTableEnvironment}
 import org.apache.flink.table.catalog.CatalogDescriptor
 import org.apache.flink.table.connector.ChangelogMode
@@ -27,8 +29,6 @@ import org.apache.flink.table.module.ModuleEntry
 import org.apache.flink.table.resource.ResourceUri
 import org.apache.flink.table.types.AbstractDataType
 import org.apache.flink.types.Row
-
-import java.util.{List => JList}
 
 class StreamTableContext(
     override val parameter: ParameterTool,
@@ -39,7 +39,8 @@ class StreamTableContext(
   def this(args: (ParameterTool, StreamExecutionEnvironment, StreamTableEnvironment)) =
     this(args._1, args._2, args._3)
 
-  def this(args: StreamTableEnvConfig) = this(FlinkTableInitializer.initialize(args))
+  def this(args: StreamTableEnvConfig) =
+    this(FlinkTableInitializer.initialize(args))
 
   override def fromDataStream[T](dataStream: DataStream[T], schema: Schema): Table =
     tableEnv.fromDataStream[T](dataStream, schema)
@@ -59,7 +60,8 @@ class StreamTableContext(
   override def createTemporaryView[T](
       path: String,
       dataStream: DataStream[T],
-      schema: Schema): Unit = tableEnv.createTemporaryView[T](path, dataStream, schema)
+      schema: Schema): Unit =
+    tableEnv.createTemporaryView[T](path, dataStream, schema)
 
   override def toDataStream(table: Table): DataStream[Row] = {
     isConvertedToDataStream = true
@@ -94,9 +96,11 @@ class StreamTableContext(
     tableEnv.toChangelogStream(table, targetSchema, changelogMode)
   }
 
-  override def createStatementSet(): StreamStatementSet = tableEnv.createStatementSet()
+  override def createStatementSet(): StreamStatementSet =
+    tableEnv.createStatementSet()
 
-  override def useModules(strings: String*): Unit = tableEnv.useModules(strings: _*)
+  override def useModules(strings: String*): Unit =
+    tableEnv.useModules(strings: _*)
 
   override def createTemporaryTable(path: String, descriptor: TableDescriptor): Unit =
     tableEnv.createTemporaryTable(path, descriptor)
@@ -104,32 +108,36 @@ class StreamTableContext(
   override def createTable(path: String, descriptor: TableDescriptor): Unit =
     tableEnv.createTable(path, descriptor)
 
-  override def from(descriptor: TableDescriptor): Table = tableEnv.from(descriptor)
+  override def from(descriptor: TableDescriptor): Table =
+    tableEnv.from(descriptor)
 
-  override def listFullModules(): Array[ModuleEntry] = tableEnv.listFullModules()
+  override def listFullModules(): Array[ModuleEntry] =
+    tableEnv.listFullModules()
 
   /** @since 1.15 */
-  override def listTables(s: String, s1: String): Array[String] = tableEnv.listTables(s, s1)
+  override def listTables(s: String, s1: String): Array[String] =
+    tableEnv.listTables(s, s1)
 
   /** @since 1.15 */
   override def loadPlan(planReference: PlanReference): CompiledPlan =
     tableEnv.loadPlan(planReference)
 
   /** @since 1.15 */
-  override def compilePlanSql(s: String): CompiledPlan = tableEnv.compilePlanSql(s)
+  override def compilePlanSql(s: String): CompiledPlan =
+    tableEnv.compilePlanSql(s)
 
   /** @since 1.17 */
   override def createFunction(
       path: String,
       className: String,
-      resourceUris: JList[ResourceUri]): Unit =
+      resourceUris: JavaList[ResourceUri]): Unit =
     tableEnv.createFunction(path, className, resourceUris)
 
   /** @since 1.17 */
   override def createFunction(
       path: String,
       className: String,
-      resourceUris: JList[ResourceUri],
+      resourceUris: JavaList[ResourceUri],
       ignoreIfExists: Boolean): Unit =
     tableEnv.createFunction(path, className, resourceUris, ignoreIfExists)
 
@@ -137,14 +145,14 @@ class StreamTableContext(
   override def createTemporaryFunction(
       path: String,
       className: String,
-      resourceUris: JList[ResourceUri]): Unit =
+      resourceUris: JavaList[ResourceUri]): Unit =
     tableEnv.createTemporaryFunction(path, className, resourceUris)
 
   /** @since 1.17 */
   override def createTemporarySystemFunction(
       name: String,
       className: String,
-      resourceUris: JList[ResourceUri]): Unit =
+      resourceUris: JavaList[ResourceUri]): Unit =
     tableEnv.createTemporarySystemFunction(name, className, resourceUris)
 
   /** @since 1.17 */

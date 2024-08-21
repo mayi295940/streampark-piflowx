@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.streampark.common.util
 
+import org.apache.streampark.common.util.Implicits._
 import org.apache.streampark.common.util.Utils.isEmpty
 
 import javax.annotation.Nullable
 
 import java.util
-
-import scala.collection.convert.ImplicitConversions._
 
 /** @since 2.2.0 */
 object AssertUtils {
@@ -265,7 +265,8 @@ object AssertUtils {
     }
   }
 
-  private[this] def getHasLength(@Nullable str: String): Boolean = str != null && str.nonEmpty
+  private[this] def getHasLength(@Nullable str: String): Boolean =
+    str != null && str.nonEmpty
 
   private[this] def getHasText(@Nullable str: String): Boolean = {
     str != null && str.nonEmpty && containsText(str)

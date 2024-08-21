@@ -17,14 +17,15 @@
 
 package org.apache.streampark.console.system.service.impl;
 
+import org.apache.streampark.console.base.domain.Constant;
 import org.apache.streampark.console.base.domain.RestRequest;
 import org.apache.streampark.console.base.exception.ApiAlertException;
 import org.apache.streampark.console.base.mybatis.pager.MybatisPager;
 import org.apache.streampark.console.core.enums.UserTypeEnum;
-import org.apache.streampark.console.core.service.CommonService;
 import org.apache.streampark.console.core.service.ProjectService;
 import org.apache.streampark.console.core.service.VariableService;
 import org.apache.streampark.console.core.service.application.ApplicationInfoService;
+import org.apache.streampark.console.core.util.ServiceHelper;
 import org.apache.streampark.console.system.entity.Team;
 import org.apache.streampark.console.system.entity.User;
 import org.apache.streampark.console.system.mapper.TeamMapper;
@@ -42,7 +43,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,99 +51,100 @@ import java.util.Optional;
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
 public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements TeamService {
 
-  @Autowired private UserService userService;
+    @Autowired
+    private UserService userService;
 
-  @Autowired private ApplicationInfoService applicationInfoService;
+    @Autowired
+    private ApplicationInfoService applicationInfoService;
 
-  @Autowired private ProjectService projectService;
+    @Autowired
+    private ProjectService projectService;
 
-  @Autowired private MemberService memberService;
+    @Autowired
+    private MemberService memberService;
 
-  @Autowired private VariableService variableService;
+    @Autowired
+    private VariableService variableService;
 
-  @Autowired private CommonService commonService;
-
-  @Override
-  public IPage<Team> getPage(Team team, RestRequest request) {
-    Page<Team> page = MybatisPager.getPage(request);
-    return this.baseMapper.selectPage(page, team);
-  }
-
-  @Override
-  public Team getByName(String teamName) {
-    LambdaQueryWrapper<Team> queryWrapper =
-        new LambdaQueryWrapper<Team>().eq(Team::getTeamName, teamName);
-    return baseMapper.selectOne(queryWrapper);
-  }
-
-  @Override
-  public void createTeam(Team team) {
-    Team existedTeam = getByName(team.getTeamName());
-    ApiAlertException.throwIfFalse(
-        existedTeam == null,
-        String.format(
-            "Team name [%s] exists already. Create team failed. Please rename and try again.",
-            team.getTeamName()));
-    team.setId(null);
-    Date date = new Date();
-    team.setCreateTime(date);
-    team.setModifyTime(date);
-    this.save(team);
-  }
-
-  @Override
-  public void removeById(Long teamId) {
-    log.info("{} Proceed delete team[Id={}]", commonService.getCurrentUser().getUsername(), teamId);
-    Team team = this.getById(teamId);
-
-    ApiAlertException.throwIfNull(team, "The team[Id=%s] doesn't exist.", teamId);
-
-    ApiAlertException.throwIfTrue(
-        applicationInfoService.existsByTeamId(teamId),
-        "Please delete the applications under the team[name=%s] first!",
-        team.getTeamName());
-
-    ApiAlertException.throwIfTrue(
-        projectService.existsByTeamId(teamId),
-        "Please delete the projects under the team[name=%s] first!",
-        team.getTeamName());
-
-    ApiAlertException.throwIfTrue(
-        variableService.existsByTeamId(teamId),
-        "Please delete the variables under the team[name=%s] first!",
-        team.getTeamName());
-
-    memberService.removeByTeamId(teamId);
-    userService.clearLastTeam(teamId);
-    super.removeById(teamId);
-  }
-
-  @Override
-  public void updateTeam(Team team) {
-    Team oldTeam =
-        Optional.ofNullable(this.getById(team.getId()))
-            .orElseThrow(
-                () ->
-                    new IllegalArgumentException(
-                        String.format("Team id [id=%s] not found", team.getId())));
-    ApiAlertException.throwIfFalse(
-        oldTeam.getTeamName().equals(team.getTeamName()),
-        "Team name can't be changed. Update team failed.");
-    oldTeam.setDescription(team.getDescription());
-    oldTeam.setModifyTime(new Date());
-    updateById(oldTeam);
-  }
-
-  @Override
-  public List<Team> listByUserId(Long userId) {
-    User user =
-        Optional.ofNullable(userService.getById(userId))
-            .orElseThrow(
-                () -> new ApiAlertException(String.format("The userId [%s] not found.", userId)));
-    // Admin has the permission for all teams.
-    if (UserTypeEnum.ADMIN == user.getUserType()) {
-      return this.list();
+    @Override
+    public IPage<Team> getPage(Team team, RestRequest request) {
+        Page<Team> page = MybatisPager.getPage(request);
+        return this.baseMapper.selectPage(page, team);
     }
-    return baseMapper.selectTeamsByUserId(userId);
-  }
+
+    @Override
+    public Team getByName(String teamName) {
+        LambdaQueryWrapper<Team> queryWrapper = new LambdaQueryWrapper<Team>().eq(Team::getTeamName, teamName);
+        return baseMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public void createTeam(Team team) {
+        Team existedTeam = getByName(team.getTeamName());
+        ApiAlertException.throwIfFalse(
+            existedTeam == null,
+            String.format(
+                "Team name [%s] exists already. Create team failed. Please rename and try again.",
+                team.getTeamName()));
+        team.setId(null);
+        this.save(team);
+    }
+
+    @Override
+    public void removeById(Long teamId) {
+        log.info("{} Proceed delete team[Id={}]", ServiceHelper.getLoginUser().getUsername(), teamId);
+        Team team = this.getById(teamId);
+
+        ApiAlertException.throwIfNull(team, "The team[Id=%s] doesn't exist.", teamId);
+
+        ApiAlertException.throwIfTrue(
+            applicationInfoService.existsByTeamId(teamId),
+            "Please delete the applications under the team[name=%s] first!",
+            team.getTeamName());
+
+        ApiAlertException.throwIfTrue(
+            projectService.existsByTeamId(teamId),
+            "Please delete the projects under the team[name=%s] first!",
+            team.getTeamName());
+
+        ApiAlertException.throwIfTrue(
+            variableService.existsByTeamId(teamId),
+            "Please delete the variables under the team[name=%s] first!",
+            team.getTeamName());
+
+        memberService.removeByTeamId(teamId);
+        userService.clearLastTeam(teamId);
+        super.removeById(teamId);
+    }
+
+    @Override
+    public void updateTeam(Team team) {
+        Team oldTeam = Optional.ofNullable(this.getById(team.getId()))
+            .orElseThrow(
+                () -> new IllegalArgumentException(
+                    String.format("Team id [id=%s] not found", team.getId())));
+        ApiAlertException.throwIfFalse(
+            oldTeam.getTeamName().equals(team.getTeamName()),
+            "Team name can't be changed. Update team failed.");
+        oldTeam.setDescription(team.getDescription());
+        updateById(oldTeam);
+    }
+
+    @Override
+    public List<Team> listByUserId(Long userId) {
+        User user = Optional.ofNullable(userService.getById(userId))
+            .orElseThrow(
+                () -> new ApiAlertException(
+                    String.format("The userId [%s] not found.", userId)));
+        // Admin has the permission for all teams.
+        if (UserTypeEnum.ADMIN == user.getUserType()) {
+            return this.list();
+        }
+        return baseMapper.selectTeamsByUserId(userId);
+    }
+
+    @Override
+    public Team getSysDefaultTeam() {
+        return getById(Constant.DEFAULT_TEAM_ID);
+    }
 }

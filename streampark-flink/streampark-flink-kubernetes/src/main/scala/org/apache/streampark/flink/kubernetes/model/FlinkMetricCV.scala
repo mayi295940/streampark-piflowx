@@ -18,7 +18,6 @@
 package org.apache.streampark.flink.kubernetes.model
 
 /** flink cluster metric info */
-@Deprecated
 case class FlinkMetricCV(
     groupId: String = null,
     totalJmMemory: Integer = 0,
@@ -47,8 +46,7 @@ case class FlinkMetricCV(
           finishedJob + another.finishedJob,
           cancelledJob + another.cancelledJob,
           failedJob + another.failedJob,
-          pollAckTime = math.max(pollAckTime, another.pollAckTime)
-        )
+          pollAckTime = math.max(pollAckTime, another.pollAckTime))
       } else this
     }
   }

@@ -17,13 +17,13 @@
 
 package org.apache.streampark.flink.core
 
+import org.apache.streampark.common.util.Implicits.JavaList
+
 import org.apache.flink.api.java.utils.ParameterTool
-import org.apache.flink.table.api.{CompiledPlan, ExplainDetail, ExplainFormat, PlanReference, Table, TableDescriptor, TableEnvironment, TableResult}
+import org.apache.flink.table.api._
 import org.apache.flink.table.catalog.CatalogDescriptor
 import org.apache.flink.table.module.ModuleEntry
 import org.apache.flink.table.resource.ResourceUri
-
-import java.util.{List => JList}
 
 class TableContext(override val parameter: ParameterTool, private val tableEnv: TableEnvironment)
   extends FlinkTableTrait(parameter, tableEnv) {
@@ -32,7 +32,8 @@ class TableContext(override val parameter: ParameterTool, private val tableEnv: 
 
   def this(args: TableEnvConfig) = this(FlinkTableInitializer.initialize(args))
 
-  override def useModules(strings: String*): Unit = tableEnv.useModules(strings: _*)
+  override def useModules(strings: String*): Unit =
+    tableEnv.useModules(strings: _*)
 
   override def createTemporaryTable(path: String, descriptor: TableDescriptor): Unit = {
     tableEnv.createTemporaryTable(path, descriptor)
@@ -46,7 +47,8 @@ class TableContext(override val parameter: ParameterTool, private val tableEnv: 
     tableEnv.from(tableDescriptor)
   }
 
-  override def listFullModules(): Array[ModuleEntry] = tableEnv.listFullModules()
+  override def listFullModules(): Array[ModuleEntry] =
+    tableEnv.listFullModules()
 
   /** @since 1.15 */
   override def listTables(catalogName: String, databaseName: String): Array[String] =
@@ -57,20 +59,21 @@ class TableContext(override val parameter: ParameterTool, private val tableEnv: 
     tableEnv.loadPlan(planReference)
 
   /** @since 1.15 */
-  override def compilePlanSql(stmt: String): CompiledPlan = tableEnv.compilePlanSql(stmt)
+  override def compilePlanSql(stmt: String): CompiledPlan =
+    tableEnv.compilePlanSql(stmt)
 
   /** @since 1.17 */
   override def createFunction(
       path: String,
       className: String,
-      resourceUris: JList[ResourceUri]): Unit =
+      resourceUris: JavaList[ResourceUri]): Unit =
     tableEnv.createFunction(path, className, resourceUris)
 
   /** @since 1.17 */
   override def createFunction(
       path: String,
       className: String,
-      resourceUris: JList[ResourceUri],
+      resourceUris: JavaList[ResourceUri],
       ignoreIfExists: Boolean): Unit =
     tableEnv.createFunction(path, className, resourceUris, ignoreIfExists)
 
@@ -78,14 +81,14 @@ class TableContext(override val parameter: ParameterTool, private val tableEnv: 
   override def createTemporaryFunction(
       path: String,
       className: String,
-      resourceUris: JList[ResourceUri]): Unit =
+      resourceUris: JavaList[ResourceUri]): Unit =
     tableEnv.createTemporaryFunction(path, className, resourceUris)
 
   /** @since 1.17 */
   override def createTemporarySystemFunction(
       name: String,
       className: String,
-      resourceUris: JList[ResourceUri]): Unit =
+      resourceUris: JavaList[ResourceUri]): Unit =
     tableEnv.createTemporarySystemFunction(name, className, resourceUris)
 
   /** @since 1.17 */

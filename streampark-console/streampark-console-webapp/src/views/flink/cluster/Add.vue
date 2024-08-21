@@ -54,7 +54,7 @@
         if (status === 0) {
           const resp = await fetchCreateCluster(params);
           if (resp) {
-            Swal.fire({
+            await Swal.fire({
               icon: 'success',
               title: values.clusterName.concat(
                 t('setting.flinkCluster.operateMessage.createFlinkSessionClusterSuccessful'),
@@ -64,7 +64,7 @@
             });
             go('/flink/cluster');
           } else {
-            Swal.fire(
+            await Swal.fire(
               'Failed',
               t('setting.flinkCluster.operateMessage.createFlinkSessionClusterFailed'),
               'error',

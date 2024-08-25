@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow.conf.bean
 
 import cn.piflow.{Constants, FlowImpl, Path}
@@ -55,46 +72,43 @@ class FlowBean[DataType] extends GroupEntryBean {
     // replace environment variable
     if (this.environmentVariable.keySet.nonEmpty) {
       val pattern = new Regex("\\$\\{+[^\\}]*\\}")
-      stopsList.foreach(
-        stopMap => {
-          val stopMutableMap = MMap(stopMap.toSeq: _*)
-          val stopPropertiesMap =
-            MapUtil.get(stopMutableMap, "properties").asInstanceOf[MMap[String, Any]]
-          stopPropertiesMap.keySet.foreach {
-            key =>
-              {
+      stopsList.foreach(stopMap => {
+        val stopMutableMap = MMap(stopMap.toSeq: _*)
+        val stopPropertiesMap =
+          MapUtil.get(stopMutableMap, "properties").asInstanceOf[MMap[String, Any]]
+        stopPropertiesMap.keySet.foreach {
+          key =>
+            {
 
-                val value = MapUtil.get(stopPropertiesMap, key).asInstanceOf[String]
+              val value = MapUtil.get(stopPropertiesMap, key).asInstanceOf[String]
 
-                val it = (pattern.findAllIn(value))
-                while (it.hasNext) {
-                  val item = it.next()
-                  val newValue =
-                    value.replace(item, MapUtil.get(environmentVariable, item).asInstanceOf[String])
-                  stopPropertiesMap(key) = newValue
-                  println(key + " -> " + newValue)
-                }
+              val it = (pattern.findAllIn(value))
+              while (it.hasNext) {
+                val item = it.next()
+                val newValue =
+                  value.replace(item, MapUtil.get(environmentVariable, item).asInstanceOf[String])
+                stopPropertiesMap(key) = newValue
+                println(key + " -> " + newValue)
               }
-          }
-          stopMutableMap("properties") = stopPropertiesMap.toMap
-          val stop = StopBean[DataType](this.name, stopMutableMap.toMap)
-          this.stops = stop +: this.stops
-        })
+            }
+        }
+        stopMutableMap("properties") = stopPropertiesMap.toMap
+        val stop = StopBean[DataType](this.name, stopMutableMap.toMap)
+        this.stops = stop +: this.stops
+      })
     } else { // no environment variables
-      stopsList.foreach(
-        stopMap => {
-          val stop = StopBean[DataType](this.name, stopMap)
-          this.stops = stop +: this.stops
-        })
+      stopsList.foreach(stopMap => {
+        val stop = StopBean[DataType](this.name, stopMap)
+        this.stops = stop +: this.stops
+      })
     }
 
     // construct PathBean List
     val pathsList = MapUtil.get(flowMap, "paths").asInstanceOf[List[Map[String, Any]]]
-    pathsList.foreach(
-      pathMap => {
-        val path = PathBean(pathMap)
-        this.paths = path +: this.paths
-      })
+    pathsList.foreach(pathMap => {
+      val path = PathBean(pathMap)
+      this.paths = path +: this.paths
+    })
 
   }
 
@@ -114,16 +128,14 @@ class FlowBean[DataType] extends GroupEntryBean {
     flow.setRunMode(this.runMode)
     flow.setEnvironment(this.environment)
 
-    this.stops.foreach(
-      stopBean => {
-        flow.addStop(stopBean.name, stopBean.constructStop())
-      })
+    this.stops.foreach(stopBean => {
+      flow.addStop(stopBean.name, stopBean.constructStop())
+    })
 
-    this.paths.foreach(
-      pathBean => {
-        flow.addPath(
-          Path.from(pathBean.from).via(pathBean.outport, pathBean.inport).to(pathBean.to))
-      })
+    this.paths.foreach(pathBean => {
+      flow.addPath(
+        Path.from(pathBean.from).via(pathBean.outport, pathBean.inport).to(pathBean.to))
+    })
 
     if (!this.checkpoint.equals("")) {
       val checkpointList = this.checkpoint.split(Constants.COMMA)

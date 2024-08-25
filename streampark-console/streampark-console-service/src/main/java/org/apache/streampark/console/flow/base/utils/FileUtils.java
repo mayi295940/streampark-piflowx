@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.streampark.console.flow.base.utils;
 
 import org.apache.streampark.console.flow.common.constant.MessageConfig;
@@ -52,502 +69,503 @@ import java.util.Map;
 
 public class FileUtils {
 
-  /** Introducing logs, note that they are all packaged under "org.slf4j" */
-  private static final Logger logger = LoggerUtil.getLogger();
+    /** Introducing logs, note that they are all packaged under "org.slf4j" */
+    private static final Logger logger = LoggerUtil.getLogger();
 
-  public static String CSV_TITLE_KEY = "CSV_TITLE";
-  public static String CSV_DATA_KEY = "CSV_DATA";
+    public static String CSV_TITLE_KEY = "CSV_TITLE";
+    public static String CSV_DATA_KEY = "CSV_DATA";
 
-  /**
-   * String to "xml" file and save the specified path
-   *
-   * @param xmlStr xml string
-   * @param fileName File name
-   * @param path (Storage path)
-   * @return
-   */
-  @SuppressWarnings("deprecation")
-  public static String createXml(String xmlStr, String fileName, String path) {
-    CheckPathUtils.isChartPathExist(path);
-    Document doc = strToDocument(xmlStr);
-    String realPath = path + fileName + ".xml";
-    logger.debug(
-        "============Entry Generation Method：" + new Date().toLocaleString() + "=================");
-    try {
-      // Determine if the file exists, delete it if it exists
-      File file = new File(realPath);
-      if (!file.getParentFile().exists()) {
-        // Create if it does not exist
-        boolean mkdirs = file.getParentFile().mkdirs();
-        if (mkdirs) {
-          logger.info("File created successfully");
+    /**
+     * String to "xml" file and save the specified path
+     *
+     * @param xmlStr xml string
+     * @param fileName File name
+     * @param path (Storage path)
+     * @return
+     */
+    @SuppressWarnings("deprecation")
+    public static String createXml(String xmlStr, String fileName, String path) {
+        CheckPathUtils.isChartPathExist(path);
+        Document doc = strToDocument(xmlStr);
+        String realPath = path + fileName + ".xml";
+        logger.debug(
+            "============Entry Generation Method：" + new Date().toLocaleString() + "=================");
+        try {
+            // Determine if the file exists, delete it if it exists
+            File file = new File(realPath);
+            if (!file.getParentFile().exists()) {
+                // Create if it does not exist
+                boolean mkdirs = file.getParentFile().mkdirs();
+                if (mkdirs) {
+                    logger.info("File created successfully");
+                }
+                logger.info("==============File directory does not exist, new file==============");
+            }
+            // Write the contents of the document to the file
+            TransformerFactory tFactory = TransformerFactory.newInstance();
+            Transformer transformer = tFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(new FileOutputStream(realPath));
+            transformer.transform(source, result);
+            logger.info(
+                "--------------------------------"
+                    + "Update file successfully"
+                    + "-------------------------------------");
+        } catch (final Exception exception) {
+            logger.error("update " + fileName + " error ：", exception);
         }
-        logger.info("==============File directory does not exist, new file==============");
-      }
-      // Write the contents of the document to the file
-      TransformerFactory tFactory = TransformerFactory.newInstance();
-      Transformer transformer = tFactory.newTransformer();
-      transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-      DOMSource source = new DOMSource(doc);
-      StreamResult result = new StreamResult(new FileOutputStream(realPath));
-      transformer.transform(source, result);
-      logger.info(
-          "--------------------------------"
-              + "Update file successfully"
-              + "-------------------------------------");
-    } catch (final Exception exception) {
-      logger.error("update " + fileName + " error ：", exception);
-    }
-    logger.debug(
-        "============Exit Generation Method：" + new Date().toLocaleString() + "=================");
-    return realPath;
-  }
-
-  /** Generate JSON format file */
-  public static String createJsonFile(String jsonString, String fileName, String filePath) {
-
-    // Full path of splicing file
-    // String fullPath = filePath + File.separator + fileName + ".json";
-    String fullPath = filePath + fileName + ".json";
-
-    // Generate JSON format file
-    try {
-      // Make sure to create a new file
-      File file = new File(fullPath);
-      if (!file.getParentFile()
-          .exists()) { // If the parent directory does not exist, create the parent directory
-        file.getParentFile().mkdirs();
-      }
-      if (file.exists()) { // If it already exists, delete the old file
-        file.delete();
-      }
-      file.createNewFile();
-
-      // 将格式化后的字符串写入文件
-      Writer write = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
-      write.write(jsonString);
-      write.flush();
-      write.close();
-    } catch (Exception e) {
-      fullPath = "";
-      e.printStackTrace();
+        logger.debug(
+            "============Exit Generation Method：" + new Date().toLocaleString() + "=================");
+        return realPath;
     }
 
-    // 返回是否成功的标记
-    return fullPath;
-  }
+    /** Generate JSON format file */
+    public static String createJsonFile(String jsonString, String fileName, String filePath) {
 
-  /**
-   * Uploading method
-   *
-   * @param file
-   * @param path
-   * @return
-   */
-  public static String upload(MultipartFile file, String path) {
-    return JsonUtils.toJsonNoException(uploadRtnMap(file, path, null));
-  }
+        // Full path of splicing file
+        // String fullPath = filePath + File.separator + fileName + ".json";
+        String fullPath = filePath + fileName + ".json";
 
-  public static Map<String, Object> uploadRtnMap(
-      MultipartFile file, String path, String saveFileName) {
-    if (file.isEmpty()) {
-      return ReturnMapUtils.setFailedMsg(MessageConfig.UPLOAD_FAILED_FILE_EMPTY_MSG());
-    }
-    CheckPathUtils.isChartPathExist(path);
-    // file name
-    String fileName = file.getOriginalFilename();
-    String[] fileNameSplit = fileName.split("\\.");
-    if (saveFileName == null) {
-      if (fileNameSplit.length > 0) {
-        saveFileName = UUIDUtils.getUUID32() + "." + fileNameSplit[fileNameSplit.length - 1];
-      }
-    }
-    if (StringUtils.isBlank(saveFileName)) {
-      saveFileName = UUIDUtils.getUUID32();
-    }
-    File saveFile = new File(path + saveFileName);
-    if (!saveFile.getParentFile().exists()) {
-      boolean mkdirs = saveFile.getParentFile().mkdirs();
-      if (mkdirs) {
-        logger.info("File created successfully");
-      }
-    }
-    Map<String, Object> rtnMap = new HashMap<>();
-    rtnMap.put("code", 500);
-    try {
-      BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(saveFile));
-      out.write(file.getBytes());
-      out.flush();
-      out.close();
-      logger.debug(saveFile.getName() + " Upload success");
-      rtnMap.put("fileName", fileName);
-      rtnMap.put("saveFileName", saveFileName);
-      rtnMap.put("path", path + saveFileName);
-      rtnMap.put("msgInfo", "Upload success");
-      rtnMap.put("code", 200);
-    } catch (FileNotFoundException e) {
-      // e.printStackTrace();
-      rtnMap.put("msgInfo", "Upload failure");
-      logger.error("Upload failure,", e);
-    } catch (IOException e) {
-      // e.printStackTrace();
-      rtnMap.put("msgInfo", "Upload failure");
-      logger.error("Upload failure", e);
-    }
-    return rtnMap;
-  }
+        // Generate JSON format file
+        try {
+            // Make sure to create a new file
+            File file = new File(fullPath);
+            if (!file.getParentFile()
+                .exists()) { // If the parent directory does not exist, create the parent directory
+                file.getParentFile().mkdirs();
+            }
+            if (file.exists()) { // If it already exists, delete the old file
+                file.delete();
+            }
+            file.createNewFile();
 
-  /**
-   * String to "Document"
-   *
-   * @param xmlStr
-   * @return
-   */
-  public static Document strToDocument(String xmlStr) {
-    Document doc = null;
-    if (StringUtils.isBlank(xmlStr)) {
-      return null;
-    }
-    xmlStr = xmlStr.replace("&", "&amp;");
-    StringReader sr = new StringReader(xmlStr);
-    InputSource is = new InputSource(sr);
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    DocumentBuilder builder;
-    try {
-      builder = factory.newDocumentBuilder();
-      doc = builder.parse(is);
-    } catch (ParserConfigurationException e) {
-      logger.error("ParserConfiguration Error", e);
-    } catch (SAXException e) {
-      logger.error("SAX Error", e);
-    } catch (IOException e) {
-      logger.error("IO Error", e);
-    }
-    return doc;
-  }
-
-  /**
-   * Get project access path
-   *
-   * @return
-   */
-  public static String getUrl() {
-    HttpServletRequest request = getRequest();
-    String scheme = request.getScheme(); // http
-    String serverName = request.getServerName(); // localhost
-    int serverPort = request.getServerPort(); // 8080
-    String contextPath = request.getContextPath(); // projectName
-    return scheme + "://" + serverName + ":" + serverPort + contextPath;
-  }
-
-  /**
-   * Unified access to "request"
-   *
-   * @return
-   */
-  public static HttpServletRequest getRequest() {
-    RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-    if (requestAttributes != null) {
-      return (HttpServletRequest)
-          requestAttributes.resolveReference(RequestAttributes.REFERENCE_REQUEST);
-    }
-    return null;
-  }
-
-  public static String fileToString(File fileStr) {
-    String fileString = "";
-    if (null == fileStr) {
-      return fileString;
-    }
-    byte[] strBuffer = null;
-    InputStream in;
-    try {
-      int flen;
-      in = new FileInputStream(fileStr);
-      flen = (int) fileStr.length();
-      strBuffer = new byte[flen];
-      in.read(strBuffer, 0, flen);
-      in.close();
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-      logger.error("FileNotFound Error", e);
-    } catch (IOException e) {
-      logger.error("Conversion IO Error", e);
-      e.printStackTrace();
-    }
-    if (null != strBuffer) {
-      try {
-        fileString =
-            new String(
-                strBuffer, "UTF-8"); // When constructing ‘String’, you can use the ‘byte[]’ type.
-      } catch (UnsupportedEncodingException e) {
-        e.printStackTrace();
-      }
-      logger.info(" file converted string：" + fileString);
-    }
-    return fileString;
-  }
-
-  /**
-   * file conversion string
-   *
-   * @param path
-   * @return
-   */
-  public static String FileToStrByAbsolutePath(String path) {
-    if (StringUtils.isBlank(path)) {
-      return null;
-    }
-    File file = new File(path);
-    return fileToString(file);
-  }
-
-  public static String FileToStrByRelativePath(String path) {
-    String fileString = "";
-    try {
-      File file = ResourceUtils.getFile("classpath:" + path);
-      fileString = fileToString(file);
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-      logger.error("FileNotFound Error", e);
-    }
-    logger.info(" file converted string：" + fileString);
-    return fileString;
-  }
-
-  public static void downloadFileResponse(
-      HttpServletResponse response, String fileName, String filePath) {
-    try {
-      // Download local files
-      // Read to the stream
-      InputStream inStream = new FileInputStream(filePath); // File storage path
-      // Format the output
-      response.reset();
-      response.setContentType("bin");
-      response.addHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-      // Loop out the data in the stream
-      byte[] b = new byte[100];
-      int len;
-
-      while ((len = inStream.read(b)) > 0) response.getOutputStream().write(b, 0, len);
-      inStream.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  public static void downloadFile(HttpServletResponse response, String fileName, String filePath) {
-    try {
-      // Download local files
-      // Read to the stream
-      InputStream inStream = new FileInputStream(filePath); // File storage path
-      // Format the output
-      response.reset();
-      response.addHeader("Access-Control-Allow-Origin", "*");
-      response.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-      response.setContentType("bin");
-      response.addHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-      // Loop out the data in the stream
-      byte[] b = new byte[100];
-      int len;
-
-      while ((len = inStream.read(b)) > 0) {
-        response.getOutputStream().write(b, 0, len);
-        // IOUtils.write(b, response.getOutputStream());
-      }
-      inStream.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  /**
-   * Delete folder (force delete)
-   *
-   * @param path
-   */
-  public static void deleteAllFilesOfDir(File path) {
-    if (null != path) {
-      if (!path.exists()) return;
-      if (path.isFile()) {
-        boolean result = path.delete();
-        int tryCount = 0;
-        while (!result && tryCount++ < 10) {
-          System.gc(); // Recycling resources
-          result = path.delete();
+            // 将格式化后的字符串写入文件
+            Writer write = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+            write.write(jsonString);
+            write.flush();
+            write.close();
+        } catch (Exception e) {
+            fullPath = "";
+            e.printStackTrace();
         }
-      }
-      File[] files = path.listFiles();
-      if (null != files) {
-        for (int i = 0; i < files.length; i++) {
-          deleteAllFilesOfDir(files[i]);
+
+        // 返回是否成功的标记
+        return fullPath;
+    }
+
+    /**
+     * Uploading method
+     *
+     * @param file
+     * @param path
+     * @return
+     */
+    public static String upload(MultipartFile file, String path) {
+        return JsonUtils.toJsonNoException(uploadRtnMap(file, path, null));
+    }
+
+    public static Map<String, Object> uploadRtnMap(
+                                                   MultipartFile file, String path, String saveFileName) {
+        if (file.isEmpty()) {
+            return ReturnMapUtils.setFailedMsg(MessageConfig.UPLOAD_FAILED_FILE_EMPTY_MSG());
         }
-      }
-      path.delete();
-    }
-  }
-
-  /**
-   * deleteFile
-   *
-   * @param pathname
-   * @return
-   * @throws IOException
-   */
-  public static boolean deleteFile(String pathname) {
-    boolean result = false;
-    File file = new File(pathname);
-    if (file.exists()) {
-      file.delete();
-      result = true;
-      System.out.println("The file has been deleted successfully");
-    }
-    return result;
-  }
-
-  /**
-   * file conversion string
-   *
-   * @param url
-   * @param delimiter
-   * @param header
-   * @return
-   * @throws Exception
-   */
-  public static Map<String, Object> ParseCsvFile(String url, String delimiter, String header)
-      throws Exception {
-    if (StringUtils.isBlank(url) || StringUtils.isBlank(delimiter)) {
-      return null;
-    }
-    String[] headerArr = null;
-    if (StringUtils.isNotBlank(header)) {
-      headerArr = header.split(",");
-    }
-    Map<String, Object> rtnMap = new HashMap<>();
-    File csv = new File(url);
-    BufferedReader br = null;
-    try {
-      br = new BufferedReader(new FileReader(csv));
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    }
-    String line = "";
-    String everyLine = "";
-    try {
-      List<String[]> dataList = new ArrayList<>();
-      while ((line = br.readLine()) != null) {
-        everyLine = line;
-        if (StringUtils.isBlank(everyLine)) {
-          continue;
+        CheckPathUtils.isChartPathExist(path);
+        // file name
+        String fileName = file.getOriginalFilename();
+        String[] fileNameSplit = fileName.split("\\.");
+        if (saveFileName == null) {
+            if (fileNameSplit.length > 0) {
+                saveFileName = UUIDUtils.getUUID32() + "." + fileNameSplit[fileNameSplit.length - 1];
+            }
         }
-        String[] split = everyLine.split(delimiter);
-        dataList.add(split);
-      }
-
-      if (dataList.size() > 0) {
-        if (null != headerArr) {
-          rtnMap.put(FileUtils.CSV_TITLE_KEY, headerArr);
-        } else {
-          String[] title = dataList.get(0);
-          rtnMap.put(FileUtils.CSV_TITLE_KEY, title);
-          dataList.remove(0);
+        if (StringUtils.isBlank(saveFileName)) {
+            saveFileName = UUIDUtils.getUUID32();
         }
-        rtnMap.put(FileUtils.CSV_DATA_KEY, dataList);
-      }
-    } catch (IOException e) {
-      throw new Exception("Parse failed");
-    }
-    return rtnMap;
-  }
-
-  /**
-   * file conversion string
-   *
-   * @param url
-   * @param delimiter
-   * @param header
-   * @return
-   * @throws Exception
-   */
-  @SuppressWarnings("unchecked")
-  public static LinkedHashMap<String, List<String>> ParseCsvFileRtnColumnData(
-      String url, String delimiter, String header) throws Exception {
-    Map<String, Object> parseCsvFile = ParseCsvFile(url, delimiter, header);
-    if (null == parseCsvFile) {
-      return null;
-    }
-    Object csv_title = parseCsvFile.get(FileUtils.CSV_TITLE_KEY);
-    Object csv_data = parseCsvFile.get(FileUtils.CSV_DATA_KEY);
-    if (null == csv_title || null == csv_data) {
-      return null;
-    }
-    String[] csvTitleArray = (String[]) csv_title;
-    List<String[]> csvDataList = (List<String[]>) csv_data;
-    LinkedHashMap<String, List<String>> csvDataMap = new LinkedHashMap<>();
-    Map<Integer, String> csvDataNumber = new HashMap<>();
-    for (int i = 0; i < csvTitleArray.length; i++) {
-      String string = csvTitleArray[i];
-      csvDataMap.put(string, null);
-      csvDataNumber.put(i, string);
-    }
-    for (String[] csvData : csvDataList) {
-      if (null == csvData || csvData.length <= 0) {
-        continue;
-      }
-      for (int j = 0; j < csvData.length; j++) {
-        String title = csvDataNumber.get(j);
-        List<String> list = csvDataMap.get(title);
-        if (null == list) {
-          list = new ArrayList<>();
+        File saveFile = new File(path + saveFileName);
+        if (!saveFile.getParentFile().exists()) {
+            boolean mkdirs = saveFile.getParentFile().mkdirs();
+            if (mkdirs) {
+                logger.info("File created successfully");
+            }
         }
-        list.add(csvData[j]);
-        csvDataMap.put(title, list);
-      }
+        Map<String, Object> rtnMap = new HashMap<>();
+        rtnMap.put("code", 500);
+        try {
+            BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(saveFile));
+            out.write(file.getBytes());
+            out.flush();
+            out.close();
+            logger.debug(saveFile.getName() + " Upload success");
+            rtnMap.put("fileName", fileName);
+            rtnMap.put("saveFileName", saveFileName);
+            rtnMap.put("path", path + saveFileName);
+            rtnMap.put("msgInfo", "Upload success");
+            rtnMap.put("code", 200);
+        } catch (FileNotFoundException e) {
+            // e.printStackTrace();
+            rtnMap.put("msgInfo", "Upload failure");
+            logger.error("Upload failure,", e);
+        } catch (IOException e) {
+            // e.printStackTrace();
+            rtnMap.put("msgInfo", "Upload failure");
+            logger.error("Upload failure", e);
+        }
+        return rtnMap;
     }
-    return csvDataMap;
-  }
 
-  public static void writeData(String url, String data) throws IOException {
-    InputStream in =
-        org.apache.commons.io.IOUtils.toInputStream(data, StandardCharsets.UTF_8.name());
-    File file = new File(url);
-    if (!file.getParentFile().exists()) {
-      file.getParentFile().mkdirs();
+    /**
+     * String to "Document"
+     *
+     * @param xmlStr
+     * @return
+     */
+    public static Document strToDocument(String xmlStr) {
+        Document doc = null;
+        if (StringUtils.isBlank(xmlStr)) {
+            return null;
+        }
+        xmlStr = xmlStr.replace("&", "&amp;");
+        StringReader sr = new StringReader(xmlStr);
+        InputSource is = new InputSource(sr);
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder;
+        try {
+            builder = factory.newDocumentBuilder();
+            doc = builder.parse(is);
+        } catch (ParserConfigurationException e) {
+            logger.error("ParserConfiguration Error", e);
+        } catch (SAXException e) {
+            logger.error("SAX Error", e);
+        } catch (IOException e) {
+            logger.error("IO Error", e);
+        }
+        return doc;
     }
-    if (!file.exists()) {
-      file.createNewFile();
-    }
-    FileOutputStream out = new FileOutputStream(url);
-    IOUtils.copyBytes(in, out, 4096, true);
-    // close stream
-    in.close();
-    out.close();
-  }
 
-  public static String encryptToBase64(String filePath) {
-    if (filePath == null) {
-      return null;
+    /**
+     * Get project access path
+     *
+     * @return
+     */
+    public static String getUrl() {
+        HttpServletRequest request = getRequest();
+        String scheme = request.getScheme(); // http
+        String serverName = request.getServerName(); // localhost
+        int serverPort = request.getServerPort(); // 8080
+        String contextPath = request.getContextPath(); // projectName
+        return scheme + "://" + serverName + ":" + serverPort + contextPath;
     }
-    try {
-      byte[] b = Files.readAllBytes(Paths.get(filePath));
-      return Base64.getEncoder().encodeToString(b);
-    } catch (IOException e) {
-      logger.error("Encrypt to base64 error!! message:{}", e.getMessage());
-    }
-    return null;
-  }
 
-  public static String decryptByBase64(String base64, String filePath) {
-    if (base64 == null && filePath == null) {
-      return "Create file error! Please give data!!";
+    /**
+     * Unified access to "request"
+     *
+     * @return
+     */
+    public static HttpServletRequest getRequest() {
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null) {
+            return (HttpServletRequest) requestAttributes.resolveReference(RequestAttributes.REFERENCE_REQUEST);
+        }
+        return null;
     }
-    try {
-      Files.write(
-          Paths.get(filePath), Base64.getDecoder().decode(base64), StandardOpenOption.CREATE);
-    } catch (IOException e) {
-      e.printStackTrace();
+
+    public static String fileToString(File fileStr) {
+        String fileString = "";
+        if (null == fileStr) {
+            return fileString;
+        }
+        byte[] strBuffer = null;
+        InputStream in;
+        try {
+            int flen;
+            in = new FileInputStream(fileStr);
+            flen = (int) fileStr.length();
+            strBuffer = new byte[flen];
+            in.read(strBuffer, 0, flen);
+            in.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            logger.error("FileNotFound Error", e);
+        } catch (IOException e) {
+            logger.error("Conversion IO Error", e);
+            e.printStackTrace();
+        }
+        if (null != strBuffer) {
+            try {
+                fileString =
+                    new String(
+                        strBuffer, "UTF-8"); // When constructing ‘String’, you can use the ‘byte[]’ type.
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            logger.info(" file converted string：" + fileString);
+        }
+        return fileString;
     }
-    return "Create success!!";
-  }
+
+    /**
+     * file conversion string
+     *
+     * @param path
+     * @return
+     */
+    public static String FileToStrByAbsolutePath(String path) {
+        if (StringUtils.isBlank(path)) {
+            return null;
+        }
+        File file = new File(path);
+        return fileToString(file);
+    }
+
+    public static String FileToStrByRelativePath(String path) {
+        String fileString = "";
+        try {
+            File file = ResourceUtils.getFile("classpath:" + path);
+            fileString = fileToString(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            logger.error("FileNotFound Error", e);
+        }
+        logger.info(" file converted string：" + fileString);
+        return fileString;
+    }
+
+    public static void downloadFileResponse(
+                                            HttpServletResponse response, String fileName, String filePath) {
+        try {
+            // Download local files
+            // Read to the stream
+            InputStream inStream = new FileInputStream(filePath); // File storage path
+            // Format the output
+            response.reset();
+            response.setContentType("bin");
+            response.addHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+            // Loop out the data in the stream
+            byte[] b = new byte[100];
+            int len;
+
+            while ((len = inStream.read(b)) > 0)
+                response.getOutputStream().write(b, 0, len);
+            inStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void downloadFile(HttpServletResponse response, String fileName, String filePath) {
+        try {
+            // Download local files
+            // Read to the stream
+            InputStream inStream = new FileInputStream(filePath); // File storage path
+            // Format the output
+            response.reset();
+            response.addHeader("Access-Control-Allow-Origin", "*");
+            response.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+            response.setContentType("bin");
+            response.addHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+            // Loop out the data in the stream
+            byte[] b = new byte[100];
+            int len;
+
+            while ((len = inStream.read(b)) > 0) {
+                response.getOutputStream().write(b, 0, len);
+                // IOUtils.write(b, response.getOutputStream());
+            }
+            inStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Delete folder (force delete)
+     *
+     * @param path
+     */
+    public static void deleteAllFilesOfDir(File path) {
+        if (null != path) {
+            if (!path.exists())
+                return;
+            if (path.isFile()) {
+                boolean result = path.delete();
+                int tryCount = 0;
+                while (!result && tryCount++ < 10) {
+                    System.gc(); // Recycling resources
+                    result = path.delete();
+                }
+            }
+            File[] files = path.listFiles();
+            if (null != files) {
+                for (int i = 0; i < files.length; i++) {
+                    deleteAllFilesOfDir(files[i]);
+                }
+            }
+            path.delete();
+        }
+    }
+
+    /**
+     * deleteFile
+     *
+     * @param pathname
+     * @return
+     * @throws IOException
+     */
+    public static boolean deleteFile(String pathname) {
+        boolean result = false;
+        File file = new File(pathname);
+        if (file.exists()) {
+            file.delete();
+            result = true;
+            System.out.println("The file has been deleted successfully");
+        }
+        return result;
+    }
+
+    /**
+     * file conversion string
+     *
+     * @param url
+     * @param delimiter
+     * @param header
+     * @return
+     * @throws Exception
+     */
+    public static Map<String, Object> ParseCsvFile(String url, String delimiter, String header) throws Exception {
+        if (StringUtils.isBlank(url) || StringUtils.isBlank(delimiter)) {
+            return null;
+        }
+        String[] headerArr = null;
+        if (StringUtils.isNotBlank(header)) {
+            headerArr = header.split(",");
+        }
+        Map<String, Object> rtnMap = new HashMap<>();
+        File csv = new File(url);
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(csv));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String line = "";
+        String everyLine = "";
+        try {
+            List<String[]> dataList = new ArrayList<>();
+            while ((line = br.readLine()) != null) {
+                everyLine = line;
+                if (StringUtils.isBlank(everyLine)) {
+                    continue;
+                }
+                String[] split = everyLine.split(delimiter);
+                dataList.add(split);
+            }
+
+            if (dataList.size() > 0) {
+                if (null != headerArr) {
+                    rtnMap.put(FileUtils.CSV_TITLE_KEY, headerArr);
+                } else {
+                    String[] title = dataList.get(0);
+                    rtnMap.put(FileUtils.CSV_TITLE_KEY, title);
+                    dataList.remove(0);
+                }
+                rtnMap.put(FileUtils.CSV_DATA_KEY, dataList);
+            }
+        } catch (IOException e) {
+            throw new Exception("Parse failed");
+        }
+        return rtnMap;
+    }
+
+    /**
+     * file conversion string
+     *
+     * @param url
+     * @param delimiter
+     * @param header
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    public static LinkedHashMap<String, List<String>> ParseCsvFileRtnColumnData(
+                                                                                String url, String delimiter,
+                                                                                String header) throws Exception {
+        Map<String, Object> parseCsvFile = ParseCsvFile(url, delimiter, header);
+        if (null == parseCsvFile) {
+            return null;
+        }
+        Object csv_title = parseCsvFile.get(FileUtils.CSV_TITLE_KEY);
+        Object csv_data = parseCsvFile.get(FileUtils.CSV_DATA_KEY);
+        if (null == csv_title || null == csv_data) {
+            return null;
+        }
+        String[] csvTitleArray = (String[]) csv_title;
+        List<String[]> csvDataList = (List<String[]>) csv_data;
+        LinkedHashMap<String, List<String>> csvDataMap = new LinkedHashMap<>();
+        Map<Integer, String> csvDataNumber = new HashMap<>();
+        for (int i = 0; i < csvTitleArray.length; i++) {
+            String string = csvTitleArray[i];
+            csvDataMap.put(string, null);
+            csvDataNumber.put(i, string);
+        }
+        for (String[] csvData : csvDataList) {
+            if (null == csvData || csvData.length <= 0) {
+                continue;
+            }
+            for (int j = 0; j < csvData.length; j++) {
+                String title = csvDataNumber.get(j);
+                List<String> list = csvDataMap.get(title);
+                if (null == list) {
+                    list = new ArrayList<>();
+                }
+                list.add(csvData[j]);
+                csvDataMap.put(title, list);
+            }
+        }
+        return csvDataMap;
+    }
+
+    public static void writeData(String url, String data) throws IOException {
+        InputStream in =
+            org.apache.commons.io.IOUtils.toInputStream(data, StandardCharsets.UTF_8.name());
+        File file = new File(url);
+        if (!file.getParentFile().exists()) {
+            file.getParentFile().mkdirs();
+        }
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+        FileOutputStream out = new FileOutputStream(url);
+        IOUtils.copyBytes(in, out, 4096, true);
+        // close stream
+        in.close();
+        out.close();
+    }
+
+    public static String encryptToBase64(String filePath) {
+        if (filePath == null) {
+            return null;
+        }
+        try {
+            byte[] b = Files.readAllBytes(Paths.get(filePath));
+            return Base64.getEncoder().encodeToString(b);
+        } catch (IOException e) {
+            logger.error("Encrypt to base64 error!! message:{}", e.getMessage());
+        }
+        return null;
+    }
+
+    public static String decryptByBase64(String base64, String filePath) {
+        if (base64 == null && filePath == null) {
+            return "Create file error! Please give data!!";
+        }
+        try {
+            Files.write(
+                Paths.get(filePath), Base64.getDecoder().decode(base64), StandardOpenOption.CREATE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "Create success!!";
+    }
 }

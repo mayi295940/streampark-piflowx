@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow.bundle.spark.hbase
 
 import cn.piflow.{Constants, JobContext, JobInputStream, JobOutputStream, ProcessContext}
@@ -77,34 +94,30 @@ class ReadHbase extends ConfigurableStop[DataFrame] {
     val fields: Array[StructField] = newSchema.map(d => StructField(d, StringType, nullable = true))
     val dfSchema: StructType = StructType(fields)
 
-    val kv = hBaseRDD.map(
-      r => {
-        val rowkey = Bytes.toString(r._2.getRow)
-        val row = new ArrayBuffer[String]
-        row += rowkey
-        if (families.length == 1) {
-          schema.foreach(
-            c => {
-              val fields =
-                Bytes.toString(r._2.getValue(Bytes.toBytes(columnFamily), Bytes.toBytes(c)))
+    val kv = hBaseRDD.map(r => {
+      val rowkey = Bytes.toString(r._2.getRow)
+      val row = new ArrayBuffer[String]
+      row += rowkey
+      if (families.length == 1) {
+        schema.foreach(c => {
+          val fields =
+            Bytes.toString(r._2.getValue(Bytes.toBytes(columnFamily), Bytes.toBytes(c)))
+          row += fields
+        })
+      } else {
+        families.foreach(f => {
+          schema.foreach(c => {
+            val fields = Bytes.toString(r._2.getValue(Bytes.toBytes(f), Bytes.toBytes(c)))
+            if (fields == null) {
+              row
+            } else {
               row += fields
-            })
-        } else {
-          families.foreach(
-            f => {
-              schema.foreach(
-                c => {
-                  val fields = Bytes.toString(r._2.getValue(Bytes.toBytes(f), Bytes.toBytes(c)))
-                  if (fields == null) {
-                    row
-                  } else {
-                    row += fields
-                  }
-                })
-            })
-        }
-        Row.fromSeq(row.toArray.toSeq)
-      })
+            }
+          })
+        })
+      }
+      Row.fromSeq(row.toArray.toSeq)
+    })
     val df = spark.createDataFrame(kv, dfSchema)
 
     out.write(df)

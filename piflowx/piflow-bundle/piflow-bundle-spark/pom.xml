@@ -1,15 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.apache.streampark</groupId>
         <artifactId>piflow-bundle</artifactId>
         <version>2.2.0-SNAPSHOT</version>
     </parent>
-
-    <modelVersion>4.0.0</modelVersion>
     <artifactId>piflow-bundle-spark</artifactId>
 
     <dependencies>
@@ -20,84 +35,84 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>log4j-api</artifactId>
                     <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-api</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>avro</artifactId>
                     <groupId>org.apache.avro</groupId>
+                    <artifactId>avro</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-beanutils</artifactId>
                     <groupId>commons-beanutils</groupId>
+                    <artifactId>commons-beanutils</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-codec</artifactId>
                     <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.commons</groupId>
                     <artifactId>commons-compress</artifactId>
-                    <groupId>org.apache.commons</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-logging</artifactId>
                     <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-io</artifactId>
                     <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.commons</groupId>
                     <artifactId>commons-math3</artifactId>
-                    <groupId>org.apache.commons</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>curator-recipes</artifactId>
                     <groupId>org.apache.curator</groupId>
+                    <artifactId>curator-recipes</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>guava</artifactId>
                     <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>hadoop-annotations</artifactId>
                     <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-annotations</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jackson-databind</artifactId>
                     <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.codehaus.jackson</groupId>
                     <artifactId>jackson-core-asl</artifactId>
-                    <groupId>org.codehaus.jackson</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.codehaus.jackson</groupId>
                     <artifactId>jackson-mapper-asl</artifactId>
-                    <groupId>org.codehaus.jackson</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jaxb-api</artifactId>
                     <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jsr305</artifactId>
                     <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>jsr305</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>protobuf-java</artifactId>
                     <groupId>com.google.protobuf</groupId>
+                    <artifactId>protobuf-java</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>zookeeper</artifactId>
                     <groupId>org.apache.zookeeper</groupId>
+                    <artifactId>zookeeper</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.commons</groupId>
                     <artifactId>commons-lang3</artifactId>
-                    <groupId>org.apache.commons</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-text</artifactId>
                     <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-text</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -107,28 +122,28 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>commons-cli</artifactId>
                     <groupId>commons-cli</groupId>
+                    <artifactId>commons-cli</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jsr305</artifactId>
                     <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>jsr305</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>objenesis</artifactId>
                     <groupId>org.objenesis</groupId>
+                    <artifactId>objenesis</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>chill-java</artifactId>
                     <groupId>com.twitter</groupId>
+                    <artifactId>chill-java</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>httpclient</artifactId>
                     <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>lift-json_2.12</artifactId>
                     <groupId>net.liftweb</groupId>
+                    <artifactId>lift-json_2.12</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -138,12 +153,12 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>lift-json_2.12</artifactId>
                     <groupId>net.liftweb</groupId>
+                    <artifactId>lift-json_2.12</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>shapeless_2.12</artifactId>
                     <groupId>com.chuusai</groupId>
+                    <artifactId>shapeless_2.12</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -154,76 +169,76 @@
             <version>${spark.version}</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>commons-compress</artifactId>
                     <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-compress</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
                     <artifactId>jackson-databind</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>snappy-java</artifactId>
                     <groupId>org.xerial.snappy</groupId>
+                    <artifactId>snappy-java</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>curator-client</artifactId>
                     <groupId>org.apache.curator</groupId>
+                    <artifactId>curator-client</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-logging</artifactId>
                     <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jsr305</artifactId>
                     <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>jsr305</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jackson-core</artifactId>
                     <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>javassist</artifactId>
                     <groupId>org.javassist</groupId>
+                    <artifactId>javassist</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>io.netty</groupId>
                     <artifactId>netty-all</artifactId>
-                    <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>io.netty</groupId>
                     <artifactId>netty-buffer</artifactId>
-                    <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>io.netty</groupId>
                     <artifactId>netty-common</artifactId>
-                    <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>io.netty</groupId>
                     <artifactId>netty-transport</artifactId>
-                    <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>io.netty</groupId>
                     <artifactId>netty-transport-classes-epoll</artifactId>
-                    <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>io.netty</groupId>
                     <artifactId>netty-transport-native-unix-common</artifactId>
-                    <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>io.netty</groupId>
                     <artifactId>netty-transport-classes-kqueue</artifactId>
-                    <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>gson</artifactId>
                     <groupId>com.google.code.gson</groupId>
+                    <artifactId>gson</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>protobuf-java</artifactId>
                     <groupId>com.google.protobuf</groupId>
+                    <artifactId>protobuf-java</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>audience-annotations</artifactId>
                     <groupId>org.apache.yetus</groupId>
+                    <artifactId>audience-annotations</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -233,24 +248,24 @@
             <version>${spark.version}</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>protobuf-java</artifactId>
                     <groupId>com.google.protobuf</groupId>
+                    <artifactId>protobuf-java</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>snappy-java</artifactId>
                     <groupId>org.xerial.snappy</groupId>
+                    <artifactId>snappy-java</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>zstd-jni</artifactId>
                     <groupId>com.github.luben</groupId>
+                    <artifactId>zstd-jni</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jsr305</artifactId>
                     <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>jsr305</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jackson-databind</artifactId>
                     <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -260,68 +275,68 @@
             <version>${spark.version}</version>
             <exclusions>
                 <exclusion>
+                    <groupId>org.apache.commons</groupId>
                     <artifactId>commons-compress</artifactId>
-                    <groupId>org.apache.commons</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-lang</artifactId>
                     <groupId>commons-lang</groupId>
+                    <artifactId>commons-lang</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>io.dropwizard.metrics</groupId>
                     <artifactId>metrics-core</artifactId>
-                    <groupId>io.dropwizard.metrics</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jackson-databind</artifactId>
                     <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>joda-time</artifactId>
                     <groupId>joda-time</groupId>
+                    <artifactId>joda-time</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>io.dropwizard.metrics</groupId>
                     <artifactId>metrics-json</artifactId>
-                    <groupId>io.dropwizard.metrics</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>io.dropwizard.metrics</groupId>
                     <artifactId>metrics-jvm</artifactId>
-                    <groupId>io.dropwizard.metrics</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>antlr-runtime</artifactId>
                     <groupId>org.antlr</groupId>
+                    <artifactId>antlr-runtime</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-io</artifactId>
                     <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>ivy</artifactId>
                     <groupId>org.apache.ivy</groupId>
+                    <artifactId>ivy</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-dbcp</artifactId>
                     <groupId>commons-dbcp</groupId>
+                    <artifactId>commons-dbcp</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>derby</artifactId>
                     <groupId>org.apache.derby</groupId>
+                    <artifactId>derby</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>protobuf-java</artifactId>
                     <groupId>com.google.protobuf</groupId>
+                    <artifactId>protobuf-java</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>libthrift</artifactId>
                     <groupId>org.apache.thrift</groupId>
+                    <artifactId>libthrift</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-lang3</artifactId>
                     <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>httpclient</artifactId>
                     <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -341,8 +356,8 @@
             <version>${spark.version}</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>kafka-clients</artifactId>
                     <groupId>org.apache.kafka</groupId>
+                    <artifactId>kafka-clients</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -352,12 +367,12 @@
             <version>${mongo.version}</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>bson</artifactId>
                     <groupId>org.mongodb</groupId>
+                    <artifactId>bson</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>mongodb-driver-core</artifactId>
                     <groupId>org.mongodb</groupId>
+                    <artifactId>mongodb-driver-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -367,20 +382,20 @@
             <version>${spark.version}</version>
             <exclusions>
                 <exclusion>
+                    <groupId>dev.ludovic.netlib</groupId>
                     <artifactId>arpack</artifactId>
-                    <groupId>dev.ludovic.netlib</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>dev.ludovic.netlib</groupId>
                     <artifactId>blas</artifactId>
-                    <groupId>dev.ludovic.netlib</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>dev.ludovic.netlib</groupId>
                     <artifactId>lapack</artifactId>
-                    <groupId>dev.ludovic.netlib</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>scala-collection-compat_2.12</artifactId>
                     <groupId>org.scala-lang.modules</groupId>
+                    <artifactId>scala-collection-compat_2.12</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -390,20 +405,20 @@
             <artifactId>hbase-client</artifactId>
             <exclusions>
                 <exclusion>
-                    <artifactId>commons-lang3</artifactId>
                     <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>nimbus-jose-jwt</artifactId>
                     <groupId>com.nimbusds</groupId>
+                    <artifactId>nimbus-jose-jwt</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-metrics-api</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>hbase-metrics</artifactId>
                     <groupId>org.apache.hbase</groupId>
+                    <artifactId>hbase-metrics</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -414,88 +429,88 @@
             <version>2.5.5</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>commons-lang3</artifactId>
                     <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-codec</artifactId>
                     <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-io</artifactId>
                     <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-logging</artifactId>
                     <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jackson-databind</artifactId>
                     <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>protobuf-java</artifactId>
                     <groupId>com.google.protobuf</groupId>
+                    <artifactId>protobuf-java</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>avro</artifactId>
                     <groupId>org.apache.avro</groupId>
+                    <artifactId>avro</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>hadoop-annotations</artifactId>
                     <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-annotations</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-client</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-common</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-hadoop-compat</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-hadoop2-compat</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>metrics-core</artifactId>
                     <groupId>io.dropwizard.metrics</groupId>
+                    <artifactId>metrics-core</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-protocol</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-protocol-shaded</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>zookeeper</artifactId>
                     <groupId>org.apache.zookeeper</groupId>
+                    <artifactId>zookeeper</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>hbase-server</artifactId>
                     <groupId>org.apache.hbase</groupId>
+                    <artifactId>hbase-server</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>guava</artifactId>
                     <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jaxb-api</artifactId>
                     <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>com.sun.jersey</groupId>
                     <artifactId>jersey-server</artifactId>
-                    <groupId>com.sun.jersey</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jersey-json</artifactId>
                     <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-json</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -506,28 +521,28 @@
             <version>3.3.1_0.18.7</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>commons-compress</artifactId>
                     <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-compress</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
                     <artifactId>log4j-api</artifactId>
-                    <groupId>org.apache.logging.log4j</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
                     <artifactId>log4j-core</artifactId>
-                    <groupId>org.apache.logging.log4j</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.poi</groupId>
                     <artifactId>poi</artifactId>
-                    <groupId>org.apache.poi</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>xml-apis</artifactId>
                     <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>poi-ooxml</artifactId>
                     <groupId>org.apache.poi</groupId>
+                    <artifactId>poi-ooxml</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -538,28 +553,28 @@
             <version>8.3.3</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>protobuf-java</artifactId>
                     <groupId>com.google.protobuf</groupId>
+                    <artifactId>protobuf-java</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.spark</groupId>
                     <artifactId>spark-catalyst_2.12</artifactId>
-                    <groupId>org.apache.spark</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.spark</groupId>
                     <artifactId>spark-core_2.12</artifactId>
-                    <groupId>org.apache.spark</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.spark</groupId>
                     <artifactId>spark-sql_2.12</artifactId>
-                    <groupId>org.apache.spark</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.spark</groupId>
                     <artifactId>spark-streaming_2.12</artifactId>
-                    <groupId>org.apache.spark</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>spark-yarn_2.12</artifactId>
                     <groupId>org.apache.spark</groupId>
+                    <artifactId>spark-yarn_2.12</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -574,12 +589,12 @@
                     <artifactId>*</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>lz4-java</artifactId>
                     <groupId>org.lz4</groupId>
+                    <artifactId>lz4-java</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>httpclient</artifactId>
                     <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -608,24 +623,24 @@
             <version>7.2.0</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>commons-io</artifactId>
                     <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
                     <artifactId>httpmime</artifactId>
-                    <groupId>org.apache.httpcomponents</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jcl-over-slf4j</artifactId>
                     <groupId>org.slf4j</groupId>
+                    <artifactId>jcl-over-slf4j</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>zookeeper</artifactId>
                     <groupId>org.apache.zookeeper</groupId>
+                    <artifactId>zookeeper</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>httpclient</artifactId>
                     <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -660,8 +675,8 @@
             <version>2.1.8</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>commons-io</artifactId>
                     <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -678,8 +693,8 @@
             <version>2.1.8</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>commons-io</artifactId>
                     <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -709,8 +724,8 @@
             <version>0.11.0.1</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>snappy-java</artifactId>
                     <groupId>org.xerial.snappy</groupId>
+                    <artifactId>snappy-java</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -727,12 +742,12 @@
             <version>4.1.89.Final</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>netty-transport-native-epoll</artifactId>
                     <groupId>io.netty</groupId>
+                    <artifactId>netty-transport-native-epoll</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>netty-transport-native-kqueue</artifactId>
                     <groupId>io.netty</groupId>
+                    <artifactId>netty-transport-native-kqueue</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -743,20 +758,20 @@
             <version>2.5.5-hadoop3</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>commons-lang3</artifactId>
                     <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>nimbus-jose-jwt</artifactId>
                     <groupId>com.nimbusds</groupId>
+                    <artifactId>nimbus-jose-jwt</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-metrics-api</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>hbase-metrics</artifactId>
                     <groupId>org.apache.hbase</groupId>
+                    <artifactId>hbase-metrics</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -766,68 +781,68 @@
             <version>2.5.5-hadoop3</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>error_prone_annotations</artifactId>
                     <groupId>com.google.errorprone</groupId>
+                    <artifactId>error_prone_annotations</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-lang3</artifactId>
                     <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
                     <artifactId>jackson-annotations</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
                     <artifactId>jackson-databind</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>hadoop-mapreduce-client-core</artifactId>
                     <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-asyncfs</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-client</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>javassist</artifactId>
                     <groupId>org.javassist</groupId>
+                    <artifactId>javassist</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jackson-core</artifactId>
                     <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-metrics</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-metrics-api</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-replication</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-zookeeper</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>metrics-core</artifactId>
                     <groupId>io.dropwizard.metrics</groupId>
+                    <artifactId>metrics-core</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>protobuf-java</artifactId>
                     <groupId>com.google.protobuf</groupId>
+                    <artifactId>protobuf-java</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>zookeeper</artifactId>
                     <groupId>org.apache.zookeeper</groupId>
+                    <artifactId>zookeeper</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -846,12 +861,12 @@
             <classifier>jdk15</classifier>
             <exclusions>
                 <exclusion>
-                    <artifactId>commons-collections</artifactId>
                     <groupId>commons-collections</groupId>
+                    <artifactId>commons-collections</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-lang</artifactId>
                     <groupId>commons-lang</groupId>
+                    <artifactId>commons-lang</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -868,8 +883,8 @@
             <version>1.0.2</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>commons-lang3</artifactId>
                     <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -879,12 +894,12 @@
             <version>4.5.13</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>commons-codec</artifactId>
                     <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-logging</artifactId>
                     <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -894,8 +909,8 @@
             <version>4.5.13</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>httpclient</artifactId>
                     <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -913,8 +928,8 @@
             <version>2.0.36</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>guava</artifactId>
                     <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -957,10 +972,10 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                        <phase>package</phase>
                         <configuration>
                             <filters>
                                 <filter>

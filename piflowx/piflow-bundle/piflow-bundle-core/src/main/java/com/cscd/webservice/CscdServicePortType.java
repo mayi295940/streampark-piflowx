@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.cscd.webservice;
 
 import javax.jws.Oneway;
@@ -21,125 +38,73 @@ import java.io.Serializable;
 @XmlSeeAlso({ObjectFactory.class})
 public interface CscdServicePortType extends Serializable {
 
-  @WebMethod(action = "urn:searchByExpr")
-  @Action(input = "urn:searchByExpr", output = "urn:searchByExprResponse")
-  @RequestWrapper(
-      localName = "searchByExpr",
-      targetNamespace = "http://webservice.cscd.com",
-      className = "com.cscd.webservice.SearchByExpr")
-  @ResponseWrapper(
-      localName = "searchByExprResponse",
-      targetNamespace = "http://webservice.cscd.com",
-      className = "com.cscd.webservice.SearchByExprResponse")
-  @WebResult(name = "return", targetNamespace = "http://webservice.cscd.com")
-  public String searchByExpr(
-      @WebParam(name = "code", targetNamespace = "http://webservice.cscd.com") String code,
-      @WebParam(name = "expr", targetNamespace = "http://webservice.cscd.com") String expr);
+    @WebMethod(action = "urn:searchByExpr")
+    @Action(input = "urn:searchByExpr", output = "urn:searchByExprResponse")
+    @RequestWrapper(localName = "searchByExpr", targetNamespace = "http://webservice.cscd.com", className = "com.cscd.webservice.SearchByExpr")
+    @ResponseWrapper(localName = "searchByExprResponse", targetNamespace = "http://webservice.cscd.com", className = "com.cscd.webservice.SearchByExprResponse")
+    @WebResult(name = "return", targetNamespace = "http://webservice.cscd.com")
+    public String searchByExpr(
+                               @WebParam(name = "code", targetNamespace = "http://webservice.cscd.com") String code,
+                               @WebParam(name = "expr", targetNamespace = "http://webservice.cscd.com") String expr);
 
-  @WebMethod(action = "urn:searchArticles")
-  @Action(input = "urn:searchArticles", output = "urn:searchArticlesResponse")
-  @RequestWrapper(
-      localName = "searchArticles",
-      targetNamespace = "http://webservice.cscd.com",
-      className = "com.cscd.webservice.SearchArticles")
-  @ResponseWrapper(
-      localName = "searchArticlesResponse",
-      targetNamespace = "http://webservice.cscd.com",
-      className = "com.cscd.webservice.SearchArticlesResponse")
-  @WebResult(name = "return", targetNamespace = "http://webservice.cscd.com")
-  public String searchArticles(
-      @WebParam(name = "code", targetNamespace = "http://webservice.cscd.com") String code,
-      @WebParam(name = "author", targetNamespace = "http://webservice.cscd.com") String author,
-      @WebParam(name = "institute", targetNamespace = "http://webservice.cscd.com")
-          String institute,
-      @WebParam(name = "title", targetNamespace = "http://webservice.cscd.com") String title,
-      @WebParam(name = "orcId", targetNamespace = "http://webservice.cscd.com") String orcId);
+    @WebMethod(action = "urn:searchArticles")
+    @Action(input = "urn:searchArticles", output = "urn:searchArticlesResponse")
+    @RequestWrapper(localName = "searchArticles", targetNamespace = "http://webservice.cscd.com", className = "com.cscd.webservice.SearchArticles")
+    @ResponseWrapper(localName = "searchArticlesResponse", targetNamespace = "http://webservice.cscd.com", className = "com.cscd.webservice.SearchArticlesResponse")
+    @WebResult(name = "return", targetNamespace = "http://webservice.cscd.com")
+    public String searchArticles(
+                                 @WebParam(name = "code", targetNamespace = "http://webservice.cscd.com") String code,
+                                 @WebParam(name = "author", targetNamespace = "http://webservice.cscd.com") String author,
+                                 @WebParam(name = "institute", targetNamespace = "http://webservice.cscd.com") String institute,
+                                 @WebParam(name = "title", targetNamespace = "http://webservice.cscd.com") String title,
+                                 @WebParam(name = "orcId", targetNamespace = "http://webservice.cscd.com") String orcId);
 
-  @WebMethod(action = "urn:getCode")
-  @Action(input = "urn:getCode", output = "urn:getCodeResponse")
-  @RequestWrapper(
-      localName = "getCode",
-      targetNamespace = "http://webservice.cscd.com",
-      className = "com.cscd.webservice.GetCode")
-  @ResponseWrapper(
-      localName = "getCodeResponse",
-      targetNamespace = "http://webservice.cscd.com",
-      className = "com.cscd.webservice.GetCodeResponse")
-  @WebResult(name = "return", targetNamespace = "http://webservice.cscd.com")
-  public String getCode(
-      @WebParam(name = "user", targetNamespace = "http://webservice.cscd.com") String user,
-      @WebParam(name = "passwd", targetNamespace = "http://webservice.cscd.com") String passwd);
+    @WebMethod(action = "urn:getCode")
+    @Action(input = "urn:getCode", output = "urn:getCodeResponse")
+    @RequestWrapper(localName = "getCode", targetNamespace = "http://webservice.cscd.com", className = "com.cscd.webservice.GetCode")
+    @ResponseWrapper(localName = "getCodeResponse", targetNamespace = "http://webservice.cscd.com", className = "com.cscd.webservice.GetCodeResponse")
+    @WebResult(name = "return", targetNamespace = "http://webservice.cscd.com")
+    public String getCode(
+                          @WebParam(name = "user", targetNamespace = "http://webservice.cscd.com") String user,
+                          @WebParam(name = "passwd", targetNamespace = "http://webservice.cscd.com") String passwd);
 
-  @WebMethod(action = "urn:releaseCode")
-  @Action(input = "urn:releaseCode")
-  @Oneway
-  @RequestWrapper(
-      localName = "releaseCode",
-      targetNamespace = "http://webservice.cscd.com",
-      className = "com.cscd.webservice.ReleaseCode")
-  public void releaseCode(
-      @WebParam(name = "code", targetNamespace = "http://webservice.cscd.com") String code);
+    @WebMethod(action = "urn:releaseCode")
+    @Action(input = "urn:releaseCode")
+    @Oneway
+    @RequestWrapper(localName = "releaseCode", targetNamespace = "http://webservice.cscd.com", className = "com.cscd.webservice.ReleaseCode")
+    public void releaseCode(
+                            @WebParam(name = "code", targetNamespace = "http://webservice.cscd.com") String code);
 
-  @WebMethod(action = "urn:getArticles")
-  @Action(
-      input = "urn:getArticles",
-      output = "urn:getArticlesResponse",
-      fault = {
-        @FaultAction(
-            className = CscdServiceException_Exception.class,
-            value = "urn:getArticlesCscdServiceException")
-      })
-  @RequestWrapper(
-      localName = "getArticles",
-      targetNamespace = "http://webservice.cscd.com",
-      className = "com.cscd.webservice.GetArticles")
-  @ResponseWrapper(
-      localName = "getArticlesResponse",
-      targetNamespace = "http://webservice.cscd.com",
-      className = "com.cscd.webservice.GetArticlesResponse")
-  @WebResult(name = "return", targetNamespace = "http://webservice.cscd.com")
-  public String getArticles(
-      @WebParam(name = "code", targetNamespace = "http://webservice.cscd.com") String code,
-      @WebParam(name = "cscdIds", targetNamespace = "http://webservice.cscd.com") String cscdIds)
-      throws CscdServiceException_Exception;
+    @WebMethod(action = "urn:getArticles")
+    @Action(input = "urn:getArticles", output = "urn:getArticlesResponse", fault = {
+            @FaultAction(className = CscdServiceException_Exception.class, value = "urn:getArticlesCscdServiceException")
+    })
+    @RequestWrapper(localName = "getArticles", targetNamespace = "http://webservice.cscd.com", className = "com.cscd.webservice.GetArticles")
+    @ResponseWrapper(localName = "getArticlesResponse", targetNamespace = "http://webservice.cscd.com", className = "com.cscd.webservice.GetArticlesResponse")
+    @WebResult(name = "return", targetNamespace = "http://webservice.cscd.com")
+    public String getArticles(
+                              @WebParam(name = "code", targetNamespace = "http://webservice.cscd.com") String code,
+                              @WebParam(name = "cscdIds", targetNamespace = "http://webservice.cscd.com") String cscdIds) throws CscdServiceException_Exception;
 
-  @WebMethod(action = "urn:getCitedInfo")
-  @Action(
-      input = "urn:getCitedInfo",
-      output = "urn:getCitedInfoResponse",
-      fault = {
-        @FaultAction(
-            className = CscdServiceException_Exception.class,
-            value = "urn:getCitedInfoCscdServiceException")
-      })
-  @RequestWrapper(
-      localName = "getCitedInfo",
-      targetNamespace = "http://webservice.cscd.com",
-      className = "com.cscd.webservice.GetCitedInfo")
-  @ResponseWrapper(
-      localName = "getCitedInfoResponse",
-      targetNamespace = "http://webservice.cscd.com",
-      className = "com.cscd.webservice.GetCitedInfoResponse")
-  @WebResult(name = "return", targetNamespace = "http://webservice.cscd.com")
-  public String getCitedInfo(
-      @WebParam(name = "code", targetNamespace = "http://webservice.cscd.com") String code,
-      @WebParam(name = "cscdId", targetNamespace = "http://webservice.cscd.com") String cscdId)
-      throws CscdServiceException_Exception;
+    @WebMethod(action = "urn:getCitedInfo")
+    @Action(input = "urn:getCitedInfo", output = "urn:getCitedInfoResponse", fault = {
+            @FaultAction(className = CscdServiceException_Exception.class, value = "urn:getCitedInfoCscdServiceException")
+    })
+    @RequestWrapper(localName = "getCitedInfo", targetNamespace = "http://webservice.cscd.com", className = "com.cscd.webservice.GetCitedInfo")
+    @ResponseWrapper(localName = "getCitedInfoResponse", targetNamespace = "http://webservice.cscd.com", className = "com.cscd.webservice.GetCitedInfoResponse")
+    @WebResult(name = "return", targetNamespace = "http://webservice.cscd.com")
+    public String getCitedInfo(
+                               @WebParam(name = "code", targetNamespace = "http://webservice.cscd.com") String code,
+                               @WebParam(name = "cscdId", targetNamespace = "http://webservice.cscd.com") String cscdId) throws CscdServiceException_Exception;
 
-  @WebMethod(action = "urn:searchByExprRange")
-  @Action(input = "urn:searchByExprRange", output = "urn:searchByExprRangeResponse")
-  @RequestWrapper(
-      localName = "searchByExprRange",
-      targetNamespace = "http://webservice.cscd.com",
-      className = "com.cscd.webservice.SearchByExprRange")
-  @ResponseWrapper(
-      localName = "searchByExprRangeResponse",
-      targetNamespace = "http://webservice.cscd.com",
-      className = "com.cscd.webservice.SearchByExprRangeResponse")
-  @WebResult(name = "return", targetNamespace = "http://webservice.cscd.com")
-  public String searchByExprRange(
-      @WebParam(name = "code", targetNamespace = "http://webservice.cscd.com") String code,
-      @WebParam(name = "expr", targetNamespace = "http://webservice.cscd.com") String expr,
-      @WebParam(name = "start", targetNamespace = "http://webservice.cscd.com") Integer start,
-      @WebParam(name = "limit", targetNamespace = "http://webservice.cscd.com") Integer limit);
+    @WebMethod(action = "urn:searchByExprRange")
+    @Action(input = "urn:searchByExprRange", output = "urn:searchByExprRangeResponse")
+    @RequestWrapper(localName = "searchByExprRange", targetNamespace = "http://webservice.cscd.com", className = "com.cscd.webservice.SearchByExprRange")
+    @ResponseWrapper(localName = "searchByExprRangeResponse", targetNamespace = "http://webservice.cscd.com", className = "com.cscd.webservice.SearchByExprRangeResponse")
+    @WebResult(name = "return", targetNamespace = "http://webservice.cscd.com")
+    public String searchByExprRange(
+                                    @WebParam(name = "code", targetNamespace = "http://webservice.cscd.com") String code,
+                                    @WebParam(name = "expr", targetNamespace = "http://webservice.cscd.com") String expr,
+                                    @WebParam(name = "start", targetNamespace = "http://webservice.cscd.com") Integer start,
+                                    @WebParam(name = "limit", targetNamespace = "http://webservice.cscd.com") Integer limit);
 }

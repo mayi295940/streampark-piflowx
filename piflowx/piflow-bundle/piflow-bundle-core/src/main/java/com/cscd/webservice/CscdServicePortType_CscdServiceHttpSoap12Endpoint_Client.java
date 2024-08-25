@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.cscd.webservice;
 
 /** Please modify this class to meet your needs This class is not complete */
@@ -13,104 +30,105 @@ import java.net.URL;
  */
 public final class CscdServicePortType_CscdServiceHttpSoap12Endpoint_Client {
 
-  private static final QName SERVICE_NAME = new QName("http://webservice.cscd.com", "CscdService");
+    private static final QName SERVICE_NAME = new QName("http://webservice.cscd.com", "CscdService");
 
-  private CscdServicePortType_CscdServiceHttpSoap12Endpoint_Client() {}
+    private CscdServicePortType_CscdServiceHttpSoap12Endpoint_Client() {
+    }
 
-  public static void main(String args[]) throws java.lang.Exception {
-    URL wsdlURL = CscdService.WSDL_LOCATION;
-    if (args.length > 0 && args[0] != null && !"".equals(args[0])) {
-      File wsdlFile = new File(args[0]);
-      try {
-        if (wsdlFile.exists()) {
-          wsdlURL = wsdlFile.toURI().toURL();
-        } else {
-          wsdlURL = new URL(args[0]);
+    public static void main(String args[]) throws java.lang.Exception {
+        URL wsdlURL = CscdService.WSDL_LOCATION;
+        if (args.length > 0 && args[0] != null && !"".equals(args[0])) {
+            File wsdlFile = new File(args[0]);
+            try {
+                if (wsdlFile.exists()) {
+                    wsdlURL = wsdlFile.toURI().toURL();
+                } else {
+                    wsdlURL = new URL(args[0]);
+                }
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
         }
-      } catch (MalformedURLException e) {
-        e.printStackTrace();
-      }
-    }
 
-    CscdService ss = new CscdService(wsdlURL, SERVICE_NAME);
-    CscdServicePortType port = ss.getCscdServiceHttpSoap12Endpoint();
+        CscdService ss = new CscdService(wsdlURL, SERVICE_NAME);
+        CscdServicePortType port = ss.getCscdServiceHttpSoap12Endpoint();
 
-    {
-      System.out.println("Invoking searchByExpr...");
-      String _searchByExpr_code = "";
-      String _searchByExpr_expr = "";
-      String _searchByExpr__return = port.searchByExpr(_searchByExpr_code, _searchByExpr_expr);
-      System.out.println("searchByExpr.result=" + _searchByExpr__return);
-    }
-    {
-      System.out.println("Invoking searchArticles...");
-      String _searchArticles_code = "";
-      String _searchArticles_author = "";
-      String _searchArticles_institute = "";
-      String _searchArticles_title = "";
-      String _searchArticles_orcId = "";
-      String _searchArticles__return =
-          port.searchArticles(
-              _searchArticles_code,
-              _searchArticles_author,
-              _searchArticles_institute,
-              _searchArticles_title,
-              _searchArticles_orcId);
-      System.out.println("searchArticles.result=" + _searchArticles__return);
-    }
-    {
-      System.out.println("Invoking getCode...");
-      String _getCode_user = "";
-      String _getCode_passwd = "";
-      String _getCode__return = port.getCode(_getCode_user, _getCode_passwd);
-      System.out.println("getCode.result=" + _getCode__return);
-    }
-    {
-      System.out.println("Invoking releaseCode...");
-      String _releaseCode_code = "";
-      port.releaseCode(_releaseCode_code);
-    }
-    {
-      System.out.println("Invoking getArticles...");
-      String _getArticles_code = "";
-      String _getArticles_cscdIds = "";
-      try {
-        String _getArticles__return = port.getArticles(_getArticles_code, _getArticles_cscdIds);
-        System.out.println("getArticles.result=" + _getArticles__return);
+        {
+            System.out.println("Invoking searchByExpr...");
+            String _searchByExpr_code = "";
+            String _searchByExpr_expr = "";
+            String _searchByExpr__return = port.searchByExpr(_searchByExpr_code, _searchByExpr_expr);
+            System.out.println("searchByExpr.result=" + _searchByExpr__return);
+        }
+        {
+            System.out.println("Invoking searchArticles...");
+            String _searchArticles_code = "";
+            String _searchArticles_author = "";
+            String _searchArticles_institute = "";
+            String _searchArticles_title = "";
+            String _searchArticles_orcId = "";
+            String _searchArticles__return =
+                port.searchArticles(
+                    _searchArticles_code,
+                    _searchArticles_author,
+                    _searchArticles_institute,
+                    _searchArticles_title,
+                    _searchArticles_orcId);
+            System.out.println("searchArticles.result=" + _searchArticles__return);
+        }
+        {
+            System.out.println("Invoking getCode...");
+            String _getCode_user = "";
+            String _getCode_passwd = "";
+            String _getCode__return = port.getCode(_getCode_user, _getCode_passwd);
+            System.out.println("getCode.result=" + _getCode__return);
+        }
+        {
+            System.out.println("Invoking releaseCode...");
+            String _releaseCode_code = "";
+            port.releaseCode(_releaseCode_code);
+        }
+        {
+            System.out.println("Invoking getArticles...");
+            String _getArticles_code = "";
+            String _getArticles_cscdIds = "";
+            try {
+                String _getArticles__return = port.getArticles(_getArticles_code, _getArticles_cscdIds);
+                System.out.println("getArticles.result=" + _getArticles__return);
 
-      } catch (CscdServiceException_Exception e) {
-        System.out.println("Expected exception: CscdServiceException has occurred.");
-        System.out.println(e.toString());
-      }
-    }
-    {
-      System.out.println("Invoking getCitedInfo...");
-      String _getCitedInfo_code = "";
-      String _getCitedInfo_cscdId = "";
-      try {
-        String _getCitedInfo__return = port.getCitedInfo(_getCitedInfo_code, _getCitedInfo_cscdId);
-        System.out.println("getCitedInfo.result=" + _getCitedInfo__return);
+            } catch (CscdServiceException_Exception e) {
+                System.out.println("Expected exception: CscdServiceException has occurred.");
+                System.out.println(e.toString());
+            }
+        }
+        {
+            System.out.println("Invoking getCitedInfo...");
+            String _getCitedInfo_code = "";
+            String _getCitedInfo_cscdId = "";
+            try {
+                String _getCitedInfo__return = port.getCitedInfo(_getCitedInfo_code, _getCitedInfo_cscdId);
+                System.out.println("getCitedInfo.result=" + _getCitedInfo__return);
 
-      } catch (CscdServiceException_Exception e) {
-        System.out.println("Expected exception: CscdServiceException has occurred.");
-        System.out.println(e.toString());
-      }
-    }
-    {
-      System.out.println("Invoking searchByExprRange...");
-      String _searchByExprRange_code = "";
-      String _searchByExprRange_expr = "";
-      Integer _searchByExprRange_start = null;
-      Integer _searchByExprRange_limit = null;
-      String _searchByExprRange__return =
-          port.searchByExprRange(
-              _searchByExprRange_code,
-              _searchByExprRange_expr,
-              _searchByExprRange_start,
-              _searchByExprRange_limit);
-      System.out.println("searchByExprRange.result=" + _searchByExprRange__return);
-    }
+            } catch (CscdServiceException_Exception e) {
+                System.out.println("Expected exception: CscdServiceException has occurred.");
+                System.out.println(e.toString());
+            }
+        }
+        {
+            System.out.println("Invoking searchByExprRange...");
+            String _searchByExprRange_code = "";
+            String _searchByExprRange_expr = "";
+            Integer _searchByExprRange_start = null;
+            Integer _searchByExprRange_limit = null;
+            String _searchByExprRange__return =
+                port.searchByExprRange(
+                    _searchByExprRange_code,
+                    _searchByExprRange_expr,
+                    _searchByExprRange_start,
+                    _searchByExprRange_limit);
+            System.out.println("searchByExprRange.result=" + _searchByExprRange__return);
+        }
 
-    System.exit(0);
-  }
+        System.exit(0);
+    }
 }

@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.streampark.console.flow.component.testData.mapper;
 
 import org.apache.streampark.console.flow.component.testData.entity.TestDataSchema;
@@ -19,118 +36,113 @@ import java.util.List;
 @Mapper
 public interface TestDataSchemaMapper {
 
-  /**
-   * add TestDataSchema
-   *
-   * @param testDataSchema testDataSchema
-   * @return Integer
-   */
-  @InsertProvider(type = TestDataSchemaMapperProvider.class, method = "addTestDataSchema")
-  Integer addTestDataSchema(TestDataSchema testDataSchema);
+    /**
+     * add TestDataSchema
+     *
+     * @param testDataSchema testDataSchema
+     * @return Integer
+     */
+    @InsertProvider(type = TestDataSchemaMapperProvider.class, method = "addTestDataSchema")
+    Integer addTestDataSchema(TestDataSchema testDataSchema);
 
-  /**
-   * add TestDataSchema List
-   *
-   * @param testDataSchemaList testDataSchemaList
-   */
-  @InsertProvider(type = TestDataSchemaMapperProvider.class, method = "addTestDataSchemaList")
-  Integer addTestDataSchemaList(List<TestDataSchema> testDataSchemaList);
+    /**
+     * add TestDataSchema List
+     *
+     * @param testDataSchemaList testDataSchemaList
+     */
+    @InsertProvider(type = TestDataSchemaMapperProvider.class, method = "addTestDataSchemaList")
+    Integer addTestDataSchemaList(List<TestDataSchema> testDataSchemaList);
 
-  /**
-   * update TestDataSchema
-   *
-   * @param testDataSchema testDataSchema
-   */
-  @UpdateProvider(type = TestDataSchemaMapperProvider.class, method = "updateTestDataSchema")
-  Integer updateTestDataSchema(TestDataSchema testDataSchema);
+    /**
+     * update TestDataSchema
+     *
+     * @param testDataSchema testDataSchema
+     */
+    @UpdateProvider(type = TestDataSchemaMapperProvider.class, method = "updateTestDataSchema")
+    Integer updateTestDataSchema(TestDataSchema testDataSchema);
 
-  /**
-   * update TestDataSchema enable_flag
-   *
-   * @param isAdmin isAdmin
-   * @param username username
-   * @param testDataId testDataId
-   */
-  @UpdateProvider(
-      type = TestDataSchemaMapperProvider.class,
-      method = "delTestDataSchemaByTestDataId")
-  Integer delTestDataSchemaByTestDataId(boolean isAdmin, String username, String testDataId);
+    /**
+     * update TestDataSchema enable_flag
+     *
+     * @param isAdmin isAdmin
+     * @param username username
+     * @param testDataId testDataId
+     */
+    @UpdateProvider(type = TestDataSchemaMapperProvider.class, method = "delTestDataSchemaByTestDataId")
+    Integer delTestDataSchemaByTestDataId(boolean isAdmin, String username, String testDataId);
 
-  /**
-   * update TestDataSchema enable_flag
-   *
-   * @param isAdmin isAdmin
-   * @param username username
-   * @param schemaId schemaId
-   */
-  @UpdateProvider(type = TestDataSchemaMapperProvider.class, method = "delTestDataSchemaById")
-  Integer delTestDataSchemaById(boolean isAdmin, String username, String schemaId);
+    /**
+     * update TestDataSchema enable_flag
+     *
+     * @param isAdmin isAdmin
+     * @param username username
+     * @param schemaId schemaId
+     */
+    @UpdateProvider(type = TestDataSchemaMapperProvider.class, method = "delTestDataSchemaById")
+    Integer delTestDataSchemaById(boolean isAdmin, String username, String schemaId);
 
-  /**
-   * get TestDataSchema by id
-   *
-   * @param id id
-   */
-  @SelectProvider(type = TestDataSchemaMapperProvider.class, method = "getTestDataSchemaById")
-  TestDataSchema getTestDataSchemaById(String id);
+    /**
+     * get TestDataSchema by id
+     *
+     * @param id id
+     */
+    @SelectProvider(type = TestDataSchemaMapperProvider.class, method = "getTestDataSchemaById")
+    TestDataSchema getTestDataSchemaById(String id);
 
-  /**
-   * get TestDataSchema list by testDataId
-   *
-   * @param testDataId testDataId
-   */
-  @Select(
-      "SELECT * FROM test_data_schema "
-          + "WHERE enable_flag=1 "
-          + "AND fk_test_data_id = #{testDataId} "
-          + "ORDER BY  field_soft ASC ")
-  @Results({
-    @Result(id = true, column = "id", property = "id"),
+    /**
+     * get TestDataSchema list by testDataId
+     *
+     * @param testDataId testDataId
+     */
+    @Select("SELECT * FROM test_data_schema "
+        + "WHERE enable_flag=1 "
+        + "AND fk_test_data_id = #{testDataId} "
+        + "ORDER BY  field_soft ASC ")
+    @Results({
+            @Result(id = true, column = "id", property = "id"),
     // @Result(column = "id", property = "schemaValuesList", many = @Many(select =
-    // "org.apache.streampark.console.flow.component.testData.mapper.TestDataSchemaValuesMapper.getTestDataSchemaValuesListBySchemaId", fetchType = FetchType.LAZY))
-  })
-  List<TestDataSchema> getTestDataSchemaListByTestDataId(@Param("testDataId") String testDataId);
+    // "org.apache.streampark.console.flow.component.testData.mapper.TestDataSchemaValuesMapper.getTestDataSchemaValuesListBySchemaId",
+    // fetchType = FetchType.LAZY))
+    })
+    List<TestDataSchema> getTestDataSchemaListByTestDataId(@Param("testDataId") String testDataId);
 
-  /**
-   * get TestDataSchema list by testDataId page
-   *
-   * @param isAdmin isAdmin
-   * @param username username
-   * @param param param
-   * @param testDataId testDataId
-   */
-  @SelectProvider(
-      type = TestDataSchemaMapperProvider.class,
-      method = "getTestDataSchemaListByTestDataIdSearch")
-  List<TestDataSchema> getTestDataSchemaListByTestDataIdSearch(
-      boolean isAdmin, String username, String param, String testDataId);
+    /**
+     * get TestDataSchema list by testDataId page
+     *
+     * @param isAdmin isAdmin
+     * @param username username
+     * @param param param
+     * @param testDataId testDataId
+     */
+    @SelectProvider(type = TestDataSchemaMapperProvider.class, method = "getTestDataSchemaListByTestDataIdSearch")
+    List<TestDataSchema> getTestDataSchemaListByTestDataIdSearch(
+                                                                 boolean isAdmin, String username, String param,
+                                                                 String testDataId);
 
-  /**
-   * get TestDataSchemaVo list by testDataId search
-   *
-   * @param isAdmin isAdmin
-   * @param username username
-   * @param param param
-   * @param testDataId testDataId
-   */
-  @SelectProvider(
-      type = TestDataSchemaMapperProvider.class,
-      method = "getTestDataSchemaListByTestDataIdSearch")
-  List<TestDataSchemaVo> getTestDataSchemaVoListByTestDataIdSearch(
-      boolean isAdmin, String username, String param, String testDataId);
+    /**
+     * get TestDataSchemaVo list by testDataId search
+     *
+     * @param isAdmin isAdmin
+     * @param username username
+     * @param param param
+     * @param testDataId testDataId
+     */
+    @SelectProvider(type = TestDataSchemaMapperProvider.class, method = "getTestDataSchemaListByTestDataIdSearch")
+    List<TestDataSchemaVo> getTestDataSchemaVoListByTestDataIdSearch(
+                                                                     boolean isAdmin, String username, String param,
+                                                                     String testDataId);
 
-  /**
-   * get TestDataSchemaId and NameList by testDataId
-   *
-   * @param testDataId testDataId
-   * @return List<Map<String,String>> key1=ID key2=FIELD_NAME
-   */
-  @Select(
-      "SELECT TDS.id AS ID,TDS.field_name as FIELD_NAME "
-          + "FROM test_data_schema TDS "
-          + "WHERE TDS.enable_flag=1 "
-          + "AND TDS.fk_test_data_id = #{testDataId} "
-          + "ORDER BY TDS.field_soft ASC ")
-  List<LinkedHashMap<String, Object>> getTestDataSchemaIdAndNameListByTestDataId(
-      @Param("testDataId") String testDataId);
+    /**
+     * get TestDataSchemaId and NameList by testDataId
+     *
+     * @param testDataId testDataId
+     * @return List<Map<String,String>> key1=ID key2=FIELD_NAME
+     */
+    @Select("SELECT TDS.id AS ID,TDS.field_name as FIELD_NAME "
+        + "FROM test_data_schema TDS "
+        + "WHERE TDS.enable_flag=1 "
+        + "AND TDS.fk_test_data_id = #{testDataId} "
+        + "ORDER BY TDS.field_soft ASC ")
+    List<LinkedHashMap<String, Object>> getTestDataSchemaIdAndNameListByTestDataId(
+                                                                                   @Param("testDataId") String testDataId);
 }

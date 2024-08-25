@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.streampark.console.flow.controller.api.flow;
 
 import org.apache.streampark.console.flow.base.utils.ReturnMapUtils;
@@ -24,82 +41,82 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping("/flowTemplate")
 public class FlowTemplateCtrl {
 
-  private final IFlowTemplateService flowTemplateServiceImpl;
-  private final ILogHelperService logHelperServiceImpl;
+    private final IFlowTemplateService flowTemplateServiceImpl;
+    private final ILogHelperService logHelperServiceImpl;
 
-  @Autowired
-  public FlowTemplateCtrl(
-      IFlowTemplateService flowTemplateServiceImpl, ILogHelperService logHelperServiceImpl) {
-    this.flowTemplateServiceImpl = flowTemplateServiceImpl;
-    this.logHelperServiceImpl = logHelperServiceImpl;
-  }
-
-  @RequestMapping(value = "/saveFlowTemplate", method = RequestMethod.POST)
-  @ResponseBody
-  @ApiOperation(value = "saveFlowTemplate", notes = "save FlowTemplate")
-  public String saveFlowTemplate(String name, String load, String templateType) {
-    String username = SessionUserUtil.getCurrentUsername();
-    logHelperServiceImpl.logAuthSucceed("saveFlowTemplate", username);
-    return flowTemplateServiceImpl.addFlowTemplate(username, name, load, templateType);
-  }
-
-  @RequestMapping(value = "/flowTemplatePage", method = RequestMethod.GET)
-  @ResponseBody
-  @ApiOperation(value = "flowTemplatePage", notes = "get FlowTemplate list page")
-  public String templatePage(Integer page, Integer limit, String param) {
-    String username = SessionUserUtil.getCurrentUsername();
-    boolean isAdmin = SessionUserUtil.isAdmin();
-    return flowTemplateServiceImpl.getFlowTemplateListPage(username, isAdmin, page, limit, param);
-  }
-
-  /** Delete the template based on id */
-  @RequestMapping(value = "/deleteFlowTemplate", method = RequestMethod.GET)
-  @ResponseBody
-  @ApiOperation(value = "deleteFlowTemplate", notes = "delete FlowTemplate")
-  public String deleteFlowTemplate(String id) {
-    String username = SessionUserUtil.getCurrentUsername();
-    logHelperServiceImpl.logAuthSucceed("deleteFlowTemplate" + id, username);
-    return flowTemplateServiceImpl.deleteFlowTemplate(id);
-  }
-
-  /** Download template */
-  @RequestMapping(value = "/templateDownload", method = RequestMethod.GET)
-  @ApiOperation(value = "templateDownload", notes = "download FlowTemplate")
-  public void templateDownload(HttpServletResponse response, String flowTemplateId) {
-    flowTemplateServiceImpl.templateDownload(response, flowTemplateId);
-  }
-
-  /** Upload xml file and save flowTemplate */
-  @RequestMapping(value = "/uploadXmlFile", method = RequestMethod.POST)
-  @ResponseBody
-  @ApiOperation(value = "uploadXmlFile", notes = "upload FlowTemplate")
-  public String uploadXmlFile(@RequestParam("file") MultipartFile file) {
-    String username = SessionUserUtil.getCurrentUsername();
-    logHelperServiceImpl.logAuthSucceed("uploadXmlFile" + file.getName(), username);
-    return flowTemplateServiceImpl.uploadXmlFile(username, file);
-  }
-
-  /** Query all templates for drop-down displays */
-  @RequestMapping(value = "/flowTemplateList", method = RequestMethod.POST)
-  @ResponseBody
-  @ApiOperation(value = "flowTemplateList", notes = "flowTemplate List")
-  public String flowTemplateList() {
-    String username = SessionUserUtil.getCurrentUsername();
-    boolean isAdmin = SessionUserUtil.isAdmin();
-    return flowTemplateServiceImpl.flowTemplateList(username, isAdmin);
-  }
-
-  @RequestMapping(value = "/loadingXmlPage", method = RequestMethod.POST)
-  @ResponseBody
-  @ApiOperation(value = "loadingXmlPage", notes = "loading xml Page")
-  public String loadingXml(String templateId, String load, String loadType) throws Exception {
-    String username = SessionUserUtil.getCurrentUsername();
-    if ("TASK".equals(loadType)) {
-      return flowTemplateServiceImpl.loadTaskTemplate(username, templateId, load);
-    } else if ("GROUP".equals(loadType)) {
-      return flowTemplateServiceImpl.loadGroupTemplate(username, templateId, load);
-    } else {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.LOAD_TYPE_ERROR_MSG());
+    @Autowired
+    public FlowTemplateCtrl(
+                            IFlowTemplateService flowTemplateServiceImpl, ILogHelperService logHelperServiceImpl) {
+        this.flowTemplateServiceImpl = flowTemplateServiceImpl;
+        this.logHelperServiceImpl = logHelperServiceImpl;
     }
-  }
+
+    @RequestMapping(value = "/saveFlowTemplate", method = RequestMethod.POST)
+    @ResponseBody
+    @ApiOperation(value = "saveFlowTemplate", notes = "save FlowTemplate")
+    public String saveFlowTemplate(String name, String load, String templateType) {
+        String username = SessionUserUtil.getCurrentUsername();
+        logHelperServiceImpl.logAuthSucceed("saveFlowTemplate", username);
+        return flowTemplateServiceImpl.addFlowTemplate(username, name, load, templateType);
+    }
+
+    @RequestMapping(value = "/flowTemplatePage", method = RequestMethod.GET)
+    @ResponseBody
+    @ApiOperation(value = "flowTemplatePage", notes = "get FlowTemplate list page")
+    public String templatePage(Integer page, Integer limit, String param) {
+        String username = SessionUserUtil.getCurrentUsername();
+        boolean isAdmin = SessionUserUtil.isAdmin();
+        return flowTemplateServiceImpl.getFlowTemplateListPage(username, isAdmin, page, limit, param);
+    }
+
+    /** Delete the template based on id */
+    @RequestMapping(value = "/deleteFlowTemplate", method = RequestMethod.GET)
+    @ResponseBody
+    @ApiOperation(value = "deleteFlowTemplate", notes = "delete FlowTemplate")
+    public String deleteFlowTemplate(String id) {
+        String username = SessionUserUtil.getCurrentUsername();
+        logHelperServiceImpl.logAuthSucceed("deleteFlowTemplate" + id, username);
+        return flowTemplateServiceImpl.deleteFlowTemplate(id);
+    }
+
+    /** Download template */
+    @RequestMapping(value = "/templateDownload", method = RequestMethod.GET)
+    @ApiOperation(value = "templateDownload", notes = "download FlowTemplate")
+    public void templateDownload(HttpServletResponse response, String flowTemplateId) {
+        flowTemplateServiceImpl.templateDownload(response, flowTemplateId);
+    }
+
+    /** Upload xml file and save flowTemplate */
+    @RequestMapping(value = "/uploadXmlFile", method = RequestMethod.POST)
+    @ResponseBody
+    @ApiOperation(value = "uploadXmlFile", notes = "upload FlowTemplate")
+    public String uploadXmlFile(@RequestParam("file") MultipartFile file) {
+        String username = SessionUserUtil.getCurrentUsername();
+        logHelperServiceImpl.logAuthSucceed("uploadXmlFile" + file.getName(), username);
+        return flowTemplateServiceImpl.uploadXmlFile(username, file);
+    }
+
+    /** Query all templates for drop-down displays */
+    @RequestMapping(value = "/flowTemplateList", method = RequestMethod.POST)
+    @ResponseBody
+    @ApiOperation(value = "flowTemplateList", notes = "flowTemplate List")
+    public String flowTemplateList() {
+        String username = SessionUserUtil.getCurrentUsername();
+        boolean isAdmin = SessionUserUtil.isAdmin();
+        return flowTemplateServiceImpl.flowTemplateList(username, isAdmin);
+    }
+
+    @RequestMapping(value = "/loadingXmlPage", method = RequestMethod.POST)
+    @ResponseBody
+    @ApiOperation(value = "loadingXmlPage", notes = "loading xml Page")
+    public String loadingXml(String templateId, String load, String loadType) throws Exception {
+        String username = SessionUserUtil.getCurrentUsername();
+        if ("TASK".equals(loadType)) {
+            return flowTemplateServiceImpl.loadTaskTemplate(username, templateId, load);
+        } else if ("GROUP".equals(loadType)) {
+            return flowTemplateServiceImpl.loadGroupTemplate(username, templateId, load);
+        } else {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.LOAD_TYPE_ERROR_MSG());
+        }
+    }
 }

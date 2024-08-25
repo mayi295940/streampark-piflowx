@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow
 
 import cn.piflow.util._
@@ -90,8 +107,7 @@ class GroupExecutionImpl[DataType](
 
   val id: String = "group_" + IdGenerator.uuid
 
-  private val mapGroupEntryWithConditions
-      : Map[String, (GroupEntry[DataType], Condition[GroupExecution])] =
+  private val mapGroupEntryWithConditions: Map[String, (GroupEntry[DataType], Condition[GroupExecution])] =
     group.mapFlowWithConditions()
 
   private val completedGroupEntry = MMap[String, Boolean]()
@@ -245,11 +261,9 @@ class GroupExecutionImpl[DataType](
             getTodos
           }
 
-          if (
-            todosFlow.isEmpty && todosGroup.isEmpty
+          if (todosFlow.isEmpty && todosGroup.isEmpty
             && H2Util.isGroupChildError(id)
-            && !H2Util.isGroupChildRunning(id)
-          ) {
+            && !H2Util.isGroupChildRunning(id)) {
 
             val (todosFlow, todosGroup) = getTodos
             if (todosFlow.isEmpty && todosGroup.isEmpty)
@@ -257,16 +271,14 @@ class GroupExecutionImpl[DataType](
           }
 
           startedProcesses.synchronized {
-            todosFlow.foreach(
-              en => {
-                startProcess(en._1, en._2, id)
-              })
+            todosFlow.foreach(en => {
+              startProcess(en._1, en._2, id)
+            })
           }
           startedGroup.synchronized {
-            todosGroup.foreach(
-              en => {
-                startGroup(en._1, en._2, id)
-              })
+            todosGroup.foreach(en => {
+              startGroup(en._1, en._2, id)
+            })
           }
 
           Thread.sleep(POLLING_INTERVAL)
@@ -288,10 +300,9 @@ class GroupExecutionImpl[DataType](
   })
 
   private val doit = Try {
-    pollingThread.setUncaughtExceptionHandler(
-      (thread: Thread, throwable: Throwable) => {
-        maybeException = Some(throwable)
-      })
+    pollingThread.setUncaughtExceptionHandler((thread: Thread, throwable: Throwable) => {
+      maybeException = Some(throwable)
+    })
     pollingThread.start()
     // pollingThread.join()
   }
@@ -359,8 +370,7 @@ class GroupExecutionImpl[DataType](
     }
   }
 
-  private def getTodos
-      : (ArrayBuffer[(String, Flow[DataType])], ArrayBuffer[(String, Group[DataType])]) = {
+  private def getTodos: (ArrayBuffer[(String, Flow[DataType])], ArrayBuffer[(String, Group[DataType])]) = {
 
     val todosFlow = ArrayBuffer[(String, Flow[DataType])]()
     val todosGroup = ArrayBuffer[(String, Group[DataType])]()

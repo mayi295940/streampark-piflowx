@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.streampark.console.flow.component.process.mapper.provider;
 
 import org.apache.streampark.console.flow.base.utils.DateUtils;
@@ -13,398 +30,398 @@ import java.util.Map;
 
 public class ProcessStopMapperProvider {
 
-  private String id;
-  private String lastUpdateDttmStr;
-  private String lastUpdateUser;
-  private int enableFlag;
-  private long version;
-  private String name;
-  private String bundle;
-  private String groups;
-  private String owner;
-  private String description;
-  private String inports;
-  private String inPortTypeName;
-  private String outports;
-  private String outPortTypeName;
-  private String stateName;
-  private String startTimeStr;
-  private String endTimeStr;
-  private String pageId;
-  private String processId;
-  private int isDataSource;
+    private String id;
+    private String lastUpdateDttmStr;
+    private String lastUpdateUser;
+    private int enableFlag;
+    private long version;
+    private String name;
+    private String bundle;
+    private String groups;
+    private String owner;
+    private String description;
+    private String inports;
+    private String inPortTypeName;
+    private String outports;
+    private String outPortTypeName;
+    private String stateName;
+    private String startTimeStr;
+    private String endTimeStr;
+    private String pageId;
+    private String processId;
+    private int isDataSource;
 
-  private boolean preventSQLInjectionProcessStop(ProcessStop processStop) {
-    if (null == processStop || StringUtils.isBlank(processStop.getLastUpdateUser())) {
-      return false;
+    private boolean preventSQLInjectionProcessStop(ProcessStop processStop) {
+        if (null == processStop || StringUtils.isBlank(processStop.getLastUpdateUser())) {
+            return false;
+        }
+        // Mandatory Field
+        String id = processStop.getId();
+        String lastUpdateUser = processStop.getLastUpdateUser();
+        Boolean enableFlag = processStop.getEnableFlag();
+        Long version = processStop.getVersion();
+        Date lastUpdateDttm = processStop.getLastUpdateDttm();
+        this.id = SqlUtils.preventSQLInjection(id);
+        this.lastUpdateUser = SqlUtils.preventSQLInjection(lastUpdateUser);
+        this.enableFlag = ((null != enableFlag && enableFlag) ? 1 : 0);
+        this.version = (null != version ? version : 0L);
+        String lastUpdateDttmStr =
+            DateUtils.dateTimesToStr(null != lastUpdateDttm ? lastUpdateDttm : new Date());
+        this.lastUpdateDttmStr = SqlUtils.preventSQLInjection(lastUpdateDttmStr);
+
+        // Selection field
+        this.name = SqlUtils.preventSQLInjection(processStop.getName());
+        this.bundle = SqlUtils.preventSQLInjection(processStop.getBundle());
+        this.groups = SqlUtils.preventSQLInjection(processStop.getGroups());
+        this.owner = SqlUtils.preventSQLInjection(processStop.getOwner());
+        this.description = SqlUtils.preventSQLInjection(processStop.getDescription());
+        this.inports = SqlUtils.preventSQLInjection(processStop.getInports());
+        this.inPortTypeName =
+            SqlUtils.preventSQLInjection(
+                null != processStop.getInPortType() ? processStop.getInPortType().name() : null);
+        this.outports = SqlUtils.preventSQLInjection(processStop.getOutports());
+        this.outPortTypeName =
+            SqlUtils.preventSQLInjection(
+                null != processStop.getOutPortType() ? processStop.getOutPortType().name() : null);
+        this.stateName =
+            SqlUtils.preventSQLInjection(
+                null != processStop.getState() ? processStop.getState().name() : null);
+        String startTime =
+            (null != processStop.getStartTime()
+                ? DateUtils.dateTimesToStr(processStop.getStartTime())
+                : null);
+        String endTime =
+            (null != processStop.getEndTime()
+                ? DateUtils.dateTimesToStr(processStop.getEndTime())
+                : null);
+        this.startTimeStr = SqlUtils.preventSQLInjection(startTime);
+        this.endTimeStr = SqlUtils.preventSQLInjection(endTime);
+        this.pageId = SqlUtils.preventSQLInjection(processStop.getPageId());
+        String processIdStr =
+            (null != processStop.getProcess() ? processStop.getProcess().getId() : null);
+        this.processId = (null != processIdStr ? SqlUtils.preventSQLInjection(processIdStr) : null);
+        this.isDataSource =
+            ((null != processStop.getIsDataSource() && processStop.getIsDataSource()) ? 1 : 0);
+        return true;
     }
-    // Mandatory Field
-    String id = processStop.getId();
-    String lastUpdateUser = processStop.getLastUpdateUser();
-    Boolean enableFlag = processStop.getEnableFlag();
-    Long version = processStop.getVersion();
-    Date lastUpdateDttm = processStop.getLastUpdateDttm();
-    this.id = SqlUtils.preventSQLInjection(id);
-    this.lastUpdateUser = SqlUtils.preventSQLInjection(lastUpdateUser);
-    this.enableFlag = ((null != enableFlag && enableFlag) ? 1 : 0);
-    this.version = (null != version ? version : 0L);
-    String lastUpdateDttmStr =
-        DateUtils.dateTimesToStr(null != lastUpdateDttm ? lastUpdateDttm : new Date());
-    this.lastUpdateDttmStr = SqlUtils.preventSQLInjection(lastUpdateDttmStr);
 
-    // Selection field
-    this.name = SqlUtils.preventSQLInjection(processStop.getName());
-    this.bundle = SqlUtils.preventSQLInjection(processStop.getBundle());
-    this.groups = SqlUtils.preventSQLInjection(processStop.getGroups());
-    this.owner = SqlUtils.preventSQLInjection(processStop.getOwner());
-    this.description = SqlUtils.preventSQLInjection(processStop.getDescription());
-    this.inports = SqlUtils.preventSQLInjection(processStop.getInports());
-    this.inPortTypeName =
-        SqlUtils.preventSQLInjection(
-            null != processStop.getInPortType() ? processStop.getInPortType().name() : null);
-    this.outports = SqlUtils.preventSQLInjection(processStop.getOutports());
-    this.outPortTypeName =
-        SqlUtils.preventSQLInjection(
-            null != processStop.getOutPortType() ? processStop.getOutPortType().name() : null);
-    this.stateName =
-        SqlUtils.preventSQLInjection(
-            null != processStop.getState() ? processStop.getState().name() : null);
-    String startTime =
-        (null != processStop.getStartTime()
-            ? DateUtils.dateTimesToStr(processStop.getStartTime())
-            : null);
-    String endTime =
-        (null != processStop.getEndTime()
-            ? DateUtils.dateTimesToStr(processStop.getEndTime())
-            : null);
-    this.startTimeStr = SqlUtils.preventSQLInjection(startTime);
-    this.endTimeStr = SqlUtils.preventSQLInjection(endTime);
-    this.pageId = SqlUtils.preventSQLInjection(processStop.getPageId());
-    String processIdStr =
-        (null != processStop.getProcess() ? processStop.getProcess().getId() : null);
-    this.processId = (null != processIdStr ? SqlUtils.preventSQLInjection(processIdStr) : null);
-    this.isDataSource =
-        ((null != processStop.getIsDataSource() && processStop.getIsDataSource()) ? 1 : 0);
-    return true;
-  }
-
-  private void reset() {
-    this.id = null;
-    this.lastUpdateDttmStr = null;
-    this.lastUpdateUser = null;
-    this.enableFlag = 1;
-    this.version = 0L;
-    this.name = null;
-    this.bundle = null;
-    this.groups = null;
-    this.owner = null;
-    this.description = null;
-    this.inports = null;
-    this.inPortTypeName = null;
-    this.outports = null;
-    this.outPortTypeName = null;
-    this.stateName = null;
-    this.startTimeStr = null;
-    this.endTimeStr = null;
-    this.pageId = null;
-    this.processId = null;
-    this.isDataSource = 0;
-  }
-
-  private StringBuffer splicingInsert() {
-    // INSERT_INTO brackets is table name
-    StringBuffer strBuf = new StringBuffer();
-    strBuf.append("INSERT INTO flow_process_stop ");
-    strBuf.append("(");
-    // Mandatory Field
-    strBuf.append(SqlUtils.baseFieldName());
-    strBuf.append(", ");
-    strBuf.append("name, ");
-    strBuf.append("bundle, ");
-    strBuf.append("`groups`, ");
-    strBuf.append("owner, ");
-    strBuf.append("description, ");
-    strBuf.append("inports, ");
-    strBuf.append("in_port_type, ");
-    strBuf.append("outports, ");
-    strBuf.append("out_port_type, ");
-    strBuf.append("state, ");
-    strBuf.append("start_time, ");
-    strBuf.append("end_time, ");
-    strBuf.append("page_id, ");
-    strBuf.append("fk_flow_process_id, ");
-    strBuf.append("is_data_source ");
-    strBuf.append(") ");
-    strBuf.append("VALUES ");
-    return strBuf;
-  }
-
-  /**
-   * add processStop
-   *
-   * @param processStop
-   * @return
-   */
-  public String addProcessStop(ProcessStop processStop) {
-    if (!this.preventSQLInjectionProcessStop(processStop)) {
-      return "SELECT 0";
+    private void reset() {
+        this.id = null;
+        this.lastUpdateDttmStr = null;
+        this.lastUpdateUser = null;
+        this.enableFlag = 1;
+        this.version = 0L;
+        this.name = null;
+        this.bundle = null;
+        this.groups = null;
+        this.owner = null;
+        this.description = null;
+        this.inports = null;
+        this.inPortTypeName = null;
+        this.outports = null;
+        this.outPortTypeName = null;
+        this.stateName = null;
+        this.startTimeStr = null;
+        this.endTimeStr = null;
+        this.pageId = null;
+        this.processId = null;
+        this.isDataSource = 0;
     }
-    StringBuffer strBuf = splicingInsert();
-    strBuf.append("(");
-    // Selection field
-    strBuf.append(SqlUtils.baseFieldValues(processStop) + ", ");
-    // handle other fields
-    strBuf.append(this.name + ", ");
-    strBuf.append(this.bundle + ", ");
-    strBuf.append(this.groups + ", ");
-    strBuf.append(this.owner + ", ");
-    strBuf.append(this.description + ", ");
-    strBuf.append(this.inports + ", ");
-    strBuf.append(this.inPortTypeName + ", ");
-    strBuf.append(this.outports + ", ");
-    strBuf.append(this.outPortTypeName + ", ");
-    strBuf.append(this.stateName + ", ");
-    strBuf.append(this.startTimeStr + ", ");
-    strBuf.append(this.endTimeStr + ", ");
-    strBuf.append(this.pageId + ", ");
-    strBuf.append(this.processId + ", ");
-    strBuf.append(this.isDataSource + " ");
-    strBuf.append(") ");
-    this.reset();
-    return strBuf.toString();
-  }
 
-  /**
-   * add processStopList
-   *
-   * @param processStopList
-   * @return
-   */
-  public String addProcessStopList(Map<String, List<ProcessStop>> processStopList) {
-    List<ProcessStop> processStops = processStopList.get("processStopList");
-    if (null == processStops || processStops.size() <= 0) {
-      return "SELECT 0";
-    }
-    // INSERT_INTO brackets is table name
-    StringBuffer strBuf = splicingInsert();
-
-    boolean firstFlag = true;
-    for (int i = 0; i < processStops.size(); i++) {
-      ProcessStop processStop = processStops.get(i);
-      if (!preventSQLInjectionProcessStop(processStop)) {
-        continue;
-      }
-      if (firstFlag) {
+    private StringBuffer splicingInsert() {
+        // INSERT_INTO brackets is table name
+        StringBuffer strBuf = new StringBuffer();
+        strBuf.append("INSERT INTO flow_process_stop ");
         strBuf.append("(");
-      } else {
-        strBuf.append(",(");
-      }
-      // Selection field
-      strBuf.append(SqlUtils.baseFieldValues(processStop) + ", ");
-      // handle other fields
-      strBuf.append(this.name + ", ");
-      strBuf.append(this.bundle + ", ");
-      strBuf.append(this.groups + ", ");
-      strBuf.append(this.owner + ", ");
-      strBuf.append(this.description + ", ");
-      strBuf.append(this.inports + ", ");
-      strBuf.append(this.inPortTypeName + ", ");
-      strBuf.append(this.outports + ", ");
-      strBuf.append(this.outPortTypeName + ", ");
-      strBuf.append(this.stateName + ", ");
-      strBuf.append(this.startTimeStr + ", ");
-      strBuf.append(this.endTimeStr + ", ");
-      strBuf.append(this.pageId + ", ");
-      strBuf.append(this.processId + ", ");
-      strBuf.append(this.isDataSource + " ");
-      strBuf.append(") ");
-      this.reset();
+        // Mandatory Field
+        strBuf.append(SqlUtils.baseFieldName());
+        strBuf.append(", ");
+        strBuf.append("name, ");
+        strBuf.append("bundle, ");
+        strBuf.append("`groups`, ");
+        strBuf.append("owner, ");
+        strBuf.append("description, ");
+        strBuf.append("inports, ");
+        strBuf.append("in_port_type, ");
+        strBuf.append("outports, ");
+        strBuf.append("out_port_type, ");
+        strBuf.append("state, ");
+        strBuf.append("start_time, ");
+        strBuf.append("end_time, ");
+        strBuf.append("page_id, ");
+        strBuf.append("fk_flow_process_id, ");
+        strBuf.append("is_data_source ");
+        strBuf.append(") ");
+        strBuf.append("VALUES ");
+        return strBuf;
     }
-    return strBuf.toString();
-  }
 
-  public String getProcessStopByProcessId(String processId) {
-    String sqlStr = "SELECT 0";
-    if (StringUtils.isNotBlank(processId)) {
-      SQL sql = new SQL();
-      sql.SELECT("*");
-      sql.FROM("flow_process_stop");
-      sql.WHERE("enable_flag = 1");
-      sql.WHERE("fk_flow_process_id = " + SqlUtils.preventSQLInjection(processId));
-
-      sqlStr = sql.toString();
+    /**
+     * add processStop
+     *
+     * @param processStop
+     * @return
+     */
+    public String addProcessStop(ProcessStop processStop) {
+        if (!this.preventSQLInjectionProcessStop(processStop)) {
+            return "SELECT 0";
+        }
+        StringBuffer strBuf = splicingInsert();
+        strBuf.append("(");
+        // Selection field
+        strBuf.append(SqlUtils.baseFieldValues(processStop) + ", ");
+        // handle other fields
+        strBuf.append(this.name + ", ");
+        strBuf.append(this.bundle + ", ");
+        strBuf.append(this.groups + ", ");
+        strBuf.append(this.owner + ", ");
+        strBuf.append(this.description + ", ");
+        strBuf.append(this.inports + ", ");
+        strBuf.append(this.inPortTypeName + ", ");
+        strBuf.append(this.outports + ", ");
+        strBuf.append(this.outPortTypeName + ", ");
+        strBuf.append(this.stateName + ", ");
+        strBuf.append(this.startTimeStr + ", ");
+        strBuf.append(this.endTimeStr + ", ");
+        strBuf.append(this.pageId + ", ");
+        strBuf.append(this.processId + ", ");
+        strBuf.append(this.isDataSource + " ");
+        strBuf.append(") ");
+        this.reset();
+        return strBuf.toString();
     }
-    return sqlStr;
-  }
 
-  /**
-   * Query based on pid and pageId
-   *
-   * @param processId
-   * @param pageId
-   * @return
-   */
-  public String getProcessStopByPageIdAndPageId(String processId, String pageId) {
-    String sqlStr = "SELECT 0";
-    if (!StringUtils.isAnyEmpty(processId, pageId)) {
-      SQL sql = new SQL();
-      sql.SELECT("*");
-      sql.FROM("flow_process_stop");
-      sql.WHERE("enable_flag = 1");
-      sql.WHERE("fk_flow_process_id = " + SqlUtils.preventSQLInjection(processId));
-      sql.WHERE("page_id = " + SqlUtils.preventSQLInjection(pageId));
+    /**
+     * add processStopList
+     *
+     * @param processStopList
+     * @return
+     */
+    public String addProcessStopList(Map<String, List<ProcessStop>> processStopList) {
+        List<ProcessStop> processStops = processStopList.get("processStopList");
+        if (null == processStops || processStops.size() <= 0) {
+            return "SELECT 0";
+        }
+        // INSERT_INTO brackets is table name
+        StringBuffer strBuf = splicingInsert();
 
-      sqlStr = sql.toString();
+        boolean firstFlag = true;
+        for (int i = 0; i < processStops.size(); i++) {
+            ProcessStop processStop = processStops.get(i);
+            if (!preventSQLInjectionProcessStop(processStop)) {
+                continue;
+            }
+            if (firstFlag) {
+                strBuf.append("(");
+            } else {
+                strBuf.append(",(");
+            }
+            // Selection field
+            strBuf.append(SqlUtils.baseFieldValues(processStop) + ", ");
+            // handle other fields
+            strBuf.append(this.name + ", ");
+            strBuf.append(this.bundle + ", ");
+            strBuf.append(this.groups + ", ");
+            strBuf.append(this.owner + ", ");
+            strBuf.append(this.description + ", ");
+            strBuf.append(this.inports + ", ");
+            strBuf.append(this.inPortTypeName + ", ");
+            strBuf.append(this.outports + ", ");
+            strBuf.append(this.outPortTypeName + ", ");
+            strBuf.append(this.stateName + ", ");
+            strBuf.append(this.startTimeStr + ", ");
+            strBuf.append(this.endTimeStr + ", ");
+            strBuf.append(this.pageId + ", ");
+            strBuf.append(this.processId + ", ");
+            strBuf.append(this.isDataSource + " ");
+            strBuf.append(") ");
+            this.reset();
+        }
+        return strBuf.toString();
     }
-    return sqlStr;
-  }
 
-  /**
-   * Query based on pid and pageIds
-   *
-   * @param map
-   * @return
-   */
-  @SuppressWarnings("rawtypes")
-  public String getProcessStopByPageIdAndPageIds(Map map) {
-    String processId = (String) map.get("processId");
-    String[] pageIds = (String[]) map.get("pageIds");
-    String sqlStr = "SELECT 0";
-    if (StringUtils.isNotBlank(processId) && null != pageIds && pageIds.length > 0) {
-      SQL sql = new SQL();
-      sql.SELECT("*");
-      sql.FROM("flow_process_stop");
-      sql.WHERE("enable_flag = 1");
-      sql.WHERE("fk_flow_process_id = " + SqlUtils.preventSQLInjection(processId));
-      sql.WHERE("page_id in ( " + SqlUtils.strArrayToStr(pageIds) + ")");
+    public String getProcessStopByProcessId(String processId) {
+        String sqlStr = "SELECT 0";
+        if (StringUtils.isNotBlank(processId)) {
+            SQL sql = new SQL();
+            sql.SELECT("*");
+            sql.FROM("flow_process_stop");
+            sql.WHERE("enable_flag = 1");
+            sql.WHERE("fk_flow_process_id = " + SqlUtils.preventSQLInjection(processId));
 
-      sqlStr = sql.toString();
+            sqlStr = sql.toString();
+        }
+        return sqlStr;
     }
-    return sqlStr;
-  }
 
-  /**
-   * Query by pid and name
-   *
-   * @param processId
-   * @param name
-   * @return
-   */
-  public String getProcessStopByNameAndPid(String processId, String name) {
-    String sqlStr = "SELECT 0";
-    if (!StringUtils.isAnyEmpty(processId, name)) {
-      SQL sql = new SQL();
-      sql.SELECT("*");
-      sql.FROM("flow_process_stop");
-      sql.WHERE("enable_flag = 1");
-      sql.WHERE("fk_flow_process_id = " + SqlUtils.preventSQLInjection(processId));
-      sql.WHERE("name = " + SqlUtils.preventSQLInjection(name));
+    /**
+     * Query based on pid and pageId
+     *
+     * @param processId
+     * @param pageId
+     * @return
+     */
+    public String getProcessStopByPageIdAndPageId(String processId, String pageId) {
+        String sqlStr = "SELECT 0";
+        if (!StringUtils.isAnyEmpty(processId, pageId)) {
+            SQL sql = new SQL();
+            sql.SELECT("*");
+            sql.FROM("flow_process_stop");
+            sql.WHERE("enable_flag = 1");
+            sql.WHERE("fk_flow_process_id = " + SqlUtils.preventSQLInjection(processId));
+            sql.WHERE("page_id = " + SqlUtils.preventSQLInjection(pageId));
 
-      sqlStr = sql.toString();
+            sqlStr = sql.toString();
+        }
+        return sqlStr;
     }
-    return sqlStr;
-  }
 
-  /**
-   * Query appId by stopId
-   *
-   * @param stopId
-   * @return
-   */
-  public static String getProcessAppIdByStopId(String stopId) {
-    String sqlStr = "SELECT 0";
-    if (!StringUtils.isAnyEmpty(stopId)) {
-      // SELECT fp.app_id FROM flow_process fp left join flow_process_stop fps on fp.id =
-      // fps.fk_flow_process_id WHERE fp.enable_flag = 1 AND fps.enable_flag = 1 AND  fps.id =
-      // '00a652e1af604e13a2eda1b7f7bb7d58'
-      SQL sql = new SQL();
-      sql.SELECT("fp.app_id");
-      sql.FROM("flow_process fp");
-      sql.LEFT_OUTER_JOIN("flow_process_stop fps on fp.id = fps.fk_flow_process_id ");
-      sql.WHERE("fp.enable_flag = 1");
-      sql.WHERE("fps.enable_flag = 1");
-      sql.WHERE("fps.id = " + SqlUtils.preventSQLInjection(stopId));
+    /**
+     * Query based on pid and pageIds
+     *
+     * @param map
+     * @return
+     */
+    @SuppressWarnings("rawtypes")
+    public String getProcessStopByPageIdAndPageIds(Map map) {
+        String processId = (String) map.get("processId");
+        String[] pageIds = (String[]) map.get("pageIds");
+        String sqlStr = "SELECT 0";
+        if (StringUtils.isNotBlank(processId) && null != pageIds && pageIds.length > 0) {
+            SQL sql = new SQL();
+            sql.SELECT("*");
+            sql.FROM("flow_process_stop");
+            sql.WHERE("enable_flag = 1");
+            sql.WHERE("fk_flow_process_id = " + SqlUtils.preventSQLInjection(processId));
+            sql.WHERE("page_id in ( " + SqlUtils.strArrayToStr(pageIds) + ")");
 
-      sqlStr = sql.toString();
+            sqlStr = sql.toString();
+        }
+        return sqlStr;
     }
-    return sqlStr;
-  }
 
-  /**
-   * Query appId by stopId
-   *
-   * @param stopId
-   * @return
-   */
-  public static String getProcessStopNameByStopId(String stopId) {
-    String sqlStr = "SELECT 0";
-    if (!StringUtils.isAnyEmpty(stopId)) {
-      SQL sql = new SQL();
-      sql.SELECT("fps.name");
-      sql.FROM("flow_process_stop fps");
-      sql.WHERE("fps.enable_flag = 1");
-      sql.WHERE("fps.id = " + SqlUtils.preventSQLInjection(stopId));
+    /**
+     * Query by pid and name
+     *
+     * @param processId
+     * @param name
+     * @return
+     */
+    public String getProcessStopByNameAndPid(String processId, String name) {
+        String sqlStr = "SELECT 0";
+        if (!StringUtils.isAnyEmpty(processId, name)) {
+            SQL sql = new SQL();
+            sql.SELECT("*");
+            sql.FROM("flow_process_stop");
+            sql.WHERE("enable_flag = 1");
+            sql.WHERE("fk_flow_process_id = " + SqlUtils.preventSQLInjection(processId));
+            sql.WHERE("name = " + SqlUtils.preventSQLInjection(name));
 
-      sqlStr = sql.toString();
+            sqlStr = sql.toString();
+        }
+        return sqlStr;
     }
-    return sqlStr;
-  }
 
-  public String updateProcessStop(ProcessStop processStop) {
-    String sqlStr = "SELECT 0";
-    if (this.preventSQLInjectionProcessStop(processStop)) {
-      if (StringUtils.isBlank(this.id)) {
-        return "SELECT 0";
-      }
-      SQL sql = new SQL();
-      sql.UPDATE("flow_process_stop");
+    /**
+     * Query appId by stopId
+     *
+     * @param stopId
+     * @return
+     */
+    public static String getProcessAppIdByStopId(String stopId) {
+        String sqlStr = "SELECT 0";
+        if (!StringUtils.isAnyEmpty(stopId)) {
+            // SELECT fp.app_id FROM flow_process fp left join flow_process_stop fps on fp.id =
+            // fps.fk_flow_process_id WHERE fp.enable_flag = 1 AND fps.enable_flag = 1 AND fps.id =
+            // '00a652e1af604e13a2eda1b7f7bb7d58'
+            SQL sql = new SQL();
+            sql.SELECT("fp.app_id");
+            sql.FROM("flow_process fp");
+            sql.LEFT_OUTER_JOIN("flow_process_stop fps on fp.id = fps.fk_flow_process_id ");
+            sql.WHERE("fp.enable_flag = 1");
+            sql.WHERE("fps.enable_flag = 1");
+            sql.WHERE("fps.id = " + SqlUtils.preventSQLInjection(stopId));
 
-      // Process the required fields first
-      sql.SET("last_update_dttm = " + lastUpdateDttmStr);
-      sql.SET("last_update_user = " + lastUpdateUser);
-      sql.SET("version = " + (version + 1));
-
-      // handle other fields
-      sql.SET("enable_flag = " + enableFlag);
-      sql.SET("name = " + name);
-      sql.SET("bundle = " + bundle);
-      sql.SET("`groups` = " + groups);
-      sql.SET("owner = " + owner);
-      sql.SET("description = " + description);
-      sql.SET("inports = " + inports);
-      sql.SET("in_port_type = " + inPortTypeName);
-      sql.SET("outports = " + outports);
-      sql.SET("out_port_type = " + outPortTypeName);
-      sql.SET("state = " + stateName);
-      sql.SET("start_time = " + startTimeStr);
-      sql.SET("end_time = " + endTimeStr);
-      sql.SET("page_id = " + pageId);
-      sql.WHERE("enable_flag = 1");
-      sql.WHERE("version = " + version);
-      sql.WHERE("id = " + id);
-
-      sqlStr = sql.toString();
+            sqlStr = sql.toString();
+        }
+        return sqlStr;
     }
-    this.reset();
-    return sqlStr;
-  }
 
-  public String updateEnableFlagByProcessId(String processId, String username) {
-    String sqlStr = "SELECT 0";
-    if (StringUtils.isNoneEmpty(processId, username)) {
-      SQL sql = new SQL();
-      sql.UPDATE("flow_process_stop");
-      sql.SET(
-          "last_update_dttm = "
-              + SqlUtils.preventSQLInjection(DateUtils.dateTimesToStr(new Date())));
-      sql.SET("last_update_user = " + SqlUtils.preventSQLInjection(username));
-      sql.SET("version=(version+1)");
-      sql.SET("enable_flag = 0");
-      sql.WHERE("enable_flag = 1");
-      sql.WHERE("fk_flow_process_id = " + SqlUtils.preventSQLInjection(processId));
+    /**
+     * Query appId by stopId
+     *
+     * @param stopId
+     * @return
+     */
+    public static String getProcessStopNameByStopId(String stopId) {
+        String sqlStr = "SELECT 0";
+        if (!StringUtils.isAnyEmpty(stopId)) {
+            SQL sql = new SQL();
+            sql.SELECT("fps.name");
+            sql.FROM("flow_process_stop fps");
+            sql.WHERE("fps.enable_flag = 1");
+            sql.WHERE("fps.id = " + SqlUtils.preventSQLInjection(stopId));
 
-      sqlStr = sql.toString();
+            sqlStr = sql.toString();
+        }
+        return sqlStr;
     }
-    return sqlStr;
-  }
+
+    public String updateProcessStop(ProcessStop processStop) {
+        String sqlStr = "SELECT 0";
+        if (this.preventSQLInjectionProcessStop(processStop)) {
+            if (StringUtils.isBlank(this.id)) {
+                return "SELECT 0";
+            }
+            SQL sql = new SQL();
+            sql.UPDATE("flow_process_stop");
+
+            // Process the required fields first
+            sql.SET("last_update_dttm = " + lastUpdateDttmStr);
+            sql.SET("last_update_user = " + lastUpdateUser);
+            sql.SET("version = " + (version + 1));
+
+            // handle other fields
+            sql.SET("enable_flag = " + enableFlag);
+            sql.SET("name = " + name);
+            sql.SET("bundle = " + bundle);
+            sql.SET("`groups` = " + groups);
+            sql.SET("owner = " + owner);
+            sql.SET("description = " + description);
+            sql.SET("inports = " + inports);
+            sql.SET("in_port_type = " + inPortTypeName);
+            sql.SET("outports = " + outports);
+            sql.SET("out_port_type = " + outPortTypeName);
+            sql.SET("state = " + stateName);
+            sql.SET("start_time = " + startTimeStr);
+            sql.SET("end_time = " + endTimeStr);
+            sql.SET("page_id = " + pageId);
+            sql.WHERE("enable_flag = 1");
+            sql.WHERE("version = " + version);
+            sql.WHERE("id = " + id);
+
+            sqlStr = sql.toString();
+        }
+        this.reset();
+        return sqlStr;
+    }
+
+    public String updateEnableFlagByProcessId(String processId, String username) {
+        String sqlStr = "SELECT 0";
+        if (StringUtils.isNoneEmpty(processId, username)) {
+            SQL sql = new SQL();
+            sql.UPDATE("flow_process_stop");
+            sql.SET(
+                "last_update_dttm = "
+                    + SqlUtils.preventSQLInjection(DateUtils.dateTimesToStr(new Date())));
+            sql.SET("last_update_user = " + SqlUtils.preventSQLInjection(username));
+            sql.SET("version=(version+1)");
+            sql.SET("enable_flag = 0");
+            sql.WHERE("enable_flag = 1");
+            sql.WHERE("fk_flow_process_id = " + SqlUtils.preventSQLInjection(processId));
+
+            sqlStr = sql.toString();
+        }
+        return sqlStr;
+    }
 }

@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.streampark.console.flow.utils;
 
 import org.apache.streampark.console.flow.component.flow.vo.StopsPropertyVo;
@@ -23,238 +40,235 @@ import java.util.Map;
 
 public class FlinkTableUtil {
 
-  private static final String COMMA = ",";
+    private static final String COMMA = ",";
 
-  public static String getDDL(List<StopsPropertyVo> propertiesVos) {
+    public static String getDDL(List<StopsPropertyVo> propertiesVos) {
 
-    String ddl = "";
+        String ddl = "";
 
-    if (CollectionUtils.isEmpty(propertiesVos)) {
-      return ddl;
-    }
-
-    FlinkTableDefinition tableDefinition = null;
-    Map<String, String> properties = new HashMap<>();
-
-    List<String> configList = new ArrayList<>();
-
-    configList.add(String.format("'connector' = '%s'", "connector"));
-
-    for (StopsPropertyVo propertiesVo : propertiesVos) {
-
-      if ("tableDefinition".equalsIgnoreCase(propertiesVo.getName())) {
-        tableDefinition =
-            JSON.parseObject(propertiesVo.getCustomValue(), FlinkTableDefinition.class);
-      } else if ("properties".equalsIgnoreCase(propertiesVo.getName())) {
-        properties =
-            JSON.parseObject(
-                propertiesVo.getCustomValue(), new TypeReference<HashMap<String, String>>() {});
-      } else {
-        if (StringUtils.isNotBlank(propertiesVo.getCustomValue())) {
-          String value = propertiesVo.getCustomValue();
-          if (propertiesVo.getSensitive()) {
-            value = "********";
-          }
-          configList.add(String.format("'%s' = '%s'", propertiesVo.getName(), value));
+        if (CollectionUtils.isEmpty(propertiesVos)) {
+            return ddl;
         }
-      }
-    }
 
-    if (tableDefinition == null) {
-      return ddl;
-    }
+        FlinkTableDefinition tableDefinition = null;
+        Map<String, String> properties = new HashMap<>();
 
-    FlinkTableBaseInfo baseInfo = tableDefinition.getTableBaseInfo();
-    List<FlinkTablePhysicalColumn> physicalColumns = tableDefinition.getPhysicalColumnDefinition();
+        List<String> configList = new ArrayList<>();
 
-    /*
-     * <physical_column_definition>:
-     * column_name column_type [ <column_constraint> ] [COMMENT column_comment]
-     */
-    if (!CollectionUtils.isEmpty(physicalColumns)) {
+        configList.add(String.format("'connector' = '%s'", "connector"));
 
-      StringBuilder columns = new StringBuilder();
-      List<String> primaryKeyList = new ArrayList<>();
-      List<String> partitionKeyList = new ArrayList<>();
+        for (StopsPropertyVo propertiesVo : propertiesVos) {
 
-      FlinkTableAsSelectStatement asSelectStatement = tableDefinition.getAsSelectStatement();
-      FlinkTableLikeStatement likeStatement = tableDefinition.getLikeStatement();
-      List<FlinkTableMetadataColumn> metadataColumns =
-          tableDefinition.getMetadataColumnDefinition();
-      List<FlinkTableComputedColumn> computedColumns =
-          tableDefinition.getComputedColumnDefinition();
-      FlinkTableWatermark watermark = tableDefinition.getWatermarkDefinition();
-
-      for (FlinkTablePhysicalColumn column : physicalColumns) {
-        if (StringUtils.isNotBlank(column.getColumnName())) {
-          if (column.getLength() != null && column.getLength() > 0) {
-            columns.append(
-                String.format(
-                    "`%s` %s(%d)",
-                    column.getColumnName(), column.getColumnType(), column.getLength()));
-          } else if (column.getPrecision() != null
-              && column.getPrecision() > 0
-              && column.getScale() != null
-              && column.getScale() > 0) {
-            columns.append(
-                String.format(
-                    "`%s` %s(%d, %d)",
-                    column.getColumnName(),
-                    column.getColumnType(),
-                    column.getPrecision(),
-                    column.getScale()));
-          } else {
-            columns.append(
-                String.format("`%s` %s", column.getColumnName(), column.getColumnType()));
-          }
-
-          if (StringUtils.isNotBlank(column.getComment())) {
-            columns.append(String.format(" COMMENT '%s'", column.getComment()));
-          }
-
-          columns.append(COMMA);
-
-          if (column.getPrimaryKey()) {
-            primaryKeyList.add(column.getColumnName());
-          }
-          if (column.getPartitionKey()) {
-            partitionKeyList.add(column.getColumnName());
-          }
-        }
-      }
-
-      /*
-       * <metadata_column_definition>:
-       *  column_name column_type METADATA [ FROM metadata_key ] [ VIRTUAL ]
-       */
-      if (!CollectionUtils.isEmpty(metadataColumns)) {
-        for (FlinkTableMetadataColumn column : metadataColumns) {
-          if (StringUtils.isNotBlank(column.getColumnName())) {
-            columns.append(
-                String.format(" `%s` %s METADATA", column.getColumnName(), column.getColumnType()));
-            if (StringUtils.isNotBlank(column.getFrom())) {
-              columns.append(String.format(" FROM '%s' ", column.getFrom()));
+            if ("tableDefinition".equalsIgnoreCase(propertiesVo.getName())) {
+                tableDefinition =
+                    JSON.parseObject(propertiesVo.getCustomValue(), FlinkTableDefinition.class);
+            } else if ("properties".equalsIgnoreCase(propertiesVo.getName())) {
+                properties =
+                    JSON.parseObject(
+                        propertiesVo.getCustomValue(), new TypeReference<HashMap<String, String>>() {
+                        });
+            } else {
+                if (StringUtils.isNotBlank(propertiesVo.getCustomValue())) {
+                    String value = propertiesVo.getCustomValue();
+                    if (propertiesVo.getSensitive()) {
+                        value = "********";
+                    }
+                    configList.add(String.format("'%s' = '%s'", propertiesVo.getName(), value));
+                }
             }
-            if (column.getVirtual()) {
-              columns.append(" VIRTUAL ");
-            }
-            columns.append(COMMA);
-          }
         }
-      }
 
-      /*
-       * <computed_column_definition>:
-       * column_name AS computed_column_expression [COMMENT column_comment]
-       */
-      if (!CollectionUtils.isEmpty(computedColumns)) {
-        computedColumns.forEach(
-            column -> {
-              if (StringUtils.isNotBlank(column.getColumnName())) {
+        if (tableDefinition == null) {
+            return ddl;
+        }
+
+        FlinkTableBaseInfo baseInfo = tableDefinition.getTableBaseInfo();
+        List<FlinkTablePhysicalColumn> physicalColumns = tableDefinition.getPhysicalColumnDefinition();
+
+        /*
+         * <physical_column_definition>: column_name column_type [ <column_constraint> ] [COMMENT column_comment]
+         */
+        if (!CollectionUtils.isEmpty(physicalColumns)) {
+
+            StringBuilder columns = new StringBuilder();
+            List<String> primaryKeyList = new ArrayList<>();
+            List<String> partitionKeyList = new ArrayList<>();
+
+            FlinkTableAsSelectStatement asSelectStatement = tableDefinition.getAsSelectStatement();
+            FlinkTableLikeStatement likeStatement = tableDefinition.getLikeStatement();
+            List<FlinkTableMetadataColumn> metadataColumns =
+                tableDefinition.getMetadataColumnDefinition();
+            List<FlinkTableComputedColumn> computedColumns =
+                tableDefinition.getComputedColumnDefinition();
+            FlinkTableWatermark watermark = tableDefinition.getWatermarkDefinition();
+
+            for (FlinkTablePhysicalColumn column : physicalColumns) {
+                if (StringUtils.isNotBlank(column.getColumnName())) {
+                    if (column.getLength() != null && column.getLength() > 0) {
+                        columns.append(
+                            String.format(
+                                "`%s` %s(%d)",
+                                column.getColumnName(), column.getColumnType(), column.getLength()));
+                    } else if (column.getPrecision() != null
+                        && column.getPrecision() > 0
+                        && column.getScale() != null
+                        && column.getScale() > 0) {
+                        columns.append(
+                            String.format(
+                                "`%s` %s(%d, %d)",
+                                column.getColumnName(),
+                                column.getColumnType(),
+                                column.getPrecision(),
+                                column.getScale()));
+                    } else {
+                        columns.append(
+                            String.format("`%s` %s", column.getColumnName(), column.getColumnType()));
+                    }
+
+                    if (StringUtils.isNotBlank(column.getComment())) {
+                        columns.append(String.format(" COMMENT '%s'", column.getComment()));
+                    }
+
+                    columns.append(COMMA);
+
+                    if (column.getPrimaryKey()) {
+                        primaryKeyList.add(column.getColumnName());
+                    }
+                    if (column.getPartitionKey()) {
+                        partitionKeyList.add(column.getColumnName());
+                    }
+                }
+            }
+
+            /*
+             * <metadata_column_definition>: column_name column_type METADATA [ FROM metadata_key ] [ VIRTUAL ]
+             */
+            if (!CollectionUtils.isEmpty(metadataColumns)) {
+                for (FlinkTableMetadataColumn column : metadataColumns) {
+                    if (StringUtils.isNotBlank(column.getColumnName())) {
+                        columns.append(
+                            String.format(" `%s` %s METADATA", column.getColumnName(), column.getColumnType()));
+                        if (StringUtils.isNotBlank(column.getFrom())) {
+                            columns.append(String.format(" FROM '%s' ", column.getFrom()));
+                        }
+                        if (column.getVirtual()) {
+                            columns.append(" VIRTUAL ");
+                        }
+                        columns.append(COMMA);
+                    }
+                }
+            }
+
+            /*
+             * <computed_column_definition>: column_name AS computed_column_expression [COMMENT column_comment]
+             */
+            if (!CollectionUtils.isEmpty(computedColumns)) {
+                computedColumns.forEach(
+                    column -> {
+                        if (StringUtils.isNotBlank(column.getColumnName())) {
+                            columns.append(
+                                String.format(
+                                    " `%s` AS %s",
+                                    column.getColumnName(), column.getComputedColumnExpression()));
+
+                            if (StringUtils.isNotBlank(column.getComment())) {
+                                columns.append(String.format(" COMMENT '%s'", column.getComment()));
+                            }
+                            columns.append(COMMA);
+                        }
+                    });
+            }
+
+            /*
+             * <watermark_definition>: WATERMARK FOR rowtime_column_name AS watermark_strategy_expression WATERMARK FOR
+             * view_time as view_time - INTERVAL '5' SECOND
+             */
+            if (watermark != null && StringUtils.isNotBlank(watermark.getRowTimeColumnName())) {
                 columns.append(
                     String.format(
-                        " `%s` AS %s",
-                        column.getColumnName(), column.getComputedColumnExpression()));
+                        " WATERMARK FOR %s AS %s - INTERVAL '%s' %s,",
+                        watermark.getRowTimeColumnName(),
+                        watermark.getRowTimeColumnName(),
+                        watermark.getTime(),
+                        watermark.getTimeUnit()));
+            }
 
-                if (StringUtils.isNotBlank(column.getComment())) {
-                  columns.append(String.format(" COMMENT '%s'", column.getComment()));
-                }
-                columns.append(COMMA);
-              }
-            });
-      }
+            if (!CollectionUtils.isEmpty(primaryKeyList)) {
+                columns.append(
+                    String.format(" PRIMARY KEY (%s) NOT ENFORCED,", String.join(COMMA, primaryKeyList)));
+            }
 
-      /*
-       * <watermark_definition>:
-       * WATERMARK FOR rowtime_column_name AS watermark_strategy_expression
-       * WATERMARK FOR view_time as view_time - INTERVAL '5' SECOND
-       */
-      if (watermark != null && StringUtils.isNotBlank(watermark.getRowTimeColumnName())) {
-        columns.append(
-            String.format(
-                " WATERMARK FOR %s AS %s - INTERVAL '%s' %s,",
-                watermark.getRowTimeColumnName(),
-                watermark.getRowTimeColumnName(),
-                watermark.getTime(),
-                watermark.getTimeUnit()));
-      }
+            String tableComment = "";
+            if (baseInfo != null && StringUtils.isNotBlank(baseInfo.getRegisterTableComment())) {
+                tableComment = String.format(" COMMENT '%s'", baseInfo.getRegisterTableComment());
+            }
 
-      if (!CollectionUtils.isEmpty(primaryKeyList)) {
-        columns.append(
-            String.format(" PRIMARY KEY (%s) NOT ENFORCED,", String.join(COMMA, primaryKeyList)));
-      }
+            String partitionStatement = "";
+            if (!CollectionUtils.isEmpty(partitionKeyList)) {
+                tableComment = String.format(" PARTITIONED BY (%s)", String.join(COMMA, partitionKeyList));
+            }
 
-      String tableComment = "";
-      if (baseInfo != null && StringUtils.isNotBlank(baseInfo.getRegisterTableComment())) {
-        tableComment = String.format(" COMMENT '%s'", baseInfo.getRegisterTableComment());
-      }
+            String columnsStatement = columns.toString();
+            if (columnsStatement.endsWith(",")) {
+                columnsStatement = columnsStatement.substring(0, columnsStatement.length() - 1);
+            }
 
-      String partitionStatement = "";
-      if (!CollectionUtils.isEmpty(partitionKeyList)) {
-        tableComment = String.format(" PARTITIONED BY (%s)", String.join(COMMA, partitionKeyList));
-      }
+            String ifNotExists = "";
+            if (baseInfo != null && baseInfo.getIfNotExists()) {
+                ifNotExists = "IF NOT EXISTS";
+            }
 
-      String columnsStatement = columns.toString();
-      if (columnsStatement.endsWith(",")) {
-        columnsStatement = columnsStatement.substring(0, columnsStatement.length() - 1);
-      }
+            String selectStatement = "";
+            if (asSelectStatement != null
+                && StringUtils.isNotBlank(asSelectStatement.getSelectStatement())) {
+                selectStatement =
+                    String.format(" AS %s", String.join(COMMA, asSelectStatement.getSelectStatement()));
+            }
 
-      String ifNotExists = "";
-      if (baseInfo != null && baseInfo.getIfNotExists()) {
-        ifNotExists = "IF NOT EXISTS";
-      }
+            String like = "";
+            if (likeStatement != null && StringUtils.isNotBlank(likeStatement.getLikeStatement())) {
+                like = String.format(" LIKE %s", String.join(COMMA, likeStatement.getLikeStatement()));
+            }
 
-      String selectStatement = "";
-      if (asSelectStatement != null
-          && StringUtils.isNotBlank(asSelectStatement.getSelectStatement())) {
-        selectStatement =
-            String.format(" AS %s", String.join(COMMA, asSelectStatement.getSelectStatement()));
-      }
+            String tmpTable = "";
+            if (StringUtils.isEmpty(tableDefinition.getRegisterTableName())) {
+                tmpTable = "tmp_table";
+            } else {
+                tmpTable += tableDefinition.getFullRegisterTableName();
+            }
 
-      String like = "";
-      if (likeStatement != null && StringUtils.isNotBlank(likeStatement.getLikeStatement())) {
-        like = String.format(" LIKE %s", String.join(COMMA, likeStatement.getLikeStatement()));
-      }
+            if (properties != null && !properties.isEmpty()) {
+                properties.forEach(
+                    (key, value) -> {
+                        if (StringUtils.isNotBlank(value)) {
+                            configList.add(String.format("'%s' = '%s',", key, value));
+                        }
+                    });
+            }
 
-      String tmpTable = "";
-      if (StringUtils.isEmpty(tableDefinition.getRegisterTableName())) {
-        tmpTable = "tmp_table";
-      } else {
-        tmpTable += tableDefinition.getFullRegisterTableName();
-      }
+            String conf = String.join(COMMA, configList);
 
-      if (properties != null && !properties.isEmpty()) {
-        properties.forEach(
-            (key, value) -> {
-              if (StringUtils.isNotBlank(value)) {
-                configList.add(String.format("'%s' = '%s',", key, value));
-              }
-            });
-      }
+            ddl =
+                String.format(
+                    " CREATE TABLE %s %s "
+                        + "( %s )"
+                        + " %s "
+                        + " %s "
+                        + "WITH ("
+                        + "%s"
+                        + ") "
+                        + " %s "
+                        + " %s ",
+                    ifNotExists,
+                    tmpTable,
+                    columnsStatement,
+                    tableComment,
+                    partitionStatement,
+                    conf,
+                    selectStatement,
+                    like);
+        }
 
-      String conf = String.join(COMMA, configList);
-
-      ddl =
-          String.format(
-              " CREATE TABLE %s %s "
-                  + "( %s )"
-                  + " %s "
-                  + " %s "
-                  + "WITH ("
-                  + "%s"
-                  + ") "
-                  + " %s "
-                  + " %s ",
-              ifNotExists,
-              tmpTable,
-              columnsStatement,
-              tableComment,
-              partitionStatement,
-              conf,
-              selectStatement,
-              like);
+        return ddl;
     }
-
-    return ddl;
-  }
 }

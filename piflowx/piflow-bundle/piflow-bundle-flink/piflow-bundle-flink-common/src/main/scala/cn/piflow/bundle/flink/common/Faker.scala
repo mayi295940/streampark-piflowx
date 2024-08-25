@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow.bundle.flink.common
 
 import cn.piflow._
@@ -116,48 +133,47 @@ class Faker extends ConfigurableStop[Table] {
     var columns = List[String]()
     var conf = List[String]()
 
-    schema.foreach(
-      item => {
+    schema.foreach(item => {
 
-        val filedMap = MMap(item.toSeq: _*)
+      val filedMap = MMap(item.toSeq: _*)
 
-        val filedName = MapUtil.get(filedMap, "filedName").toString
-        columns = columns :+ s"`$filedName` "
+      val filedName = MapUtil.get(filedMap, "filedName").toString
+      columns = columns :+ s"`$filedName` "
 
-        val filedType = filedMap.getOrElse("filedType", "").toString
-        if (StringUtils.isNotBlank(filedType)) {
-          columns = columns :+ s"$filedType"
-        }
+      val filedType = filedMap.getOrElse("filedType", "").toString
+      if (StringUtils.isNotBlank(filedType)) {
+        columns = columns :+ s"$filedType"
+      }
 
-        val computedColumnExpression = filedMap.getOrElse("computedColumnExpression", "").toString
-        if (StringUtils.isEmpty(filedType) && StringUtils.isNotBlank(computedColumnExpression)) {
-          columns = columns :+ s"AS $computedColumnExpression"
-        }
+      val computedColumnExpression = filedMap.getOrElse("computedColumnExpression", "").toString
+      if (StringUtils.isEmpty(filedType) && StringUtils.isNotBlank(computedColumnExpression)) {
+        columns = columns :+ s"AS $computedColumnExpression"
+      }
 
-        val comment = filedMap.getOrElse("comment", "").toString
-        if (StringUtils.isNotBlank(comment)) {
-          columns = columns :+ s" COMMENT '$comment'"
-        }
+      val comment = filedMap.getOrElse("comment", "").toString
+      if (StringUtils.isNotBlank(comment)) {
+        columns = columns :+ s" COMMENT '$comment'"
+      }
 
-        columns = columns :+ Constants.COMMA
+      columns = columns :+ Constants.COMMA
 
-        var expression = filedMap.getOrElse("expression", "").toString
-        if (StringUtils.isNotBlank(expression)) {
-          expression = expression.trim.replaceFirst("<", "").dropRight(1)
-          conf = s"'fields.$filedName.expression' = '#{$expression}'," :: conf
-        }
+      var expression = filedMap.getOrElse("expression", "").toString
+      if (StringUtils.isNotBlank(expression)) {
+        expression = expression.trim.replaceFirst("<", "").dropRight(1)
+        conf = s"'fields.$filedName.expression' = '#{$expression}'," :: conf
+      }
 
-        val nullRate = filedMap.getOrElse("nullRate", "").toString
-        if (StringUtils.isNotBlank(nullRate)) {
-          conf = s"'fields.$filedName.null-rate' = '$nullRate'," :: conf
-        }
+      val nullRate = filedMap.getOrElse("nullRate", "").toString
+      if (StringUtils.isNotBlank(nullRate)) {
+        conf = s"'fields.$filedName.null-rate' = '$nullRate'," :: conf
+      }
 
-        val length = filedMap.getOrElse("length", "").toString
-        if (StringUtils.isNotBlank(length)) {
-          conf = s"'fields.$filedName.length' = '$length'," :: conf
-        }
+      val length = filedMap.getOrElse("length", "").toString
+      if (StringUtils.isNotBlank(length)) {
+        conf = s"'fields.$filedName.length' = '$length'," :: conf
+      }
 
-      })
+    })
 
     (columns.mkString("").trim.dropRight(1), conf.mkString(""))
   }

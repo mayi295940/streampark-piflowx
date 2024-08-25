@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.streampark.console.flow.component.process.service;
 
 import org.apache.streampark.console.flow.component.process.vo.DebugDataRequest;
@@ -7,231 +24,231 @@ import java.util.List;
 
 public interface IProcessService {
 
-  /**
-   * Query processVoList (Query contains its subtables)
-   *
-   * @return
-   */
-  public List<ProcessVo> getProcessAllVoList();
+    /**
+     * Query processVoList (Query contains its subtables)
+     *
+     * @return
+     */
+    public List<ProcessVo> getProcessAllVoList();
 
-  /**
-   * Query processVoList (query process table only)
-   *
-   * @return
-   */
-  public List<ProcessVo> getProcessVoList();
+    /**
+     * Query processVoList (query process table only)
+     *
+     * @return
+     */
+    public List<ProcessVo> getProcessVoList();
 
-  /**
-   * Query processVo according to ID (query contains its subtable)
-   *
-   * @param id
-   * @return
-   */
-  public ProcessVo getProcessAllVoById(String username, boolean isAdmin, String id);
+    /**
+     * Query processVo according to ID (query contains its subtable)
+     *
+     * @param id
+     * @return
+     */
+    public ProcessVo getProcessAllVoById(String username, boolean isAdmin, String id);
 
-  /**
-   * Query processVo according to ID (query process table only)
-   *
-   * @param id
-   * @return
-   */
-  public String getProcessVoById(String username, boolean isAdmin, String id);
+    /**
+     * Query processVo according to ID (query process table only)
+     *
+     * @param id
+     * @return
+     */
+    public String getProcessVoById(String username, boolean isAdmin, String id);
 
-  /**
-   * Query process according to ID
-   *
-   * @param id
-   * @return
-   */
-  public ProcessVo getProcessById(String username, boolean isAdmin, String id);
+    /**
+     * Query process according to ID
+     *
+     * @param id
+     * @return
+     */
+    public ProcessVo getProcessById(String username, boolean isAdmin, String id);
 
-  /**
-   * Query process according to Appid
-   *
-   * @param appId
-   * @return
-   */
-  public ProcessVo getProcessVoByAppId(String appId);
+    /**
+     * Query process according to Appid
+     *
+     * @param appId
+     * @return
+     */
+    public ProcessVo getProcessVoByAppId(String appId);
 
-  /**
-   * Query appInfo on a third-party interface based on appID and save
-   *
-   * @param appID
-   * @return
-   * @throws Exception
-   */
-  public ProcessVo getAppInfoByThirdAndSave(String appID) throws Exception;
+    /**
+     * Query appInfo on a third-party interface based on appID and save
+     *
+     * @param appID
+     * @return
+     * @throws Exception
+     */
+    public ProcessVo getAppInfoByThirdAndSave(String appID) throws Exception;
 
-  /**
-   * Query appInfo according to appID
-   *
-   * @param appID
-   * @return
-   */
-  public String getAppInfoByAppId(String appID);
+    /**
+     * Query appInfo according to appID
+     *
+     * @param appID
+     * @return
+     */
+    public String getAppInfoByAppId(String appID);
 
-  /**
-   * Query progress and save on third-party interface according to appID
-   *
-   * @param appIDs
-   * @return
-   * @throws Exception
-   */
-  public String getProgressByThirdAndSave(String[] appIDs) throws Exception;
+    /**
+     * Query progress and save on third-party interface according to appID
+     *
+     * @param appIDs
+     * @return
+     * @throws Exception
+     */
+    public String getProgressByThirdAndSave(String[] appIDs) throws Exception;
 
-  /**
-   * Query process according to appID
-   *
-   * @param appIDs
-   * @return
-   */
-  public String getProgressByAppIds(String[] appIDs);
+    /**
+     * Query process according to appID
+     *
+     * @param appIDs
+     * @return
+     */
+    public String getProgressByAppIds(String[] appIDs);
 
-  /**
-   * Modify the process (only update the process table, the subtable is not updated)
-   *
-   * @param processVo
-   * @return
-   * @throws Exception
-   */
-  public int updateProcess(String username, boolean isAdmin, ProcessVo processVo) throws Exception;
+    /**
+     * Modify the process (only update the process table, the subtable is not updated)
+     *
+     * @param processVo
+     * @return
+     * @throws Exception
+     */
+    public int updateProcess(String username, boolean isAdmin, ProcessVo processVo) throws Exception;
 
-  /**
-   * Generate Process from flowId and save it
-   *
-   * @param isAdmin
-   * @param username
-   * @param flowId
-   * @return
-   */
-  public ProcessVo flowToProcessAndSave(boolean isAdmin, String username, String flowId)
-      throws Exception;
+    /**
+     * Generate Process from flowId and save it
+     *
+     * @param isAdmin
+     * @param username
+     * @param flowId
+     * @return
+     */
+    public ProcessVo flowToProcessAndSave(boolean isAdmin, String username, String flowId) throws Exception;
 
-  /**
-   * Logical deletion
-   *
-   * @param processId
-   * @return
-   */
-  public String delProcess(boolean isAdmin, String username, String processId);
+    /**
+     * Logical deletion
+     *
+     * @param processId
+     * @return
+     */
+    public String delProcess(boolean isAdmin, String username, String processId);
 
-  /**
-   * Query the running process List (process List) according to flowId
-   *
-   * @param flowId
-   * @return
-   */
-  public String getRunningProcessVoList(String flowId);
+    /**
+     * Query the running process List (process List) according to flowId
+     *
+     * @param flowId
+     * @return
+     */
+    public String getRunningProcessVoList(String flowId);
 
-  /**
-   * Query processVoList (parameter space-time non-paging)
-   *
-   * @param offset
-   * @param limit
-   * @param param
-   * @return
-   */
-  public String getProcessVoListPage(
-      String username, boolean isAdmin, Integer offset, Integer limit, String param);
+    /**
+     * Query processVoList (parameter space-time non-paging)
+     *
+     * @param offset
+     * @param limit
+     * @param param
+     * @return
+     */
+    public String getProcessVoListPage(
+                                       String username, boolean isAdmin, Integer offset, Integer limit, String param);
 
-  /**
-   * Query processVoList (parameter space-time non-paging)
-   *
-   * @param offset
-   * @param limit
-   * @param param
-   * @return
-   */
-  public String getProcessGroupVoListPage(
-      String username, boolean isAdmin, Integer offset, Integer limit, String param);
+    /**
+     * Query processVoList (parameter space-time non-paging)
+     *
+     * @param offset
+     * @param limit
+     * @param param
+     * @return
+     */
+    public String getProcessGroupVoListPage(
+                                            String username, boolean isAdmin, Integer offset, Integer limit,
+                                            String param);
 
-  /**
-   * Start processes
-   *
-   * @param isAdmin
-   * @param username
-   * @param processId
-   * @param checkpoint
-   * @param runMode
-   * @return
-   * @throws Exception
-   */
-  public String startProcess(
-      boolean isAdmin, String username, String processId, String checkpoint, String runMode)
-      throws Exception;
+    /**
+     * Start processes
+     *
+     * @param isAdmin
+     * @param username
+     * @param processId
+     * @param checkpoint
+     * @param runMode
+     * @return
+     * @throws Exception
+     */
+    public String startProcess(
+                               boolean isAdmin, String username, String processId, String checkpoint,
+                               String runMode) throws Exception;
 
-  /**
-   * Stop running processes
-   *
-   * @param processId
-   * @return
-   */
-  public String stopProcess(String username, boolean isAdmin, String processId);
+    /**
+     * Stop running processes
+     *
+     * @param processId
+     * @return
+     */
+    public String stopProcess(String username, boolean isAdmin, String processId);
 
-  /**
-   * get debug data
-   *
-   * @param debugDataRequest
-   * @return
-   */
-  public String getDebugData(DebugDataRequest debugDataRequest);
+    /**
+     * get debug data
+     *
+     * @param debugDataRequest
+     * @return
+     */
+    public String getDebugData(DebugDataRequest debugDataRequest);
 
-  /**
-   * get visualization data
-   *
-   * @param appID
-   * @param stopName
-   * @param visualizationType
-   * @return
-   */
-  public String getVisualizationData(
-      String appID, String stopName, String visualizationType, boolean isSoft);
+    /**
+     * get visualization data
+     *
+     * @param appID
+     * @param stopName
+     * @param visualizationType
+     * @return
+     */
+    public String getVisualizationData(
+                                       String appID, String stopName, String visualizationType, boolean isSoft);
 
-  /**
-   * Query process based on processId and pageId
-   *
-   * @param processGroupId
-   * @param pageId
-   * @return
-   */
-  public ProcessVo getProcessVoByPageId(
-      String username, boolean isAdmin, String processGroupId, String pageId);
+    /**
+     * Query process based on processId and pageId
+     *
+     * @param processGroupId
+     * @param pageId
+     * @return
+     */
+    public ProcessVo getProcessVoByPageId(
+                                          String username, boolean isAdmin, String processGroupId, String pageId);
 
-  /**
-   * getCheckpoints
-   *
-   * @param parentProcessId
-   * @param pID
-   * @return
-   */
-  public String getCheckpoints(String parentProcessId, String pID);
+    /**
+     * getCheckpoints
+     *
+     * @param parentProcessId
+     * @param pID
+     * @return
+     */
+    public String getCheckpoints(String parentProcessId, String pID);
 
-  /**
-   * getLogUrl
-   *
-   * @param appId
-   * @return
-   */
-  public String getLogUrl(String appId);
+    /**
+     * getLogUrl
+     *
+     * @param appId
+     * @return
+     */
+    public String getLogUrl(String appId);
 
-  /**
-   * drawingBoard Data
-   *
-   * @param username
-   * @param isAdmin
-   * @param loadId
-   * @param parentAccessPath
-   * @return
-   */
-  public String drawingBoardData(
-      String username, boolean isAdmin, String loadId, String parentAccessPath);
+    /**
+     * drawingBoard Data
+     *
+     * @param username
+     * @param isAdmin
+     * @param loadId
+     * @param parentAccessPath
+     * @return
+     */
+    public String drawingBoardData(
+                                   String username, boolean isAdmin, String loadId, String parentAccessPath);
 
-  /**
-   * Query processStop based on processId and pageId
-   *
-   * @param processId
-   * @param pageId
-   * @return
-   */
-  public String getProcessStopVoByPageId(String processId, String pageId);
+    /**
+     * Query processStop based on processId and pageId
+     *
+     * @param processId
+     * @param pageId
+     * @return
+     */
+    public String getProcessStopVoByPageId(String processId, String pageId);
 }

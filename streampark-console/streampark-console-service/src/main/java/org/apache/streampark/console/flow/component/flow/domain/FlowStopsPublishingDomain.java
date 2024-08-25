@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.streampark.console.flow.component.flow.domain;
 
 import org.apache.streampark.console.flow.base.utils.UUIDUtils;
@@ -17,138 +34,136 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Component
-@Transactional(
-    propagation = Propagation.REQUIRED,
-    isolation = Isolation.DEFAULT,
-    timeout = 36000,
-    rollbackFor = Exception.class)
+@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, timeout = 36000, rollbackFor = Exception.class)
 public class FlowStopsPublishingDomain {
 
-  @Autowired private FlowStopsPublishingMapper flowStopsPublishingMapper;
+    @Autowired
+    private FlowStopsPublishingMapper flowStopsPublishingMapper;
 
-  public int addFlowStopsPublishing(FlowStopsPublishing flowStopsPublishing) throws Exception {
-    if (null == flowStopsPublishing) {
-      throw new Exception("save failed");
-    }
-    String id = flowStopsPublishing.getId();
-    if (StringUtils.isBlank(id)) {
-      flowStopsPublishing.setId(UUIDUtils.getUUID32());
-    }
-    int affectedRows = flowStopsPublishingMapper.addFlowStopsPublishing(flowStopsPublishing);
-    if (affectedRows <= 0) {
-      throw new Exception("save failed");
-    }
-    return affectedRows;
-  }
-
-  public int updateFlowStopsPublishing(
-      boolean isAdmin, String username, String publishingId, String name, List<String> stopsIds)
-      throws Exception {
-    if (StringUtils.isBlank(username)) {
-      throw new Exception("lastUpdateUser is null");
-    }
-    if (StringUtils.isBlank(publishingId)) {
-      throw new Exception("publishingId is null");
-    }
-    if (StringUtils.isBlank(name)) {
-      throw new Exception("name is null");
-    }
-    if (null == stopsIds || stopsIds.size() <= 0) {
-      throw new Exception("stopsId is null");
-    }
-    // find stops id list by publishingId
-    List<String> publishingStopsIdList = null;
-    if (isAdmin) {
-      publishingStopsIdList = getFlowStopsPublishingByPublishingId(publishingId);
-    } else {
-      publishingStopsIdList =
-          getFlowStopsPublishingByPublishingIdAndCreateUser(username, publishingId);
-    }
-    if (null == publishingStopsIdList || publishingStopsIdList.size() <= 0) {
-      throw new Exception("data error!!!");
-    }
-    int affectedRows =
-        flowStopsPublishingMapper.updateFlowStopsPublishingName(username, publishingId, name);
-    if (affectedRows <= 0) {
-      return 0;
-    }
-    // Eliminate existing and to be deleted
-    for (String stopsId : publishingStopsIdList) {
-      if (stopsIds.contains(stopsId)) {
-        stopsIds.remove(stopsId);
-        continue;
-      }
-      affectedRows +=
-          flowStopsPublishingMapper.updateFlowStopsPublishingEnableFlagByPublishingIdAndStopId(
-              username, publishingId, stopsId);
+    public int addFlowStopsPublishing(FlowStopsPublishing flowStopsPublishing) throws Exception {
+        if (null == flowStopsPublishing) {
+            throw new Exception("save failed");
+        }
+        String id = flowStopsPublishing.getId();
+        if (StringUtils.isBlank(id)) {
+            flowStopsPublishing.setId(UUIDUtils.getUUID32());
+        }
+        int affectedRows = flowStopsPublishingMapper.addFlowStopsPublishing(flowStopsPublishing);
+        if (affectedRows <= 0) {
+            throw new Exception("save failed");
+        }
+        return affectedRows;
     }
 
-    // add stopsId
-    if (stopsIds.size() > 0) {
-      FlowStopsPublishing flowStopsPublishing =
-          FlowStopsPublishingUtils.flowStopsPublishingNewNoId(username);
-      flowStopsPublishing.setId(UUIDUtils.getUUID32());
-      flowStopsPublishing.setPublishingId(publishingId);
-      flowStopsPublishing.setName(name);
-      flowStopsPublishing.setStopsIds(stopsIds);
-      affectedRows += flowStopsPublishingMapper.addFlowStopsPublishing(flowStopsPublishing);
+    public int updateFlowStopsPublishing(
+                                         boolean isAdmin, String username, String publishingId, String name,
+                                         List<String> stopsIds) throws Exception {
+        if (StringUtils.isBlank(username)) {
+            throw new Exception("lastUpdateUser is null");
+        }
+        if (StringUtils.isBlank(publishingId)) {
+            throw new Exception("publishingId is null");
+        }
+        if (StringUtils.isBlank(name)) {
+            throw new Exception("name is null");
+        }
+        if (null == stopsIds || stopsIds.size() <= 0) {
+            throw new Exception("stopsId is null");
+        }
+        // find stops id list by publishingId
+        List<String> publishingStopsIdList = null;
+        if (isAdmin) {
+            publishingStopsIdList = getFlowStopsPublishingByPublishingId(publishingId);
+        } else {
+            publishingStopsIdList =
+                getFlowStopsPublishingByPublishingIdAndCreateUser(username, publishingId);
+        }
+        if (null == publishingStopsIdList || publishingStopsIdList.size() <= 0) {
+            throw new Exception("data error!!!");
+        }
+        int affectedRows =
+            flowStopsPublishingMapper.updateFlowStopsPublishingName(username, publishingId, name);
+        if (affectedRows <= 0) {
+            return 0;
+        }
+        // Eliminate existing and to be deleted
+        for (String stopsId : publishingStopsIdList) {
+            if (stopsIds.contains(stopsId)) {
+                stopsIds.remove(stopsId);
+                continue;
+            }
+            affectedRows +=
+                flowStopsPublishingMapper.updateFlowStopsPublishingEnableFlagByPublishingIdAndStopId(
+                    username, publishingId, stopsId);
+        }
+
+        // add stopsId
+        if (stopsIds.size() > 0) {
+            FlowStopsPublishing flowStopsPublishing =
+                FlowStopsPublishingUtils.flowStopsPublishingNewNoId(username);
+            flowStopsPublishing.setId(UUIDUtils.getUUID32());
+            flowStopsPublishing.setPublishingId(publishingId);
+            flowStopsPublishing.setName(name);
+            flowStopsPublishing.setStopsIds(stopsIds);
+            affectedRows += flowStopsPublishingMapper.addFlowStopsPublishing(flowStopsPublishing);
+        }
+        return affectedRows;
     }
-    return affectedRows;
-  }
 
-  public int updateFlowStopsPublishingEnableFlagByPublishingId(
-      String username, String publishingId) {
-    return flowStopsPublishingMapper.updateFlowStopsPublishingEnableFlagByPublishingId(
-        username, publishingId);
-  }
+    public int updateFlowStopsPublishingEnableFlagByPublishingId(
+                                                                 String username, String publishingId) {
+        return flowStopsPublishingMapper.updateFlowStopsPublishingEnableFlagByPublishingId(
+            username, publishingId);
+    }
 
-  public List<FlowStopsPublishing> getFlowStopsPublishingList(
-      String username, boolean isAdmin, String param) {
-    return flowStopsPublishingMapper.getFlowStopsPublishingList(username, isAdmin, param);
-  }
+    public List<FlowStopsPublishing> getFlowStopsPublishingList(
+                                                                String username, boolean isAdmin, String param) {
+        return flowStopsPublishingMapper.getFlowStopsPublishingList(username, isAdmin, param);
+    }
 
-  public List<FlowStopsPublishingVo> getFlowStopsPublishingVoByPublishingId(String publishingId) {
-    return flowStopsPublishingMapper.getFlowStopsPublishingVoByPublishingId(publishingId);
-  }
+    public List<FlowStopsPublishingVo> getFlowStopsPublishingVoByPublishingId(String publishingId) {
+        return flowStopsPublishingMapper.getFlowStopsPublishingVoByPublishingId(publishingId);
+    }
 
-  public List<String> getFlowStopsPublishingByPublishingId(String publishingId) {
-    return flowStopsPublishingMapper.getPublishingStopsIdsByPublishingId(publishingId);
-  }
+    public List<String> getFlowStopsPublishingByPublishingId(String publishingId) {
+        return flowStopsPublishingMapper.getPublishingStopsIdsByPublishingId(publishingId);
+    }
 
-  public List<String> getFlowStopsPublishingByPublishingIdAndCreateUser(
-      String username, String publishingId) {
-    return flowStopsPublishingMapper.getFlowStopsPublishingByPublishingIdAndCreateUser(
-        username, publishingId);
-  }
+    public List<String> getFlowStopsPublishingByPublishingIdAndCreateUser(
+                                                                          String username, String publishingId) {
+        return flowStopsPublishingMapper.getFlowStopsPublishingByPublishingIdAndCreateUser(
+            username, publishingId);
+    }
 
-  public List<FlowStopsPublishing> getFlowStopsPublishingListByPublishingIdAndStopsId(
-      String publishingId, String stopsId) {
-    return flowStopsPublishingMapper.getFlowStopsPublishingListByPublishingIdAndStopsId(
-        publishingId, stopsId);
-  }
+    public List<FlowStopsPublishing> getFlowStopsPublishingListByPublishingIdAndStopsId(
+                                                                                        String publishingId,
+                                                                                        String stopsId) {
+        return flowStopsPublishingMapper.getFlowStopsPublishingListByPublishingIdAndStopsId(
+            publishingId, stopsId);
+    }
 
-  public List<FlowStopsPublishing> getFlowStopsPublishingListByFlowId(
-      String username, String flowId) {
-    return flowStopsPublishingMapper.getFlowStopsPublishingListByFlowId(username, flowId);
-  }
+    public List<FlowStopsPublishing> getFlowStopsPublishingListByFlowId(
+                                                                        String username, String flowId) {
+        return flowStopsPublishingMapper.getFlowStopsPublishingListByFlowId(username, flowId);
+    }
 
-  public List<String> getPublishingNameListByStopsIds(List<String> stopsIds) {
-    return flowStopsPublishingMapper.getPublishingNameListByStopsIds(stopsIds);
-  }
+    public List<String> getPublishingNameListByStopsIds(List<String> stopsIds) {
+        return flowStopsPublishingMapper.getPublishingNameListByStopsIds(stopsIds);
+    }
 
-  public List<String> getPublishingNameListByFlowId(String flowId) {
-    return flowStopsPublishingMapper.getPublishingNameListByFlowId(flowId);
-  }
+    public List<String> getPublishingNameListByFlowId(String flowId) {
+        return flowStopsPublishingMapper.getPublishingNameListByFlowId(flowId);
+    }
 
-  public List<String> getFlowIdByPublishingId(String publishingId) {
-    return flowStopsPublishingMapper.getFlowIdByPublishingId(publishingId);
-  }
+    public List<String> getFlowIdByPublishingId(String publishingId) {
+        return flowStopsPublishingMapper.getFlowIdByPublishingId(publishingId);
+    }
 
-  public List<String> getPublishingIdsByPublishingName(String publishingName) {
-    return flowStopsPublishingMapper.getPublishingIdsByPublishingName(publishingName);
-  }
+    public List<String> getPublishingIdsByPublishingName(String publishingName) {
+        return flowStopsPublishingMapper.getPublishingIdsByPublishingName(publishingName);
+    }
 
-  public List<String> getPublishingNamesByStopsId(String stopsId) {
-    return flowStopsPublishingMapper.getPublishingNamesByStopsId(stopsId);
-  }
+    public List<String> getPublishingNamesByStopsId(String stopsId) {
+        return flowStopsPublishingMapper.getPublishingNamesByStopsId(stopsId);
+    }
 }

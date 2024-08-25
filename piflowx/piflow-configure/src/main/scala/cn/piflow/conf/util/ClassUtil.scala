@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow.conf.util
 
 import cn.piflow.Constants
@@ -98,21 +115,20 @@ object ClassUtil {
     val stopList = findAllConfigurableStop()
 
     val groupList = stopList
-      .flatMap(
-        stop => {
-          // stop.getGroup()
-          var group = List("")
-          try {
-            group = stop.getGroup()
+      .flatMap(stop => {
+        // stop.getGroup()
+        var group = List("")
+        try {
+          group = stop.getGroup()
 
-          } catch {
-            // case ex : Exception => println(ex)
-            case ex: scala.NotImplementedError => println(stop.getClass.getName + " -> " + ex)
-          }
+        } catch {
+          // case ex : Exception => println(ex)
+          case ex: scala.NotImplementedError => println(stop.getClass.getName + " -> " + ex)
+        }
 
-          group
+        group
 
-        })
+      })
       .distinct
       .filter(_ != "")
     groupList
@@ -187,8 +203,7 @@ object ClassUtil {
       stop: ConfigurableStop[DataType]): JValue = {
     val stopName = bundle.split("\\.").last
     val propertyDescriptorList: List[PropertyDescriptor] = stop.getPropertyDescriptor()
-    propertyDescriptorList.foreach(
-      p => if (p.allowableValues == null || p.allowableValues == None) p.allowableValues = List(""))
+    propertyDescriptorList.foreach(p => if (p.allowableValues == null || p.allowableValues == None) p.allowableValues = List(""))
     val base64Encoder = new BASE64Encoder()
     var iconArrayByte: Array[Byte] = Array[Byte]()
     try {
@@ -247,12 +262,11 @@ object ClassUtil {
   def findConfigurableStopListInfo(bundleList: List[String]): String = {
 
     var stopInfoJValueList = List[JValue]()
-    bundleList.foreach(
-      bundle => {
-        val stop = ClassUtil.findConfigurableStop(bundle)
-        val stopJValue = constructStopInfoJValue(bundle, stop)
-        stopInfoJValueList = stopJValue +: stopInfoJValueList
-      })
+    bundleList.foreach(bundle => {
+      val stop = ClassUtil.findConfigurableStop(bundle)
+      val stopJValue = constructStopInfoJValue(bundle, stop)
+      stopInfoJValueList = stopJValue +: stopInfoJValueList
+    })
     val stopInfoJValue = stopInfoJValueList
     val jsonString = compactRender(stopInfoJValue)
     jsonString

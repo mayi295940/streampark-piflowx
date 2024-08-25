@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.streampark.console.flow.component.flow.mapper.provider;
 
 import org.apache.streampark.console.flow.base.utils.DateUtils;
@@ -11,313 +28,313 @@ import java.util.Date;
 
 public class FlowMapperProvider {
 
-  private String id;
-  private String lastUpdateDttmStr;
-  private String lastUpdateUser;
-  private int enableFlag;
-  private long version;
-  private String description;
-  private String name;
-  private String engineType;
-  private String uuid;
-  private String environment;
-  private Integer isExample;
-  private String pageId;
-  private String flowGroupId;
+    private String id;
+    private String lastUpdateDttmStr;
+    private String lastUpdateUser;
+    private int enableFlag;
+    private long version;
+    private String description;
+    private String name;
+    private String engineType;
+    private String uuid;
+    private String environment;
+    private Integer isExample;
+    private String pageId;
+    private String flowGroupId;
 
-  private boolean preventSQLInjectionFlow(Flow flow) {
-    if (null == flow || StringUtils.isBlank(flow.getLastUpdateUser())) {
-      return false;
+    private boolean preventSQLInjectionFlow(Flow flow) {
+        if (null == flow || StringUtils.isBlank(flow.getLastUpdateUser())) {
+            return false;
+        }
+
+        // Mandatory Field
+        Boolean enableFlag = flow.getEnableFlag();
+        Long version = flow.getVersion();
+        this.id = SqlUtils.preventSQLInjection(flow.getId());
+        this.lastUpdateUser = SqlUtils.preventSQLInjection(flow.getLastUpdateUser());
+        this.enableFlag = ((null != enableFlag && enableFlag) ? 1 : 0);
+        this.version = (null != version ? version : 0L);
+        String lastUpdateDttmStr =
+            StringUtils.isBlank(flow.getLastUpdateDttmString())
+                ? DateUtils.dateTimesToStr(new Date())
+                : flow.getLastUpdateDttmString();
+        this.lastUpdateDttmStr = SqlUtils.preventSQLInjection(lastUpdateDttmStr);
+
+        // Selection field
+        this.description = SqlUtils.preventSQLInjection(flow.getDescription());
+        this.name = SqlUtils.preventSQLInjection(flow.getName());
+        this.engineType = SqlUtils.preventSQLInjection(flow.getEngineType());
+        this.uuid = SqlUtils.preventSQLInjection(flow.getUuid());
+        this.environment = SqlUtils.preventSQLInjection(flow.getEnvironment());
+        this.isExample = (null == flow.getIsExample() ? 0 : (flow.getIsExample() ? 1 : 0));
+        this.pageId = SqlUtils.preventSQLInjection(flow.getPageId());
+        String flowGroupId_str =
+            (null != flow.getFlowGroup() && StringUtils.isNotBlank(flow.getFlowGroup().getId()))
+                ? flow.getFlowGroup().getId()
+                : null;
+        this.flowGroupId = SqlUtils.preventSQLInjection(flowGroupId_str);
+        return true;
     }
 
-    // Mandatory Field
-    Boolean enableFlag = flow.getEnableFlag();
-    Long version = flow.getVersion();
-    this.id = SqlUtils.preventSQLInjection(flow.getId());
-    this.lastUpdateUser = SqlUtils.preventSQLInjection(flow.getLastUpdateUser());
-    this.enableFlag = ((null != enableFlag && enableFlag) ? 1 : 0);
-    this.version = (null != version ? version : 0L);
-    String lastUpdateDttmStr =
-        StringUtils.isBlank(flow.getLastUpdateDttmString())
-            ? DateUtils.dateTimesToStr(new Date())
-            : flow.getLastUpdateDttmString();
-    this.lastUpdateDttmStr = SqlUtils.preventSQLInjection(lastUpdateDttmStr);
-
-    // Selection field
-    this.description = SqlUtils.preventSQLInjection(flow.getDescription());
-    this.name = SqlUtils.preventSQLInjection(flow.getName());
-    this.engineType = SqlUtils.preventSQLInjection(flow.getEngineType());
-    this.uuid = SqlUtils.preventSQLInjection(flow.getUuid());
-    this.environment = SqlUtils.preventSQLInjection(flow.getEnvironment());
-    this.isExample = (null == flow.getIsExample() ? 0 : (flow.getIsExample() ? 1 : 0));
-    this.pageId = SqlUtils.preventSQLInjection(flow.getPageId());
-    String flowGroupId_str =
-        (null != flow.getFlowGroup() && StringUtils.isNotBlank(flow.getFlowGroup().getId()))
-            ? flow.getFlowGroup().getId()
-            : null;
-    this.flowGroupId = SqlUtils.preventSQLInjection(flowGroupId_str);
-    return true;
-  }
-
-  private void reset() {
-    this.id = null;
-    this.lastUpdateDttmStr = null;
-    this.lastUpdateUser = null;
-    this.enableFlag = 1;
-    this.version = 0L;
-    this.description = null;
-    this.name = null;
-    this.engineType = null;
-    this.uuid = null;
-    this.environment = null;
-    this.isExample = null;
-    this.pageId = null;
-    this.flowGroupId = null;
-  }
-
-  /**
-   * add Flow
-   *
-   * @param flow flow
-   */
-  public String addFlow(Flow flow) {
-    String sqlStr = "";
-    boolean flag = this.preventSQLInjectionFlow(flow);
-    if (flag) {
-      StringBuffer stringBuffer = new StringBuffer();
-      stringBuffer.append("INSERT INTO flow ");
-      stringBuffer.append("( ");
-      stringBuffer.append(SqlUtils.baseFieldName() + ", ");
-      stringBuffer.append("description, ");
-      stringBuffer.append("name, ");
-      stringBuffer.append("engine_type, ");
-      stringBuffer.append("uuid, ");
-      stringBuffer.append("environment, ");
-      stringBuffer.append("is_example, ");
-      stringBuffer.append("page_id, ");
-      stringBuffer.append("fk_flow_group_id ");
-      stringBuffer.append(") ");
-      stringBuffer.append("VALUES ");
-      stringBuffer.append("( ");
-      stringBuffer.append(SqlUtils.baseFieldValues(flow) + ", ");
-      // handle other fields
-      stringBuffer.append(this.description + ", ");
-      stringBuffer.append(this.name + ", ");
-      stringBuffer.append(this.engineType + ", ");
-      stringBuffer.append(this.uuid + ", ");
-      stringBuffer.append(this.environment + ", ");
-      stringBuffer.append(this.isExample + ", ");
-      stringBuffer.append(this.pageId + ", ");
-      stringBuffer.append(this.flowGroupId + " ");
-      stringBuffer.append(") ");
-      sqlStr = stringBuffer.toString();
-      this.reset();
+    private void reset() {
+        this.id = null;
+        this.lastUpdateDttmStr = null;
+        this.lastUpdateUser = null;
+        this.enableFlag = 1;
+        this.version = 0L;
+        this.description = null;
+        this.name = null;
+        this.engineType = null;
+        this.uuid = null;
+        this.environment = null;
+        this.isExample = null;
+        this.pageId = null;
+        this.flowGroupId = null;
     }
-    return sqlStr;
-  }
 
-  /** update Flow */
-  public String updateFlow(Flow flow) {
-
-    String sqlStr = "";
-    this.preventSQLInjectionFlow(flow);
-    if (null != flow) {
-      SQL sql = new SQL();
-
-      // INSERT_INTO brackets is table name
-      sql.UPDATE("flow");
-      // The first string in the SET is the name of the field corresponding to the table in the
-      // database
-      sql.SET("last_update_dttm = " + lastUpdateDttmStr);
-      sql.SET("last_update_user = " + lastUpdateUser);
-      sql.SET("version = " + (version + 1));
-
-      // handle other fields
-      sql.SET("enable_flag = " + enableFlag);
-      sql.SET("description = " + description);
-      sql.SET("name = " + name);
-      sql.SET("engine_type = " + engineType);
-      sql.SET("uuid = " + uuid);
-      sql.SET("environment = " + environment);
-      sql.WHERE("version = " + version);
-      sql.WHERE("id = " + id);
-      sqlStr = sql.toString();
-      if (StringUtils.isBlank(id)) {
-        sqlStr = "";
-      }
+    /**
+     * add Flow
+     *
+     * @param flow flow
+     */
+    public String addFlow(Flow flow) {
+        String sqlStr = "";
+        boolean flag = this.preventSQLInjectionFlow(flow);
+        if (flag) {
+            StringBuffer stringBuffer = new StringBuffer();
+            stringBuffer.append("INSERT INTO flow ");
+            stringBuffer.append("( ");
+            stringBuffer.append(SqlUtils.baseFieldName() + ", ");
+            stringBuffer.append("description, ");
+            stringBuffer.append("name, ");
+            stringBuffer.append("engine_type, ");
+            stringBuffer.append("uuid, ");
+            stringBuffer.append("environment, ");
+            stringBuffer.append("is_example, ");
+            stringBuffer.append("page_id, ");
+            stringBuffer.append("fk_flow_group_id ");
+            stringBuffer.append(") ");
+            stringBuffer.append("VALUES ");
+            stringBuffer.append("( ");
+            stringBuffer.append(SqlUtils.baseFieldValues(flow) + ", ");
+            // handle other fields
+            stringBuffer.append(this.description + ", ");
+            stringBuffer.append(this.name + ", ");
+            stringBuffer.append(this.engineType + ", ");
+            stringBuffer.append(this.uuid + ", ");
+            stringBuffer.append(this.environment + ", ");
+            stringBuffer.append(this.isExample + ", ");
+            stringBuffer.append(this.pageId + ", ");
+            stringBuffer.append(this.flowGroupId + " ");
+            stringBuffer.append(") ");
+            sqlStr = stringBuffer.toString();
+            this.reset();
+        }
+        return sqlStr;
     }
-    this.reset();
-    return sqlStr;
-  }
 
-  /** get flow list */
-  public String getFlowList() {
-    String sqlStr = "";
-    SQL sql = new SQL();
-    sql.SELECT("*");
-    sql.FROM("flow");
-    sql.WHERE("enable_flag = 1");
-    sql.WHERE("is_example = 0");
-    sql.WHERE("fk_flow_group_id = null ");
-    sql.ORDER_BY(" crt_dttm desc  ");
-    sqlStr = sql.toString();
-    return sqlStr;
-  }
+    /** update Flow */
+    public String updateFlow(Flow flow) {
 
-  /** Query all flow paging queries */
-  public String getFlowListParam(String username, boolean isAdmin, String param) {
-    String sqlStr = "SELECT 0";
-    StringBuffer strBuf = new StringBuffer();
-    strBuf.append("SELECT * ");
-    strBuf.append("FROM flow ");
-    strBuf.append("WHERE ");
-    strBuf.append("enable_flag = 1 ");
-    strBuf.append("AND is_example = 0 ");
-    strBuf.append("AND fk_flow_group_id IS NULL ");
-    if (StringUtils.isNotBlank(param)) {
-      strBuf.append("AND ( ");
-      strBuf.append("name LIKE CONCAT('%'," + SqlUtils.preventSQLInjection(param) + ",'%')");
-      strBuf.append(
-          "OR description LIKE CONCAT('%'," + SqlUtils.preventSQLInjection(param) + ",'%')");
-      strBuf.append(") ");
-    }
-    if (!isAdmin) {
-      strBuf.append("AND crt_user = " + SqlUtils.preventSQLInjection(username));
-    }
-    strBuf.append("ORDER BY crt_dttm DESC ");
-    sqlStr = strBuf.toString();
-    return sqlStr;
-  }
+        String sqlStr = "";
+        this.preventSQLInjectionFlow(flow);
+        if (null != flow) {
+            SQL sql = new SQL();
 
-  /** Query the sample flow list */
-  public String getFlowExampleList() {
-    String sqlStr = "";
-    SQL sql = new SQL();
-    sql.SELECT("id,name");
-    sql.FROM("flow");
-    sql.WHERE("enable_flag = 1");
-    sql.WHERE("is_example = 1");
-    sql.ORDER_BY(" name asc  ");
-    sqlStr = sql.toString();
-    return sqlStr;
-  }
+            // INSERT_INTO brackets is table name
+            sql.UPDATE("flow");
+            // The first string in the SET is the name of the field corresponding to the table in the
+            // database
+            sql.SET("last_update_dttm = " + lastUpdateDttmStr);
+            sql.SET("last_update_user = " + lastUpdateUser);
+            sql.SET("version = " + (version + 1));
 
-  /** get flow by id */
-  public String getFlowById(String id) {
-    String sqlStr = "";
-    if (StringUtils.isNotBlank(id)) {
-      StringBuffer strBuf = new StringBuffer();
-      strBuf.append("select * ");
-      strBuf.append("from flow ");
-      strBuf.append("where enable_flag = 1 ");
-      strBuf.append("and id = " + SqlUtils.preventSQLInjection(id) + " ");
-      sqlStr = strBuf.toString();
+            // handle other fields
+            sql.SET("enable_flag = " + enableFlag);
+            sql.SET("description = " + description);
+            sql.SET("name = " + name);
+            sql.SET("engine_type = " + engineType);
+            sql.SET("uuid = " + uuid);
+            sql.SET("environment = " + environment);
+            sql.WHERE("version = " + version);
+            sql.WHERE("id = " + id);
+            sqlStr = sql.toString();
+            if (StringUtils.isBlank(id)) {
+                sqlStr = "";
+            }
+        }
+        this.reset();
+        return sqlStr;
     }
-    return sqlStr;
-  }
 
-  /** get flow by pageId */
-  public String getFlowByPageId(String fid, String pageId) {
-    String sqlStr = "";
-    if (StringUtils.isBlank(fid) || StringUtils.isBlank(pageId)) {
-      return "SELECT 0";
+    /** get flow list */
+    public String getFlowList() {
+        String sqlStr = "";
+        SQL sql = new SQL();
+        sql.SELECT("*");
+        sql.FROM("flow");
+        sql.WHERE("enable_flag = 1");
+        sql.WHERE("is_example = 0");
+        sql.WHERE("fk_flow_group_id = null ");
+        sql.ORDER_BY(" crt_dttm desc  ");
+        sqlStr = sql.toString();
+        return sqlStr;
     }
-    StringBuffer strBuf = new StringBuffer();
-    strBuf.append("select * ");
-    strBuf.append("from flow ");
-    strBuf.append("where enable_flag=1 ");
-    strBuf.append("and fk_flow_group_id= " + SqlUtils.preventSQLInjection(fid) + " ");
-    strBuf.append("and page_id= " + SqlUtils.preventSQLInjection(pageId) + " ");
-    sqlStr = strBuf.toString();
-    return sqlStr;
-  }
 
-  /** Delete according to id logic, set to invalid */
-  public String updateEnableFlagById(String username, String id) {
-    if (StringUtils.isBlank(username)) {
-      return "SELECT 0";
+    /** Query all flow paging queries */
+    public String getFlowListParam(String username, boolean isAdmin, String param) {
+        String sqlStr = "SELECT 0";
+        StringBuffer strBuf = new StringBuffer();
+        strBuf.append("SELECT * ");
+        strBuf.append("FROM flow ");
+        strBuf.append("WHERE ");
+        strBuf.append("enable_flag = 1 ");
+        strBuf.append("AND is_example = 0 ");
+        strBuf.append("AND fk_flow_group_id IS NULL ");
+        if (StringUtils.isNotBlank(param)) {
+            strBuf.append("AND ( ");
+            strBuf.append("name LIKE CONCAT('%'," + SqlUtils.preventSQLInjection(param) + ",'%')");
+            strBuf.append(
+                "OR description LIKE CONCAT('%'," + SqlUtils.preventSQLInjection(param) + ",'%')");
+            strBuf.append(") ");
+        }
+        if (!isAdmin) {
+            strBuf.append("AND crt_user = " + SqlUtils.preventSQLInjection(username));
+        }
+        strBuf.append("ORDER BY crt_dttm DESC ");
+        sqlStr = strBuf.toString();
+        return sqlStr;
     }
-    if (StringUtils.isBlank(id)) {
-      return "SELECT 0";
-    }
-    SQL sql = new SQL();
-    sql.UPDATE("flow");
-    sql.SET("enable_flag = 0");
-    sql.SET("last_update_user = " + SqlUtils.preventSQLInjection(username));
-    sql.SET(
-        "last_update_dttm = " + SqlUtils.preventSQLInjection(DateUtils.dateTimesToStr(new Date())));
-    sql.WHERE("enable_flag = 1");
-    sql.WHERE("is_example = 0");
-    sql.WHERE("id = " + SqlUtils.preventSQLInjection(id));
 
-    return sql.toString();
-  }
+    /** Query the sample flow list */
+    public String getFlowExampleList() {
+        String sqlStr = "";
+        SQL sql = new SQL();
+        sql.SELECT("id,name");
+        sql.FROM("flow");
+        sql.WHERE("enable_flag = 1");
+        sql.WHERE("is_example = 1");
+        sql.ORDER_BY(" name asc  ");
+        sqlStr = sql.toString();
+        return sqlStr;
+    }
 
-  public String getFlowListGroupId(String flowGroupId) {
-    String sqlStr = "SELECT 0";
-    if (StringUtils.isNotBlank(flowGroupId)) {
-      StringBuffer strBuf = new StringBuffer();
-      strBuf.append("select * ");
-      strBuf.append("from flow ");
-      strBuf.append("where enable_flag = 1 ");
-      strBuf.append("and fk_flow_group_id = " + SqlUtils.preventSQLInjection(flowGroupId) + " ");
-      sqlStr = strBuf.toString();
+    /** get flow by id */
+    public String getFlowById(String id) {
+        String sqlStr = "";
+        if (StringUtils.isNotBlank(id)) {
+            StringBuffer strBuf = new StringBuffer();
+            strBuf.append("select * ");
+            strBuf.append("from flow ");
+            strBuf.append("where enable_flag = 1 ");
+            strBuf.append("and id = " + SqlUtils.preventSQLInjection(id) + " ");
+            sqlStr = strBuf.toString();
+        }
+        return sqlStr;
     }
-    return sqlStr;
-  }
 
-  public String getGlobalParamsIdsByFlowId(String flowId) {
-    if (StringUtils.isBlank(flowId)) {
-      return "SELECT 0";
+    /** get flow by pageId */
+    public String getFlowByPageId(String fid, String pageId) {
+        String sqlStr = "";
+        if (StringUtils.isBlank(fid) || StringUtils.isBlank(pageId)) {
+            return "SELECT 0";
+        }
+        StringBuffer strBuf = new StringBuffer();
+        strBuf.append("select * ");
+        strBuf.append("from flow ");
+        strBuf.append("where enable_flag=1 ");
+        strBuf.append("and fk_flow_group_id= " + SqlUtils.preventSQLInjection(fid) + " ");
+        strBuf.append("and page_id= " + SqlUtils.preventSQLInjection(pageId) + " ");
+        sqlStr = strBuf.toString();
+        return sqlStr;
     }
-    String sqlStr =
-        ("SELECT global_params_id FROM `association_global_params_flow` WHERE flow_id= "
-            + SqlUtils.preventSQLInjection(flowId));
-    return sqlStr;
-  }
 
-  public String linkGlobalParams(String flowId, String[] globalParamsIds) {
-    if (StringUtils.isBlank(flowId) || globalParamsIds.length <= 0) {
-      return "SELECT 0";
-    }
-    StringBuffer strBuf = new StringBuffer();
-    strBuf.append("INSERT INTO `association_global_params_flow` ");
-    strBuf.append("( ");
-    strBuf.append("`flow_id`, ");
-    strBuf.append("`global_params_id` ");
-    strBuf.append(") ");
-    strBuf.append("values ");
-    for (int i = 0; i < globalParamsIds.length; i++) {
-      strBuf.append("( ");
-      strBuf.append(SqlUtils.preventSQLInjection(flowId) + ", ");
-      strBuf.append(SqlUtils.preventSQLInjection(globalParamsIds[i]));
-      strBuf.append(") ");
-      if ((i + 1) < globalParamsIds.length) {
-        strBuf.append(", ");
-      }
-    }
-    String sqlStr = strBuf.toString();
-    return sqlStr;
-  }
+    /** Delete according to id logic, set to invalid */
+    public String updateEnableFlagById(String username, String id) {
+        if (StringUtils.isBlank(username)) {
+            return "SELECT 0";
+        }
+        if (StringUtils.isBlank(id)) {
+            return "SELECT 0";
+        }
+        SQL sql = new SQL();
+        sql.UPDATE("flow");
+        sql.SET("enable_flag = 0");
+        sql.SET("last_update_user = " + SqlUtils.preventSQLInjection(username));
+        sql.SET(
+            "last_update_dttm = " + SqlUtils.preventSQLInjection(DateUtils.dateTimesToStr(new Date())));
+        sql.WHERE("enable_flag = 1");
+        sql.WHERE("is_example = 0");
+        sql.WHERE("id = " + SqlUtils.preventSQLInjection(id));
 
-  public String unlinkGlobalParams(String flowId, String[] globalParamsIds) {
-    if (StringUtils.isBlank(flowId) || globalParamsIds.length == 0) {
-      return "SELECT 0";
+        return sql.toString();
     }
-    StringBuffer strBuf = new StringBuffer();
-    strBuf.append("DELETE FROM `association_global_params_flow` ");
-    strBuf.append("WHERE ");
-    strBuf.append(" `flow_id`= " + SqlUtils.preventSQLInjection(flowId));
-    strBuf.append(" AND ");
-    strBuf.append(" `global_params_id` in ");
-    strBuf.append("( ");
-    for (int i = 0; i < globalParamsIds.length; i++) {
-      strBuf.append(SqlUtils.preventSQLInjection(globalParamsIds[i]));
-      if ((i + 1) < globalParamsIds.length) {
-        strBuf.append(", ");
-      }
+
+    public String getFlowListGroupId(String flowGroupId) {
+        String sqlStr = "SELECT 0";
+        if (StringUtils.isNotBlank(flowGroupId)) {
+            StringBuffer strBuf = new StringBuffer();
+            strBuf.append("select * ");
+            strBuf.append("from flow ");
+            strBuf.append("where enable_flag = 1 ");
+            strBuf.append("and fk_flow_group_id = " + SqlUtils.preventSQLInjection(flowGroupId) + " ");
+            sqlStr = strBuf.toString();
+        }
+        return sqlStr;
     }
-    strBuf.append(") ");
-    return strBuf.toString();
-  }
+
+    public String getGlobalParamsIdsByFlowId(String flowId) {
+        if (StringUtils.isBlank(flowId)) {
+            return "SELECT 0";
+        }
+        String sqlStr =
+            ("SELECT global_params_id FROM `association_global_params_flow` WHERE flow_id= "
+                + SqlUtils.preventSQLInjection(flowId));
+        return sqlStr;
+    }
+
+    public String linkGlobalParams(String flowId, String[] globalParamsIds) {
+        if (StringUtils.isBlank(flowId) || globalParamsIds.length <= 0) {
+            return "SELECT 0";
+        }
+        StringBuffer strBuf = new StringBuffer();
+        strBuf.append("INSERT INTO `association_global_params_flow` ");
+        strBuf.append("( ");
+        strBuf.append("`flow_id`, ");
+        strBuf.append("`global_params_id` ");
+        strBuf.append(") ");
+        strBuf.append("values ");
+        for (int i = 0; i < globalParamsIds.length; i++) {
+            strBuf.append("( ");
+            strBuf.append(SqlUtils.preventSQLInjection(flowId) + ", ");
+            strBuf.append(SqlUtils.preventSQLInjection(globalParamsIds[i]));
+            strBuf.append(") ");
+            if ((i + 1) < globalParamsIds.length) {
+                strBuf.append(", ");
+            }
+        }
+        String sqlStr = strBuf.toString();
+        return sqlStr;
+    }
+
+    public String unlinkGlobalParams(String flowId, String[] globalParamsIds) {
+        if (StringUtils.isBlank(flowId) || globalParamsIds.length == 0) {
+            return "SELECT 0";
+        }
+        StringBuffer strBuf = new StringBuffer();
+        strBuf.append("DELETE FROM `association_global_params_flow` ");
+        strBuf.append("WHERE ");
+        strBuf.append(" `flow_id`= " + SqlUtils.preventSQLInjection(flowId));
+        strBuf.append(" AND ");
+        strBuf.append(" `global_params_id` in ");
+        strBuf.append("( ");
+        for (int i = 0; i < globalParamsIds.length; i++) {
+            strBuf.append(SqlUtils.preventSQLInjection(globalParamsIds[i]));
+            if ((i + 1) < globalParamsIds.length) {
+                strBuf.append(", ");
+            }
+        }
+        strBuf.append(") ");
+        return strBuf.toString();
+    }
 }

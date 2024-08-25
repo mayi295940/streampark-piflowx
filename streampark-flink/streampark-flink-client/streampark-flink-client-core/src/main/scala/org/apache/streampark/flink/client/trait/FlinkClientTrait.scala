@@ -43,7 +43,7 @@ import org.apache.flink.runtime.jobgraph.{JobGraph, SavepointConfigOptions}
 import org.apache.flink.util.Preconditions.checkNotNull
 
 import java.io.File
-import java.util.Collections
+import java.util.{Collections, Date}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -160,9 +160,6 @@ trait FlinkClientTrait extends Logger {
         submitRequest.restoreMode != null && submitRequest.flinkVersion
           .checkVersion(FlinkRestoreMode.SINCE_FLINK_VERSION)
       if (enableRestoreMode) {
-      val enableRestoreModeState = submitRequest.flinkVersion.checkVersion(
-        FlinkRestoreMode.SINCE_FLINK_VERSION) && submitRequest.restoreMode != null
-      if (enableRestoreModeState) {
         flinkConfig.setString(FlinkRestoreMode.RESTORE_MODE, submitRequest.restoreMode.getName);
       }
     }

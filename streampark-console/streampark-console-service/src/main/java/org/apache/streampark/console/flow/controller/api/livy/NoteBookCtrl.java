@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.streampark.console.flow.controller.api.livy;
 
 import org.apache.streampark.console.flow.base.utils.SessionUserUtil;
@@ -20,105 +37,101 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/noteBoot")
 public class NoteBookCtrl {
 
-  private final INoteBookService noteBookServiceImpl;
-  private final ILogHelperService logHelperServiceImpl;
+    private final INoteBookService noteBookServiceImpl;
+    private final ILogHelperService logHelperServiceImpl;
 
-  @Autowired
-  public NoteBookCtrl(
-      INoteBookService noteBookServiceImpl, ILogHelperService logHelperServiceImpl) {
-    this.noteBookServiceImpl = noteBookServiceImpl;
-    this.logHelperServiceImpl = logHelperServiceImpl;
-  }
+    @Autowired
+    public NoteBookCtrl(
+                        INoteBookService noteBookServiceImpl, ILogHelperService logHelperServiceImpl) {
+        this.noteBookServiceImpl = noteBookServiceImpl;
+        this.logHelperServiceImpl = logHelperServiceImpl;
+    }
 
-  @RequestMapping(value = "/saveOrUpdateNoteBook", method = RequestMethod.POST)
-  @ResponseBody
-  @ApiOperation(value = "saveOrUpdateNoteBook", notes = "save or update NoteBook")
-  public String saveOrUpdateNoteBook(NoteBookVoRequest noteBookVo) throws Exception {
-    String currentUsername = SessionUserUtil.getCurrentUsername();
-    boolean isAdmin = SessionUserUtil.isAdmin();
-    logHelperServiceImpl.logAuthSucceed(
-        "saveOrUpdateNoteBook " + noteBookVo.getName(), currentUsername);
-    return noteBookServiceImpl.saveOrUpdateNoteBook(currentUsername, isAdmin, noteBookVo, false);
-  }
+    @RequestMapping(value = "/saveOrUpdateNoteBook", method = RequestMethod.POST)
+    @ResponseBody
+    @ApiOperation(value = "saveOrUpdateNoteBook", notes = "save or update NoteBook")
+    public String saveOrUpdateNoteBook(NoteBookVoRequest noteBookVo) throws Exception {
+        String currentUsername = SessionUserUtil.getCurrentUsername();
+        boolean isAdmin = SessionUserUtil.isAdmin();
+        logHelperServiceImpl.logAuthSucceed(
+            "saveOrUpdateNoteBook " + noteBookVo.getName(), currentUsername);
+        return noteBookServiceImpl.saveOrUpdateNoteBook(currentUsername, isAdmin, noteBookVo, false);
+    }
 
-  @RequestMapping(value = "/getNoteBookById", method = RequestMethod.POST)
-  @ResponseBody
-  @ApiOperation(value = "getNoteBookById", notes = "get NoteBook by id")
-  @ApiImplicitParam(name = "id", value = "id", required = true, paramType = "query")
-  public String getNoteBookById(String id) throws Exception {
-    String currentUsername = SessionUserUtil.getCurrentUsername();
-    boolean isAdmin = SessionUserUtil.isAdmin();
-    return noteBookServiceImpl.getNoteBookById(currentUsername, isAdmin, id);
-  }
+    @RequestMapping(value = "/getNoteBookById", method = RequestMethod.POST)
+    @ResponseBody
+    @ApiOperation(value = "getNoteBookById", notes = "get NoteBook by id")
+    @ApiImplicitParam(name = "id", value = "id", required = true, paramType = "query")
+    public String getNoteBookById(String id) throws Exception {
+        String currentUsername = SessionUserUtil.getCurrentUsername();
+        boolean isAdmin = SessionUserUtil.isAdmin();
+        return noteBookServiceImpl.getNoteBookById(currentUsername, isAdmin, id);
+    }
 
-  @RequestMapping(value = "/checkNoteBookName", method = RequestMethod.POST)
-  @ResponseBody
-  @ApiOperation(value = "checkNoteBookName", notes = "check NoteBook name")
-  @ApiImplicitParam(
-      name = "noteBookName",
-      value = "noteBookName",
-      required = true,
-      paramType = "query")
-  public String checkNoteBookName(String noteBookName) {
-    String currentUsername = SessionUserUtil.getCurrentUsername();
-    boolean isAdmin = SessionUserUtil.isAdmin();
-    return noteBookServiceImpl.checkNoteBookName(currentUsername, isAdmin, noteBookName);
-  }
+    @RequestMapping(value = "/checkNoteBookName", method = RequestMethod.POST)
+    @ResponseBody
+    @ApiOperation(value = "checkNoteBookName", notes = "check NoteBook name")
+    @ApiImplicitParam(name = "noteBookName", value = "noteBookName", required = true, paramType = "query")
+    public String checkNoteBookName(String noteBookName) {
+        String currentUsername = SessionUserUtil.getCurrentUsername();
+        boolean isAdmin = SessionUserUtil.isAdmin();
+        return noteBookServiceImpl.checkNoteBookName(currentUsername, isAdmin, noteBookName);
+    }
 
-  @RequestMapping(value = "/deleteNoteBook", method = RequestMethod.POST)
-  @ResponseBody
-  @ApiOperation(value = "deleteNoteBook", notes = "delete NoteBook")
-  @ApiImplicitParam(name = "noteBookId", value = "noteBookId", required = true, paramType = "query")
-  public String deleteNoteBook(String noteBookId) {
-    String currentUsername = SessionUserUtil.getCurrentUsername();
-    boolean isAdmin = SessionUserUtil.isAdmin();
-    logHelperServiceImpl.logAuthSucceed("deleteNoteBook " + noteBookId, currentUsername);
-    return noteBookServiceImpl.deleteNoteBook(currentUsername, isAdmin, noteBookId);
-  }
+    @RequestMapping(value = "/deleteNoteBook", method = RequestMethod.POST)
+    @ResponseBody
+    @ApiOperation(value = "deleteNoteBook", notes = "delete NoteBook")
+    @ApiImplicitParam(name = "noteBookId", value = "noteBookId", required = true, paramType = "query")
+    public String deleteNoteBook(String noteBookId) {
+        String currentUsername = SessionUserUtil.getCurrentUsername();
+        boolean isAdmin = SessionUserUtil.isAdmin();
+        logHelperServiceImpl.logAuthSucceed("deleteNoteBook " + noteBookId, currentUsername);
+        return noteBookServiceImpl.deleteNoteBook(currentUsername, isAdmin, noteBookId);
+    }
 
-  @RequestMapping(value = "/noteBookListPage", method = RequestMethod.POST)
-  @ResponseBody
-  @ApiOperation(value = "noteBookListPage", notes = "NoteBook list")
-  @ApiImplicitParams({
-    @ApiImplicitParam(name = "page", value = "page", required = true, paramType = "query"),
-    @ApiImplicitParam(name = "limit", value = "limit", required = true, paramType = "query"),
-    @ApiImplicitParam(name = "param", value = "param", required = false, paramType = "query")
-  })
-  public String noteBookListPage(Integer page, Integer limit, String param) {
-    String currentUsername = SessionUserUtil.getCurrentUsername();
-    boolean isAdmin = SessionUserUtil.isAdmin();
-    return noteBookServiceImpl.getNoteBookListPage(currentUsername, isAdmin, page, limit, param);
-  }
+    @RequestMapping(value = "/noteBookListPage", method = RequestMethod.POST)
+    @ResponseBody
+    @ApiOperation(value = "noteBookListPage", notes = "NoteBook list")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "page", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "limit", value = "limit", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "param", value = "param", required = false, paramType = "query")
+    })
+    public String noteBookListPage(Integer page, Integer limit, String param) {
+        String currentUsername = SessionUserUtil.getCurrentUsername();
+        boolean isAdmin = SessionUserUtil.isAdmin();
+        return noteBookServiceImpl.getNoteBookListPage(currentUsername, isAdmin, page, limit, param);
+    }
 
-  @RequestMapping(value = "/startNoteBookSession", method = RequestMethod.POST)
-  @ResponseBody
-  @ApiOperation(value = "startNoteBookSession", notes = "start NoteBook session")
-  @ApiImplicitParam(name = "noteBookId", value = "noteBookId", required = true, paramType = "query")
-  public String startNoteBookSession(String noteBookId) {
-    String currentUsername = SessionUserUtil.getCurrentUsername();
-    boolean isAdmin = SessionUserUtil.isAdmin();
-    logHelperServiceImpl.logAuthSucceed("startNoteBookSession " + noteBookId, currentUsername);
-    return noteBookServiceImpl.startNoteBookSession(currentUsername, isAdmin, noteBookId);
-  }
+    @RequestMapping(value = "/startNoteBookSession", method = RequestMethod.POST)
+    @ResponseBody
+    @ApiOperation(value = "startNoteBookSession", notes = "start NoteBook session")
+    @ApiImplicitParam(name = "noteBookId", value = "noteBookId", required = true, paramType = "query")
+    public String startNoteBookSession(String noteBookId) {
+        String currentUsername = SessionUserUtil.getCurrentUsername();
+        boolean isAdmin = SessionUserUtil.isAdmin();
+        logHelperServiceImpl.logAuthSucceed("startNoteBookSession " + noteBookId, currentUsername);
+        return noteBookServiceImpl.startNoteBookSession(currentUsername, isAdmin, noteBookId);
+    }
 
-  @RequestMapping(value = "/getNoteBookSessionState", method = RequestMethod.POST)
-  @ResponseBody
-  @ApiOperation(value = "startNoteBookSession", notes = "start NoteBook session")
-  @ApiImplicitParam(name = "noteBookId", value = "noteBookId", required = true, paramType = "query")
-  public String getNoteBookSessionState(String noteBookId) {
-    String currentUsername = SessionUserUtil.getCurrentUsername();
-    boolean isAdmin = SessionUserUtil.isAdmin();
-    return noteBookServiceImpl.getNoteBookSessionState(currentUsername, isAdmin, noteBookId);
-  }
+    @RequestMapping(value = "/getNoteBookSessionState", method = RequestMethod.POST)
+    @ResponseBody
+    @ApiOperation(value = "startNoteBookSession", notes = "start NoteBook session")
+    @ApiImplicitParam(name = "noteBookId", value = "noteBookId", required = true, paramType = "query")
+    public String getNoteBookSessionState(String noteBookId) {
+        String currentUsername = SessionUserUtil.getCurrentUsername();
+        boolean isAdmin = SessionUserUtil.isAdmin();
+        return noteBookServiceImpl.getNoteBookSessionState(currentUsername, isAdmin, noteBookId);
+    }
 
-  @RequestMapping(value = "/deleteNoteBookSession", method = RequestMethod.POST)
-  @ResponseBody
-  @ApiOperation(value = "deleteNoteBookSession", notes = "delete NoteBook session")
-  @ApiImplicitParam(name = "noteBookId", value = "noteBookId", required = true, paramType = "query")
-  public String deleteNoteBookSession(String noteBookId) {
-    String currentUsername = SessionUserUtil.getCurrentUsername();
-    boolean isAdmin = SessionUserUtil.isAdmin();
-    logHelperServiceImpl.logAuthSucceed("deleteNoteBookSession " + noteBookId, currentUsername);
-    return noteBookServiceImpl.delNoteBookSession(currentUsername, isAdmin, noteBookId);
-  }
+    @RequestMapping(value = "/deleteNoteBookSession", method = RequestMethod.POST)
+    @ResponseBody
+    @ApiOperation(value = "deleteNoteBookSession", notes = "delete NoteBook session")
+    @ApiImplicitParam(name = "noteBookId", value = "noteBookId", required = true, paramType = "query")
+    public String deleteNoteBookSession(String noteBookId) {
+        String currentUsername = SessionUserUtil.getCurrentUsername();
+        boolean isAdmin = SessionUserUtil.isAdmin();
+        logHelperServiceImpl.logAuthSucceed("deleteNoteBookSession " + noteBookId, currentUsername);
+        return noteBookServiceImpl.delNoteBookSession(currentUsername, isAdmin, noteBookId);
+    }
 }

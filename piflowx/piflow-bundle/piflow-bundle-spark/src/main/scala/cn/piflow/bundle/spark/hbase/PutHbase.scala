@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow.bundle.spark.hbase
 
 import cn.piflow.{Constants, JobContext, JobInputStream, JobOutputStream, ProcessContext}
@@ -67,21 +84,19 @@ class PutHbase extends ConfigurableStop[DataFrame] {
 
     val columnQualifier = df.schema.fieldNames
     df.rdd
-      .map(
-        row => {
-          val rowid = nullHandle(row.getAs[String](rowkey))
-          /*一个Put对象就是一行记录，在构造方法中指定主键
-           * 所有插入的数据 须用 org.apache.hadoop.hbase.util.Bytes.toBytes 转换
-           * Put.addColumn 方法接收三个参数：列族，列名，数据*/
-          val p = new Put(Bytes.toBytes(rowid))
+      .map(row => {
+        val rowid = nullHandle(row.getAs[String](rowkey))
+        /*一个Put对象就是一行记录，在构造方法中指定主键
+         * 所有插入的数据 须用 org.apache.hadoop.hbase.util.Bytes.toBytes 转换
+         * Put.addColumn 方法接收三个参数：列族，列名，数据*/
+        val p = new Put(Bytes.toBytes(rowid))
 
-          columnQualifier.foreach(
-            a => {
-              val value = nullHandle(row.getAs[String](a))
-              p.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes(a), Bytes.toBytes(value))
-            })
-          (new ImmutableBytesWritable, p)
+        columnQualifier.foreach(a => {
+          val value = nullHandle(row.getAs[String](a))
+          p.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes(a), Bytes.toBytes(value))
         })
+        (new ImmutableBytesWritable, p)
+      })
       .saveAsHadoopDataset(jobConf)
   }
 

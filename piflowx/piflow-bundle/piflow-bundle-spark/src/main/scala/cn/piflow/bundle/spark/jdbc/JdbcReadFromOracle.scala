@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow.bundle.spark.jdbc
 
 import cn.piflow._
@@ -103,42 +120,37 @@ class JdbcReadFromOracle extends ConfigurableStop[DataFrame] {
     val nameArrBuff: ArrayBuffer[String] = ArrayBuffer()
     val typeArrBuff: ArrayBuffer[String] = ArrayBuffer()
 
-    filedNames.foreach(
-      x => {
-        nameArrBuff += x.split("\\.")(0)
-        typeArrBuff += x.split("\\.")(1)
-      })
+    filedNames.foreach(x => {
+      nameArrBuff += x.split("\\.")(0)
+      typeArrBuff += x.split("\\.")(1)
+    })
 
     var num: Int = 0
-    val fields: ArrayBuffer[StructField] = nameArrBuff.map(
-      x => {
-        var sf: StructField = null
-        val typeName: String = typeArrBuff(num)
-        if (
-          typeName.toUpperCase.equals("BLOB") || typeName.toUpperCase.equals(
-            "CLOB") || typeName.toUpperCase.equals("NCLOB") || typeName.toUpperCase.equals(
-            "XMLTYPE")
-        ) {
-          sf = StructField(x, DataTypes.createArrayType(ByteType), nullable = true)
-        } else if (typeName.toUpperCase.equals("DATE")) {
-          sf = StructField(x, DateType, nullable = true)
-        } else if (typeName.toUpperCase.equals("NUMBER")) {
-          sf = StructField(x, IntegerType, nullable = true)
-        } else if (typeName.toUpperCase.equals("XMLTYPE")) {
-          sf = StructField(x, IntegerType, nullable = true)
-        } else {
-          sf = StructField(x, StringType, nullable = true)
-        }
-        num += 1
-        sf
-      })
+    val fields: ArrayBuffer[StructField] = nameArrBuff.map(x => {
+      var sf: StructField = null
+      val typeName: String = typeArrBuff(num)
+      if (typeName.toUpperCase.equals("BLOB") || typeName.toUpperCase.equals(
+          "CLOB") || typeName.toUpperCase.equals("NCLOB") || typeName.toUpperCase.equals(
+          "XMLTYPE")) {
+        sf = StructField(x, DataTypes.createArrayType(ByteType), nullable = true)
+      } else if (typeName.toUpperCase.equals("DATE")) {
+        sf = StructField(x, DateType, nullable = true)
+      } else if (typeName.toUpperCase.equals("NUMBER")) {
+        sf = StructField(x, IntegerType, nullable = true)
+      } else if (typeName.toUpperCase.equals("XMLTYPE")) {
+        sf = StructField(x, IntegerType, nullable = true)
+      } else {
+        sf = StructField(x, StringType, nullable = true)
+      }
+      num += 1
+      sf
+    })
 
     val schemaNew: StructType = StructType(fields)
-    val rows: List[Row] = rowsArr.toList.map(
-      arr => {
-        val row: Row = Row.fromSeq(arr)
-        row
-      })
+    val rows: List[Row] = rowsArr.toList.map(arr => {
+      val row: Row = Row.fromSeq(arr)
+      row
+    })
 
     val rdd: RDD[Row] = session.sparkContext.makeRDD(rows)
     val df: DataFrame = session.createDataFrame(rdd, schemaNew)

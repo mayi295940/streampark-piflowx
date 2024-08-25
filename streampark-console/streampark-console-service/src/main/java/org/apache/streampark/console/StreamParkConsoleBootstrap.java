@@ -49,10 +49,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @Slf4j
 @PropertySources({
-  @PropertySource(value = "classpath:flow/apiConfig.properties", encoding = "utf-8"),
-  @PropertySource(value = "classpath:flow/baseConfig.properties", encoding = "utf-8"),
-  @PropertySource(value = "classpath:flow/messageConfig.properties", encoding = "utf-8"),
-  @PropertySource(value = "classpath:flow/docker.properties", encoding = "utf-8")
+        @PropertySource(value = "classpath:flow/apiConfig.properties", encoding = "utf-8"),
+        @PropertySource(value = "classpath:flow/baseConfig.properties", encoding = "utf-8"),
+        @PropertySource(value = "classpath:flow/messageConfig.properties", encoding = "utf-8"),
+        @PropertySource(value = "classpath:flow/docker.properties", encoding = "utf-8")
 })
 @MapperScan(basePackages = "org.apache.streampark.console.flow.**.mapper.*.*")
 @EnableTransactionManagement

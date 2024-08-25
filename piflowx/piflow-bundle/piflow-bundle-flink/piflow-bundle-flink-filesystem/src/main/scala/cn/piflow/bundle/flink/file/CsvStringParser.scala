@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow.bundle.flink.file
 
 import cn.piflow._
@@ -37,32 +54,31 @@ class CsvStringParser extends ConfigurableStop[Table] {
     val arrStr: Array[String] = content.split(Constants.LINE_SPLIT_N).map(x => x.trim)
 
     val listROW: List[Row] = arrStr
-      .map(
-        line => {
+      .map(line => {
 
-          val seqSTR: Seq[String] = line.split(delimiter).map(x => x.trim).toSeq
+        val seqSTR: Seq[String] = line.split(delimiter).map(x => x.trim).toSeq
 
-          // todo time format
+        // todo time format
 
-          val row = new Row(colNum)
-          for (i <- 0 until colNum) {
+        val row = new Row(colNum)
+        for (i <- 0 until colNum) {
 
-            val colType = children.get(i).getConversionClass.getSimpleName.toLowerCase()
-            colType match {
-              case "string" => row.setField(i, seqSTR(i))
-              case "integer" => row.setField(i, seqSTR(i).toInt)
-              case "long" => row.setField(i, seqSTR(i).toLong)
-              case "double" => row.setField(i, seqSTR(i).toDouble)
-              case "float" => row.setField(i, seqSTR(i).toFloat)
-              case "boolean" => row.setField(i, seqSTR(i).toBoolean)
-              case "date" => row.setField(i, DateUtils.strToDate(seqSTR(i)))
-              case "timestamp" => row.setField(i, DateUtils.strToSqlTimestamp(seqSTR(i)))
-              case _ => row.setField(i, seqSTR(i))
-            }
+          val colType = children.get(i).getConversionClass.getSimpleName.toLowerCase()
+          colType match {
+            case "string" => row.setField(i, seqSTR(i))
+            case "integer" => row.setField(i, seqSTR(i).toInt)
+            case "long" => row.setField(i, seqSTR(i).toLong)
+            case "double" => row.setField(i, seqSTR(i).toDouble)
+            case "float" => row.setField(i, seqSTR(i).toFloat)
+            case "boolean" => row.setField(i, seqSTR(i).toBoolean)
+            case "date" => row.setField(i, DateUtils.strToDate(seqSTR(i)))
+            case "timestamp" => row.setField(i, DateUtils.strToSqlTimestamp(seqSTR(i)))
+            case _ => row.setField(i, seqSTR(i))
           }
+        }
 
-          row
-        })
+        row
+      })
       .toList
 
     out.write(tableEnv.fromValues(rowType, listROW: _*))

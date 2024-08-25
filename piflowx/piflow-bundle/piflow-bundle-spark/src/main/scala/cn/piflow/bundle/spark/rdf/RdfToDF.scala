@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow.bundle.spark.rdf
 
 import cn.piflow.{Constants, JobContext, JobInputStream, JobOutputStream, ProcessContext}
@@ -197,85 +214,76 @@ class RdfToDF extends ConfigurableStop[DataFrame] {
     }
 
     val entityRdd = hdfsFile
-      .filter(
-        s =>
-          entityRegexPattern.matcher(s).find() ||
-            propertyRegexPattern.matcher(s).find())
+      .filter(s =>
+        entityRegexPattern.matcher(s).find() ||
+          propertyRegexPattern.matcher(s).find())
 
     val relationshipRdd = hdfsFile
       .filter(s => relationRegexPattern.matcher(s).find())
 
     val settleUpEntityRdd = entityRdd
-      .map(
-        s => {
-          val me = entityRegexPattern.matcher(s)
-          val mp = propertyRegexPattern.matcher(s)
-          if (me.find()) {
-            (me.group("id"), me.group())
-          } else {
-            mp.find()
-            (mp.group("id"), mp.group())
-          }
-        })
+      .map(s => {
+        val me = entityRegexPattern.matcher(s)
+        val mp = propertyRegexPattern.matcher(s)
+        if (me.find()) {
+          (me.group("id"), me.group())
+        } else {
+          mp.find()
+          (mp.group("id"), mp.group())
+        }
+      })
       .groupByKey() // main
       .values
       .map(s => s.toList)
 
     val entitySchema: Set[String] = settleUpEntityRdd
       .map(s => s.filter(l => propertyRegexPattern.matcher(l).find()))
-      .map(
-        s => {
-          s.map(
-            line => {
-              val m = propertyRegexPattern.matcher(line)
-              m.find()
-              m.group("name")
-            })
+      .map(s => {
+        s.map(line => {
+          val m = propertyRegexPattern.matcher(line)
+          m.find()
+          m.group("name")
         })
-      .map(
-        l => {
-          l.toSet
-        })
+      })
+      .map(l => {
+        l.toSet
+      })
       .reduce(_ ++ _)
 
     val finalEntitySchema = IDName + "," +
       entitySchema.reduce((a, b) => a + "," + b) + "," + LABELName
 
-    val entityObjectRdd = settleUpEntityRdd.map(
-      l => {
-        val en = l.filter(s => entityRegexPattern.matcher(s).find()).head
-        val label = get(entityRegexPattern.matcher(en), "label")
-        val id = get(entityRegexPattern.matcher(en), "id")
-        val prop = l
-          .filter(s => ?(propertyRegexPattern, s))
-          .map(
-            s =>
-              (
-                get(propertyRegexPattern.matcher(s), "name")
-                  ->
-                    get(propertyRegexPattern.matcher(s), "value").replace("\"", " ")
-              ))
-          .groupBy(i => i._1)
-          .map(f => (f._1, f._2.map(_._2).toArray))
-          .toArray
-          .toMap
+    val entityObjectRdd = settleUpEntityRdd.map(l => {
+      val en = l.filter(s => entityRegexPattern.matcher(s).find()).head
+      val label = get(entityRegexPattern.matcher(en), "label")
+      val id = get(entityRegexPattern.matcher(en), "id")
+      val prop = l
+        .filter(s => ?(propertyRegexPattern, s))
+        .map(s =>
+          (
+            get(propertyRegexPattern.matcher(s), "name")
+              ->
+                get(propertyRegexPattern.matcher(s), "value").replace("\"", " ")
+          ))
+        .groupBy(i => i._1)
+        .map(f => (f._1, f._2.map(_._2).toArray))
+        .toArray
+        .toMap
 
-        new Entity(id, label, prop, entitySchema.toSeq)
-      })
+      new Entity(id, label, prop, entitySchema.toSeq)
+    })
 
     val entityRowRdd = entityObjectRdd.map(_.getEntityRow)
 
     val sampleEntity = entityObjectRdd.first()
 
     val relationshipRowRdd = relationshipRdd
-      .map(
-        s =>
-          Seq(
-            get(relationRegexPattern.matcher(s), "id1"),
-            get(relationRegexPattern.matcher(s), "type"),
-            get(relationRegexPattern.matcher(s), "id2"),
-            get(relationRegexPattern.matcher(s), "type")
-          ))
+      .map(s =>
+        Seq(
+          get(relationRegexPattern.matcher(s), "id1"),
+          get(relationRegexPattern.matcher(s), "type"),
+          get(relationRegexPattern.matcher(s), "id2"),
+          get(relationRegexPattern.matcher(s), "type")))
       .map(s => Row(s))
 
     var sampleSchema: Seq[String] = sampleEntity.schema

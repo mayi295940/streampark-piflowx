@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow.util
 
 import cn.piflow.Constants
@@ -81,8 +98,7 @@ object H2Util {
         "-tcp",
         "-tcpAllowOthers",
         "-tcpPort",
-        PropertyUtil.getPropertyValue("h2.port")
-      )
+        PropertyUtil.getPropertyValue("h2.port"))
       .start()
 
     try {
@@ -140,11 +156,10 @@ object H2Util {
     // update related stop stop when flow state is KILLED
     if (state.equals(FlowState.KILLED)) {
       val startedStopList = getStartedStop(appId)
-      startedStopList.foreach(
-        stopName => {
-          updateStopState(appId, stopName, StopState.KILLED)
-          updateStopFinishedTime(appId, stopName, new Date().toString)
-        })
+      startedStopList.foreach(stopName => {
+        updateStopState(appId, stopName, StopState.KILLED)
+        updateStopFinishedTime(appId, stopName, new Date().toString)
+      })
     }
     // println(updateSql)
     statement.executeUpdate(updateSql)
@@ -534,17 +549,13 @@ object H2Util {
 
   def isGroupChildError(groupId: String): Boolean = {
 
-    if (
-      getGroupChildByStatus(groupId, GroupState.FAILED).size > 0 || getGroupChildByStatus(
+    if (getGroupChildByStatus(groupId, GroupState.FAILED).size > 0 || getGroupChildByStatus(
         groupId,
-        GroupState.KILLED).size > 0
-    )
+        GroupState.KILLED).size > 0)
       return true
-    else if (
-      getFlowChildByStatus(groupId, FlowState.FAILED).size > 0 || getFlowChildByStatus(
+    else if (getFlowChildByStatus(groupId, FlowState.FAILED).size > 0 || getFlowChildByStatus(
         groupId,
-        FlowState.KILLED).size > 0
-    )
+        FlowState.KILLED).size > 0)
       return true
     else
       return false
@@ -697,8 +708,9 @@ object H2Util {
 
       statement.close()
 
-      val progress: Double = (completedFlowCount.asInstanceOf[Double] + completedGroupCount
-        .asInstanceOf[Double]) / childCount * 100
+      val progress: Double =
+        (completedFlowCount.asInstanceOf[Double] + completedGroupCount
+          .asInstanceOf[Double]) / childCount * 100
       return progress.toString
     }
 

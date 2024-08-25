@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow.api
 
 import cn.piflow.{Constants, GroupExecution, Process, Runner}
@@ -39,13 +56,12 @@ object API {
     val sparkJarFile = new File(PropertyUtil.getSpartJarPath())
     val jarFile = FileUtil.getJarFile(sparkJarFile)
     breakable {
-      jarFile.foreach(
-        i => {
-          if (i.getName.equals(addSparkJarName)) {
-            id = H2Util.addSparkJar(addSparkJarName)
-            break
-          }
-        })
+      jarFile.foreach(i => {
+        if (i.getName.equals(addSparkJarName)) {
+          id = H2Util.addSparkJar(addSparkJarName)
+          break
+        }
+      })
     }
     id
   }
@@ -70,16 +86,15 @@ object API {
     val classpathFile = new File(pluginManager.getPluginPath)
     val jarFile = FileUtil.getJarFile(classpathFile)
     breakable {
-      jarFile.foreach(
-        i => {
-          if (i.getName.equals(pluginName)) {
+      jarFile.foreach(i => {
+        if (i.getName.equals(pluginName)) {
 
-            pluginManager.unloadPlugin(i.getAbsolutePath)
-            pluginManager.loadPlugin(i.getAbsolutePath)
-            id = H2Util.addPlugin(pluginName)
-            break
-          }
-        })
+          pluginManager.unloadPlugin(i.getAbsolutePath)
+          pluginManager.loadPlugin(i.getAbsolutePath)
+          id = H2Util.addPlugin(pluginName)
+          break
+        }
+      })
     }
     id
   }
@@ -91,16 +106,15 @@ object API {
       val classpathFile = new File(pluginManager.getPluginPath)
       val jarFile = FileUtil.getJarFile(classpathFile)
       breakable {
-        jarFile.foreach(
-          i => {
-            println(i.getAbsolutePath)
-            if (i.getName.equals(pluginName)) {
-              pluginManager.unloadPlugin(i.getAbsolutePath)
-              H2Util.removePlugin(pluginName)
-              result = true
-              break
-            }
-          })
+        jarFile.foreach(i => {
+          println(i.getAbsolutePath)
+          if (i.getName.equals(pluginName)) {
+            pluginManager.unloadPlugin(i.getAbsolutePath)
+            H2Util.removePlugin(pluginName)
+            result = true
+            break
+          }
+        })
       }
     }
 
@@ -115,10 +129,9 @@ object API {
   def getConfigurableStopInPlugin(pluginManager: PluginManager, pluginName: String): String = {
     var bundleList = List[String]()
     val stops = pluginManager.getPluginConfigurableStops(pluginName)
-    stops.foreach(
-      s => {
-        bundleList = s.getClass.getName +: bundleList
-      })
+    stops.foreach(s => {
+      bundleList = s.getClass.getName +: bundleList
+    })
 
     """{"bundles":"""" + bundleList.mkString(",") + """"}"""
   }
@@ -126,10 +139,9 @@ object API {
   def getConfigurableStopInfoInPlugin(pluginManager: PluginManager, pluginName: String): String = {
     var bundleList = List[String]()
     val stops = pluginManager.getPluginConfigurableStops(pluginName)
-    stops.foreach(
-      s => {
-        bundleList = s.getClass.getName +: bundleList
-      })
+    stops.foreach(s => {
+      bundleList = s.getClass.getName +: bundleList
+    })
     val jsonString = ClassUtil.findConfigurableStopListInfo(bundleList)
     jsonString
   }
@@ -154,8 +166,7 @@ object API {
       val cpuInfo = Map(
         "totalVirtualCores" -> totalVirtualCores,
         "allocatedVirtualCores" -> allocatedVirtualCores,
-        "remainingVirtualCores" -> remainingVirtualCores
-      )
+        "remainingVirtualCores" -> remainingVirtualCores)
 
       val totalMemoryGB = matricInfo.getOrElse("totalMB", "").asInstanceOf[Double] / 1024
       val allocatedMemoryGB = matricInfo.getOrElse("allocatedMB", "").asInstanceOf[Double] / 1024
@@ -163,8 +174,7 @@ object API {
       val memoryInfo = Map(
         "totalMemoryGB" -> totalMemoryGB,
         "allocatedMemoryGB" -> allocatedMemoryGB,
-        "remainingMemoryGB" -> remainingMemoryGB
-      )
+        "remainingMemoryGB" -> remainingMemoryGB)
 
       val hdfsInfo = HdfsUtil.getCapacity()
       val map = Map("cpu" -> cpuInfo, "memory" -> memoryInfo, "hdfs" -> hdfsInfo)
@@ -415,25 +425,21 @@ object API {
     val schemaArray = visualizationSchema.split(",")
     val jsonMapList = getJsonMapList(visuanlizationPath + "/data")
 
-    if (
-      VisualizationType.LineChart == visualizationType ||
-      VisualizationType.Histogram == visualizationType
-    ) {
+    if (VisualizationType.LineChart == visualizationType ||
+      VisualizationType.Histogram == visualizationType) {
 
       val jsonTupleList = jsonMapList.flatMap(map => map.toSeq)
       val visualizationInfo = jsonTupleList.groupBy(_._1)
-      visualizationInfo.foreach(
-        dimension => {
-          var valueList = List[String]()
-          val dimensionList = dimension._2
-          dimensionList.foreach(
-            dimensionAndCountPair => {
-              val v = String.valueOf(dimensionAndCountPair._2)
-              println(v)
-              valueList = valueList :+ v
-            })
-          dimensionMap += (dimension._1 -> valueList)
+      visualizationInfo.foreach(dimension => {
+        var valueList = List[String]()
+        val dimensionList = dimension._2
+        dimensionList.foreach(dimensionAndCountPair => {
+          val v = String.valueOf(dimensionAndCountPair._2)
+          println(v)
+          valueList = valueList :+ v
         })
+        dimensionMap += (dimension._1 -> valueList)
+      })
       // dimensionMap
       var lineChartMap = Map[String, Any]()
       var legend = List[String]()
@@ -445,20 +451,19 @@ object API {
       var seritesList = List[Map[String, Any]]()
       dimensionMap
         .filterKeys(!_.equals(x))
-        .foreach(
-          item => {
-            val name_action = item._1
-            val data = item._2
-            val name = name_action.split("_")(0)
-            val action = name_action.split("_")(1)
-            val vType = visualizationType match {
-              case VisualizationType.LineChart => "line"
-              case VisualizationType.Histogram => "bar"
-            }
-            val map = Map("name" -> name, "type" -> vType, "stack" -> action, "data" -> data)
-            seritesList = map +: seritesList
-            legend = name +: legend
-          })
+        .foreach(item => {
+          val name_action = item._1
+          val data = item._2
+          val name = name_action.split("_")(0)
+          val action = name_action.split("_")(1)
+          val vType = visualizationType match {
+            case VisualizationType.LineChart => "line"
+            case VisualizationType.Histogram => "bar"
+          }
+          val map = Map("name" -> name, "type" -> vType, "stack" -> action, "data" -> data)
+          seritesList = map +: seritesList
+          legend = name +: legend
+        })
       lineChartMap += {
         "series" -> seritesList
       }
@@ -476,46 +481,41 @@ object API {
 
       // get legend
       val legendList = jsonMapList
-        .map(
-          item => {
-            item.getOrElse(legendColumn, "").asInstanceOf[String]
-          })
+        .map(item => {
+          item.getOrElse(legendColumn, "").asInstanceOf[String]
+        })
         .distinct
 
       // get schema
       val newSchema = schemaArray.filter(_ != legendColumn)
       val schemaList = ListBuffer[Map[String, Any]]()
       var index = 0
-      newSchema.foreach(
-        column => {
-          val schemaMap = Map("name" -> column, "index" -> index, "text" -> column)
-          schemaList.append(schemaMap)
-          index = index + 1
-        })
+      newSchema.foreach(column => {
+        val schemaMap = Map("name" -> column, "index" -> index, "text" -> column)
+        schemaList.append(schemaMap)
+        index = index + 1
+      })
 
       // get series
       val seriesList = ListBuffer[Map[String, Any]]()
-      legendList.foreach(
-        legend => {
+      legendList.foreach(legend => {
 
-          val legendDataList = ListBuffer[List[String]]()
-          jsonMapList.foreach(
-            item => {
-              if (item.getOrElse(legendColumn, "").asInstanceOf[String].equals(legend)) {
-                val dataList = ListBuffer[String]()
-                newSchema.foreach(
-                  column => {
-                    val value = item.getOrElse(column, "").asInstanceOf[String]
-                    dataList.append(value)
-                  })
-                legendDataList.append(dataList.toList)
-              }
+        val legendDataList = ListBuffer[List[String]]()
+        jsonMapList.foreach(item => {
+          if (item.getOrElse(legendColumn, "").asInstanceOf[String].equals(legend)) {
+            val dataList = ListBuffer[String]()
+            newSchema.foreach(column => {
+              val value = item.getOrElse(column, "").asInstanceOf[String]
+              dataList.append(value)
             })
-
-          val legendMap =
-            Map[String, Any]("name" -> legend, "type" -> "scatter", "data" -> legendDataList.toList)
-          seriesList.append(legendMap)
+            legendDataList.append(dataList.toList)
+          }
         })
+
+        val legendMap =
+          Map[String, Any]("name" -> legend, "type" -> "scatter", "data" -> legendDataList.toList)
+        seriesList.append(legendMap)
+      })
 
       val resultMap = Map[String, Any](
         "legend" -> legendList,
@@ -531,19 +531,17 @@ object API {
       val jsonMapList = getJsonMapList(visuanlizationPath + "/data")
 
       var pieChartList = List[Map[String, Any]]()
-      jsonMapList.foreach(
-        map => {
-          var lineMap = Map[String, Any]()
-          for (i <- 0 until schemaArray.size) {
-            val column = schemaArray(i)
-            lineMap += (schemaReplaceMap.getOrElse(column, "") -> map.getOrElse(column, ""))
-          }
-          pieChartList = lineMap +: pieChartList
-        })
-      pieChartList.foreach(
-        item => {
-          legend = item.getOrElse("name", "").toString +: legend
-        })
+      jsonMapList.foreach(map => {
+        var lineMap = Map[String, Any]()
+        for (i <- 0 until schemaArray.size) {
+          val column = schemaArray(i)
+          lineMap += (schemaReplaceMap.getOrElse(column, "") -> map.getOrElse(column, ""))
+        }
+        pieChartList = lineMap +: pieChartList
+      })
+      pieChartList.foreach(item => {
+        legend = item.getOrElse("name", "").toString +: legend
+      })
       val pieChartMap = Map("legend" -> legend, "series" -> pieChartList)
       val visualizationJsonData = JsonUtil.format(JsonUtil.toJson(pieChartMap))
       println(visualizationJsonData)
@@ -599,30 +597,26 @@ object API {
         ClassUtil.findAllConfigurableStop[PCollection[Row]]("cn.piflow.bundle.beam")
     }
 
-    configurableStopList.foreach(
-      s => {
-        // generate (group,bundle) pair and put into stops
-        val configurableStop = s.asInstanceOf[ConfigurableStop[Any]]
-        val groupList = configurableStop.getGroup()
-        groupList.foreach(
-          group => {
-            val tuple = (group, configurableStop.getClass.getName)
-            stops = tuple +: stops
-          })
+    configurableStopList.foreach(s => {
+      // generate (group,bundle) pair and put into stops
+      val configurableStop = s.asInstanceOf[ConfigurableStop[Any]]
+      val groupList = configurableStop.getGroup()
+      groupList.foreach(group => {
+        val tuple = (group, configurableStop.getClass.getName)
+        stops = tuple +: stops
       })
+    })
 
     // (CommonGroup,List((CommonGroup,cn.piflow.bundle.common.Fork),(CommonGroup,cn.piflow.bundle.common.Merge),(...)))
     val groupsInfo = stops.groupBy(_._1)
-    groupsInfo.foreach(
-      group => {
-        val stopList = group._2
-        stopList.foreach(
-          groupAndstopPair => {
-            println(groupAndstopPair._1 + ":\t\t" + groupAndstopPair._2)
-            var groupAndStop = groupAndstopPair._1 + ":" + groupAndstopPair._2
-            resultList = groupAndStop +: resultList
-          })
+    groupsInfo.foreach(group => {
+      val stopList = group._2
+      stopList.foreach(groupAndstopPair => {
+        println(groupAndstopPair._1 + ":\t\t" + groupAndstopPair._2)
+        var groupAndStop = groupAndstopPair._1 + ":" + groupAndstopPair._2
+        resultList = groupAndStop +: resultList
       })
+    })
     println("Total stop count : " + stops.size)
 
     """{"stopWithGroup":"""" + resultList.mkString(",") + """"}"""

@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow.bundle.flink.util
 
 import cn.piflow.Constants
@@ -217,33 +234,30 @@ object RowTypeUtil {
      * column_name column_type [ <column_constraint> ] [COMMENT column_comment]
      */
     if (CollectionUtils.isNotEmpty(physicalColumns)) {
-      physicalColumns.forEach(
-        column => {
-          if (StringUtils.isNotBlank(column.getColumnName)) {
+      physicalColumns.forEach(column => {
+        if (StringUtils.isNotBlank(column.getColumnName)) {
 
-            if (column.getLength != null && column.getLength > 0) {
-              columns += s"  ${column.getColumnName} ${column.getColumnType}(${column.getLength})"
-            } else if (
-              column.getPrecision != null && column.getPrecision > 0 && column.getScale != null && column.getScale > 0
-            ) {
-              columns += s"  ${column.getColumnName} ${column.getColumnType}(${column.getPrecision}, ${column.getScale})"
-            } else {
-              columns += s"  ${column.getColumnName} ${column.getColumnType}"
-            }
-
-            if (StringUtils.isNotBlank(column.getComment)) {
-              columns += s" COMMENT '${column.getComment}'"
-            }
-            columns += Constants.COMMA
-
-            if (column.getPrimaryKey()) {
-              primaryKeyList = column.getColumnName :: primaryKeyList
-            }
-            if (column.getPartitionKey()) {
-              partitionKeyList = column.getColumnName :: partitionKeyList
-            }
+          if (column.getLength != null && column.getLength > 0) {
+            columns += s"  ${column.getColumnName} ${column.getColumnType}(${column.getLength})"
+          } else if (column.getPrecision != null && column.getPrecision > 0 && column.getScale != null && column.getScale > 0) {
+            columns += s"  ${column.getColumnName} ${column.getColumnType}(${column.getPrecision}, ${column.getScale})"
+          } else {
+            columns += s"  ${column.getColumnName} ${column.getColumnType}"
           }
-        })
+
+          if (StringUtils.isNotBlank(column.getComment)) {
+            columns += s" COMMENT '${column.getComment}'"
+          }
+          columns += Constants.COMMA
+
+          if (column.getPrimaryKey()) {
+            primaryKeyList = column.getColumnName :: primaryKeyList
+          }
+          if (column.getPartitionKey()) {
+            partitionKeyList = column.getColumnName :: partitionKeyList
+          }
+        }
+      })
     }
 
     /*
@@ -251,19 +265,18 @@ object RowTypeUtil {
      *  column_name column_type METADATA [ FROM metadata_key ] [ VIRTUAL ]
      */
     if (CollectionUtils.isNotEmpty(metadataColumns)) {
-      metadataColumns.forEach(
-        column => {
-          if (StringUtils.isNotBlank(column.getColumnName)) {
-            columns += s"  ${column.getColumnName} ${column.getColumnType} METADATA"
-            if (StringUtils.isNotBlank(column.getFrom)) {
-              columns += s" FROM '${column.getFrom}"
-            }
-            if (column.getVirtual) {
-              columns += " VIRTUAL"
-            }
-            columns += Constants.COMMA
+      metadataColumns.forEach(column => {
+        if (StringUtils.isNotBlank(column.getColumnName)) {
+          columns += s"  ${column.getColumnName} ${column.getColumnType} METADATA"
+          if (StringUtils.isNotBlank(column.getFrom)) {
+            columns += s" FROM '${column.getFrom}"
           }
-        })
+          if (column.getVirtual) {
+            columns += " VIRTUAL"
+          }
+          columns += Constants.COMMA
+        }
+      })
     }
 
     /*
@@ -271,16 +284,15 @@ object RowTypeUtil {
      * column_name AS computed_column_expression [COMMENT column_comment]
      */
     if (CollectionUtils.isNotEmpty(computedColumns)) {
-      computedColumns.forEach(
-        column => {
-          if (StringUtils.isNotBlank(column.getColumnName)) {
-            columns += s"  ${column.getColumnName} AS ${column.getComputedColumnExpression}"
-            if (StringUtils.isNotBlank(column.getComment)) {
-              columns += s" COMMENT '${column.getComment}"
-            }
-            columns += Constants.COMMA
+      computedColumns.forEach(column => {
+        if (StringUtils.isNotBlank(column.getColumnName)) {
+          columns += s"  ${column.getColumnName} AS ${column.getComputedColumnExpression}"
+          if (StringUtils.isNotBlank(column.getComment)) {
+            columns += s" COMMENT '${column.getComment}"
           }
-        })
+          columns += Constants.COMMA
+        }
+      })
     }
 
     /*

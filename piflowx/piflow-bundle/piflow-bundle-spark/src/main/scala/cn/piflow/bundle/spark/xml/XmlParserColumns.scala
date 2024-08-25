@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow.bundle.spark.xml
 
 import cn.piflow._
@@ -35,26 +52,24 @@ class XmlParserColumns extends ConfigurableStop[DataFrame] {
 
     val fields: Array[String] = df.schema.fieldNames
     val fieldString = new StringBuilder
-    fields.foreach(
-      x => {
-        if (columns.contains(x.toLowerCase)) {
-          fieldString.append(s"xmlToJson($x) as $x ,")
-        } else {
-          fieldString.append(s"$x,")
-        }
-      })
+    fields.foreach(x => {
+      if (columns.contains(x.toLowerCase)) {
+        fieldString.append(s"xmlToJson($x) as $x ,")
+      } else {
+        fieldString.append(s"$x,")
+      }
+    })
 
     df.createOrReplaceTempView("temp")
     val sqlText = "select " + fieldString.stripSuffix(Constants.COMMA) + " from temp"
     val frame: DataFrame = spark.sql(sqlText)
 
-    val rdd: RDD[String] = frame.toJSON.rdd.map(
-      x => {
-        x.replace("\\n", "")
-          .replace("}\"", "}")
-          .replace(":\"{", ":{")
-          .replace("\\", "")
-      })
+    val rdd: RDD[String] = frame.toJSON.rdd.map(x => {
+      x.replace("\\n", "")
+        .replace("}\"", "}")
+        .replace(":\"{", ":{")
+        .replace("\\", "")
+    })
 
     val outDF: DataFrame = spark.read.json(rdd)
     outDF.printSchema()

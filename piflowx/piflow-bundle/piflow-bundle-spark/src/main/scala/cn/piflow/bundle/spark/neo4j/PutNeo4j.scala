@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow.bundle.spark.neo4j
 
 import cn.piflow.{Constants, JobContext, JobInputStream, JobOutputStream, ProcessContext}
@@ -38,33 +55,32 @@ class PutNeo4j extends ConfigurableStop[DataFrame] {
     try {
       session = driver.session()
       transaction = session.beginTransaction()
-      inDf.collect.foreach(
-        row => {
-          n = n + 1
-          cypher = "create(a:" + labelName + "{"
-          for (x <- fileNames.indices) {
-            cypher += (fileNames(x) + ":\"")
-            fileData = row.getAs[String](fileNames(x))
+      inDf.collect.foreach(row => {
+        n = n + 1
+        cypher = "create(a:" + labelName + "{"
+        for (x <- fileNames.indices) {
+          cypher += (fileNames(x) + ":\"")
+          fileData = row.getAs[String](fileNames(x))
 
-            if (fileData != null) {
-              fileData = fileData
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-            }
+          if (fileData != null) {
+            fileData = fileData
+              .replace("\\", "\\\\")
+              .replace("\"", "\\\"")
+          }
 
-            cypher += fileData
-            cypher += """","""
-          }
-          cypher = cypher.substring(0, cypher.length - 1)
-          cypher += "})"
-          transaction.run(cypher)
-          transaction.success()
-          if (n == 500) {
-            transaction.close()
-            transaction = session.beginTransaction()
-            n = 0
-          }
-        })
+          cypher += fileData
+          cypher += """","""
+        }
+        cypher = cypher.substring(0, cypher.length - 1)
+        cypher += "})"
+        transaction.run(cypher)
+        transaction.success()
+        if (n == 500) {
+          transaction.close()
+          transaction = session.beginTransaction()
+          n = 0
+        }
+      })
     } finally {
       transaction.close()
       session.close()

@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.cscd.webservice;
 
 import javax.xml.bind.JAXBElement;
@@ -31,134 +48,112 @@ import java.io.Serializable;
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(
-    name = "",
-    propOrder = {"code", "author", "institute", "title", "orcId"})
+@XmlType(name = "", propOrder = {"code", "author", "institute", "title", "orcId"})
 @XmlRootElement(name = "searchArticles")
 public class SearchArticles implements Serializable {
 
-  @XmlElementRef(
-      name = "code",
-      namespace = "http://webservice.cscd.com",
-      type = JAXBElement.class,
-      required = false)
-  protected JAXBElement<String> code;
+    @XmlElementRef(name = "code", namespace = "http://webservice.cscd.com", type = JAXBElement.class, required = false)
+    protected JAXBElement<String> code;
 
-  @XmlElementRef(
-      name = "author",
-      namespace = "http://webservice.cscd.com",
-      type = JAXBElement.class,
-      required = false)
-  protected JAXBElement<String> author;
+    @XmlElementRef(name = "author", namespace = "http://webservice.cscd.com", type = JAXBElement.class, required = false)
+    protected JAXBElement<String> author;
 
-  @XmlElementRef(
-      name = "institute",
-      namespace = "http://webservice.cscd.com",
-      type = JAXBElement.class,
-      required = false)
-  protected JAXBElement<String> institute;
+    @XmlElementRef(name = "institute", namespace = "http://webservice.cscd.com", type = JAXBElement.class, required = false)
+    protected JAXBElement<String> institute;
 
-  @XmlElementRef(
-      name = "title",
-      namespace = "http://webservice.cscd.com",
-      type = JAXBElement.class,
-      required = false)
-  protected JAXBElement<String> title;
+    @XmlElementRef(name = "title", namespace = "http://webservice.cscd.com", type = JAXBElement.class, required = false)
+    protected JAXBElement<String> title;
 
-  @XmlElementRef(
-      name = "orcId",
-      namespace = "http://webservice.cscd.com",
-      type = JAXBElement.class,
-      required = false)
-  protected JAXBElement<String> orcId;
+    @XmlElementRef(name = "orcId", namespace = "http://webservice.cscd.com", type = JAXBElement.class, required = false)
+    protected JAXBElement<String> orcId;
 
-  /**
-   * 获取code属性的值。
-   *
-   * @return possible object is {@link JAXBElement }{@code <}{@link String }{@code >}
-   */
-  public JAXBElement<String> getCode() {
-    return code;
-  }
+    /**
+     * 获取code属性的值。
+     *
+     * @return possible object is {@link JAXBElement }{@code <}{@link String }{@code >}
+     */
+    public JAXBElement<String> getCode() {
+        return code;
+    }
 
-  /**
-   * 设置code属性的值。
-   *
-   * @param value allowed object is {@link JAXBElement }{@code <}{@link String }{@code >}
-   */
-  public void setCode(JAXBElement<String> value) {
-    this.code = value;
-  }
+    /**
+     * 设置code属性的值。
+     *
+     * @param value allowed object is {@link JAXBElement }{@code <}{@link String }{@code >}
+     */
+    public void setCode(JAXBElement<String> value) {
+        this.code = value;
+    }
 
-  /**
-   * 获取author属性的值。
-   *
-   * @return possible object is {@link JAXBElement }{@code <}{@link String }{@code >}
-   */
-  public JAXBElement<String> getAuthor() {
-    return author;
-  }
+    /**
+     * 获取author属性的值。
+     *
+     * @return possible object is {@link JAXBElement }{@code <}{@link String }{@code >}
+     */
+    public JAXBElement<String> getAuthor() {
+        return author;
+    }
 
-  /**
-   * 设置author属性的值。
-   *
-   * @param value allowed object is {@link JAXBElement }{@code <}{@link String }{@code >}
-   */
-  public void setAuthor(JAXBElement<String> value) {
-    this.author = value;
-  }
+    /**
+     * 设置author属性的值。
+     *
+     * @param value allowed object is {@link JAXBElement }{@code <}{@link String }{@code >}
+     */
+    public void setAuthor(JAXBElement<String> value) {
+        this.author = value;
+    }
 
-  /**
-   * 获取institute属性的值。
-   *
-   * @return possible object is {@link JAXBElement }{@code <}{@link String }{@code >}
-   */
-  public JAXBElement<String> getInstitute() {
-    return institute;
-  }
+    /**
+     * 获取institute属性的值。
+     *
+     * @return possible object is {@link JAXBElement }{@code <}{@link String }{@code >}
+     */
+    public JAXBElement<String> getInstitute() {
+        return institute;
+    }
 
-  /**
-   * 设置institute属性的值。
-   *
-   * @param value allowed object is {@link JAXBElement }{@code <}{@link String }{@code >}
-   */
-  public void setInstitute(JAXBElement<String> value) {
-    this.institute = value;
-  }
+    /**
+     * 设置institute属性的值。
+     *
+     * @param value allowed object is {@link JAXBElement }{@code <}{@link String }{@code >}
+     */
+    public void setInstitute(JAXBElement<String> value) {
+        this.institute = value;
+    }
 
-  /**
-   * 获取title属性的值。
-   *
-   * @return possible object is {@link JAXBElement }{@code <}{@link String }{@code >}
-   */
-  public JAXBElement<String> getTitle() {
-    return title;
-  }
+    /**
+     * 获取title属性的值。
+     *
+     * @return possible object is {@link JAXBElement }{@code <}{@link String }{@code >}
+     */
+    public JAXBElement<String> getTitle() {
+        return title;
+    }
 
-  /**
-   * 设置title属性的值。
-   *
-   * @param value allowed object is {@link JAXBElement }{@code <}{@link String }{@code >}
-   */
-  public void setTitle(JAXBElement<String> value) {
-    this.title = value;
-  }
+    /**
+     * 设置title属性的值。
+     *
+     * @param value allowed object is {@link JAXBElement }{@code <}{@link String }{@code >}
+     */
+    public void setTitle(JAXBElement<String> value) {
+        this.title = value;
+    }
 
-  /**
-   * 获取orcId属性的值。
-   *
-   * @return possible object is {@link JAXBElement }{@code <}{@link String }{@code >}
-   */
-  public JAXBElement<String> getOrcId() {
-    return orcId;
-  }
+    /**
+     * 获取orcId属性的值。
+     *
+     * @return possible object is {@link JAXBElement }{@code <}{@link String }{@code >}
+     */
+    public JAXBElement<String> getOrcId() {
+        return orcId;
+    }
 
-  /**
-   * 设置orcId属性的值。
-   *
-   * @param value allowed object is {@link JAXBElement }{@code <}{@link String }{@code >}
-   */
-  public void setOrcId(JAXBElement<String> value) {
-    this.orcId = value;
-  }
+    /**
+     * 设置orcId属性的值。
+     *
+     * @param value allowed object is {@link JAXBElement }{@code <}{@link String }{@code >}
+     */
+    public void setOrcId(JAXBElement<String> value) {
+        this.orcId = value;
+    }
 }

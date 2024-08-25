@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.streampark.console.flow.component.process.service.Impl;
 
 import org.apache.streampark.console.flow.base.utils.ReturnMapUtils;
@@ -28,111 +45,114 @@ import java.util.Map;
 @Service
 public class ProcessStopServiceImpl implements IProcessStopService {
 
-  @Autowired private ProcessDomain processDomain;
+    @Autowired
+    private ProcessDomain processDomain;
 
-  @Autowired private StopsComponentDomain stopsComponentDomain;
+    @Autowired
+    private StopsComponentDomain stopsComponentDomain;
 
-  @Autowired private IVisualDataDirectory visualDataDirectoryImpl;
+    @Autowired
+    private IVisualDataDirectory visualDataDirectoryImpl;
 
-  /**
-   * Query processStop based on processId and pageId
-   *
-   * @param processId
-   * @param pageId
-   * @return
-   */
-  @Override
-  public String getProcessStopVoByPageId(String processId, String pageId) {
-    if (StringUtils.isAnyEmpty(processId, pageId)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("Parameter passed in incorrectly");
+    /**
+     * Query processStop based on processId and pageId
+     *
+     * @param processId
+     * @param pageId
+     * @return
+     */
+    @Override
+    public String getProcessStopVoByPageId(String processId, String pageId) {
+        if (StringUtils.isAnyEmpty(processId, pageId)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr("Parameter passed in incorrectly");
+        }
+        ProcessStop processStopByPageId =
+            processDomain.getProcessStopByPageIdAndPageId(processId, pageId);
+        if (null == processStopByPageId) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr("process stop data is null");
+        }
+        ProcessStopVo processStopVo = ProcessUtils.processStopPoToVo(processStopByPageId);
+        StopsComponent stopsComponentByBundle =
+            stopsComponentDomain.getStopsComponentByBundle(processStopByPageId.getBundle());
+        if (null != stopsComponentByBundle) {
+            processStopVo.setVisualizationType(stopsComponentByBundle.getVisualizationType());
+        }
+        return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("processStopVo", processStopVo);
     }
-    ProcessStop processStopByPageId =
-        processDomain.getProcessStopByPageIdAndPageId(processId, pageId);
-    if (null == processStopByPageId) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("process stop data is null");
-    }
-    ProcessStopVo processStopVo = ProcessUtils.processStopPoToVo(processStopByPageId);
-    StopsComponent stopsComponentByBundle =
-        stopsComponentDomain.getStopsComponentByBundle(processStopByPageId.getBundle());
-    if (null != stopsComponentByBundle) {
-      processStopVo.setVisualizationType(stopsComponentByBundle.getVisualizationType());
-    }
-    return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("processStopVo", processStopVo);
-  }
 
-  /**
-   * showViewData
-   *
-   * @param stopId stopId
-   * @return json
-   */
-  @Override
-  public void showViewData(HttpServletResponse response, String stopId) throws Exception {
-    try {
-      if (StringUtils.isBlank(stopId)) {
-        throw new Exception(MessageConfig.PARAM_IS_NULL_MSG("id"));
-      }
-      String appId = processDomain.getProcessAppIdByStopId(stopId);
-      if (StringUtils.isBlank(appId)) {
-        throw new Exception(MessageConfig.NO_DATA_BY_ID_XXX_MSG(stopId));
-      }
-      String stopName = processDomain.getProcessStopNameByStopId(stopId);
-      if (StringUtils.isBlank(stopName)) {
-        throw new Exception(MessageConfig.NO_DATA_BY_ID_XXX_MSG(stopName));
-      }
-      Map<String, Object> visualDataDirectoryData =
-          visualDataDirectoryImpl.getVisualDataDirectoryData(appId, stopName);
-      if (!"200".equals(visualDataDirectoryData.get(ReturnMapUtils.KEY_CODE).toString())) {
-        throw new Exception(MessageConfig.ERROR_MSG());
-      }
-      byte[] fileContent = (byte[]) visualDataDirectoryData.get("fileContent");
-      response.setCharacterEncoding("utf-8");
-      downloadFile(response, stopName, fileContent);
-    } catch (Exception e) {
-      reSetError(response, e.getMessage());
+    /**
+     * showViewData
+     *
+     * @param stopId stopId
+     * @return json
+     */
+    @Override
+    public void showViewData(HttpServletResponse response, String stopId) throws Exception {
+        try {
+            if (StringUtils.isBlank(stopId)) {
+                throw new Exception(MessageConfig.PARAM_IS_NULL_MSG("id"));
+            }
+            String appId = processDomain.getProcessAppIdByStopId(stopId);
+            if (StringUtils.isBlank(appId)) {
+                throw new Exception(MessageConfig.NO_DATA_BY_ID_XXX_MSG(stopId));
+            }
+            String stopName = processDomain.getProcessStopNameByStopId(stopId);
+            if (StringUtils.isBlank(stopName)) {
+                throw new Exception(MessageConfig.NO_DATA_BY_ID_XXX_MSG(stopName));
+            }
+            Map<String, Object> visualDataDirectoryData =
+                visualDataDirectoryImpl.getVisualDataDirectoryData(appId, stopName);
+            if (!"200".equals(visualDataDirectoryData.get(ReturnMapUtils.KEY_CODE).toString())) {
+                throw new Exception(MessageConfig.ERROR_MSG());
+            }
+            byte[] fileContent = (byte[]) visualDataDirectoryData.get("fileContent");
+            response.setCharacterEncoding("utf-8");
+            downloadFile(response, stopName, fileContent);
+        } catch (Exception e) {
+            reSetError(response, e.getMessage());
+        }
     }
-  }
 
-  /**
-   * The file is read as a stream
-   *
-   * @param fileName fileName
-   * @param buffer buffer
-   * @return
-   */
-  private void downloadFile(HttpServletResponse response, String fileName, byte[] buffer)
-      throws URISyntaxException, IOException {
-    if (null == buffer || StringUtils.isBlank(fileName)) {
-      new Exception("data error");
+    /**
+     * The file is read as a stream
+     *
+     * @param fileName fileName
+     * @param buffer buffer
+     * @return
+     */
+    private void downloadFile(HttpServletResponse response, String fileName,
+                              byte[] buffer) throws URISyntaxException, IOException {
+        if (null == buffer || StringUtils.isBlank(fileName)) {
+            new Exception("data error");
+        }
+        // Clear response
+        response.reset();
+        // Set the header of response and UTF-8 code the file name. Otherwise, the file name is garbled
+        // and wrong when downloading
+        response.addHeader(
+            "Content-Disposition",
+            "attachment;filename=" + URLEncoder.encode(fileName + ".csv", "UTF-8"));
+        response.addHeader("Content-Length", "" + buffer.length);
+        OutputStream toClient = new BufferedOutputStream(response.getOutputStream());
+        response.setContentType("application/vnd.ms-excel;charset=utf-8");
+        toClient.write(buffer);
+        toClient.flush();
+        toClient.close();
     }
-    // Clear response
-    response.reset();
-    // Set the header of response and UTF-8 code the file name. Otherwise, the file name is garbled
-    // and wrong when downloading
-    response.addHeader(
-        "Content-Disposition",
-        "attachment;filename=" + URLEncoder.encode(fileName + ".csv", "UTF-8"));
-    response.addHeader("Content-Length", "" + buffer.length);
-    OutputStream toClient = new BufferedOutputStream(response.getOutputStream());
-    response.setContentType("application/vnd.ms-excel;charset=utf-8");
-    toClient.write(buffer);
-    toClient.flush();
-    toClient.close();
-  }
 
-  private void reSetError(HttpServletResponse response, String errorMessage) throws Exception {
-    // 重置response
-    response.reset();
-    response.setContentType("application/json");
-    response.setCharacterEncoding("utf-8");
-    Map<String, Object> map = ReturnMapUtils.setFailedMsg(errorMessage);
-    map.put("status", "failure");
-    map.put("message", errorMessage);
-    response.setStatus(ReturnMapUtils.ERROR_CODE);
-    try {
-      response.getWriter().println();
-    } catch (IOException e) {
-      throw new Exception("error");
+    private void reSetError(HttpServletResponse response, String errorMessage) throws Exception {
+        // 重置response
+        response.reset();
+        response.setContentType("application/json");
+        response.setCharacterEncoding("utf-8");
+        Map<String, Object> map = ReturnMapUtils.setFailedMsg(errorMessage);
+        map.put("status", "failure");
+        map.put("message", errorMessage);
+        response.setStatus(ReturnMapUtils.ERROR_CODE);
+        try {
+            response.getWriter().println();
+        } catch (IOException e) {
+            throw new Exception("error");
+        }
     }
-  }
 }

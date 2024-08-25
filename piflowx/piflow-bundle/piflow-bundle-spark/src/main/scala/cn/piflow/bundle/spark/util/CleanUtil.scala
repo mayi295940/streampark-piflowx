@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow.bundle.spark.util
 
 import java.text.SimpleDateFormat
@@ -38,20 +55,16 @@ object CleanUtil extends Serializable {
   def processProvince(word: String): String = {
     var str = ""
     if (word == null) str = ""
-    else if (
-      word.indexOf("北京") > -1 || word.indexOf("天津") > -1 || word.indexOf("上海") > -1 || word.indexOf(
-        "重庆") > -1
-    ) str = word.replace("市", "")
-    else if (
-      word.indexOf("云南") > -1 || word.indexOf("吉林") > -1 || word.indexOf("四川") > -1 || word.indexOf(
+    else if (word.indexOf("北京") > -1 || word.indexOf("天津") > -1 || word.indexOf("上海") > -1 || word.indexOf(
+        "重庆") > -1) str = word.replace("市", "")
+    else if (word.indexOf("云南") > -1 || word.indexOf("吉林") > -1 || word.indexOf("四川") > -1 || word.indexOf(
         "安徽") > -1 || word.indexOf("山东") > -1 || word.indexOf("山西") > -1 || word.indexOf(
         "广东") > -1 || word.indexOf("江苏") > -1 || word.indexOf("江西") > -1 || word.indexOf(
         "河北") > -1 || word.indexOf("河南") > -1 || word.indexOf("浙江") > -1 || word.indexOf(
         "海南") > -1 || word.indexOf("湖北") > -1 || word.indexOf("湖南") > -1 || word.indexOf(
         "甘肃") > -1 || word.indexOf("福建") > -1 || word.indexOf("贵州") > -1 || word.indexOf(
         "辽宁") > -1 || word.indexOf("重庆") > -1 || word.indexOf("陕西") > -1 || word.indexOf(
-        "青海") > -1 || word.indexOf("黑龙江") > -1
-    ) str = word.replace("省", "")
+        "青海") > -1 || word.indexOf("黑龙江") > -1) str = word.replace("省", "")
     else if (word.toLowerCase.indexOf("anhui") > -1) str = "安徽"
     else if (word.toLowerCase.indexOf("beijing") > -1) str = "北京"
     else if (word.toLowerCase.indexOf("chongqing") > -1) str = "重庆"
@@ -157,8 +170,7 @@ object CleanUtil extends Serializable {
     Array("71", "台湾"),
     Array("81", "香港"),
     Array("82", "澳门"),
-    Array("91", "国外")
-  )
+    Array("91", "国外"))
 
   private val cityCode = Array(
     "11",
@@ -195,8 +207,7 @@ object CleanUtil extends Serializable {
     "71",
     "81",
     "82",
-    "91"
-  )
+    "91")
 
   // 每位加权因子
   private val power = Array(7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2)

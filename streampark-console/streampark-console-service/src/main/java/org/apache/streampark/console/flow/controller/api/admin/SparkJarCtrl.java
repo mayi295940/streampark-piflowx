@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.streampark.console.flow.controller.api.admin;
 
 import org.apache.streampark.console.flow.base.utils.SessionUserUtil;
@@ -19,64 +36,64 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/sparkJar")
 public class SparkJarCtrl {
 
-  private final ISparkJarService sparkJarServiceImpl;
-  private final ILogHelperService logHelperServiceImpl;
+    private final ISparkJarService sparkJarServiceImpl;
+    private final ILogHelperService logHelperServiceImpl;
 
-  @Autowired
-  public SparkJarCtrl(
-      ISparkJarService sparkJarServiceImpl, ILogHelperService logHelperServiceImpl) {
-    this.sparkJarServiceImpl = sparkJarServiceImpl;
-    this.logHelperServiceImpl = logHelperServiceImpl;
-  }
+    @Autowired
+    public SparkJarCtrl(
+                        ISparkJarService sparkJarServiceImpl, ILogHelperService logHelperServiceImpl) {
+        this.sparkJarServiceImpl = sparkJarServiceImpl;
+        this.logHelperServiceImpl = logHelperServiceImpl;
+    }
 
-  /** Query and enter the spark jar list */
-  @RequestMapping(value = "/sparkJarListPage", method = RequestMethod.GET)
-  @ResponseBody
-  @ApiOperation(value = "sparkJarListPage", notes = "spark jar list")
-  public String sparkJarListPage(Integer page, Integer limit, String param) {
-    String username = SessionUserUtil.getCurrentUsername();
-    boolean isAdmin = SessionUserUtil.isAdmin();
-    return sparkJarServiceImpl.sparkJarListPage(username, isAdmin, page, limit, param);
-  }
+    /** Query and enter the spark jar list */
+    @RequestMapping(value = "/sparkJarListPage", method = RequestMethod.GET)
+    @ResponseBody
+    @ApiOperation(value = "sparkJarListPage", notes = "spark jar list")
+    public String sparkJarListPage(Integer page, Integer limit, String param) {
+        String username = SessionUserUtil.getCurrentUsername();
+        boolean isAdmin = SessionUserUtil.isAdmin();
+        return sparkJarServiceImpl.sparkJarListPage(username, isAdmin, page, limit, param);
+    }
 
-  /** Upload spark jar file and save spark jar */
-  @RequestMapping(value = "/uploadSparkJarFile", method = RequestMethod.POST)
-  @ResponseBody
-  @ApiOperation(value = "uploadSparkJarFile", notes = "update spark jar")
-  public String uploadSparkJarFile(@RequestParam("file") MultipartFile file) {
-    String username = SessionUserUtil.getCurrentUsername();
-    logHelperServiceImpl.logAuthSucceed("uploadSparkJarFile " + file.getName(), username);
-    return sparkJarServiceImpl.uploadSparkJarFile(username, file);
-  }
+    /** Upload spark jar file and save spark jar */
+    @RequestMapping(value = "/uploadSparkJarFile", method = RequestMethod.POST)
+    @ResponseBody
+    @ApiOperation(value = "uploadSparkJarFile", notes = "update spark jar")
+    public String uploadSparkJarFile(@RequestParam("file") MultipartFile file) {
+        String username = SessionUserUtil.getCurrentUsername();
+        logHelperServiceImpl.logAuthSucceed("uploadSparkJarFile " + file.getName(), username);
+        return sparkJarServiceImpl.uploadSparkJarFile(username, file);
+    }
 
-  /** Mount spark jar */
-  @RequestMapping(value = "/mountSparkJar", method = RequestMethod.POST)
-  @ResponseBody
-  @ApiOperation(value = "mountSparkJar", notes = "mount spark jar")
-  public String mountSparkJar(String id) {
-    String username = SessionUserUtil.getCurrentUsername();
-    Boolean isAdmin = SessionUserUtil.isAdmin();
-    return sparkJarServiceImpl.mountSparkJar(username, isAdmin, id);
-  }
+    /** Mount spark jar */
+    @RequestMapping(value = "/mountSparkJar", method = RequestMethod.POST)
+    @ResponseBody
+    @ApiOperation(value = "mountSparkJar", notes = "mount spark jar")
+    public String mountSparkJar(String id) {
+        String username = SessionUserUtil.getCurrentUsername();
+        Boolean isAdmin = SessionUserUtil.isAdmin();
+        return sparkJarServiceImpl.mountSparkJar(username, isAdmin, id);
+    }
 
-  /** unmount spark jar */
-  @RequestMapping(value = "/unmountSparkJar", method = RequestMethod.POST)
-  @ResponseBody
-  @ApiOperation(value = "unmountSparkJar", notes = "mount spark jar")
-  public String unmountSparkJar(String id) {
-    String username = SessionUserUtil.getCurrentUsername();
-    Boolean isAdmin = SessionUserUtil.isAdmin();
-    return sparkJarServiceImpl.unmountSparkJar(username, isAdmin, id);
-  }
+    /** unmount spark jar */
+    @RequestMapping(value = "/unmountSparkJar", method = RequestMethod.POST)
+    @ResponseBody
+    @ApiOperation(value = "unmountSparkJar", notes = "mount spark jar")
+    public String unmountSparkJar(String id) {
+        String username = SessionUserUtil.getCurrentUsername();
+        Boolean isAdmin = SessionUserUtil.isAdmin();
+        return sparkJarServiceImpl.unmountSparkJar(username, isAdmin, id);
+    }
 
-  /** del spark jar */
-  @RequestMapping(value = "/delSparkJar", method = RequestMethod.POST)
-  @ResponseBody
-  @ApiOperation(value = "delSparkJar", notes = "delete spark jar")
-  public String delSparkJar(String id) {
-    String username = SessionUserUtil.getCurrentUsername();
-    Boolean isAdmin = SessionUserUtil.isAdmin();
-    logHelperServiceImpl.logAuthSucceed("del SparkJar " + id, username);
-    return sparkJarServiceImpl.delSparkJar(username, isAdmin, id);
-  }
+    /** del spark jar */
+    @RequestMapping(value = "/delSparkJar", method = RequestMethod.POST)
+    @ResponseBody
+    @ApiOperation(value = "delSparkJar", notes = "delete spark jar")
+    public String delSparkJar(String id) {
+        String username = SessionUserUtil.getCurrentUsername();
+        Boolean isAdmin = SessionUserUtil.isAdmin();
+        logHelperServiceImpl.logAuthSucceed("del SparkJar " + id, username);
+        return sparkJarServiceImpl.delSparkJar(username, isAdmin, id);
+    }
 }

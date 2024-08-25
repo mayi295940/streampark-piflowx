@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.streampark.console.flow.component.mxGraph.service.impl;
 
 import org.apache.streampark.console.flow.base.utils.FileUtils;
@@ -26,78 +43,78 @@ import java.util.Map;
 @Service
 public class MxNodeImageServiceImpl implements IMxNodeImageService {
 
-  private final MxNodeImageDomain mxNodeImageDomain;
+    private final MxNodeImageDomain mxNodeImageDomain;
 
-  @Autowired
-  public MxNodeImageServiceImpl(MxNodeImageDomain mxNodeImageDomain) {
-    this.mxNodeImageDomain = mxNodeImageDomain;
-  }
-
-  @Override
-  public String uploadNodeImage(
-      String username, MultipartFile file, String imageType, String nodeEngineType)
-      throws Exception {
-
-    if (StringUtils.isBlank(username)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
-    }
-    if (StringUtils.isBlank(imageType)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("imageType is null");
-    }
-    if (file.isEmpty()) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.UPLOAD_FAILED_MSG());
+    @Autowired
+    public MxNodeImageServiceImpl(MxNodeImageDomain mxNodeImageDomain) {
+        this.mxNodeImageDomain = mxNodeImageDomain;
     }
 
-    String imagePath =
-        Constants.ENGIN_FLINK.equalsIgnoreCase(nodeEngineType)
-            ? SysParamsCache.ENGINE_FLINK_IMAGES_PATH
-            : SysParamsCache.ENGINE_SPARK_IMAGES_PATH;
+    @Override
+    public String uploadNodeImage(
+                                  String username, MultipartFile file, String imageType,
+                                  String nodeEngineType) throws Exception {
 
-    Map<String, Object> uploadMap = FileUtils.uploadRtnMap(file, imagePath, null);
-    if (null == uploadMap || uploadMap.isEmpty()) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.UPLOAD_FAILED_MSG());
-    }
-    Integer code = (Integer) uploadMap.get("code");
-    if (500 == code) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("failed to upload file");
-    }
-    String saveFileName = (String) uploadMap.get("saveFileName");
-    String fileName = (String) uploadMap.get("fileName");
-    String path = (String) uploadMap.get("path");
-    MxNodeImage mxNodeImage = MxNodeImageUtils.newMxNodeImageNoId(username);
-    mxNodeImage.setId(UUIDUtils.getUUID32());
-    mxNodeImage.setImageName(fileName);
-    mxNodeImage.setImagePath(path);
-    mxNodeImage.setImageUrl("/images/" + saveFileName);
-    mxNodeImage.setImageType(imageType);
-    mxNodeImageDomain.addMxNodeImage(mxNodeImage);
-    return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("imgUrl", mxNodeImage.getImageUrl());
-  }
+        if (StringUtils.isBlank(username)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+        }
+        if (StringUtils.isBlank(imageType)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr("imageType is null");
+        }
+        if (file.isEmpty()) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.UPLOAD_FAILED_MSG());
+        }
 
-  @Override
-  public String getMxNodeImageList(String username, String imageType) {
-    if (StringUtils.isBlank(username)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+        String imagePath =
+            Constants.ENGIN_FLINK.equalsIgnoreCase(nodeEngineType)
+                ? SysParamsCache.ENGINE_FLINK_IMAGES_PATH
+                : SysParamsCache.ENGINE_SPARK_IMAGES_PATH;
+
+        Map<String, Object> uploadMap = FileUtils.uploadRtnMap(file, imagePath, null);
+        if (null == uploadMap || uploadMap.isEmpty()) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.UPLOAD_FAILED_MSG());
+        }
+        Integer code = (Integer) uploadMap.get("code");
+        if (500 == code) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr("failed to upload file");
+        }
+        String saveFileName = (String) uploadMap.get("saveFileName");
+        String fileName = (String) uploadMap.get("fileName");
+        String path = (String) uploadMap.get("path");
+        MxNodeImage mxNodeImage = MxNodeImageUtils.newMxNodeImageNoId(username);
+        mxNodeImage.setId(UUIDUtils.getUUID32());
+        mxNodeImage.setImageName(fileName);
+        mxNodeImage.setImagePath(path);
+        mxNodeImage.setImageUrl("/images/" + saveFileName);
+        mxNodeImage.setImageType(imageType);
+        mxNodeImageDomain.addMxNodeImage(mxNodeImage);
+        return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("imgUrl", mxNodeImage.getImageUrl());
     }
-    if (StringUtils.isBlank(imageType)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr("imageType is null");
+
+    @Override
+    public String getMxNodeImageList(String username, String imageType) {
+        if (StringUtils.isBlank(username)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+        }
+        if (StringUtils.isBlank(imageType)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr("imageType is null");
+        }
+        List<MxNodeImageVo> mxNodeImageVoList = new ArrayList<>();
+        List<MxNodeImage> mxNodeImageList =
+            mxNodeImageDomain.userGetMxNodeImageListByImageType(username, imageType);
+        if (null == mxNodeImageList || mxNodeImageList.size() == 0) {
+            return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("nodeImageList", mxNodeImageList);
+        }
+        MxNodeImageVo mxNodeImageVo;
+        for (MxNodeImage mxNodeImage : mxNodeImageList) {
+            if (null == mxNodeImage) {
+                continue;
+            }
+            mxNodeImageVo = new MxNodeImageVo();
+            BeanUtils.copyProperties(mxNodeImage, mxNodeImageVo);
+            mxNodeImageVo.setImageUrl(SysParamsCache.SYS_CONTEXT_PATH + mxNodeImage.getImageUrl());
+            mxNodeImageVoList.add(mxNodeImageVo);
+        }
+        return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("nodeImageList", mxNodeImageVoList);
     }
-    List<MxNodeImageVo> mxNodeImageVoList = new ArrayList<>();
-    List<MxNodeImage> mxNodeImageList =
-        mxNodeImageDomain.userGetMxNodeImageListByImageType(username, imageType);
-    if (null == mxNodeImageList || mxNodeImageList.size() == 0) {
-      return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("nodeImageList", mxNodeImageList);
-    }
-    MxNodeImageVo mxNodeImageVo;
-    for (MxNodeImage mxNodeImage : mxNodeImageList) {
-      if (null == mxNodeImage) {
-        continue;
-      }
-      mxNodeImageVo = new MxNodeImageVo();
-      BeanUtils.copyProperties(mxNodeImage, mxNodeImageVo);
-      mxNodeImageVo.setImageUrl(SysParamsCache.SYS_CONTEXT_PATH + mxNodeImage.getImageUrl());
-      mxNodeImageVoList.add(mxNodeImageVo);
-    }
-    return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("nodeImageList", mxNodeImageVoList);
-  }
 }

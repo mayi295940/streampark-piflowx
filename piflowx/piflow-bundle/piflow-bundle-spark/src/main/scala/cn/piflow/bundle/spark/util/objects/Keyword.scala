@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow.bundle.spark.util.objects
 
 import cn.piflow.bundle.spark.util.StringUtil
@@ -18,10 +35,9 @@ class Keyword(val name: String, iterable: Iterable[(Hierarchy, Int, Boolean)])
   val amount: Int = sq.map(f => f._2).sum
   // 1. count 2. abstext 3. titletext
   var hiMap: Map[Hierarchy, KeywordStatus] = sq
-    .map(
-      f => {
-        (f._1, new KeywordStatus(f._2, 0, 0, amount, f._3))
-      })
+    .map(f => {
+      (f._1, new KeywordStatus(f._2, 0, 0, amount, f._3))
+    })
     .toMap
 
   // TODO 如果你想训练数据呢？
@@ -37,8 +53,7 @@ class Keyword(val name: String, iterable: Iterable[(Hierarchy, Int, Boolean)])
             StringUtil.countString(absTitle._2, name),
             amount,
             true)
-        }
-      )
+        })
     }
   }
 
@@ -47,16 +62,14 @@ class Keyword(val name: String, iterable: Iterable[(Hierarchy, Int, Boolean)])
     val resultseq = { // 全新词
       seq
         .filter(p => p._2.isNewWord)
-        .filter(
-          pair => {
-            pair._2.weight > 2.0 && pair._2.percentage > 0.7 && pair._2.count > 2
-          })
+        .filter(pair => {
+          pair._2.weight > 2.0 && pair._2.percentage > 0.7 && pair._2.count > 2
+        })
         .map(p => (p._1, p._2, "newword")) ++ seq
         .filter(p => !p._2.isNewWord)
-        .filter(
-          pair => {
-            pair._2.weight > 6.0 && pair._2.count > 15 && pair._2.count < 55 && pair._2.percentage > 0.5
-          })
+        .filter(pair => {
+          pair._2.weight > 6.0 && pair._2.count > 15 && pair._2.count < 55 && pair._2.percentage > 0.5
+        })
         .map(p => (p._1, p._2, "notbeenselectedlastyear"))
     }
     new Result(resultseq, name)

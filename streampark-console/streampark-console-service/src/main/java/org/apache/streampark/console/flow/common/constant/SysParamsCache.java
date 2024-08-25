@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.streampark.console.flow.common.constant;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -24,104 +41,104 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Component
 public class SysParamsCache {
 
-  public static ThreadPoolExecutor INIT_STOP_THREAD_POOL_EXECUTOR;
+    public static ThreadPoolExecutor INIT_STOP_THREAD_POOL_EXECUTOR;
 
-  public static ThreadPoolExecutor MONITOR_THREAD_POOL_EXECUTOR;
+    public static ThreadPoolExecutor MONITOR_THREAD_POOL_EXECUTOR;
 
-  public static Boolean IS_BOOT_COMPLETE = false;
+    public static Boolean IS_BOOT_COMPLETE = false;
 
-  public static void setIsBootComplete(boolean isBootComplete) {
-    IS_BOOT_COMPLETE = isBootComplete;
-  }
-
-  public static String ENGINE_FLINK_IMAGES_PATH;
-
-  public static String ENGINE_SPARK_IMAGES_PATH;
-
-  public static void setImagesPath(String imagesPath, String engineType) {
-    if (Constants.ENGIN_FLINK.equalsIgnoreCase(engineType)) {
-      ENGINE_FLINK_IMAGES_PATH = imagesPath;
-    } else {
-      ENGINE_SPARK_IMAGES_PATH = imagesPath;
+    public static void setIsBootComplete(boolean isBootComplete) {
+        IS_BOOT_COMPLETE = isBootComplete;
     }
-  }
 
-  public static String ENGINE_FLINK_VIDEOS_PATH;
+    public static String ENGINE_FLINK_IMAGES_PATH;
 
-  public static String ENGINE_SPARK_VIDEOS_PATH;
+    public static String ENGINE_SPARK_IMAGES_PATH;
 
-  public static void setVideosPath(String videosPath, String engineType) {
-    if (Constants.ENGIN_FLINK.equalsIgnoreCase(engineType)) {
-      ENGINE_FLINK_VIDEOS_PATH = videosPath;
-    } else {
-      ENGINE_SPARK_VIDEOS_PATH = videosPath;
+    public static void setImagesPath(String imagesPath, String engineType) {
+        if (Constants.ENGIN_FLINK.equalsIgnoreCase(engineType)) {
+            ENGINE_FLINK_IMAGES_PATH = imagesPath;
+        } else {
+            ENGINE_SPARK_IMAGES_PATH = imagesPath;
+        }
     }
-  }
 
-  // Xml file path (read in configuration file)
-  public static String ENGINE_FLINK_XML_PATH;
-  public static String ENGINE_SPARK_XML_PATH;
+    public static String ENGINE_FLINK_VIDEOS_PATH;
 
-  public static void setXmlPath(String xmlPath, String engineType) {
-    if (Constants.ENGIN_FLINK.equalsIgnoreCase(engineType)) {
-      ENGINE_FLINK_XML_PATH = xmlPath;
-    } else {
-      ENGINE_SPARK_XML_PATH = xmlPath;
+    public static String ENGINE_SPARK_VIDEOS_PATH;
+
+    public static void setVideosPath(String videosPath, String engineType) {
+        if (Constants.ENGIN_FLINK.equalsIgnoreCase(engineType)) {
+            ENGINE_FLINK_VIDEOS_PATH = videosPath;
+        } else {
+            ENGINE_SPARK_VIDEOS_PATH = videosPath;
+        }
     }
-  }
 
-  // Xml file path (read in configuration file)
-  public static String ENGINE_FLINK_CSV_PATH;
-  public static String ENGINE_SPARK_CSV_PATH;
+    // Xml file path (read in configuration file)
+    public static String ENGINE_FLINK_XML_PATH;
+    public static String ENGINE_SPARK_XML_PATH;
 
-  public static void setCsvPath(String csvPath, String engineType) {
-    if (Constants.ENGIN_FLINK.equalsIgnoreCase(engineType)) {
-      ENGINE_FLINK_CSV_PATH = csvPath;
-    } else {
-      ENGINE_SPARK_CSV_PATH = csvPath;
+    public static void setXmlPath(String xmlPath, String engineType) {
+        if (Constants.ENGIN_FLINK.equalsIgnoreCase(engineType)) {
+            ENGINE_FLINK_XML_PATH = xmlPath;
+        } else {
+            ENGINE_SPARK_XML_PATH = xmlPath;
+        }
     }
-  }
 
-  public static String SYS_CONTEXT_PATH;
+    // Xml file path (read in configuration file)
+    public static String ENGINE_FLINK_CSV_PATH;
+    public static String ENGINE_SPARK_CSV_PATH;
 
-  @Value("${server.servlet.context-path}")
-  public void setSysContextPath(String sysContextPath) {
-    SYS_CONTEXT_PATH = sysContextPath;
-  }
+    public static void setCsvPath(String csvPath, String engineType) {
+        if (Constants.ENGIN_FLINK.equalsIgnoreCase(engineType)) {
+            ENGINE_FLINK_CSV_PATH = csvPath;
+        } else {
+            ENGINE_SPARK_CSV_PATH = csvPath;
+        }
+    }
 
-  public static String IMG_PATH_PREFIX;
+    public static String SYS_CONTEXT_PATH;
 
-  @Value("${flow.images.path.prefix}")
-  public void setImgPathPrefix(String imgPathPrefix) {
-    IMG_PATH_PREFIX = imgPathPrefix;
-  }
+    @Value("${server.servlet.context-path}")
+    public void setSysContextPath(String sysContextPath) {
+        SYS_CONTEXT_PATH = sysContextPath;
+    }
 
-  public static Boolean IS_IFRAME;
+    public static String IMG_PATH_PREFIX;
 
-  @Value("${syspara.isIframe}")
-  public void setIsIframe(String isIframe) {
-    IS_IFRAME = Boolean.valueOf(isIframe);
-  }
+    @Value("${flow.images.path.prefix}")
+    public void setImgPathPrefix(String imgPathPrefix) {
+        IMG_PATH_PREFIX = imgPathPrefix;
+    }
 
-  // Interface ip and port
-  public static String INTERFACE_URL_HEAD;
+    public static Boolean IS_IFRAME;
 
-  @Value("${syspara.interfaceUrlHead}")
-  public void setInterfaceUrlHead(String interfaceUrlHead) {
-    INTERFACE_URL_HEAD = interfaceUrlHead;
-  }
+    @Value("${syspara.isIframe}")
+    public void setIsIframe(String isIframe) {
+        IS_IFRAME = Boolean.valueOf(isIframe);
+    }
 
-  public static String LIVY_SERVER;
+    // Interface ip and port
+    public static String INTERFACE_URL_HEAD;
 
-  @Value("${syspara.livyServer}")
-  public void setLivyServer(String livyServer) {
-    LIVY_SERVER = livyServer;
-  }
+    @Value("${syspara.interfaceUrlHead}")
+    public void setInterfaceUrlHead(String interfaceUrlHead) {
+        INTERFACE_URL_HEAD = interfaceUrlHead;
+    }
 
-  public static String MARKET_SOFTWARE_FLAG;
+    public static String LIVY_SERVER;
 
-  @Value("${market.software.flag}")
-  public void setMarketSoftwareFlag(String marketSoftwareFlag) {
-    MARKET_SOFTWARE_FLAG = marketSoftwareFlag;
-  }
+    @Value("${syspara.livyServer}")
+    public void setLivyServer(String livyServer) {
+        LIVY_SERVER = livyServer;
+    }
+
+    public static String MARKET_SOFTWARE_FLAG;
+
+    @Value("${market.software.flag}")
+    public void setMarketSoftwareFlag(String marketSoftwareFlag) {
+        MARKET_SOFTWARE_FLAG = marketSoftwareFlag;
+    }
 }

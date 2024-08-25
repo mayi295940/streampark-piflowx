@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.streampark.console.flow.component.stopsComponent.mapper.provider;
 
 import org.apache.streampark.console.flow.base.utils.DateUtils;
@@ -11,100 +28,100 @@ import java.util.Date;
 
 public class StopsComponentManageMapperProvider {
 
-  private String id;
-  private String lastUpdateUser;
-  private String lastUpdateDttmStr;
-  private Long version;
-  private String bundle;
-  private String stopsGroups;
-  private int isShow = 0;
+    private String id;
+    private String lastUpdateUser;
+    private String lastUpdateDttmStr;
+    private Long version;
+    private String bundle;
+    private String stopsGroups;
+    private int isShow = 0;
 
-  private boolean preventSQLInjectionStopsManage(StopsComponentManage stopsComponentManage) {
-    if (null == stopsComponentManage
-        || StringUtils.isBlank(stopsComponentManage.getLastUpdateUser())) {
-      return true;
-    }
-    // Mandatory Field
-    this.id = SqlUtils.preventSQLInjection(stopsComponentManage.getId());
-    this.lastUpdateUser = SqlUtils.preventSQLInjection(stopsComponentManage.getLastUpdateUser());
-    this.version =
-        (null != stopsComponentManage.getVersion() ? stopsComponentManage.getVersion() : 0L);
-    Date lastUpdateDttm = stopsComponentManage.getLastUpdateDttm();
-    String lastUpdateDttmStr =
-        DateUtils.dateTimesToStr(null != lastUpdateDttm ? lastUpdateDttm : new Date());
-    this.lastUpdateDttmStr = SqlUtils.preventSQLInjection(lastUpdateDttmStr);
+    private boolean preventSQLInjectionStopsManage(StopsComponentManage stopsComponentManage) {
+        if (null == stopsComponentManage
+            || StringUtils.isBlank(stopsComponentManage.getLastUpdateUser())) {
+            return true;
+        }
+        // Mandatory Field
+        this.id = SqlUtils.preventSQLInjection(stopsComponentManage.getId());
+        this.lastUpdateUser = SqlUtils.preventSQLInjection(stopsComponentManage.getLastUpdateUser());
+        this.version =
+            (null != stopsComponentManage.getVersion() ? stopsComponentManage.getVersion() : 0L);
+        Date lastUpdateDttm = stopsComponentManage.getLastUpdateDttm();
+        String lastUpdateDttmStr =
+            DateUtils.dateTimesToStr(null != lastUpdateDttm ? lastUpdateDttm : new Date());
+        this.lastUpdateDttmStr = SqlUtils.preventSQLInjection(lastUpdateDttmStr);
 
-    // Selection field
-    this.bundle = SqlUtils.preventSQLInjection(stopsComponentManage.getBundle());
-    this.stopsGroups = SqlUtils.preventSQLInjection(stopsComponentManage.getStopsGroups());
-    this.isShow = stopsComponentManage.getIsShow() ? 1 : 0;
-    return true;
-  }
-
-  private void reset() {
-    this.bundle = null;
-    this.stopsGroups = null;
-    this.isShow = 0;
-  }
-
-  public String insertStopsComponentManage(StopsComponentManage stopsComponentManage) {
-    boolean flag = this.preventSQLInjectionStopsManage(stopsComponentManage);
-    if (!flag) {
-      return "SELECT 0";
-    }
-    StringBuffer strBuf = new StringBuffer();
-    strBuf.append("INSERT INTO flow_stops_template_manage ");
-
-    strBuf.append("( ");
-    strBuf.append(SqlUtils.baseFieldName() + ", ");
-    strBuf.append("bundle, stops_groups, is_show ");
-    strBuf.append(") ");
-
-    strBuf.append("values ");
-    strBuf.append("(");
-    strBuf.append(SqlUtils.baseFieldValues(stopsComponentManage) + ", ");
-    strBuf.append(bundle + "," + stopsGroups + "," + isShow);
-    strBuf.append(")");
-    this.reset();
-    return strBuf.toString() + ";";
-  }
-
-  public String updateStopsComponentManage(StopsComponentManage stopsComponentManage) {
-    boolean flag = this.preventSQLInjectionStopsManage(stopsComponentManage);
-    if (!flag) {
-      return "SELECT 0";
-    }
-    if (StringUtils.isBlank(id)) {
-      return "SELECT 0";
+        // Selection field
+        this.bundle = SqlUtils.preventSQLInjection(stopsComponentManage.getBundle());
+        this.stopsGroups = SqlUtils.preventSQLInjection(stopsComponentManage.getStopsGroups());
+        this.isShow = stopsComponentManage.getIsShow() ? 1 : 0;
+        return true;
     }
 
-    SQL sql = new SQL();
+    private void reset() {
+        this.bundle = null;
+        this.stopsGroups = null;
+        this.isShow = 0;
+    }
 
-    // INSERT_INTO brackets is table name
-    sql.UPDATE("flow_stops_template_manage");
-    // The first string in the SET is the name of the field corresponding to the table in the
-    // database
-    sql.SET("last_update_dttm = " + lastUpdateDttmStr);
-    sql.SET("last_update_user = " + lastUpdateUser);
-    sql.SET("version = " + (version + 1));
+    public String insertStopsComponentManage(StopsComponentManage stopsComponentManage) {
+        boolean flag = this.preventSQLInjectionStopsManage(stopsComponentManage);
+        if (!flag) {
+            return "SELECT 0";
+        }
+        StringBuffer strBuf = new StringBuffer();
+        strBuf.append("INSERT INTO flow_stops_template_manage ");
 
-    // handle other fields
-    sql.SET("bundle = " + bundle);
-    sql.SET("stops_groups = " + stopsGroups);
-    sql.SET("is_show = " + isShow);
-    sql.WHERE("version = " + version);
-    sql.WHERE("id = " + id);
-    String sqlStr = sql.toString();
-    this.reset();
-    return sqlStr;
-  }
+        strBuf.append("( ");
+        strBuf.append(SqlUtils.baseFieldName() + ", ");
+        strBuf.append("bundle, stops_groups, is_show ");
+        strBuf.append(") ");
 
-  public String getStopsComponentManageByBundleAndGroup(String bundle, String stopsGroups) {
-    StringBuffer stringBuffer = new StringBuffer();
-    stringBuffer.append("SELECT * FROM flow_stops_template_manage ");
-    stringBuffer.append("WHERE ");
-    stringBuffer.append("bundle= " + SqlUtils.preventSQLInjection(bundle) + " ");
-    stringBuffer.append("AND stops_groups= " + SqlUtils.preventSQLInjection(stopsGroups));
-    return stringBuffer.toString();
-  }
+        strBuf.append("values ");
+        strBuf.append("(");
+        strBuf.append(SqlUtils.baseFieldValues(stopsComponentManage) + ", ");
+        strBuf.append(bundle + "," + stopsGroups + "," + isShow);
+        strBuf.append(")");
+        this.reset();
+        return strBuf.toString() + ";";
+    }
+
+    public String updateStopsComponentManage(StopsComponentManage stopsComponentManage) {
+        boolean flag = this.preventSQLInjectionStopsManage(stopsComponentManage);
+        if (!flag) {
+            return "SELECT 0";
+        }
+        if (StringUtils.isBlank(id)) {
+            return "SELECT 0";
+        }
+
+        SQL sql = new SQL();
+
+        // INSERT_INTO brackets is table name
+        sql.UPDATE("flow_stops_template_manage");
+        // The first string in the SET is the name of the field corresponding to the table in the
+        // database
+        sql.SET("last_update_dttm = " + lastUpdateDttmStr);
+        sql.SET("last_update_user = " + lastUpdateUser);
+        sql.SET("version = " + (version + 1));
+
+        // handle other fields
+        sql.SET("bundle = " + bundle);
+        sql.SET("stops_groups = " + stopsGroups);
+        sql.SET("is_show = " + isShow);
+        sql.WHERE("version = " + version);
+        sql.WHERE("id = " + id);
+        String sqlStr = sql.toString();
+        this.reset();
+        return sqlStr;
+    }
+
+    public String getStopsComponentManageByBundleAndGroup(String bundle, String stopsGroups) {
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("SELECT * FROM flow_stops_template_manage ");
+        stringBuffer.append("WHERE ");
+        stringBuffer.append("bundle= " + SqlUtils.preventSQLInjection(bundle) + " ");
+        stringBuffer.append("AND stops_groups= " + SqlUtils.preventSQLInjection(stopsGroups));
+        return stringBuffer.toString();
+    }
 }

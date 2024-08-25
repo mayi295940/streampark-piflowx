@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow.bundle.spark.internetWorm
 
 import cn.piflow._
@@ -90,15 +107,14 @@ class spider extends ConfigurableStop[DataFrame] {
     }
     countInt = 0
     var keySet: Set[String] = Set()
-    val rows1: List[Row] = array.toList.map(
-      map => {
-        keySet = map.keySet
-        val values: Iterable[AnyRef] = map.values
-        val seq: Seq[AnyRef] = values.toSeq
-        val seqSTR: Seq[String] = values.toSeq.map(x => x.toString)
-        val row: Row = Row.fromSeq(seqSTR)
-        row
-      })
+    val rows1: List[Row] = array.toList.map(map => {
+      keySet = map.keySet
+      val values: Iterable[AnyRef] = map.values
+      val seq: Seq[AnyRef] = values.toSeq
+      val seqSTR: Seq[String] = values.toSeq.map(x => x.toString)
+      val row: Row = Row.fromSeq(seqSTR)
+      row
+    })
     val rowRDD: RDD[Row] = session.sparkContext.makeRDD(rows1)
     val fields: Array[StructField] =
       keySet.toArray.map(d => StructField(d, StringType, nullable = true))

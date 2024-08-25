@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.streampark.console.flow.component.stopsComponent.utils;
 
 import org.apache.streampark.console.flow.base.utils.ImageUtils;
@@ -17,117 +34,117 @@ import java.util.List;
 
 public class StopsComponentUtils {
 
-  public static StopsComponent stopsComponentNewNoId(String username) {
+    public static StopsComponent stopsComponentNewNoId(String username) {
 
-    StopsComponent stopsComponent = new StopsComponent();
-    // basic properties (required when creating)
-    stopsComponent.setCrtDttm(new Date());
-    stopsComponent.setCrtUser(username);
-    // basic properties
-    stopsComponent.setEnableFlag(true);
-    stopsComponent.setLastUpdateUser(username);
-    stopsComponent.setLastUpdateDttm(new Date());
-    stopsComponent.setVersion(0L);
-    return stopsComponent;
-  }
+        StopsComponent stopsComponent = new StopsComponent();
+        // basic properties (required when creating)
+        stopsComponent.setCrtDttm(new Date());
+        stopsComponent.setCrtUser(username);
+        // basic properties
+        stopsComponent.setEnableFlag(true);
+        stopsComponent.setLastUpdateUser(username);
+        stopsComponent.setLastUpdateDttm(new Date());
+        stopsComponent.setVersion(0L);
+        return stopsComponent;
+    }
 
-  public static StopsComponent initStopsComponentBasicPropertiesNoId(
-      StopsComponent stopsComponent, String username) {
-    if (null == stopsComponent) {
-      return stopsComponentNewNoId(username);
-    }
-    // basic properties (required when creating)
-    stopsComponent.setCrtDttm(new Date());
-    stopsComponent.setCrtUser(username);
-    // basic properties
-    stopsComponent.setEnableFlag(true);
-    stopsComponent.setLastUpdateUser(username);
-    stopsComponent.setLastUpdateDttm(new Date());
-    stopsComponent.setVersion(0L);
-    return stopsComponent;
-  }
-
-  public static StopsComponent thirdStopsComponentVoToStopsTemplate(
-      String username,
-      ThirdStopsComponentVo thirdStopsComponentVo,
-      List<StopsComponentGroup> stopGroupByName) {
-
-    if (null == thirdStopsComponentVo) {
-      return null;
-    }
-    if (StringUtils.isBlank(username)) {
-      return null;
-    }
-    if (null == stopGroupByName || stopGroupByName.size() == 0) {
-      return null;
-    }
-    String inports = thirdStopsComponentVo.getInports();
-    PortType inPortType = null;
-    if (StringUtils.isNotBlank(inports)) {
-      for (PortType value : PortType.values()) {
-        if (inports.equalsIgnoreCase(value.getValue())) {
-          inPortType = value;
+    public static StopsComponent initStopsComponentBasicPropertiesNoId(
+                                                                       StopsComponent stopsComponent, String username) {
+        if (null == stopsComponent) {
+            return stopsComponentNewNoId(username);
         }
-      }
-      if (null == inPortType) {
-        inPortType = PortType.USER_DEFAULT;
-      }
+        // basic properties (required when creating)
+        stopsComponent.setCrtDttm(new Date());
+        stopsComponent.setCrtUser(username);
+        // basic properties
+        stopsComponent.setEnableFlag(true);
+        stopsComponent.setLastUpdateUser(username);
+        stopsComponent.setLastUpdateDttm(new Date());
+        stopsComponent.setVersion(0L);
+        return stopsComponent;
     }
-    PortType.selectGenderByValue(inports);
-    String outports = thirdStopsComponentVo.getOutports();
-    PortType outPortType = null;
-    if (StringUtils.isNotBlank(outports)) {
-      for (PortType value : PortType.values()) {
-        if (outports.equalsIgnoreCase(value.getValue())) {
-          outPortType = value;
+
+    public static StopsComponent thirdStopsComponentVoToStopsTemplate(
+                                                                      String username,
+                                                                      ThirdStopsComponentVo thirdStopsComponentVo,
+                                                                      List<StopsComponentGroup> stopGroupByName) {
+
+        if (null == thirdStopsComponentVo) {
+            return null;
         }
-      }
-      if (null == outPortType) {
-        outPortType = PortType.USER_DEFAULT;
-      }
+        if (StringUtils.isBlank(username)) {
+            return null;
+        }
+        if (null == stopGroupByName || stopGroupByName.size() == 0) {
+            return null;
+        }
+        String inports = thirdStopsComponentVo.getInports();
+        PortType inPortType = null;
+        if (StringUtils.isNotBlank(inports)) {
+            for (PortType value : PortType.values()) {
+                if (inports.equalsIgnoreCase(value.getValue())) {
+                    inPortType = value;
+                }
+            }
+            if (null == inPortType) {
+                inPortType = PortType.USER_DEFAULT;
+            }
+        }
+        PortType.selectGenderByValue(inports);
+        String outports = thirdStopsComponentVo.getOutports();
+        PortType outPortType = null;
+        if (StringUtils.isNotBlank(outports)) {
+            for (PortType value : PortType.values()) {
+                if (outports.equalsIgnoreCase(value.getValue())) {
+                    outPortType = value;
+                }
+            }
+            if (null == outPortType) {
+                outPortType = PortType.USER_DEFAULT;
+            }
+        }
+
+        String icon = thirdStopsComponentVo.getIcon();
+        if (StringUtils.isNotBlank(icon)) {
+
+            String imagePath =
+                Constants.ENGIN_FLINK.equalsIgnoreCase(thirdStopsComponentVo.getEngineType())
+                    ? SysParamsCache.ENGINE_FLINK_IMAGES_PATH
+                    : SysParamsCache.ENGINE_SPARK_IMAGES_PATH;
+
+            ImageUtils.generateImage(
+                icon, thirdStopsComponentVo.getName() + "_128x128", "png", imagePath);
+        }
+
+        StopsComponent stopsComponent = stopsComponentNewNoId(username);
+        stopsComponent.setId(UUIDUtils.getUUID32());
+        stopsComponent.setBundle(thirdStopsComponentVo.getBundle());
+        stopsComponent.setDescription(thirdStopsComponentVo.getDescription());
+        stopsComponent.setGroups(thirdStopsComponentVo.getGroups());
+        stopsComponent.setName(thirdStopsComponentVo.getName());
+        stopsComponent.setEngineType(thirdStopsComponentVo.getEngineType());
+        stopsComponent.setInports(inports);
+        stopsComponent.setInPortType(inPortType);
+        stopsComponent.setOutports(outports);
+        stopsComponent.setOutPortType(outPortType);
+        stopsComponent.setOwner(thirdStopsComponentVo.getOwner());
+        stopsComponent.setIsCustomized(thirdStopsComponentVo.isCustomized());
+        stopsComponent.setIsDataSource(thirdStopsComponentVo.isDataSource());
+        stopsComponent.setStopGroupList(stopGroupByName);
+        stopsComponent.setVisualizationType(thirdStopsComponentVo.getVisualizationType());
+
+        // todo 图片地址
+        String imageUrl =
+            SysParamsCache.IMG_PATH_PREFIX
+                + "/images/"
+                + thirdStopsComponentVo.getName()
+                + "_128x128.png";
+        stopsComponent.setImageUrl(imageUrl);
+
+        List<StopsComponentProperty> listStopsComponentProperty =
+            StopsComponentPropertyUtils.thirdStopsComponentPropertyVoListToStopsComponentProperty(
+                username, thirdStopsComponentVo.getProperties(), stopsComponent);
+        stopsComponent.setProperties(listStopsComponentProperty);
+        return stopsComponent;
     }
-
-    String icon = thirdStopsComponentVo.getIcon();
-    if (StringUtils.isNotBlank(icon)) {
-
-      String imagePath =
-          Constants.ENGIN_FLINK.equalsIgnoreCase(thirdStopsComponentVo.getEngineType())
-              ? SysParamsCache.ENGINE_FLINK_IMAGES_PATH
-              : SysParamsCache.ENGINE_SPARK_IMAGES_PATH;
-
-      ImageUtils.generateImage(
-          icon, thirdStopsComponentVo.getName() + "_128x128", "png", imagePath);
-    }
-
-    StopsComponent stopsComponent = stopsComponentNewNoId(username);
-    stopsComponent.setId(UUIDUtils.getUUID32());
-    stopsComponent.setBundle(thirdStopsComponentVo.getBundle());
-    stopsComponent.setDescription(thirdStopsComponentVo.getDescription());
-    stopsComponent.setGroups(thirdStopsComponentVo.getGroups());
-    stopsComponent.setName(thirdStopsComponentVo.getName());
-    stopsComponent.setEngineType(thirdStopsComponentVo.getEngineType());
-    stopsComponent.setInports(inports);
-    stopsComponent.setInPortType(inPortType);
-    stopsComponent.setOutports(outports);
-    stopsComponent.setOutPortType(outPortType);
-    stopsComponent.setOwner(thirdStopsComponentVo.getOwner());
-    stopsComponent.setIsCustomized(thirdStopsComponentVo.isCustomized());
-    stopsComponent.setIsDataSource(thirdStopsComponentVo.isDataSource());
-    stopsComponent.setStopGroupList(stopGroupByName);
-    stopsComponent.setVisualizationType(thirdStopsComponentVo.getVisualizationType());
-
-    // todo  图片地址
-    String imageUrl =
-        SysParamsCache.IMG_PATH_PREFIX
-            + "/images/"
-            + thirdStopsComponentVo.getName()
-            + "_128x128.png";
-    stopsComponent.setImageUrl(imageUrl);
-
-    List<StopsComponentProperty> listStopsComponentProperty =
-        StopsComponentPropertyUtils.thirdStopsComponentPropertyVoListToStopsComponentProperty(
-            username, thirdStopsComponentVo.getProperties(), stopsComponent);
-    stopsComponent.setProperties(listStopsComponentProperty);
-    return stopsComponent;
-  }
 }

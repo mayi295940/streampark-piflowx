@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow.bundle.spark.asr
 
 import cn.piflow._
@@ -37,10 +54,9 @@ class ChineseSpeechRecognition extends ConfigurableStop[DataFrame] {
       .textFile(audioPath)
       .rdd
       .collect()
-      .foreach(
-        each => {
-          paths += each
-        })
+      .foreach(each => {
+        paths += each
+      })
 
     import org.apache.http.client.config.RequestConfig
     import org.apache.http.client.methods.HttpPost
@@ -54,43 +70,42 @@ class ChineseSpeechRecognition extends ConfigurableStop[DataFrame] {
 
     val rows: ArrayBuffer[Row] = new ArrayBuffer[Row]
 
-    paths.foreach(
-      path => {
+    paths.foreach(path => {
 
-        val httpPost = new HttpPost(url)
-        httpPost.setConfig(requestConfig)
-        val multipartEntityBuilder = MultipartEntityBuilder.create
+      val httpPost = new HttpPost(url)
+      httpPost.setConfig(requestConfig)
+      val multipartEntityBuilder = MultipartEntityBuilder.create
 
-        try {
-          val file = new File(path)
-          if (file.exists()) {
-            // println("start post")
-            multipartEntityBuilder.addBinaryBody(
-              "audio1",
-              file,
-              ContentType.create("audio/wav"),
-              "audio1")
-            val httpEntity = multipartEntityBuilder.build
-            httpPost.setEntity(httpEntity)
-            val httpResponse = httpClient.execute(httpPost)
-            val responseEntity = httpResponse.getEntity
-            val statusCode = httpResponse.getStatusLine.getStatusCode
-            if (statusCode == 200) {
-              val result = new JSONObject(EntityUtils.toString(responseEntity))
-              val arr = Array(
-                path,
-                result.getString("error"),
-                result.getString("value"),
-                result.getBoolean("res").toString)
-              rows += Row.fromSeq(arr)
-            }
-            if (httpResponse != null) httpResponse.close()
+      try {
+        val file = new File(path)
+        if (file.exists()) {
+          // println("start post")
+          multipartEntityBuilder.addBinaryBody(
+            "audio1",
+            file,
+            ContentType.create("audio/wav"),
+            "audio1")
+          val httpEntity = multipartEntityBuilder.build
+          httpPost.setEntity(httpEntity)
+          val httpResponse = httpClient.execute(httpPost)
+          val responseEntity = httpResponse.getEntity
+          val statusCode = httpResponse.getStatusLine.getStatusCode
+          if (statusCode == 200) {
+            val result = new JSONObject(EntityUtils.toString(responseEntity))
+            val arr = Array(
+              path,
+              result.getString("error"),
+              result.getString("value"),
+              result.getBoolean("res").toString)
+            rows += Row.fromSeq(arr)
           }
-        } catch {
-          case e: FileNotFoundException => println("file not found: " + path)
+          if (httpResponse != null) httpResponse.close()
         }
+      } catch {
+        case e: FileNotFoundException => println("file not found: " + path)
+      }
 
-      })
+    })
     httpClient.close()
     val rowRDD: RDD[Row] = session.sparkContext.makeRDD(rows)
     val schema: StructType = StructType(
@@ -98,8 +113,7 @@ class ChineseSpeechRecognition extends ConfigurableStop[DataFrame] {
         StructField("audiopath", StringType),
         StructField("error", StringType),
         StructField("value", StringType),
-        StructField("res", StringType)
-      ))
+        StructField("res", StringType)))
     val df: DataFrame = session.createDataFrame(rowRDD, schema)
 
     out.write(df)

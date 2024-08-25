@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow.bundle.spark.clean
 
 import cn.piflow.{Constants, JobContext, JobInputStream, JobOutputStream, ProcessContext}
@@ -30,31 +47,29 @@ class PhoneNumberClean extends ConfigurableStop[DataFrame] {
     val structFields: Array[String] = dfOld.schema.fieldNames
     val columnNames = columnName.split(",").toSet
     val sqlNewFieldStr = new StringBuilder
-    columnNames.foreach(
-      c => {
-        if (columnNames.contains(c)) {
-          sqlNewFieldStr ++= ",regexPro("
-          sqlNewFieldStr ++= c
-          sqlNewFieldStr ++= ") as "
-          sqlNewFieldStr ++= c
-          sqlNewFieldStr ++= "_new "
-        }
-      })
+    columnNames.foreach(c => {
+      if (columnNames.contains(c)) {
+        sqlNewFieldStr ++= ",regexPro("
+        sqlNewFieldStr ++= c
+        sqlNewFieldStr ++= ") as "
+        sqlNewFieldStr ++= c
+        sqlNewFieldStr ++= "_new "
+      }
+    })
 
     val sqlText: String = "select * " + sqlNewFieldStr + " from thesis"
 
     val dfNew = sqlContext.sql(sqlText)
     dfNew.createOrReplaceTempView("thesis")
     val schemaStr = new StringBuilder
-    structFields.foreach(
-      field => {
+    structFields.foreach(field => {
+      schemaStr ++= field
+      if (columnNames.contains(field)) {
+        schemaStr ++= "_new as "
         schemaStr ++= field
-        if (columnNames.contains(field)) {
-          schemaStr ++= "_new as "
-          schemaStr ++= field
-        }
-        schemaStr ++= ","
-      })
+      }
+      schemaStr ++= ","
+    })
     val sqlTextNew: String = "select " +
       schemaStr.substring(0, schemaStr.length - 1) +
       " from thesis"

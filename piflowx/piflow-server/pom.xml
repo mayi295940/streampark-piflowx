@@ -1,13 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.streampark</groupId>
         <artifactId>piflowx</artifactId>
         <version>2.2.0-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
     <artifactId>piflow-server</artifactId>
 
@@ -24,100 +39,100 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>guava</artifactId>
                     <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.commons</groupId>
                     <artifactId>commons-compress</artifactId>
-                    <groupId>org.apache.commons</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>snappy-java</artifactId>
                     <groupId>org.xerial.snappy</groupId>
+                    <artifactId>snappy-java</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-cli</artifactId>
                     <groupId>commons-cli</groupId>
+                    <artifactId>commons-cli</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-io</artifactId>
                     <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.commons</groupId>
                     <artifactId>commons-lang3</artifactId>
-                    <groupId>org.apache.commons</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-logging</artifactId>
                     <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-text</artifactId>
                     <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-text</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>asm</artifactId>
                     <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>nimbus-jose-jwt</artifactId>
                     <groupId>com.nimbusds</groupId>
+                    <artifactId>nimbus-jose-jwt</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jackson-databind</artifactId>
                     <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.codehaus.jackson</groupId>
                     <artifactId>jackson-core-asl</artifactId>
-                    <groupId>org.codehaus.jackson</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.codehaus.jackson</groupId>
                     <artifactId>jackson-mapper-asl</artifactId>
-                    <groupId>org.codehaus.jackson</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.codehaus.jackson</groupId>
                     <artifactId>jackson-jaxrs</artifactId>
-                    <groupId>org.codehaus.jackson</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.codehaus.jackson</groupId>
                     <artifactId>jackson-xc</artifactId>
-                    <groupId>org.codehaus.jackson</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jaxb-api</artifactId>
                     <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jsr305</artifactId>
                     <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>jsr305</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>protobuf-java</artifactId>
                     <groupId>com.google.protobuf</groupId>
+                    <artifactId>protobuf-java</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>io.netty</groupId>
                     <artifactId>netty-handler</artifactId>
-                    <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>io.netty</groupId>
                     <artifactId>netty-buffer</artifactId>
-                    <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>io.netty</groupId>
                     <artifactId>netty-common</artifactId>
-                    <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>io.netty</groupId>
                     <artifactId>netty-transport</artifactId>
-                    <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>io.netty</groupId>
                     <artifactId>netty-transport-native-unix-common</artifactId>
-                    <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>scala-xml_2.12</artifactId>
                     <groupId>org.scala-lang.modules</groupId>
+                    <artifactId>scala-xml_2.12</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -128,16 +143,16 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>guava</artifactId>
                     <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>javassist</artifactId>
                     <groupId>org.javassist</groupId>
+                    <artifactId>javassist</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-io</artifactId>
                     <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -148,208 +163,208 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>chill_2.12</artifactId>
                     <groupId>com.twitter</groupId>
+                    <artifactId>chill_2.12</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>mongodb-driver-sync</artifactId>
                     <groupId>org.mongodb</groupId>
+                    <artifactId>mongodb-driver-sync</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>avro</artifactId>
                     <groupId>org.apache.avro</groupId>
+                    <artifactId>avro</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>guava</artifactId>
                     <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
                     <artifactId>jackson-core</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
                     <artifactId>jackson-databind</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>com.fasterxml.jackson.datatype</groupId>
                     <artifactId>jackson-datatype-jsr310</artifactId>
-                    <groupId>com.fasterxml.jackson.datatype</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>antlr4-runtime</artifactId>
                     <groupId>org.antlr</groupId>
+                    <artifactId>antlr4-runtime</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>zstd-jni</artifactId>
                     <groupId>com.github.luben</groupId>
+                    <artifactId>zstd-jni</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>kafka-clients</artifactId>
                     <groupId>org.apache.kafka</groupId>
+                    <artifactId>kafka-clients</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jackson-annotations</artifactId>
                     <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-annotations</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jaxb-api</artifactId>
                     <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jersey-container-servlet</artifactId>
                     <groupId>org.glassfish.jersey.containers</groupId>
+                    <artifactId>jersey-container-servlet</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jersey-hk2</artifactId>
                     <groupId>org.glassfish.jersey.inject</groupId>
+                    <artifactId>jersey-hk2</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-http</artifactId>
-                    <groupId>org.eclipse.jetty</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-io</artifactId>
-                    <groupId>org.eclipse.jetty</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-server</artifactId>
-                    <groupId>org.eclipse.jetty</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-servlet</artifactId>
-                    <groupId>org.eclipse.jetty</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-util</artifactId>
-                    <groupId>org.eclipse.jetty</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-lang3</artifactId>
                     <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>reflections</artifactId>
                     <groupId>org.reflections</groupId>
+                    <artifactId>reflections</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>io.netty</groupId>
                     <artifactId>netty-handler</artifactId>
-                    <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>io.netty</groupId>
                     <artifactId>netty-transport-native-epoll</artifactId>
-                    <groupId>io.netty</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>reactive-streams</artifactId>
                     <groupId>org.reactivestreams</groupId>
+                    <artifactId>reactive-streams</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>wildfly-common</artifactId>
                     <groupId>org.wildfly.common</groupId>
+                    <artifactId>wildfly-common</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>caffeine</artifactId>
                     <groupId>com.github.ben-manes.caffeine</groupId>
+                    <artifactId>caffeine</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jboss-logging</artifactId>
                     <groupId>org.jboss.logging</groupId>
+                    <artifactId>jboss-logging</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>protobuf-java</artifactId>
                     <groupId>com.google.protobuf</groupId>
+                    <artifactId>protobuf-java</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>checker-qual</artifactId>
                     <groupId>org.checkerframework</groupId>
+                    <artifactId>checker-qual</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jackson-datatype-jdk8</artifactId>
                     <groupId>com.fasterxml.jackson.datatype</groupId>
+                    <artifactId>jackson-datatype-jdk8</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>joda-time</artifactId>
                     <groupId>joda-time</groupId>
+                    <artifactId>joda-time</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>log4j-api</artifactId>
                     <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-api</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
                     <artifactId>hadoop-hdfs-client</artifactId>
-                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
                     <artifactId>hadoop-mapreduce-client-core</artifactId>
-                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
                     <artifactId>hadoop-yarn-client</artifactId>
-                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
                     <artifactId>hadoop-yarn-api</artifactId>
-                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-codec</artifactId>
                     <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-io</artifactId>
                     <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>curator-framework</artifactId>
                     <groupId>org.apache.curator</groupId>
+                    <artifactId>curator-framework</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-cli</artifactId>
                     <groupId>commons-cli</groupId>
+                    <artifactId>commons-cli</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hive</groupId>
                     <artifactId>hive-common</artifactId>
-                    <groupId>org.apache.hive</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hive</groupId>
                     <artifactId>hive-llap-client</artifactId>
-                    <groupId>org.apache.hive</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hive</groupId>
                     <artifactId>hive-shims</artifactId>
-                    <groupId>org.apache.hive</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>ivy</artifactId>
                     <groupId>org.apache.ivy</groupId>
+                    <artifactId>ivy</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hive</groupId>
                     <artifactId>hive-metastore</artifactId>
-                    <groupId>org.apache.hive</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hive</groupId>
                     <artifactId>hive-serde</artifactId>
-                    <groupId>org.apache.hive</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-mapreduce</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-server</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>hive-llap-common</artifactId>
                     <groupId>org.apache.hive</groupId>
+                    <artifactId>hive-llap-common</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>parquet-hadoop</artifactId>
                     <groupId>org.apache.parquet</groupId>
+                    <artifactId>parquet-hadoop</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-logging</artifactId>
                     <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -360,120 +375,120 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>commons-logging</artifactId>
                     <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>error_prone_annotations</artifactId>
                     <groupId>com.google.errorprone</groupId>
+                    <artifactId>error_prone_annotations</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>audience-annotations</artifactId>
                     <groupId>org.apache.yetus</groupId>
+                    <artifactId>audience-annotations</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase.thirdparty</groupId>
                     <artifactId>hbase-shaded-miscellaneous</artifactId>
-                    <groupId>org.apache.hbase.thirdparty</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase.thirdparty</groupId>
                     <artifactId>hbase-shaded-protobuf</artifactId>
-                    <groupId>org.apache.hbase.thirdparty</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase.thirdparty</groupId>
                     <artifactId>hbase-shaded-netty</artifactId>
-                    <groupId>org.apache.hbase.thirdparty</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>agrona</artifactId>
                     <groupId>org.agrona</groupId>
+                    <artifactId>agrona</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-codec</artifactId>
                     <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.commons</groupId>
                     <artifactId>commons-math3</artifactId>
-                    <groupId>org.apache.commons</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>hadoop-annotations</artifactId>
                     <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-annotations</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-common</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-protocol-shaded</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-protocol</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-beanutils</artifactId>
                     <groupId>commons-beanutils</groupId>
+                    <artifactId>commons-beanutils</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>shapeless_2.12</artifactId>
                     <groupId>com.chuusai</groupId>
+                    <artifactId>shapeless_2.12</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>avro</artifactId>
                     <groupId>org.apache.avro</groupId>
+                    <artifactId>avro</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>objenesis</artifactId>
                     <groupId>org.objenesis</groupId>
+                    <artifactId>objenesis</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>curator-recipes</artifactId>
                     <groupId>org.apache.curator</groupId>
+                    <artifactId>curator-recipes</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jackson-annotations</artifactId>
                     <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-annotations</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
                     <artifactId>log4j-api</artifactId>
-                    <groupId>org.apache.logging.log4j</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
                     <artifactId>log4j-core</artifactId>
-                    <groupId>org.apache.logging.log4j</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>zookeeper</artifactId>
                     <groupId>org.apache.zookeeper</groupId>
+                    <artifactId>zookeeper</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>poi-ooxml</artifactId>
                     <groupId>org.apache.poi</groupId>
+                    <artifactId>poi-ooxml</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-cli</artifactId>
                     <groupId>commons-cli</groupId>
+                    <artifactId>commons-cli</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-lang3</artifactId>
                     <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>HikariCP</artifactId>
                     <groupId>com.zaxxer</groupId>
+                    <artifactId>HikariCP</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jsr305</artifactId>
                     <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>jsr305</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.hbase</groupId>
                     <artifactId>hbase-hadoop-compat</artifactId>
-                    <groupId>org.apache.hbase</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>hbase-hadoop2-compat</artifactId>
                     <groupId>org.apache.hbase</groupId>
+                    <artifactId>hbase-hadoop2-compat</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -484,24 +499,24 @@
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>error_prone_annotations</artifactId>
                     <groupId>com.google.errorprone</groupId>
+                    <artifactId>error_prone_annotations</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jackson-databind</artifactId>
                     <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jsr305</artifactId>
                     <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>jsr305</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>checker-qual</artifactId>
                     <groupId>org.checkerframework</groupId>
+                    <artifactId>checker-qual</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-pool2</artifactId>
                     <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-pool2</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -549,12 +564,12 @@
             <version>2.0.36</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>jsr305</artifactId>
                     <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>jsr305</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>guava</artifactId>
                     <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -564,16 +579,16 @@
             <artifactId>flink-runtime</artifactId>
             <exclusions>
                 <exclusion>
+                    <groupId>org.apache.commons</groupId>
                     <artifactId>commons-compress</artifactId>
-                    <groupId>org.apache.commons</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.apache.commons</groupId>
                     <artifactId>commons-math3</artifactId>
-                    <groupId>org.apache.commons</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>chill-java</artifactId>
                     <groupId>com.twitter</groupId>
+                    <artifactId>chill-java</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -582,8 +597,8 @@
             <artifactId>flink-clients</artifactId>
             <exclusions>
                 <exclusion>
-                    <artifactId>commons-math3</artifactId>
                     <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-math3</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -592,60 +607,60 @@
             <artifactId>flink-yarn</artifactId>
             <exclusions>
                 <exclusion>
-                    <artifactId>guava</artifactId>
                     <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-cli</artifactId>
                     <groupId>commons-cli</groupId>
+                    <artifactId>commons-cli</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-io</artifactId>
                     <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-logging</artifactId>
                     <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jackson-databind</artifactId>
                     <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>netty-all</artifactId>
                     <groupId>io.netty</groupId>
+                    <artifactId>netty-all</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>protobuf-java</artifactId>
                     <groupId>com.google.protobuf</groupId>
+                    <artifactId>protobuf-java</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>hadoop-annotations</artifactId>
                     <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-annotations</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-codec</artifactId>
                     <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-compress</artifactId>
                     <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-compress</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jaxb-api</artifactId>
                     <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>com.sun.jersey</groupId>
                     <artifactId>jersey-core</artifactId>
-                    <groupId>com.sun.jersey</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>com.sun.jersey</groupId>
                     <artifactId>jersey-server</artifactId>
-                    <groupId>com.sun.jersey</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jersey-json</artifactId>
                     <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-json</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -656,7 +671,6 @@
             <version>20.0</version>
         </dependency>
 
-
         <!-- todo spark flink 分开打包-->
 
         <dependency>
@@ -665,16 +679,16 @@
             <version>${spark.version}</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>snappy-java</artifactId>
                     <groupId>org.xerial.snappy</groupId>
+                    <artifactId>snappy-java</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-logging</artifactId>
                     <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jsr305</artifactId>
                     <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>jsr305</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -684,52 +698,51 @@
             <version>${spark.version}</version>
             <exclusions>
                 <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
                     <artifactId>jackson-annotations</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
                 </exclusion>
                 <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
                     <artifactId>jackson-core</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>protobuf-java</artifactId>
                     <groupId>com.google.protobuf</groupId>
+                    <artifactId>protobuf-java</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>audience-annotations</artifactId>
                     <groupId>org.apache.yetus</groupId>
+                    <artifactId>audience-annotations</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>snappy-java</artifactId>
                     <groupId>org.xerial.snappy</groupId>
+                    <artifactId>snappy-java</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>zstd-jni</artifactId>
                     <groupId>com.github.luben</groupId>
+                    <artifactId>zstd-jni</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jsr305</artifactId>
                     <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>jsr305</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-codec</artifactId>
                     <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jackson-databind</artifactId>
                     <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.codehaus.janino</groupId>
                     <artifactId>commons-compiler</artifactId>
-                    <groupId>org.codehaus.janino</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>janino</artifactId>
                     <groupId>org.codehaus.janino</groupId>
+                    <artifactId>janino</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
-
 
         <dependency>
             <groupId>org.apache.beam</groupId>
@@ -738,18 +751,17 @@
             <scope>runtime</scope>
             <exclusions>
                 <exclusion>
-                    <artifactId>error_prone_annotations</artifactId>
                     <groupId>com.google.errorprone</groupId>
+                    <artifactId>error_prone_annotations</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jackson-databind</artifactId>
                     <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
 
     </dependencies>
-
 
     <build>
         <plugins>
@@ -758,10 +770,10 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                        <phase>package</phase>
                         <configuration>
                             <finalName>piflow-server</finalName>
                             <filters>
@@ -780,13 +792,10 @@
                                 </includes>
                             </artifactSet>
                             <transformers>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>reference.conf</resource>
                                 </transformer>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer">
-                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"></transformer>
                             </transformers>
                         </configuration>
                     </execution>

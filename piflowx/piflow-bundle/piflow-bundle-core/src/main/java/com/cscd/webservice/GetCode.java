@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.cscd.webservice;
 
 import javax.xml.bind.JAXBElement;
@@ -26,59 +43,49 @@ import javax.xml.bind.annotation.XmlType;
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(
-    name = "",
-    propOrder = {"user", "passwd"})
+@XmlType(name = "", propOrder = {"user", "passwd"})
 @XmlRootElement(name = "getCode")
 public class GetCode {
 
-  @XmlElementRef(
-      name = "user",
-      namespace = "http://webservice.cscd.com",
-      type = JAXBElement.class,
-      required = false)
-  protected JAXBElement<String> user;
+    @XmlElementRef(name = "user", namespace = "http://webservice.cscd.com", type = JAXBElement.class, required = false)
+    protected JAXBElement<String> user;
 
-  @XmlElementRef(
-      name = "passwd",
-      namespace = "http://webservice.cscd.com",
-      type = JAXBElement.class,
-      required = false)
-  protected JAXBElement<String> passwd;
+    @XmlElementRef(name = "passwd", namespace = "http://webservice.cscd.com", type = JAXBElement.class, required = false)
+    protected JAXBElement<String> passwd;
 
-  /**
-   * 获取user属性的值。
-   *
-   * @return possible object is {@link JAXBElement }{@code <}{@link String }{@code >}
-   */
-  public JAXBElement<String> getUser() {
-    return user;
-  }
+    /**
+     * 获取user属性的值。
+     *
+     * @return possible object is {@link JAXBElement }{@code <}{@link String }{@code >}
+     */
+    public JAXBElement<String> getUser() {
+        return user;
+    }
 
-  /**
-   * 设置user属性的值。
-   *
-   * @param value allowed object is {@link JAXBElement }{@code <}{@link String }{@code >}
-   */
-  public void setUser(JAXBElement<String> value) {
-    this.user = value;
-  }
+    /**
+     * 设置user属性的值。
+     *
+     * @param value allowed object is {@link JAXBElement }{@code <}{@link String }{@code >}
+     */
+    public void setUser(JAXBElement<String> value) {
+        this.user = value;
+    }
 
-  /**
-   * 获取passwd属性的值。
-   *
-   * @return possible object is {@link JAXBElement }{@code <}{@link String }{@code >}
-   */
-  public JAXBElement<String> getPasswd() {
-    return passwd;
-  }
+    /**
+     * 获取passwd属性的值。
+     *
+     * @return possible object is {@link JAXBElement }{@code <}{@link String }{@code >}
+     */
+    public JAXBElement<String> getPasswd() {
+        return passwd;
+    }
 
-  /**
-   * 设置passwd属性的值。
-   *
-   * @param value allowed object is {@link JAXBElement }{@code <}{@link String }{@code >}
-   */
-  public void setPasswd(JAXBElement<String> value) {
-    this.passwd = value;
-  }
+    /**
+     * 设置passwd属性的值。
+     *
+     * @param value allowed object is {@link JAXBElement }{@code <}{@link String }{@code >}
+     */
+    public void setPasswd(JAXBElement<String> value) {
+        this.passwd = value;
+    }
 }

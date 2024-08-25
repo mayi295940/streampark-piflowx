@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow.api
 
 import akka.actor.{ActorRef, ActorSystem, Props}
@@ -737,39 +754,38 @@ object HTTPService extends DefaultJsonProtocol with Directives with SprayJsonSup
   private def initSchedule(): Unit = {
 
     val scheduleList = H2Util.getStartedSchedule()
-    scheduleList.foreach(
-      id => {
-        val scheduleContent = FlowFileUtil.readFlowFile(FlowFileUtil.getScheduleFilePath(id))
-        val dataMap = JsonUtil.jsonToMap(scheduleContent)
+    scheduleList.foreach(id => {
+      val scheduleContent = FlowFileUtil.readFlowFile(FlowFileUtil.getScheduleFilePath(id))
+      val dataMap = JsonUtil.jsonToMap(scheduleContent)
 
-        val expression = dataMap.getOrElse("expression", "").asInstanceOf[String]
-        val startDateStr = dataMap.getOrElse("startDate", "").asInstanceOf[String]
-        val endDateStr = dataMap.getOrElse("endDate", "").asInstanceOf[String]
-        val scheduleInstance =
-          dataMap.getOrElse("schedule", Map[String, Any]()).asInstanceOf[Map[String, Any]]
+      val expression = dataMap.getOrElse("expression", "").asInstanceOf[String]
+      val startDateStr = dataMap.getOrElse("startDate", "").asInstanceOf[String]
+      val endDateStr = dataMap.getOrElse("endDate", "").asInstanceOf[String]
+      val scheduleInstance =
+        dataMap.getOrElse("schedule", Map[String, Any]()).asInstanceOf[Map[String, Any]]
 
-        var scheduleType = ""
-        if (!scheduleInstance.getOrElse("flow", "").equals("")) {
-          scheduleType = ScheduleType.FLOW
-        } else if (!scheduleInstance.getOrElse("group", "").equals("")) {
-          scheduleType = ScheduleType.GROUP
-        }
-        val flowActor = system.actorOf(Props(new ExecutionActor(id, scheduleType)))
-        scheduler.createSchedule(id, cronExpression = expression)
+      var scheduleType = ""
+      if (!scheduleInstance.getOrElse("flow", "").equals("")) {
+        scheduleType = ScheduleType.FLOW
+      } else if (!scheduleInstance.getOrElse("group", "").equals("")) {
+        scheduleType = ScheduleType.GROUP
+      }
+      val flowActor = system.actorOf(Props(new ExecutionActor(id, scheduleType)))
+      scheduler.createSchedule(id, cronExpression = expression)
 
-        if (startDateStr.equals("")) {
-          scheduler.schedule(id, flowActor, JsonUtil.format(JsonUtil.toJson(scheduleInstance)))
-        } else {
-          val startDate: Option[Date] =
-            Some(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(startDateStr))
-          scheduler.schedule(
-            id,
-            flowActor,
-            JsonUtil.format(JsonUtil.toJson(scheduleInstance)),
-            startDate)
-        }
-        actorMap += (id -> flowActor)
-      })
+      if (startDateStr.equals("")) {
+        scheduler.schedule(id, flowActor, JsonUtil.format(JsonUtil.toJson(scheduleInstance)))
+      } else {
+        val startDate: Option[Date] =
+          Some(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(startDateStr))
+        scheduler.schedule(
+          id,
+          flowActor,
+          JsonUtil.format(JsonUtil.toJson(scheduleInstance)),
+          startDate)
+      }
+      actorMap += (id -> flowActor)
+    })
 
   }
 }
@@ -805,16 +821,14 @@ object Main {
     val classpathFile = new File(pluginManager.getPluginPath)
     val jarFile = FileUtil.getJarFile(classpathFile)
 
-    pluginOnList.foreach(
-      pluginName => {
-        jarFile.foreach(
-          pluginJar => {
-            if (pluginName == pluginJar.getName) {
-              println(pluginJar.getAbsolutePath)
-              pluginManager.loadPlugin(pluginJar.getAbsolutePath)
-            }
-          })
+    pluginOnList.foreach(pluginName => {
+      jarFile.foreach(pluginJar => {
+        if (pluginName == pluginJar.getName) {
+          println(pluginJar.getAbsolutePath)
+          pluginManager.loadPlugin(pluginJar.getAbsolutePath)
+        }
       })
+    })
   }
 
   def main(argv: Array[String]): Unit = {
@@ -825,8 +839,7 @@ object Main {
         "-tcpAllowOthers",
         "-ifNotExists",
         "-tcpPort",
-        PropertyUtil.getPropertyValue("h2.port")
-      )
+        PropertyUtil.getPropertyValue("h2.port"))
       .start()
 
     flywayInit()

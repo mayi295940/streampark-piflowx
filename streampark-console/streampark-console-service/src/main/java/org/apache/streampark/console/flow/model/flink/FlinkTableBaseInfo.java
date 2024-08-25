@@ -1,63 +1,80 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.streampark.console.flow.model.flink;
 
 public class FlinkTableBaseInfo {
 
-  private String catalogName;
+    private String catalogName;
 
-  private String dbname;
-  private String schema;
+    private String dbname;
+    private String schema;
 
-  private boolean ifNotExists;
+    private boolean ifNotExists;
 
-  private String registerTableName;
+    private String registerTableName;
 
-  private String registerTableComment;
+    private String registerTableComment;
 
-  public String getCatalogName() {
-    return catalogName;
-  }
+    public String getCatalogName() {
+        return catalogName;
+    }
 
-  public void setCatalogName(String catalogName) {
-    this.catalogName = catalogName;
-  }
+    public void setCatalogName(String catalogName) {
+        this.catalogName = catalogName;
+    }
 
-  public String getDbname() {
-    return dbname;
-  }
+    public String getDbname() {
+        return dbname;
+    }
 
-  public void setDbname(String dbname) {
-    this.dbname = dbname;
-  }
+    public void setDbname(String dbname) {
+        this.dbname = dbname;
+    }
 
-  public String getSchema() {
-    return schema;
-  }
+    public String getSchema() {
+        return schema;
+    }
 
-  public void setSchema(String schema) {
-    this.schema = schema;
-  }
+    public void setSchema(String schema) {
+        this.schema = schema;
+    }
 
-  public boolean getIfNotExists() {
-    return ifNotExists;
-  }
+    public boolean getIfNotExists() {
+        return ifNotExists;
+    }
 
-  public void setIfNotExists(boolean ifNotExists) {
-    this.ifNotExists = ifNotExists;
-  }
+    public void setIfNotExists(boolean ifNotExists) {
+        this.ifNotExists = ifNotExists;
+    }
 
-  public String getRegisterTableName() {
-    return registerTableName;
-  }
+    public String getRegisterTableName() {
+        return registerTableName;
+    }
 
-  public void setRegisterTableName(String registerTableName) {
-    this.registerTableName = registerTableName;
-  }
+    public void setRegisterTableName(String registerTableName) {
+        this.registerTableName = registerTableName;
+    }
 
-  public String getRegisterTableComment() {
-    return registerTableComment;
-  }
+    public String getRegisterTableComment() {
+        return registerTableComment;
+    }
 
-  public void setRegisterTableComment(String registerTableComment) {
-    this.registerTableComment = registerTableComment;
-  }
+    public void setRegisterTableComment(String registerTableComment) {
+        this.registerTableComment = registerTableComment;
+    }
 }

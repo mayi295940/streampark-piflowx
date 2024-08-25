@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow.bundle.spark.util
 
 import cn.piflow.bundle.core.util.JedisClusterImplSer
@@ -18,11 +35,10 @@ object RedisUtil extends Serializable {
     var hm: util.HashMap[String, String] = new util.HashMap()
     val key = row.getAs(column_name).asInstanceOf[String]
 
-    row.schema.fields.foreach(
-      f => {
-        if (row.getAs(f.name).asInstanceOf[String] == null) hm.put(f.name, "None")
-        else hm.put(f.name, row.getAs(f.name).asInstanceOf[String])
-      })
+    row.schema.fields.foreach(f => {
+      if (row.getAs(f.name).asInstanceOf[String] == null) hm.put(f.name, "None")
+      else hm.put(f.name, row.getAs(f.name).asInstanceOf[String])
+    })
 
     println(hm)
     jedisClusterImplSer.getJedisCluster.hmset(key, hm)
@@ -50,32 +66,30 @@ object RedisUtil extends Serializable {
     var value = row.getString(valueIndex) // get the primary key
     build
       .split(",")
-      .foreach(
-        idKey => { // name&tel,name&email
-          var field = idKey
-          var key = ""
-          if (idKey.contains("&")) { // name&tel
-            val sl = idKey.split("&")
-            sl.foreach(
-              s_ => {
-                if (!row.isNullAt(map(s_))) {
-                  key += row.getString(map(s_))
-                } else {
-                  hasNull = true
-                }
-              })
-          } else {
-            if (!row.isNullAt(map(idKey))) {
-              key += row.getString(map(idKey))
+      .foreach(idKey => { // name&tel,name&email
+        var field = idKey
+        var key = ""
+        if (idKey.contains("&")) { // name&tel
+          val sl = idKey.split("&")
+          sl.foreach(s_ => {
+            if (!row.isNullAt(map(s_))) {
+              key += row.getString(map(s_))
             } else {
               hasNull = true
             }
+          })
+        } else {
+          if (!row.isNullAt(map(idKey))) {
+            key += row.getString(map(idKey))
+          } else {
+            hasNull = true
           }
-          if (!hasNull) {
-            jedisCluster.hset(key, field, value) // combined keys - fields - psn_code
-            //        println(key + ":" + field + ":" + value)   test pass
-          }
-        })
+        }
+        if (!hasNull) {
+          jedisCluster.hset(key, field, value) // combined keys - fields - psn_code
+          //        println(key + ":" + field + ":" + value)   test pass
+        }
+      })
   }
 
   /**
@@ -99,40 +113,38 @@ object RedisUtil extends Serializable {
     var hasPSN = false
     var hasNull = false
     breakable {
-      checkField.foreach(
-        idKey => {
-          var field = idKey
-          var key = ""
-          if (idKey.contains("&")) {
-            val sl = idKey.split("&")
-            sl.foreach(
-              s_ => {
-                if (!row._2.isNullAt(schema.fieldIndex(s_))) {
-                  key += row._2.getString(schema.fieldIndex(s_))
-                } else {
-                  hasNull = true
-                }
-              })
-          } else {
-            if (!row._2.isNullAt(schema.fieldIndex(idKey))) {
-              key += row._2.getString(schema.fieldIndex(idKey))
+      checkField.foreach(idKey => {
+        var field = idKey
+        var key = ""
+        if (idKey.contains("&")) {
+          val sl = idKey.split("&")
+          sl.foreach(s_ => {
+            if (!row._2.isNullAt(schema.fieldIndex(s_))) {
+              key += row._2.getString(schema.fieldIndex(s_))
             } else {
               hasNull = true
             }
+          })
+        } else {
+          if (!row._2.isNullAt(schema.fieldIndex(idKey))) {
+            key += row._2.getString(schema.fieldIndex(idKey))
+          } else {
+            hasNull = true
           }
-          if (!hasNull) {
-            if (jedisCluster.hexists(key, field)) {
-              Psn = jedisCluster.hget(key, field)
-              jedisCluster.hset(
-                tableName + "@" + row._1,
-                psnType + "PSNExist",
-                Psn
-              ) // 存储匹配到的ID，这部分不需要插入M_PERSON
-              hasPSN = true
-              break()
-            }
+        }
+        if (!hasNull) {
+          if (jedisCluster.hexists(key, field)) {
+            Psn = jedisCluster.hget(key, field)
+            jedisCluster.hset(
+              tableName + "@" + row._1,
+              psnType + "PSNExist",
+              Psn
+            ) // 存储匹配到的ID，这部分不需要插入M_PERSON
+            hasPSN = true
+            break()
           }
-        })
+        }
+      })
     }
     if (hasPSN) {
       Psn

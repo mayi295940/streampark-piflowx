@@ -1,6 +1,23 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow
 
-import scala.collection.mutable.{ArrayBuffer, Map => MMap}
+import scala.collection.mutable.ArrayBuffer
 
 trait PathHead {
   def via(ports: (String, String)): PathVia;
@@ -32,13 +49,13 @@ class PathImpl() extends Path {
 
   override def via(ports: (String, String)): PathVia = new PathVia() {
     override def to(stopTo: String): Path = {
-      edges += new Edge(edges.last.stopTo, stopTo, ports._1, ports._2);
+      edges += Edge(edges.last.stopTo, stopTo, ports._1, ports._2);
       thisPath;
     }
   }
 
   override def to(stopTo: String): Path = {
-    edges += new Edge(edges.last.stopTo, stopTo, "", "");
+    edges += Edge(edges.last.stopTo, stopTo, "", "");
     this;
   }
 }
@@ -55,14 +72,14 @@ object Path {
       override def via(ports: (String, String)): PathVia = new PathVia() {
         override def to(stopTo: String): Path = {
           val path = new PathImpl();
-          path.addEdge(new Edge(stopFrom, stopTo, ports._1, ports._2));
+          path.addEdge(Edge(stopFrom, stopTo, ports._1, ports._2));
           path;
         }
       }
 
       override def to(stopTo: String): Path = {
         val path = new PathImpl();
-        path.addEdge(new Edge(stopFrom, stopTo, "", ""));
+        path.addEdge(Edge(stopFrom, stopTo, "", ""));
         path;
       }
     };
@@ -74,22 +91,19 @@ object Path {
     def _addEdges(path: (Any, String)): Unit = {
       val value1 = path._1;
 
-      // String->String
-      if (value1.isInstanceOf[String]) {
-        pi.addEdge(new Edge(value1.asInstanceOf[String], path._2, "", ""));
-      }
-
-      // (String->String)->String
-      else if (value1.isInstanceOf[(Any, String)]) {
-        val tuple = value1.asInstanceOf[(Any, String)];
-        _addEdges(tuple);
-        pi.addEdge(new Edge(tuple._2, path._2, "", ""));
-      } else {
-        throw new InvalidPathException(value1);
+      value1 match {
+        case str: String =>
+          // String->String
+          pi.addEdge(Edge(str, path._2, "", ""));
+        case tuple: (Any, String) =>
+          _addEdges(tuple);
+          pi.addEdge(Edge(tuple._2, path._2, "", ""));
+        case _ =>
+          throw new InvalidPathException(value1);
       }
     }
 
-    _addEdges(path);
-    pi;
+    _addEdges(path)
+    pi
   }
 }

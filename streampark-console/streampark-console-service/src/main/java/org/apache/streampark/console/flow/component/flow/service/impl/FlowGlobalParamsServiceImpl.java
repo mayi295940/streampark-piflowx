@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.streampark.console.flow.component.flow.service.impl;
 
 import org.apache.streampark.console.flow.base.utils.PageHelperUtils;
@@ -25,125 +42,126 @@ import java.util.Map;
 @Service
 public class FlowGlobalParamsServiceImpl implements IFlowGlobalParamsService {
 
-  private final FlowGlobalParamsDomain flowGlobalParamsDomain;
+    private final FlowGlobalParamsDomain flowGlobalParamsDomain;
 
-  @Autowired
-  public FlowGlobalParamsServiceImpl(FlowGlobalParamsDomain flowGlobalParamsDomain) {
-    this.flowGlobalParamsDomain = flowGlobalParamsDomain;
-  }
+    @Autowired
+    public FlowGlobalParamsServiceImpl(FlowGlobalParamsDomain flowGlobalParamsDomain) {
+        this.flowGlobalParamsDomain = flowGlobalParamsDomain;
+    }
 
-  @Override
-  public String addFlowGlobalParams(String username, FlowGlobalParamsVoRequestAdd globalParamsVo)
-      throws Exception {
-    if (StringUtils.isBlank(username)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+    @Override
+    public String addFlowGlobalParams(String username, FlowGlobalParamsVoRequestAdd globalParamsVo) throws Exception {
+        if (StringUtils.isBlank(username)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+        }
+        if (null == globalParamsVo) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_ERROR_MSG());
+        }
+        if (StringUtils.isBlank(globalParamsVo.getName())) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_MSG());
+        }
+        FlowGlobalParams globalParams =
+            FlowGlobalParamsUtils.setFlowGlobalParamsBasicInformation(null, true, username);
+        // copy
+        BeanUtils.copyProperties(globalParamsVo, globalParams);
+        // set update info
+        globalParams.setLastUpdateDttm(new Date());
+        globalParams.setLastUpdateUser(username);
+        int affectedRows = flowGlobalParamsDomain.addFlowGlobalParams(globalParams);
+        if (affectedRows <= 0) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ADD_ERROR_MSG());
+        }
+        return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("globalParamsId", globalParams.getId());
     }
-    if (null == globalParamsVo) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_ERROR_MSG());
-    }
-    if (StringUtils.isBlank(globalParamsVo.getName())) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_MSG());
-    }
-    FlowGlobalParams globalParams =
-        FlowGlobalParamsUtils.setFlowGlobalParamsBasicInformation(null, true, username);
-    // copy
-    BeanUtils.copyProperties(globalParamsVo, globalParams);
-    // set update info
-    globalParams.setLastUpdateDttm(new Date());
-    globalParams.setLastUpdateUser(username);
-    int affectedRows = flowGlobalParamsDomain.addFlowGlobalParams(globalParams);
-    if (affectedRows <= 0) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ADD_ERROR_MSG());
-    }
-    return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("globalParamsId", globalParams.getId());
-  }
 
-  @Override
-  public String updateFlowGlobalParams(
-      String username, boolean isAdmin, FlowGlobalParamsVoRequest globalParamsVo) throws Exception {
-    if (StringUtils.isBlank(username)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+    @Override
+    public String updateFlowGlobalParams(
+                                         String username, boolean isAdmin,
+                                         FlowGlobalParamsVoRequest globalParamsVo) throws Exception {
+        if (StringUtils.isBlank(username)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+        }
+        if (null == globalParamsVo) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_ERROR_MSG());
+        }
+        String id = globalParamsVo.getId();
+        if (StringUtils.isBlank(id)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_MSG());
+        }
+        FlowGlobalParams globalParamsById =
+            flowGlobalParamsDomain.getFlowGlobalParamsById(username, isAdmin, id);
+        if (null == globalParamsById) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_MSG());
+        }
+        // copy
+        BeanUtils.copyProperties(globalParamsVo, globalParamsById);
+        int affectedRows = flowGlobalParamsDomain.updateFlowGlobalParams(globalParamsById);
+        if (affectedRows <= 0) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.UPDATE_ERROR_MSG());
+        }
+        return ReturnMapUtils.setSucceededMsgRtnJsonStr(MessageConfig.SUCCEEDED_MSG());
     }
-    if (null == globalParamsVo) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_ERROR_MSG());
-    }
-    String id = globalParamsVo.getId();
-    if (StringUtils.isBlank(id)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_MSG());
-    }
-    FlowGlobalParams globalParamsById =
-        flowGlobalParamsDomain.getFlowGlobalParamsById(username, isAdmin, id);
-    if (null == globalParamsById) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_MSG());
-    }
-    // copy
-    BeanUtils.copyProperties(globalParamsVo, globalParamsById);
-    int affectedRows = flowGlobalParamsDomain.updateFlowGlobalParams(globalParamsById);
-    if (affectedRows <= 0) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.UPDATE_ERROR_MSG());
-    }
-    return ReturnMapUtils.setSucceededMsgRtnJsonStr(MessageConfig.SUCCEEDED_MSG());
-  }
 
-  @Override
-  public String deleteFlowGlobalParamsById(String username, boolean isAdmin, String id) {
-    int affectedRows = flowGlobalParamsDomain.updateEnableFlagById(username, id, false);
-    if (affectedRows <= 0) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.DELETE_ERROR_MSG());
+    @Override
+    public String deleteFlowGlobalParamsById(String username, boolean isAdmin, String id) {
+        int affectedRows = flowGlobalParamsDomain.updateEnableFlagById(username, id, false);
+        if (affectedRows <= 0) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.DELETE_ERROR_MSG());
+        }
+        return ReturnMapUtils.setSucceededMsgRtnJsonStr(MessageConfig.SUCCEEDED_MSG());
     }
-    return ReturnMapUtils.setSucceededMsgRtnJsonStr(MessageConfig.SUCCEEDED_MSG());
-  }
 
-  /**
-   * Paging query FlowGlobalParams
-   *
-   * @param username
-   * @param isAdmin
-   * @param offset Number of pages
-   * @param limit Number of pages per page
-   * @param param search for the keyword
-   * @return
-   */
-  @Override
-  public String getFlowGlobalParamsListPage(
-      String username, boolean isAdmin, Integer offset, Integer limit, String param) {
-    if (null == offset || null == limit) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ERROR_MSG());
-    }
-    Page<FlowGlobalParams> page = PageHelper.startPage(offset, limit, "crt_dttm desc");
-    flowGlobalParamsDomain.getFlowGlobalParamsListParam(username, isAdmin, param);
-    Map<String, Object> rtnMap = ReturnMapUtils.setSucceededMsg(MessageConfig.SUCCEEDED_MSG());
-    return PageHelperUtils.setLayTableParamRtnStr(page, rtnMap);
-  }
-
-  /**
-   * Paging query FlowGlobalParams
-   *
-   * @param username
-   * @param isAdmin
-   * @param param search for the keyword
-   * @return
-   */
-  @Override
-  public String getFlowGlobalParamsList(String username, boolean isAdmin, String param) {
-    List<FlowGlobalParams> flowGlobalParamsListParam =
+    /**
+     * Paging query FlowGlobalParams
+     *
+     * @param username
+     * @param isAdmin
+     * @param offset Number of pages
+     * @param limit Number of pages per page
+     * @param param search for the keyword
+     * @return
+     */
+    @Override
+    public String getFlowGlobalParamsListPage(
+                                              String username, boolean isAdmin, Integer offset, Integer limit,
+                                              String param) {
+        if (null == offset || null == limit) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ERROR_MSG());
+        }
+        Page<FlowGlobalParams> page = PageHelper.startPage(offset, limit, "crt_dttm desc");
         flowGlobalParamsDomain.getFlowGlobalParamsListParam(username, isAdmin, param);
-    return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("data", flowGlobalParamsListParam);
-  }
+        Map<String, Object> rtnMap = ReturnMapUtils.setSucceededMsg(MessageConfig.SUCCEEDED_MSG());
+        return PageHelperUtils.setLayTableParamRtnStr(page, rtnMap);
+    }
 
-  @Override
-  public String getFlowGlobalParamsById(String username, boolean isAdmin, String id) {
-    if (StringUtils.isBlank(username)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+    /**
+     * Paging query FlowGlobalParams
+     *
+     * @param username
+     * @param isAdmin
+     * @param param search for the keyword
+     * @return
+     */
+    @Override
+    public String getFlowGlobalParamsList(String username, boolean isAdmin, String param) {
+        List<FlowGlobalParams> flowGlobalParamsListParam =
+            flowGlobalParamsDomain.getFlowGlobalParamsListParam(username, isAdmin, param);
+        return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("data", flowGlobalParamsListParam);
     }
-    if (StringUtils.isBlank(id)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_IS_NULL_MSG("id"));
+
+    @Override
+    public String getFlowGlobalParamsById(String username, boolean isAdmin, String id) {
+        if (StringUtils.isBlank(username)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+        }
+        if (StringUtils.isBlank(id)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_IS_NULL_MSG("id"));
+        }
+        FlowGlobalParams globalParamsById =
+            flowGlobalParamsDomain.getFlowGlobalParamsById(username, isAdmin, id);
+        if (null == globalParamsById) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_BY_ID_XXX_MSG(id));
+        }
+        return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("globalParams", globalParamsById);
     }
-    FlowGlobalParams globalParamsById =
-        flowGlobalParamsDomain.getFlowGlobalParamsById(username, isAdmin, id);
-    if (null == globalParamsById) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_BY_ID_XXX_MSG(id));
-    }
-    return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("globalParams", globalParamsById);
-  }
 }

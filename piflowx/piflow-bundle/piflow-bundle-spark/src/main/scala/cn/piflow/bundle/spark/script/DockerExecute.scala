@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cn.piflow.bundle.spark.script
 
 import cn.piflow.{Constants, JobContext, JobInputStream, JobOutputStream, ProcessContext}
@@ -32,10 +49,9 @@ class DockerExecute extends ConfigurableStop[DataFrame] {
     PropertyUtil
       .getPropertyValue("hdfs.cluster")
       .split(";")
-      .foreach(
-        x => {
-          stringBuffer.append(System.lineSeparator() + "      - \"" + x + "\"")
-        })
+      .foreach(x => {
+        stringBuffer.append(System.lineSeparator() + "      - \"" + x + "\"")
+      })
 
     ymlContent = ymlContent
       .replace("piflow_hdfs_url", PropertyUtil.getPropertyValue("hdfs.web.url"))
@@ -58,19 +74,18 @@ class DockerExecute extends ConfigurableStop[DataFrame] {
     val inputPathStringBuffer = new StringBuffer()
 
     if (!(inports.contains("Default") || inports.contains("DefaultPort"))) {
-      inports.foreach(
-        x => {
-          println("输入端口：=============================" + x + "=================")
-          val hdfsSavePath = inputPath + x
-          inputPathStringBuffer.append(hdfsSavePath + ",")
-          in.read(x)
-            .write
-            .format("csv")
-            .mode("overwrite")
-            .option("delimiter", "\t")
-            .option("header", true)
-            .save(hdfsSavePath)
-        })
+      inports.foreach(x => {
+        println("输入端口：=============================" + x + "=================")
+        val hdfsSavePath = inputPath + x
+        inputPathStringBuffer.append(hdfsSavePath + ",")
+        in.read(x)
+          .write
+          .format("csv")
+          .mode("overwrite")
+          .option("delimiter", "\t")
+          .option("header", true)
+          .save(hdfsSavePath)
+      })
 
       println("执行命令：======================输入路径写入app/inputPath.txt 文件========================")
       DockerStreamUtil.execRuntime(s"echo $inputPath> app/inputPath.txt")
@@ -84,16 +99,15 @@ class DockerExecute extends ConfigurableStop[DataFrame] {
     DockerStreamUtil.execRuntime(dockerShellString)
 
     if (!(outports.contains("Default") || outports.contains("DefaultPort"))) {
-      outports.foreach(
-        x => {
-          println("输出端口：=============================" + x + "=================")
-          val outDF = spark.read
-            .format("csv")
-            .option("header", true)
-            .option("mode", "FAILFAST")
-            .load(outputPath + x)
-          out.write(x, outDF)
-        })
+      outports.foreach(x => {
+        println("输出端口：=============================" + x + "=================")
+        val outDF = spark.read
+          .format("csv")
+          .option("header", true)
+          .option("mode", "FAILFAST")
+          .load(outputPath + x)
+        out.write(x, outDF)
+      })
     }
 
     DockerStreamUtil.execRuntime(dockerDownShellString)

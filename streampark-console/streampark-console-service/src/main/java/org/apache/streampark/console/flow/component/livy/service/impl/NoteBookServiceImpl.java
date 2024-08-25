@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.streampark.console.flow.component.livy.service.impl;
 
 import org.apache.streampark.console.flow.base.utils.PageHelperUtils;
@@ -27,195 +44,195 @@ import java.util.Map;
 @Transactional
 public class NoteBookServiceImpl implements INoteBookService {
 
-  private final NoteBookDomain noteBookDomain;
-  private final ILivy livyImpl;
+    private final NoteBookDomain noteBookDomain;
+    private final ILivy livyImpl;
 
-  @Autowired
-  public NoteBookServiceImpl(NoteBookDomain noteBookDomain, ILivy livyImpl) {
-    this.noteBookDomain = noteBookDomain;
-    this.livyImpl = livyImpl;
-  }
-
-  @Override
-  public String saveOrUpdateNoteBook(
-      String username, boolean isAdmin, NoteBookVoRequest noteBookVo, boolean flag)
-      throws Exception {
-    if (StringUtils.isBlank(username)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
-    }
-    if (null == noteBookVo) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_ERROR_MSG());
-    }
-    if (StringUtils.isBlank(noteBookVo.getName())) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_IS_NULL_MSG("name"));
-    }
-    NoteBook noteBook = null;
-    String noteBookVoId = noteBookVo.getId();
-    if (StringUtils.isNotBlank(noteBookVoId)) {
-      noteBook = noteBookDomain.getNoteBookById(isAdmin, username, noteBookVoId);
+    @Autowired
+    public NoteBookServiceImpl(NoteBookDomain noteBookDomain, ILivy livyImpl) {
+        this.noteBookDomain = noteBookDomain;
+        this.livyImpl = livyImpl;
     }
 
-    if (null == noteBook) {
-      noteBook = NoteBookUtils.setNoteBookBasicInformation(null, false, username);
-    }
-    BeanUtils.copyProperties(noteBookVo, noteBook);
-    int returnValue;
-    if (StringUtils.isBlank(noteBook.getId())) {
-      noteBook.setId(UUIDUtils.getUUID32());
-      returnValue = noteBookDomain.addNoteBook(noteBook);
-    } else {
-      returnValue = noteBookDomain.updateNoteBook(noteBook);
-    }
-    if (returnValue > 0) {
-      Map<String, Object> rtnMap = ReturnMapUtils.setSucceededMsg(MessageConfig.SUCCEEDED_MSG());
-      return ReturnMapUtils.appendValuesToJson(rtnMap, "noteBookId", noteBook.getId());
-    }
-    return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ERROR_MSG());
-  }
+    @Override
+    public String saveOrUpdateNoteBook(
+                                       String username, boolean isAdmin, NoteBookVoRequest noteBookVo,
+                                       boolean flag) throws Exception {
+        if (StringUtils.isBlank(username)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+        }
+        if (null == noteBookVo) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_ERROR_MSG());
+        }
+        if (StringUtils.isBlank(noteBookVo.getName())) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_IS_NULL_MSG("name"));
+        }
+        NoteBook noteBook = null;
+        String noteBookVoId = noteBookVo.getId();
+        if (StringUtils.isNotBlank(noteBookVoId)) {
+            noteBook = noteBookDomain.getNoteBookById(isAdmin, username, noteBookVoId);
+        }
 
-  @Override
-  public String checkNoteBookName(String username, boolean isAdmin, String noteBookName) {
-    if (StringUtils.isBlank(noteBookName)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_IS_NULL_MSG("noteBookName"));
+        if (null == noteBook) {
+            noteBook = NoteBookUtils.setNoteBookBasicInformation(null, false, username);
+        }
+        BeanUtils.copyProperties(noteBookVo, noteBook);
+        int returnValue;
+        if (StringUtils.isBlank(noteBook.getId())) {
+            noteBook.setId(UUIDUtils.getUUID32());
+            returnValue = noteBookDomain.addNoteBook(noteBook);
+        } else {
+            returnValue = noteBookDomain.updateNoteBook(noteBook);
+        }
+        if (returnValue > 0) {
+            Map<String, Object> rtnMap = ReturnMapUtils.setSucceededMsg(MessageConfig.SUCCEEDED_MSG());
+            return ReturnMapUtils.appendValuesToJson(rtnMap, "noteBookId", noteBook.getId());
+        }
+        return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ERROR_MSG());
     }
-    int noteBookNameCount = noteBookDomain.checkNoteBookByName(isAdmin, username, noteBookName);
-    if (noteBookNameCount > 0) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.XXX_ALREADY_TAKEN_MSG("noteBook"));
-    } else {
-      return ReturnMapUtils.setSucceededMsgRtnJsonStr(MessageConfig.XXX_AVAILABLE_MSG("noteBook"));
-    }
-  }
 
-  @Override
-  public String deleteNoteBook(String username, boolean isAdmin, String noteBookId) {
-    if (StringUtils.isBlank(username)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+    @Override
+    public String checkNoteBookName(String username, boolean isAdmin, String noteBookName) {
+        if (StringUtils.isBlank(noteBookName)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_IS_NULL_MSG("noteBookName"));
+        }
+        int noteBookNameCount = noteBookDomain.checkNoteBookByName(isAdmin, username, noteBookName);
+        if (noteBookNameCount > 0) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.XXX_ALREADY_TAKEN_MSG("noteBook"));
+        } else {
+            return ReturnMapUtils.setSucceededMsgRtnJsonStr(MessageConfig.XXX_AVAILABLE_MSG("noteBook"));
+        }
     }
-    if (StringUtils.isBlank(noteBookId)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_IS_NULL_MSG("noteBookId"));
-    }
-    int i = noteBookDomain.deleteNoteBookById(isAdmin, username, noteBookId);
-    if (i <= 0) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ERROR_MSG());
-    }
-    return ReturnMapUtils.setSucceededMsgRtnJsonStr(MessageConfig.SUCCEEDED_MSG());
-  }
 
-  @Override
-  public String getNoteBookListPage(
-      String username, boolean isAdmin, Integer offset, Integer limit, String param) {
-    if (StringUtils.isBlank(username)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+    @Override
+    public String deleteNoteBook(String username, boolean isAdmin, String noteBookId) {
+        if (StringUtils.isBlank(username)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+        }
+        if (StringUtils.isBlank(noteBookId)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_IS_NULL_MSG("noteBookId"));
+        }
+        int i = noteBookDomain.deleteNoteBookById(isAdmin, username, noteBookId);
+        if (i <= 0) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ERROR_MSG());
+        }
+        return ReturnMapUtils.setSucceededMsgRtnJsonStr(MessageConfig.SUCCEEDED_MSG());
     }
-    if (null == offset || null == limit) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_ERROR_MSG());
-    }
-    Page<NoteBook> page = PageHelper.startPage(offset, limit);
-    noteBookDomain.getNoteBookList(isAdmin, username, param);
-    Map<String, Object> rtnMap = ReturnMapUtils.setSucceededMsg(MessageConfig.SUCCEEDED_MSG());
-    return PageHelperUtils.setLayTableParamRtnStr(page, rtnMap);
-  }
 
-  @Override
-  public String getNoteBookById(String username, boolean isAdmin, String id) {
-    if (StringUtils.isBlank(username)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+    @Override
+    public String getNoteBookListPage(
+                                      String username, boolean isAdmin, Integer offset, Integer limit, String param) {
+        if (StringUtils.isBlank(username)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+        }
+        if (null == offset || null == limit) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_ERROR_MSG());
+        }
+        Page<NoteBook> page = PageHelper.startPage(offset, limit);
+        noteBookDomain.getNoteBookList(isAdmin, username, param);
+        Map<String, Object> rtnMap = ReturnMapUtils.setSucceededMsg(MessageConfig.SUCCEEDED_MSG());
+        return PageHelperUtils.setLayTableParamRtnStr(page, rtnMap);
     }
-    if (StringUtils.isBlank(id)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_IS_NULL_MSG("noteBookId"));
-    }
-    NoteBook noteBook = noteBookDomain.getNoteBookById(isAdmin, username, id);
-    if (null == noteBook) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_MSG());
-    }
-    return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("noteBook", noteBook);
-  }
 
-  @Override
-  public String startNoteBookSession(String username, boolean isAdmin, String noteBookId) {
-    if (StringUtils.isBlank(username)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+    @Override
+    public String getNoteBookById(String username, boolean isAdmin, String id) {
+        if (StringUtils.isBlank(username)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+        }
+        if (StringUtils.isBlank(id)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_IS_NULL_MSG("noteBookId"));
+        }
+        NoteBook noteBook = noteBookDomain.getNoteBookById(isAdmin, username, id);
+        if (null == noteBook) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_MSG());
+        }
+        return ReturnMapUtils.setSucceededCustomParamRtnJsonStr("noteBook", noteBook);
     }
-    if (StringUtils.isBlank(noteBookId)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_IS_NULL_MSG("noteBookId"));
-    }
-    NoteBook noteBook = noteBookDomain.getNoteBookById(isAdmin, username, noteBookId);
-    if (null == noteBook) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_MSG());
-    }
-    Map<String, Object> rtnMap = livyImpl.startSessions();
-    if (null == rtnMap || (int) rtnMap.get(ReturnMapUtils.KEY_CODE) != 200) {
-      return ReturnMapUtils.toJson(rtnMap);
-    }
-    String sessionsId = rtnMap.get("sessionsId").toString();
-    noteBook.setSessionsId(sessionsId);
-    noteBook.setLastUpdateDttm(new Date());
-    noteBook.setLastUpdateUser(username);
-    int affectedRows = noteBookDomain.updateNoteBook(noteBook);
-    if (affectedRows > 0) {
-      return ReturnMapUtils.toJson(rtnMap);
-    }
-    livyImpl.stopSessions(sessionsId);
-    return ReturnMapUtils.setFailedMsgRtnJsonStr(
-        MessageConfig.INTERFACE_CALL_SUCCEEDED_SAVE_ERROR_MSG());
-  }
 
-  @Override
-  public String getNoteBookSessionState(String username, boolean isAdmin, String noteBookId) {
-    if (StringUtils.isBlank(username)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+    @Override
+    public String startNoteBookSession(String username, boolean isAdmin, String noteBookId) {
+        if (StringUtils.isBlank(username)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+        }
+        if (StringUtils.isBlank(noteBookId)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_IS_NULL_MSG("noteBookId"));
+        }
+        NoteBook noteBook = noteBookDomain.getNoteBookById(isAdmin, username, noteBookId);
+        if (null == noteBook) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_MSG());
+        }
+        Map<String, Object> rtnMap = livyImpl.startSessions();
+        if (null == rtnMap || (int) rtnMap.get(ReturnMapUtils.KEY_CODE) != 200) {
+            return ReturnMapUtils.toJson(rtnMap);
+        }
+        String sessionsId = rtnMap.get("sessionsId").toString();
+        noteBook.setSessionsId(sessionsId);
+        noteBook.setLastUpdateDttm(new Date());
+        noteBook.setLastUpdateUser(username);
+        int affectedRows = noteBookDomain.updateNoteBook(noteBook);
+        if (affectedRows > 0) {
+            return ReturnMapUtils.toJson(rtnMap);
+        }
+        livyImpl.stopSessions(sessionsId);
+        return ReturnMapUtils.setFailedMsgRtnJsonStr(
+            MessageConfig.INTERFACE_CALL_SUCCEEDED_SAVE_ERROR_MSG());
     }
-    if (StringUtils.isBlank(noteBookId)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_IS_NULL_MSG("noteBookId"));
-    }
-    NoteBook noteBook = noteBookDomain.getNoteBookById(isAdmin, username, noteBookId);
-    if (null == noteBook) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_MSG());
-    }
-    String sessionsId = noteBook.getSessionsId();
-    if (StringUtils.isBlank(sessionsId)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(
-          MessageConfig.NO_DATA_XXX_IS_NULL_MSG("sessionsId"));
-    }
-    Map<String, Object> rtnMap = livyImpl.getSessionsState(sessionsId);
-    return ReturnMapUtils.toJson(rtnMap);
-  }
 
-  @Override
-  public String delNoteBookSession(String username, boolean isAdmin, String noteBookId) {
-    if (StringUtils.isBlank(username)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+    @Override
+    public String getNoteBookSessionState(String username, boolean isAdmin, String noteBookId) {
+        if (StringUtils.isBlank(username)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+        }
+        if (StringUtils.isBlank(noteBookId)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_IS_NULL_MSG("noteBookId"));
+        }
+        NoteBook noteBook = noteBookDomain.getNoteBookById(isAdmin, username, noteBookId);
+        if (null == noteBook) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_MSG());
+        }
+        String sessionsId = noteBook.getSessionsId();
+        if (StringUtils.isBlank(sessionsId)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(
+                MessageConfig.NO_DATA_XXX_IS_NULL_MSG("sessionsId"));
+        }
+        Map<String, Object> rtnMap = livyImpl.getSessionsState(sessionsId);
+        return ReturnMapUtils.toJson(rtnMap);
     }
-    if (StringUtils.isBlank(noteBookId)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_IS_NULL_MSG("noteBookId"));
-    }
-    NoteBook noteBook = noteBookDomain.getNoteBookById(isAdmin, username, noteBookId);
-    if (null == noteBook) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_MSG());
-    }
-    String sessionsId = noteBook.getSessionsId();
-    if (StringUtils.isBlank(sessionsId)) {
-      return ReturnMapUtils.setFailedMsgRtnJsonStr(
-          MessageConfig.NO_DATA_XXX_IS_NULL_MSG("sessionsId"));
-    }
-    Map<String, Object> rtnMap = livyImpl.stopSessions(sessionsId);
-    if (null == rtnMap || (int) rtnMap.get(ReturnMapUtils.KEY_CODE) != 200) {
-      return ReturnMapUtils.toJson(rtnMap);
-    }
-    noteBook.setSessionsId(null);
-    noteBook.setLastUpdateDttm(new Date());
-    noteBook.setLastUpdateUser(username);
-    int affectedRows = noteBookDomain.updateNoteBook(noteBook);
-    if (affectedRows > 0) {
-      return ReturnMapUtils.toJson(rtnMap);
-    }
-    return ReturnMapUtils.setFailedMsgRtnJsonStr(
-        MessageConfig.INTERFACE_CALL_SUCCEEDED_SAVE_ERROR_MSG());
-  }
 
-  @Override
-  public String getAllNoteBookRunning(String username, boolean isAdmin) {
-    Map<String, Object> rtnMap = livyImpl.getAllSessions();
-    return ReturnMapUtils.toJson(rtnMap);
-  }
+    @Override
+    public String delNoteBookSession(String username, boolean isAdmin, String noteBookId) {
+        if (StringUtils.isBlank(username)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
+        }
+        if (StringUtils.isBlank(noteBookId)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.PARAM_IS_NULL_MSG("noteBookId"));
+        }
+        NoteBook noteBook = noteBookDomain.getNoteBookById(isAdmin, username, noteBookId);
+        if (null == noteBook) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.NO_DATA_MSG());
+        }
+        String sessionsId = noteBook.getSessionsId();
+        if (StringUtils.isBlank(sessionsId)) {
+            return ReturnMapUtils.setFailedMsgRtnJsonStr(
+                MessageConfig.NO_DATA_XXX_IS_NULL_MSG("sessionsId"));
+        }
+        Map<String, Object> rtnMap = livyImpl.stopSessions(sessionsId);
+        if (null == rtnMap || (int) rtnMap.get(ReturnMapUtils.KEY_CODE) != 200) {
+            return ReturnMapUtils.toJson(rtnMap);
+        }
+        noteBook.setSessionsId(null);
+        noteBook.setLastUpdateDttm(new Date());
+        noteBook.setLastUpdateUser(username);
+        int affectedRows = noteBookDomain.updateNoteBook(noteBook);
+        if (affectedRows > 0) {
+            return ReturnMapUtils.toJson(rtnMap);
+        }
+        return ReturnMapUtils.setFailedMsgRtnJsonStr(
+            MessageConfig.INTERFACE_CALL_SUCCEEDED_SAVE_ERROR_MSG());
+    }
+
+    @Override
+    public String getAllNoteBookRunning(String username, boolean isAdmin) {
+        Map<String, Object> rtnMap = livyImpl.getAllSessions();
+        return ReturnMapUtils.toJson(rtnMap);
+    }
 }

@@ -208,7 +208,8 @@ export const useCreateAndEditSchema = (
         label: t('flink.app.flinkCluster'),
         component: 'Select',
         render: (param) => renderFlinkCluster(getExecutionCluster(ExecModeEnum.REMOTE), param),
-        ifShow: ({ values }) => values.executionMode == ExecModeEnum.REMOTE,
+        ifShow: ({ values }) =>
+          values.executionMode == ExecModeEnum.REMOTE && values?.stepCurrent == 0,
         rules: [
           { required: true, message: t('flink.app.addAppTips.flinkClusterIsRequiredMessage') },
         ],
@@ -219,7 +220,8 @@ export const useCreateAndEditSchema = (
         component: 'Select',
         render: (param) =>
           renderFlinkCluster(getExecutionCluster(ExecModeEnum.YARN_SESSION), param),
-        ifShow: ({ values }) => values.executionMode == ExecModeEnum.YARN_SESSION,
+        ifShow: ({ values }) =>
+          values.executionMode == ExecModeEnum.YARN_SESSION && values?.stepCurrent == 0,
         rules: [
           { required: true, message: t('flink.app.addAppTips.flinkClusterIsRequiredMessage') },
         ],
@@ -230,7 +232,8 @@ export const useCreateAndEditSchema = (
         component: 'Select',
         render: (param) =>
           renderFlinkCluster(getExecutionCluster(ExecModeEnum.KUBERNETES_SESSION), param),
-        ifShow: ({ values }) => values.executionMode == ExecModeEnum.KUBERNETES_SESSION,
+        ifShow: ({ values }) =>
+          values.executionMode == ExecModeEnum.KUBERNETES_SESSION && values?.stepCurrent == 0,
         rules: [
           { required: true, message: t('flink.app.addAppTips.flinkClusterIsRequiredMessage') },
         ],
@@ -239,7 +242,8 @@ export const useCreateAndEditSchema = (
         field: 'k8sNamespace',
         label: t('flink.app.kubernetesNamespace'),
         component: 'Input',
-        ifShow: ({ values }) => values.executionMode == ExecModeEnum.KUBERNETES_APPLICATION,
+        ifShow: ({ values }) =>
+          values.executionMode == ExecModeEnum.KUBERNETES_APPLICATION && values?.stepCurrent == 0,
         render: ({ model, field }) =>
           renderInputDropdown(model, field, {
             placeholder: t('flink.app.addAppTips.kubernetesNamespacePlaceholder'),
@@ -250,7 +254,8 @@ export const useCreateAndEditSchema = (
         field: 'serviceAccount',
         label: t('setting.flinkCluster.form.serviceAccount'),
         component: 'Input',
-        ifShow: ({ values }) => values.executionMode == ExecModeEnum.KUBERNETES_APPLICATION,
+        ifShow: ({ values }) =>
+          values.executionMode == ExecModeEnum.KUBERNETES_APPLICATION && values?.stepCurrent == 0,
         render: ({ model, field }) =>
           renderInputDropdown(model, field, {
             placeholder: t('flink.app.addAppTips.serviceAccountPlaceholder'),
@@ -261,7 +266,8 @@ export const useCreateAndEditSchema = (
         field: 'flinkImage',
         label: t('flink.app.flinkBaseDockerImage'),
         component: 'Input',
-        ifShow: ({ values }) => values.executionMode == ExecModeEnum.KUBERNETES_APPLICATION,
+        ifShow: ({ values }) =>
+          values.executionMode == ExecModeEnum.KUBERNETES_APPLICATION && values?.stepCurrent == 0,
         render: ({ model, field }) =>
           renderInputDropdown(model, field, {
             placeholder: t('flink.app.addAppTips.flinkImagePlaceholder'),
@@ -272,7 +278,8 @@ export const useCreateAndEditSchema = (
       {
         field: 'k8sRestExposedType',
         label: t('flink.app.restServiceExposedType'),
-        ifShow: ({ values }) => values.executionMode == ExecModeEnum.KUBERNETES_APPLICATION,
+        ifShow: ({ values }) =>
+          values.executionMode == ExecModeEnum.KUBERNETES_APPLICATION && values?.stepCurrent == 0,
         component: 'Select',
         componentProps: {
           placeholder: t('flink.app.addAppTips.k8sRestExposedTypePlaceholder'),
@@ -335,6 +342,7 @@ export const useCreateAndEditSchema = (
             },
           ];
         },
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       {
         field: 'tags',
@@ -566,7 +574,7 @@ export const useCreateAndEditSchema = (
           }
           return '';
         },
-        show: ({ values }) => values?.jobType != JobTypeEnum.PIPELINE && values?.stepCurrent == 0,
+        show: ({ values }) => values?.stepCurrent == 0,
       },
     ];
   });

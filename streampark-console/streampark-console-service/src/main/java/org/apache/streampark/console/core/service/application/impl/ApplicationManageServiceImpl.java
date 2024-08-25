@@ -36,6 +36,7 @@ import org.apache.streampark.console.core.entity.FlinkSql;
 import org.apache.streampark.console.core.entity.Resource;
 import org.apache.streampark.console.core.enums.CandidateTypeEnum;
 import org.apache.streampark.console.core.enums.ChangeTypeEnum;
+import org.apache.streampark.console.core.enums.EngineTypeEnum;
 import org.apache.streampark.console.core.enums.FlinkAppStateEnum;
 import org.apache.streampark.console.core.enums.OptionStateEnum;
 import org.apache.streampark.console.core.enums.ReleaseStateEnum;
@@ -57,7 +58,9 @@ import org.apache.streampark.console.core.util.ServiceHelper;
 import org.apache.streampark.console.core.watcher.FlinkAppHttpWatcher;
 import org.apache.streampark.console.core.watcher.FlinkClusterWatcher;
 import org.apache.streampark.console.core.watcher.FlinkK8sWatcherWrapper;
+import org.apache.streampark.console.flow.base.utils.SessionUserUtil;
 import org.apache.streampark.console.flow.component.flow.service.IFlowService;
+import org.apache.streampark.console.flow.controller.requestVo.FlowInfoVoRequestAdd;
 import org.apache.streampark.flink.kubernetes.FlinkK8sWatcher;
 import org.apache.streampark.flink.packer.pipeline.PipelineStatusEnum;
 
@@ -360,6 +363,16 @@ public class ApplicationManageServiceImpl extends ServiceImpl<ApplicationMapper,
             if (appParam.getConfig() != null) {
                 configService.create(appParam, true);
             }
+
+            if (appParam.isPipelineJob()) {
+                String username = SessionUserUtil.getCurrentUsername();
+                FlowInfoVoRequestAdd flowVo = new FlowInfoVoRequestAdd();
+                flowVo.setId(String.valueOf(appParam.getId()));
+                flowVo.setName(appParam.getJobName());
+                flowVo.setEngineType(EngineTypeEnum.FLINK.name().toLowerCase());
+                flowServiceImpl.addFlow(username, flowVo);
+            }
+
             return true;
         } else {
             throw new ApiAlertException("create application failed");

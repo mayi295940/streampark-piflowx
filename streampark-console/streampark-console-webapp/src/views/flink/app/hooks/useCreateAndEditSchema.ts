@@ -564,6 +564,7 @@ export const useCreateAndEditSchema = (
           } else if (model.appType == AppTypeEnum.STREAMPARK_SPARK) {
             return getAlertSvgIcon('spark', 'StreamPark Spark');
           }
+          return '';
         },
         show: ({ values }) => values?.jobType != JobTypeEnum.PIPELINE && values?.stepCurrent == 0,
       },

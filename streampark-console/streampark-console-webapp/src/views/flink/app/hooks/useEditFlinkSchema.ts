@@ -34,7 +34,7 @@ export const useEditFlinkSchema = (jars: Ref) => {
     getFlinkClusterSchemas,
     getFlinkFormOtherSchemas,
     getFlinkTypeSchema,
-    getExecutionModeSchema,
+    getDeployModeSchema,
     suggestions,
   } = useCreateAndEditSchema(null, { appId: route.query.appId as string, mode: 'streampark' });
 
@@ -47,7 +47,7 @@ export const useEditFlinkSchema = (jars: Ref) => {
         show: false,
       },
       ...getFlinkTypeSchema.value,
-      ...getExecutionModeSchema.value,
+      ...getDeployModeSchema.value,
       {
         field: 'resourceFrom',
         label: 'Resource From',

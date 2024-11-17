@@ -20,7 +20,7 @@ package org.apache.streampark.console.core.watcher;
 import org.apache.streampark.common.conf.CommonConfig;
 import org.apache.streampark.common.conf.InternalConfigHolder;
 import org.apache.streampark.common.enums.ClusterState;
-import org.apache.streampark.common.enums.FlinkExecutionMode;
+import org.apache.streampark.common.enums.FlinkDeployMode;
 import org.apache.streampark.common.util.HadoopUtils;
 import org.apache.streampark.common.util.HttpClientUtils;
 import org.apache.streampark.common.util.YarnUtils;
@@ -30,7 +30,7 @@ import org.apache.streampark.console.core.metrics.flink.Overview;
 import org.apache.streampark.console.core.metrics.yarn.YarnAppInfo;
 import org.apache.streampark.console.core.service.FlinkClusterService;
 import org.apache.streampark.console.core.service.alert.AlertService;
-import org.apache.streampark.console.core.service.application.ApplicationInfoService;
+import org.apache.streampark.console.core.service.application.FlinkApplicationInfoService;
 import org.apache.streampark.console.core.utils.AlertTemplateUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -69,7 +69,7 @@ public class FlinkClusterWatcher {
     private AlertService alertService;
 
     @Autowired
-    private ApplicationInfoService applicationInfoService;
+    private FlinkApplicationInfoService applicationInfoService;
 
     private static final Timeout HTTP_TIMEOUT = Timeout.ofSeconds(5L);
 
@@ -85,8 +85,8 @@ public class FlinkClusterWatcher {
     /** Watcher cluster lists */
     private static final Map<Long, FlinkCluster> WATCHER_CLUSTERS = new ConcurrentHashMap<>(8);
 
-    private static final Cache<Long, ClusterState> FAILED_STATES = Caffeine.newBuilder()
-        .expireAfterWrite(WATCHER_INTERVAL).build();
+    private static final Cache<Long, ClusterState> FAILED_STATES =
+        Caffeine.newBuilder().expireAfterWrite(WATCHER_INTERVAL).build();
 
     private boolean immediateWatch = false;
 
@@ -94,15 +94,16 @@ public class FlinkClusterWatcher {
     @PostConstruct
     private void init() {
         WATCHER_CLUSTERS.clear();
-        List<FlinkCluster> flinkClusters = flinkClusterService.list(
-            new LambdaQueryWrapper<FlinkCluster>()
-                .eq(FlinkCluster::getClusterState, ClusterState.RUNNING.getState())
-                // excluding flink clusters on kubernetes
-                .notIn(FlinkCluster::getExecutionMode, FlinkExecutionMode.getKubernetesMode()));
+        List<FlinkCluster> flinkClusters =
+            flinkClusterService.list(
+                new LambdaQueryWrapper<FlinkCluster>()
+                    .eq(FlinkCluster::getClusterState, ClusterState.RUNNING.getState())
+                    // excluding flink clusters on kubernetes
+                    .notIn(FlinkCluster::getDeployMode, FlinkDeployMode.getKubernetesMode()));
         flinkClusters.forEach(cluster -> WATCHER_CLUSTERS.put(cluster.getId(), cluster));
     }
 
-    @Scheduled(fixedDelay = 1000)
+    @Scheduled(fixedDelayString = "${job.state-watcher.fixed-delayed:1000}")
     private void start() {
         Long timeMillis = System.currentTimeMillis();
         if (immediateWatch || timeMillis - lastWatchTime >= WATCHER_INTERVAL.toMillis()) {
@@ -117,8 +118,7 @@ public class FlinkClusterWatcher {
                             case LOST:
                             case UNKNOWN:
                             case KILLED:
-                                flinkClusterService.updateClusterState(flinkCluster.getId(),
-                                    state);
+                                flinkClusterService.updateClusterState(flinkCluster.getId(), state);
                                 unWatching(flinkCluster);
                                 alert(flinkCluster, state);
                                 break;
@@ -134,11 +134,11 @@ public class FlinkClusterWatcher {
             cluster.setAllJobs(applicationInfoService.countByClusterId(cluster.getId()));
             cluster.setAffectedJobs(
                 applicationInfoService.countAffectedByClusterId(
-                    cluster.getId(),
-                    InternalConfigHolder.get(CommonConfig.SPRING_PROFILES_ACTIVE())));
+                    cluster.getId(), InternalConfigHolder.get(CommonConfig.SPRING_PROFILES_ACTIVE())));
             cluster.setClusterState(state.getState());
             cluster.setEndTime(new Date());
-            alertService.alert(cluster.getAlertId(), AlertTemplateUtils.createAlertTemplate(cluster, state));
+            alertService.alert(
+                cluster.getAlertId(), AlertTemplateUtils.createAlertTemplate(cluster, state));
         }
     }
 
@@ -194,7 +194,7 @@ public class FlinkClusterWatcher {
      * @return
      */
     private ClusterState httpClusterState(FlinkCluster flinkCluster) {
-        switch (flinkCluster.getFlinkExecutionModeEnum()) {
+        switch (flinkCluster.getFlinkDeployModeEnum()) {
             case REMOTE:
                 return httpRemoteClusterState(flinkCluster);
             case YARN_SESSION:
@@ -213,13 +213,15 @@ public class FlinkClusterWatcher {
     private ClusterState getStateFromFlinkRestApi(FlinkCluster flinkCluster) {
         String address = flinkCluster.getAddress();
         String jobManagerUrl = flinkCluster.getJobManagerUrl();
-        String flinkUrl = StringUtils.isBlank(jobManagerUrl)
-            ? address.concat("/overview")
-            : jobManagerUrl.concat("/overview");
+        String flinkUrl =
+            StringUtils.isBlank(jobManagerUrl)
+                ? address.concat("/overview")
+                : jobManagerUrl.concat("/overview");
         try {
-            String res = HttpClientUtils.httpGetRequest(
-                flinkUrl,
-                RequestConfig.custom().setConnectTimeout(5000, TimeUnit.MILLISECONDS).build());
+            String res =
+                HttpClientUtils.httpGetRequest(
+                    flinkUrl,
+                    RequestConfig.custom().setConnectTimeout(5000, TimeUnit.MILLISECONDS).build());
             JacksonUtils.read(res, Overview.class);
             return ClusterState.RUNNING;
         } catch (Exception ignored) {
@@ -261,7 +263,7 @@ public class FlinkClusterWatcher {
      * @param flinkCluster
      */
     public static void addWatching(FlinkCluster flinkCluster) {
-        if (!FlinkExecutionMode.isKubernetesMode(flinkCluster.getFlinkExecutionModeEnum())
+        if (!FlinkDeployMode.isKubernetesMode(flinkCluster.getFlinkDeployModeEnum())
             && !WATCHER_CLUSTERS.containsKey(flinkCluster.getId())) {
             log.info("add the cluster with id:{} to watcher cluster cache", flinkCluster.getId());
             WATCHER_CLUSTERS.put(flinkCluster.getId(), flinkCluster);

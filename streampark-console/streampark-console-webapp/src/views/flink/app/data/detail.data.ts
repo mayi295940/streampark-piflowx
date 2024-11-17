@@ -36,7 +36,7 @@ export const getDescSchema = (): DescItem[] => {
     { field: 'jobName', label: t('flink.app.appName') },
     {
       field: 'jobType',
-      label: t('flink.app.developmentMode'),
+      label: t('flink.app.jobType'),
       render: (curVal) =>
         h(
           'div',
@@ -132,8 +132,8 @@ export const getBackupColumns = (): BasicColumn[] => [
 
 export const getOptionLogColumns = (): BasicColumn[] => [
   { title: 'Operation Name', dataIndex: 'optionName', width: 150 },
-  { title: 'Cluster Id', dataIndex: 'yarnAppId' },
-  { title: 'JobManager URL', dataIndex: 'jobManagerUrl' },
+  { title: 'Cluster Id', dataIndex: 'clusterId' },
+  { title: 'Tracking URL', dataIndex: 'trackingUrl' },
   { title: 'Start Status', dataIndex: 'success', width: 120 },
   { title: 'Option Time', dataIndex: 'optionTime', width: 200 },
 ];

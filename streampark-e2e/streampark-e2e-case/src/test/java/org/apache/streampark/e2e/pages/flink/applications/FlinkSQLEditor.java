@@ -32,6 +32,7 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Getter
@@ -39,9 +40,11 @@ import java.util.List;
 public final class FlinkSQLEditor {
 
     @FindBy(xpath = "//label[contains(@for, 'form_item_flinkSql')]/../..//div[contains(@class, 'monaco-editor')]//div[contains(@class, 'view-line') and not(contains(@class, 'view-lines'))]")
-    private List<WebElement> flinkSqlEditor;
+    public List<WebElement> flinkSqlEditor;
 
-    private WebDriver driver;
+    public WebDriver driver;
+
+    public static final Integer FLINK_SQL_EDITOR_SLEEP_MILLISECONDS = 1000;
 
     public FlinkSQLEditor(WebDriver driver) {
         PageFactory.initElements(driver, this);
@@ -55,7 +58,7 @@ public final class FlinkSQLEditor {
 
         Actions actions = new Actions(this.driver);
 
-        List<String> contentList = List.of(content.split(Constants.LINE_SEPARATOR));
+        List<String> contentList = Arrays.asList(content.split(Constants.LINE_SEPARATOR));
 
         for (int i = 0; i < contentList.size(); i++) {
             String editorLineText;
@@ -74,33 +77,24 @@ public final class FlinkSQLEditor {
             }
 
             if (StringUtils.isNotBlank(inputContent)) {
-                if (editorLineText.isEmpty()) {
-                    actions.moveToElement(flinkSqlEditor.get(flinkSqlEditorIndex))
-                        .click()
-                        .sendKeys(inputContent)
-                        .sendKeys(Constants.LINE_SEPARATOR)
-                        .perform();
-                    Thread.sleep(Constants.DEFAULT_FLINK_SQL_EDITOR_SLEEP_MILLISECONDS);
-                } else {
-                    for (int p = 0; p < editorLineText.strip().length(); p++) {
+                if (!editorLineText.isEmpty()) {
+                    for (int p = 0; p < editorLineText.trim().length(); p++) {
                         clearLine(actions, flinkSqlEditor.get(flinkSqlEditorIndex));
                     }
-                    if (!editorLineText.isEmpty()) {
-                        clearLine(actions, flinkSqlEditor.get(flinkSqlEditorIndex));
-                    }
-                    actions.moveToElement(flinkSqlEditor.get(flinkSqlEditorIndex))
-                        .click()
-                        .sendKeys(inputContent)
-                        .sendKeys(Constants.LINE_SEPARATOR)
-                        .perform();
-                    Thread.sleep(Constants.DEFAULT_FLINK_SQL_EDITOR_SLEEP_MILLISECONDS);
+                    clearLine(actions, flinkSqlEditor.get(flinkSqlEditorIndex));
                 }
+                actions.moveToElement(flinkSqlEditor.get(flinkSqlEditorIndex))
+                    .click()
+                    .sendKeys(inputContent)
+                    .sendKeys(Constants.LINE_SEPARATOR)
+                    .perform();
+                Thread.sleep(FLINK_SQL_EDITOR_SLEEP_MILLISECONDS);
             } else {
                 actions.moveToElement(flinkSqlEditor.get(flinkSqlEditorIndex))
                     .click()
                     .sendKeys(Constants.LINE_SEPARATOR)
                     .perform();
-                Thread.sleep(Constants.DEFAULT_FLINK_SQL_EDITOR_SLEEP_MILLISECONDS);
+                Thread.sleep(FLINK_SQL_EDITOR_SLEEP_MILLISECONDS);
             }
         }
 

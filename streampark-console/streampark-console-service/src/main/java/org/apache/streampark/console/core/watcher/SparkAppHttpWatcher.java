@@ -17,6 +17,7 @@
 
 package org.apache.streampark.console.core.watcher;
 
+import org.apache.streampark.common.util.HadoopUtils;
 import org.apache.streampark.common.util.YarnUtils;
 import org.apache.streampark.console.base.util.JacksonUtils;
 import org.apache.streampark.console.core.bean.AlertTemplate;
@@ -27,6 +28,7 @@ import org.apache.streampark.console.core.enums.StopFromEnum;
 import org.apache.streampark.console.core.metrics.spark.Job;
 import org.apache.streampark.console.core.metrics.spark.SparkApplicationSummary;
 import org.apache.streampark.console.core.metrics.yarn.YarnAppInfo;
+import org.apache.streampark.console.core.service.DistributedTaskService;
 import org.apache.streampark.console.core.service.alert.AlertService;
 import org.apache.streampark.console.core.service.application.SparkApplicationActionService;
 import org.apache.streampark.console.core.service.application.SparkApplicationInfoService;
@@ -34,6 +36,7 @@ import org.apache.streampark.console.core.service.application.SparkApplicationMa
 import org.apache.streampark.console.core.utils.AlertTemplateUtils;
 
 import org.apache.flink.annotation.VisibleForTesting;
+import org.apache.hadoop.yarn.api.records.FinalApplicationStatus;
 import org.apache.hc.core5.util.Timeout;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -60,6 +63,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -73,6 +77,9 @@ public class SparkAppHttpWatcher {
 
     @Autowired
     private SparkApplicationInfoService applicationInfoService;
+
+    @Autowired
+    private DistributedTaskService distributedTaskService;
 
     @Autowired
     private AlertService alertService;
@@ -100,6 +107,8 @@ public class SparkAppHttpWatcher {
     private static final Map<Long, SparkApplication> WATCHING_APPS = new ConcurrentHashMap<>(0);
 
     /**
+     *
+     *
      * <pre>
      * StopFrom: Recording spark application stopped by streampark or stopped by other actions
      * </pre>
@@ -122,16 +131,19 @@ public class SparkAppHttpWatcher {
     @PostConstruct
     public void init() {
         WATCHING_APPS.clear();
-        List<SparkApplication> applications =
-            applicationManageService.list(
-                new LambdaQueryWrapper<SparkApplication>()
-                    .eq(SparkApplication::getTracking, 1)
-                    .ne(SparkApplication::getState, SparkAppStateEnum.LOST.getValue()));
-        applications.forEach(
-            (app) -> {
-                WATCHING_APPS.put(app.getId(), app);
-                STARTING_CACHE.put(app.getId(), DEFAULT_FLAG_BYTE);
-            });
+        List<SparkApplication> applications = applicationManageService.list(
+            new LambdaQueryWrapper<SparkApplication>()
+                .eq(SparkApplication::getTracking, 1)
+                .ne(SparkApplication::getState, SparkAppStateEnum.LOST.getValue()))
+            .stream()
+            .filter(application -> distributedTaskService.isLocalProcessing(application.getId()))
+            .collect(Collectors.toList());
+
+        applications.forEach(app -> {
+            Long appId = app.getId();
+            WATCHING_APPS.put(appId, app);
+            STARTING_CACHE.put(appId, DEFAULT_FLAG_BYTE);
+        });
     }
 
     @PreDestroy
@@ -149,7 +161,7 @@ public class SparkAppHttpWatcher {
      *
      * <p><strong>2) Normal information obtain, once every 5 seconds</strong>
      */
-    @Scheduled(fixedDelay = 1000)
+    @Scheduled(fixedDelayString = "${job.state-watcher.fixed-delayed:1000}")
     public void start() {
         Long timeMillis = System.currentTimeMillis();
         if (lastWatchTime == null
@@ -197,6 +209,8 @@ public class SparkAppHttpWatcher {
         } else {
             try {
                 String state = yarnAppInfo.getApp().getState();
+                FinalApplicationStatus appFinalStatus =
+                    HadoopUtils.toYarnFinalStatus(yarnAppInfo.getApp().getFinalStatus());
                 SparkAppStateEnum sparkAppStateEnum = SparkAppStateEnum.of(state);
                 if (SparkAppStateEnum.OTHER == sparkAppStateEnum) {
                     return;
@@ -205,11 +219,18 @@ public class SparkAppHttpWatcher {
                     log.info(
                         "[StreamPark][SparkAppHttpWatcher] getStateFromYarn, app {} was ended, appId is {}, state is {}",
                         application.getId(),
-                        application.getAppId(),
+                        application.getClusterId(),
                         sparkAppStateEnum);
                     application.setEndTime(new Date());
+                    if (appFinalStatus.equals(FinalApplicationStatus.FAILED)) {
+                        sparkAppStateEnum = SparkAppStateEnum.FAILED;
+                    }
                 }
                 if (SparkAppStateEnum.RUNNING == sparkAppStateEnum) {
+                    if (application.getStartTime() != null
+                        && application.getStartTime().getTime() > 0) {
+                        application.setDuration(System.currentTimeMillis() - application.getStartTime().getTime());
+                    }
                     SparkApplicationSummary summary;
                     try {
                         summary = httpStageAndTaskStatus(application);
@@ -217,7 +238,8 @@ public class SparkAppHttpWatcher {
                         summary.setUsedVCores(Long.parseLong(yarnAppInfo.getApp().getAllocatedVCores()));
                         application.fillRunningMetrics(summary);
                     } catch (IOException e) {
-                        // This may happen when the job is finished right after the job status is abtained from yarn.
+                        // This may happen when the job is finished right after the job status is abtained from
+                        // yarn.
                         log.warn(
                             "[StreamPark][SparkAppHttpWatcher] getStateFromYarn, fetch spark job status failed. The job may have already been finished.");
                     }
@@ -299,19 +321,18 @@ public class SparkAppHttpWatcher {
     }
 
     private YarnAppInfo httpYarnAppInfo(SparkApplication application) throws Exception {
-        String reqURL = "ws/v1/cluster/apps/".concat(application.getAppId());
+        String reqURL = "ws/v1/cluster/apps/".concat(application.getClusterId());
         return yarnRestRequest(reqURL, YarnAppInfo.class);
     }
-
     private Job[] httpJobsStatus(SparkApplication application) throws IOException {
         String format = "proxy/%s/api/v1/applications/%s/jobs";
-        String reqURL = String.format(format, application.getAppId(), application.getAppId());
+        String reqURL = String.format(format, application.getClusterId(), application.getClusterId());
         return yarnRestRequest(reqURL, Job[].class);
     }
 
     /**
-     * Calculate spark stage and task metric from yarn rest api.
-     * Only available when yarn application status is RUNNING.
+     * Calculate spark stage and task metric from yarn rest api. Only available when yarn application
+     * status is RUNNING.
      *
      * @param application
      * @return task progress
@@ -323,12 +344,15 @@ public class SparkAppHttpWatcher {
         if (jobs == null) {
             return summary;
         }
-        Arrays.stream(jobs).forEach(job -> {
-            summary.setNumTasks(job.getNumTasks() + summary.getNumTasks());
-            summary.setNumCompletedTasks(job.getNumCompletedTasks() + summary.getNumCompletedTasks());
-            summary.setNumStages(job.getStageIds().size() + summary.getNumStages());
-            summary.setNumStages(job.getNumCompletedStages() + summary.getNumCompletedStages());
-        });
+        Arrays.stream(jobs)
+            .forEach(
+                job -> {
+                    summary.setNumTasks(job.getNumTasks() + summary.getNumTasks());
+                    summary.setNumCompletedTasks(
+                        job.getNumCompletedTasks() + summary.getNumCompletedTasks());
+                    summary.setNumStages(job.getStageIds().size() + summary.getNumStages());
+                    summary.setNumStages(job.getNumCompletedStages() + summary.getNumCompletedStages());
+                });
         return summary;
     }
 

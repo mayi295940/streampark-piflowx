@@ -19,7 +19,7 @@ package org.apache.streampark.console.core.entity;
 
 import org.apache.streampark.common.conf.ConfigKeys;
 import org.apache.streampark.common.enums.ClusterState;
-import org.apache.streampark.common.enums.FlinkExecutionMode;
+import org.apache.streampark.common.enums.FlinkDeployMode;
 import org.apache.streampark.common.enums.FlinkK8sRestExposedType;
 import org.apache.streampark.common.enums.ResolveOrder;
 import org.apache.streampark.common.util.HttpClientUtils;
@@ -36,11 +36,11 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,7 +53,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-@Data
+@Getter
+@Setter
 @TableName("t_flink_cluster")
 public class FlinkCluster implements Serializable {
 
@@ -70,7 +71,7 @@ public class FlinkCluster implements Serializable {
 
     private String clusterName;
 
-    private Integer executionMode;
+    private Integer deployMode;
 
     /** flink version */
     private Long versionId;
@@ -123,10 +124,12 @@ public class FlinkCluster implements Serializable {
         return FlinkK8sRestExposedType.of(this.k8sRestExposedType);
     }
 
-    public FlinkExecutionMode getFlinkExecutionModeEnum() {
-        return FlinkExecutionMode.of(this.executionMode);
+    @JsonIgnore
+    public FlinkDeployMode getFlinkDeployModeEnum() {
+        return FlinkDeployMode.of(this.deployMode);
     }
 
+    @JsonIgnore
     public ClusterState getClusterStateEnum() {
         return ClusterState.of(this.clusterState);
     }
@@ -138,7 +141,7 @@ public class FlinkCluster implements Serializable {
             return new HashMap<>();
         }
         Map<String, Object> optionMap = JacksonUtils.read(this.options, Map.class);
-        if (FlinkExecutionMode.YARN_SESSION == getFlinkExecutionModeEnum()) {
+        if (FlinkDeployMode.YARN_SESSION == getFlinkDeployModeEnum()) {
             optionMap.put(ConfigKeys.KEY_YARN_APP_NAME(), this.clusterName);
             optionMap.putAll(YarnQueueLabelExpression.getQueueLabelMap(yarnQueue));
         }
@@ -188,13 +191,4 @@ public class FlinkCluster implements Serializable {
         return propertyMap;
     }
 
-    public static class SFunc {
-
-        public static final SFunction<FlinkCluster, Long> ID = FlinkCluster::getId;
-        public static final SFunction<FlinkCluster, String> ADDRESS = FlinkCluster::getAddress;
-        public static final SFunction<FlinkCluster, String> JOB_MANAGER_URL = FlinkCluster::getJobManagerUrl;
-        public static final SFunction<FlinkCluster, Integer> CLUSTER_STATE = FlinkCluster::getClusterState;
-        public static final SFunction<FlinkCluster, Integer> EXECUTION_MODE = FlinkCluster::getExecutionMode;
-        public static final SFunction<FlinkCluster, String> EXCEPTION = FlinkCluster::getException;
-    }
 }

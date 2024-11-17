@@ -14,25 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { computed, h, onMounted, ref, unref, type Ref } from 'vue';
+import { computed, onMounted, ref, unref, type Ref } from 'vue';
 import type { FormSchema } from '/@/components/Form';
 import { useI18n } from '/@/hooks/web/useI18n';
-import { AppExistsStateEnum, JobTypeEnum } from '/@/enums/sparkEnum';
+import { AppExistsStateEnum, JobTypeEnum, DeployMode } from '/@/enums/sparkEnum';
 import { ResourceFromEnum } from '/@/enums/flinkEnum';
-import { SvgIcon } from '/@/components/Icon';
 import type { SparkEnv } from '/@/api/spark/home.type';
 import type { RuleObject } from 'ant-design-vue/lib/form';
 import type { StoreValue } from 'ant-design-vue/lib/form/interface';
-import { renderIsSetConfig, renderStreamParkResource, renderYarnQueue } from './useSparkRender';
-import { executionModes } from '../data';
+import { renderIsSetConfig, renderStreamParkResource, sparkJobTypeMap } from './useSparkRender';
+import { deployModes } from '../data';
 import { useDrawer } from '/@/components/Drawer';
 import { fetchVariableAll } from '/@/api/resource/variable';
 import { fetchTeamResource } from '/@/api/resource/upload';
 import { fetchCheckSparkName } from '/@/api/spark/app';
+import { useRoute } from 'vue-router';
+import { Alert, Select, Tag } from 'ant-design-vue';
+import { fetchYarnQueueList } from '/@/api/setting/yarnQueue';
 
 export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
   const { t } = useI18n();
+  const route = useRoute();
   const teamResource = ref<Array<any>>([]);
+  const yarnQueue = ref<Array<any>>([]);
   const suggestions = ref<Array<{ text: string; description: string; value: string }>>([]);
 
   const [registerConfDrawer, { openDrawer: openConfDrawer }] = useDrawer();
@@ -42,9 +46,9 @@ export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
       return Promise.reject(t('spark.app.addAppTips.appNameIsRequiredMessage'));
     }
     const params = { appName: value };
-    // if (edit?.appId) {
-    //   Object.assign(params, { id: edit.appId });
-    // }
+    if (route.query?.appId) {
+      Object.assign(params, { id: route.query?.appId });
+    }
     const res = await fetchCheckSparkName(params);
     switch (parseInt(res)) {
       case AppExistsStateEnum.NO:
@@ -60,70 +64,78 @@ export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
     }
   }
   const getJobTypeOptions = () => {
-    return [
-      {
-        label: h('div', {}, [
-          h(SvgIcon, { name: 'code', color: '#108ee9' }, ''),
-          h('span', { class: 'pl-10px' }, 'Custom Code'),
-        ]),
-        value: String(JobTypeEnum.JAR),
-      },
-      {
-        label: h('div', {}, [
-          h(SvgIcon, { name: 'fql', color: '#108ee9' }, ''),
-          h('span', { class: 'pl-10px' }, 'Flink SQL'),
-        ]),
-        value: String(JobTypeEnum.SQL),
-      },
-      {
-        label: h('div', {}, [
-          h(SvgIcon, { name: 'py', color: '#108ee9' }, ''),
-          h('span', { class: 'pl-10px' }, 'Python Flink'),
-        ]),
-        value: String(JobTypeEnum.PYSPARK),
-      },
-    ];
+    return Object.values(sparkJobTypeMap);
   };
 
+  const getJobTypeSchema = computed((): FormSchema[] => {
+    if (route.query.appId) {
+      return [
+        {
+          field: 'jobType',
+          label: t('spark.app.jobType'),
+          component: 'InputNumber',
+          render: ({ model }) => {
+            const jobOptions = getJobTypeOptions();
+            return (
+              <Alert
+                type="info"
+                v-slots={{
+                  message: () => jobOptions.find((v) => v.value == model.jobType)?.label ?? '',
+                }}
+              ></Alert>
+            );
+          },
+        },
+      ];
+    } else {
+      return [
+        {
+          field: 'jobType',
+          label: t('spark.app.jobType'),
+          component: 'Select',
+          componentProps: ({ formModel }) => {
+            return {
+              placeholder: t('spark.app.addAppTips.jobTypePlaceholder'),
+              options: getJobTypeOptions(),
+              onChange: (value) => {
+                if (value != JobTypeEnum.SQL) {
+                  formModel.resourceFrom = String(ResourceFromEnum.PROJECT);
+                }
+              },
+            };
+          },
+          defaultValue: JobTypeEnum.SQL,
+          rules: [
+            {
+              required: true,
+              message: t('spark.app.addAppTips.jobTypeIsRequiredMessage'),
+              type: 'number',
+            },
+          ],
+        },
+      ];
+    }
+  });
   const formSchema = computed((): FormSchema[] => {
     return [
+      ...getJobTypeSchema.value,
       {
-        field: 'jobType',
-        label: t('spark.app.developmentMode'),
-        component: 'Select',
-        componentProps: ({ formModel }) => {
-          return {
-            placeholder: t('spark.app.addAppTips.developmentModePlaceholder'),
-            options: getJobTypeOptions(),
-            onChange: (value) => {
-              if (value != JobTypeEnum.SQL) {
-                formModel.resourceFrom = String(ResourceFromEnum.PROJECT);
-              }
-            },
-          };
-        },
-        defaultValue: String(JobTypeEnum.SQL),
-        rules: [
-          { required: true, message: t('spark.app.addAppTips.developmentModeIsRequiredMessage') },
-        ],
-      },
-      {
-        field: 'executionMode',
-        label: t('spark.app.executionMode'),
+        field: 'deployMode',
+        label: t('spark.app.deployMode'),
         component: 'Select',
         itemProps: {
           autoLink: false, //Resolve multiple trigger validators with null value ·
         },
         componentProps: {
-          placeholder: t('spark.app.addAppTips.executionModePlaceholder'),
-          options: executionModes,
+          placeholder: t('spark.app.addAppTips.deployModePlaceholder'),
+          options: deployModes,
         },
         rules: [
           {
             required: true,
             validator: async (_rule, value) => {
               if (value === null || value === undefined || value === '') {
-                return Promise.reject(t('spark.app.addAppTips.executionModeIsRequiredMessage'));
+                return Promise.reject(t('spark.app.addAppTips.deployModeIsRequiredMessage'));
               } else {
                 return Promise.resolve();
               }
@@ -141,7 +153,7 @@ export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
           fieldNames: { label: 'sparkName', value: 'id', options: 'options' },
         },
         rules: [
-          { required: true, message: t('spark.app.addAppTips.flinkVersionIsRequiredMessage') },
+          { required: true, message: t('spark.app.addAppTips.sparkVersionIsRequiredMessage') },
         ],
       },
       {
@@ -150,14 +162,15 @@ export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
         component: 'Input',
         slot: 'sparkSql',
         ifShow: ({ values }) => values?.jobType == JobTypeEnum.SQL,
-        rules: [{ required: true, message: t('spark.app.addAppTips.flinkSqlIsRequiredMessage') }],
+        rules: [{ required: true, message: t('spark.app.addAppTips.sparkSqlIsRequiredMessage') }],
       },
       {
-        field: 'teamResource',
+        field: 'jar',
         label: t('spark.app.resource'),
         component: 'Select',
         render: ({ model }) => renderStreamParkResource({ model, resources: unref(teamResource) }),
         ifShow: ({ values }) => values.jobType == JobTypeEnum.JAR,
+        rules: [{ required: true, message: t('spark.app.addAppTips.sparkAppRequire') }],
       },
       {
         field: 'mainClass',
@@ -168,7 +181,7 @@ export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
         rules: [{ required: true, message: t('spark.app.addAppTips.mainClassIsRequiredMessage') }],
       },
       {
-        field: 'jobName',
+        field: 'appName',
         label: t('spark.app.appName'),
         component: 'Input',
         componentProps: { placeholder: t('spark.app.addAppTips.appNamePlaceholder') },
@@ -184,19 +197,23 @@ export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
         },
       },
       {
-        field: 'tags',
-        label: t('spark.app.tags'),
-        component: 'Input',
-        componentProps: {
-          placeholder: t('spark.app.addAppTips.tagsPlaceholder'),
-        },
+        field: 'args',
+        label: t('spark.app.programArgs'),
+        component: 'InputTextArea',
+        defaultValue: '',
+        slot: 'args',
+        ifShow: ({ model }) => [JobTypeEnum.JAR, JobTypeEnum.PYSPARK].includes(model?.jobType),
       },
       {
-        field: 'yarnQueue',
-        label: t('spark.app.yarnQueue'),
-        component: 'Input',
-        render: (renderCallbackParams) => renderYarnQueue(renderCallbackParams),
+        field: 'appProperties',
+        label: 'Spark Properties',
+        component: 'InputTextArea',
+        componentProps: {
+          rows: 4,
+          placeholder: '--conf, -c PROP=VALUE Arbitrary Spark configuration property.',
+        },
       },
+      { field: 'configOverride', label: '', component: 'Input', show: false },
       {
         field: 'isSetConfig',
         label: t('spark.app.appConf'),
@@ -206,27 +223,49 @@ export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
         },
       },
       {
-        field: 'appProperties',
-        label: 'Application Properties',
-        component: 'InputTextArea',
+        field: 'tags',
+        label: t('spark.app.tags'),
+        component: 'Input',
         componentProps: {
-          rows: 4,
-          placeholder:
-            '$key=$value,If there are multiple parameters,you can new line enter them (-D <arg>)',
+          placeholder: t('spark.app.addAppTips.tagsPlaceholder'),
         },
-      },
-      {
-        field: 'args',
-        label: t('spark.app.programArgs'),
-        component: 'InputTextArea',
-        defaultValue: '',
-        slot: 'args',
-        ifShow: ({ values }) => [JobTypeEnum.JAR, JobTypeEnum.PYSPARK].includes(values?.jobType),
       },
       {
         field: 'hadoopUser',
         label: t('spark.app.hadoopUser'),
         component: 'Input',
+        ifShow: ({ values }) =>
+          values?.deployMode == DeployMode.YARN_CLIENT ||
+          values?.deployMode == DeployMode.YARN_CLUSTER,
+      },
+      {
+        field: 'yarnQueue',
+        label: t('spark.app.yarnQueue'),
+        component: 'Input',
+        ifShow: ({ values }) =>
+          values?.deployMode == DeployMode.YARN_CLIENT ||
+          values?.deployMode == DeployMode.YARN_CLUSTER,
+        render: ({ model, field }) => {
+          return (
+            <div>
+              <Select
+                name="yarnQueue"
+                placeholder={t('setting.yarnQueue.placeholder.yarnQueueLabelExpression')}
+                fieldNames={{ label: 'queueLabel', value: 'queueLabel' }}
+                v-model={[model[field], 'value']}
+                showSearch={true}
+              />
+              <p class="conf-desc mt-10px">
+                <span class="note-info">
+                  <Tag color="#2db7f5" class="tag-note">
+                    {t('spark.app.noteInfo.note')}
+                  </Tag>
+                  {t('setting.yarnQueue.selectionHint')}
+                </span>
+              </p>
+            </div>
+          );
+        },
       },
       {
         field: 'description',
@@ -240,6 +279,12 @@ export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
     /* Get team dependencies */
     fetchTeamResource({}).then((res) => {
       teamResource.value = res;
+    });
+    fetchYarnQueueList({
+      page: 1,
+      pageSize: 9999,
+    }).then((res) => {
+      yarnQueue.value = res.records;
     });
     fetchVariableAll().then((res) => {
       suggestions.value = res.map((v) => {

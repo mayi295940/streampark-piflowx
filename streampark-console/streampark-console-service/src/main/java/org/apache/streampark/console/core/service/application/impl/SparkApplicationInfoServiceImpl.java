@@ -17,14 +17,10 @@
 
 package org.apache.streampark.console.core.service.application.impl;
 
-import org.apache.streampark.common.Constant;
-import org.apache.streampark.common.conf.Workspace;
 import org.apache.streampark.common.enums.ApplicationType;
-import org.apache.streampark.common.enums.SparkExecutionMode;
-import org.apache.streampark.common.fs.LfsOperator;
+import org.apache.streampark.common.enums.SparkDeployMode;
 import org.apache.streampark.common.util.ExceptionUtils;
 import org.apache.streampark.common.util.HadoopUtils;
-import org.apache.streampark.common.util.Utils;
 import org.apache.streampark.common.util.YarnUtils;
 import org.apache.streampark.console.base.exception.ApiDetailException;
 import org.apache.streampark.console.base.exception.ApplicationException;
@@ -56,9 +52,7 @@ import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -66,8 +60,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import static org.apache.streampark.common.enums.StorageType.LFS;
 
 @Slf4j
 @Service
@@ -219,23 +211,12 @@ public class SparkApplicationInfoServiceImpl
     }
 
     @Override
-    public List<String> listHistoryUploadJars() {
-        return Arrays.stream(LfsOperator.listDir(Workspace.of(LFS).APP_UPLOADS()))
-            .filter(File::isFile)
-            .sorted(Comparator.comparingLong(File::lastModified).reversed())
-            .map(File::getName)
-            .filter(fn -> fn.endsWith(Constant.JAR_SUFFIX))
-            .limit(DEFAULT_HISTORY_RECORD_LIMIT)
-            .collect(Collectors.toList());
-    }
-
-    @Override
     public AppExistsStateEnum checkStart(Long id) {
         SparkApplication application = getById(id);
         if (application == null) {
             return AppExistsStateEnum.INVALID;
         }
-        if (SparkExecutionMode.isYarnMode(application.getExecutionMode())) {
+        if (SparkDeployMode.isYarnMode(application.getDeployMode())) {
             boolean exists = !getYarnAppReport(application.getAppName()).isEmpty();
             return exists ? AppExistsStateEnum.IN_YARN : AppExistsStateEnum.NO;
         }
@@ -303,7 +284,7 @@ public class SparkApplicationInfoServiceImpl
             // has stopped status
             if (SparkAppStateEnum.isEndState(app.getState())) {
                 // check whether jobName exists on yarn
-                if (SparkExecutionMode.isYarnMode(appParam.getExecutionMode())
+                if (SparkDeployMode.isYarnMode(appParam.getDeployMode())
                     && YarnUtils.isContains(appParam.getAppName())) {
                     return AppExistsStateEnum.IN_YARN;
                 }
@@ -314,7 +295,7 @@ public class SparkApplicationInfoServiceImpl
             }
 
             // check whether jobName exists on yarn
-            if (SparkExecutionMode.isYarnMode(appParam.getExecutionMode())
+            if (SparkDeployMode.isYarnMode(appParam.getDeployMode())
                 && YarnUtils.isContains(appParam.getAppName())) {
                 return AppExistsStateEnum.IN_YARN;
             }
@@ -332,15 +313,6 @@ public class SparkApplicationInfoServiceImpl
         File file = new File(appConfig);
         String conf = org.apache.streampark.common.util.FileUtils.readFile(file);
         return Base64.getEncoder().encodeToString(conf.getBytes());
-    }
-
-    @Override
-    public String getMain(SparkApplication appParam) {
-        File jarFile = null;
-        if (appParam.getProjectId() == null) {
-            jarFile = new File(appParam.getJar());
-        }
-        return Utils.getJarManClass(jarFile);
     }
 
     private Boolean checkJobName(String jobName) {

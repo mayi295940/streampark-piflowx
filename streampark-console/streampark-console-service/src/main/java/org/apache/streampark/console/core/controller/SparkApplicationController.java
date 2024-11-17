@@ -23,13 +23,13 @@ import org.apache.streampark.console.base.domain.RestRequest;
 import org.apache.streampark.console.base.domain.RestResponse;
 import org.apache.streampark.console.base.exception.InternalException;
 import org.apache.streampark.console.core.annotation.AppChangeEvent;
-import org.apache.streampark.console.core.entity.ApplicationBackUp;
+import org.apache.streampark.console.core.entity.ApplicationLog;
+import org.apache.streampark.console.core.entity.FlinkApplicationBackup;
 import org.apache.streampark.console.core.entity.SparkApplication;
-import org.apache.streampark.console.core.entity.SparkApplicationLog;
 import org.apache.streampark.console.core.enums.AppExistsStateEnum;
-import org.apache.streampark.console.core.service.ApplicationBackUpService;
 import org.apache.streampark.console.core.service.ResourceService;
-import org.apache.streampark.console.core.service.SparkApplicationLogService;
+import org.apache.streampark.console.core.service.application.ApplicationLogService;
+import org.apache.streampark.console.core.service.application.FlinkApplicationBackupService;
 import org.apache.streampark.console.core.service.application.SparkApplicationActionService;
 import org.apache.streampark.console.core.service.application.SparkApplicationInfoService;
 import org.apache.streampark.console.core.service.application.SparkApplicationManageService;
@@ -43,7 +43,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,10 +66,10 @@ public class SparkApplicationController {
     private SparkApplicationInfoService applicationInfoService;
 
     @Autowired
-    private ApplicationBackUpService backUpService;
+    private FlinkApplicationBackupService backUpService;
 
     @Autowired
-    private SparkApplicationLogService applicationLogService;
+    private ApplicationLogService applicationLogService;
 
     @Autowired
     private ResourceService resourceService;
@@ -153,8 +152,8 @@ public class SparkApplicationController {
 
     @PostMapping("cancel")
     @RequiresPermissions("app:cancel")
-    public RestResponse stop(SparkApplication app) throws Exception {
-        applicationActionService.stop(app);
+    public RestResponse cancel(SparkApplication app) throws Exception {
+        applicationActionService.cancel(app);
         return RestResponse.success();
     }
 
@@ -196,21 +195,15 @@ public class SparkApplicationController {
         return RestResponse.success(config);
     }
 
-    @PostMapping("main")
-    public RestResponse getMain(SparkApplication application) {
-        String mainClass = applicationInfoService.getMain(application);
-        return RestResponse.success(mainClass);
-    }
-
     @PostMapping("backups")
-    public RestResponse backups(ApplicationBackUp backUp, RestRequest request) {
-        IPage<ApplicationBackUp> backups = backUpService.getPage(backUp, request);
+    public RestResponse backups(FlinkApplicationBackup backUp, RestRequest request) {
+        IPage<FlinkApplicationBackup> backups = backUpService.getPage(backUp, request);
         return RestResponse.success(backups);
     }
 
     @PostMapping("opt_log")
-    public RestResponse optionlog(SparkApplicationLog applicationLog, RestRequest request) {
-        IPage<SparkApplicationLog> applicationList = applicationLogService.getPage(applicationLog, request);
+    public RestResponse optionlog(ApplicationLog applicationLog, RestRequest request) {
+        IPage<ApplicationLog> applicationList = applicationLogService.getPage(applicationLog, request);
         return RestResponse.success(applicationList);
     }
 
@@ -229,7 +222,7 @@ public class SparkApplicationController {
     }
 
     @PostMapping("delete/bak")
-    public RestResponse deleteBak(ApplicationBackUp backUp) throws InternalException {
+    public RestResponse deleteBak(FlinkApplicationBackup backUp) throws InternalException {
         Boolean deleted = backUpService.removeById(backUp.getId());
         return RestResponse.success(deleted);
     }
@@ -243,13 +236,6 @@ public class SparkApplicationController {
         } catch (IOException e) {
             return RestResponse.success(file).message(e.getLocalizedMessage());
         }
-    }
-
-    @PostMapping("upload")
-    @RequiresPermissions("app:create")
-    public RestResponse upload(MultipartFile file) throws Exception {
-        String uploadPath = resourceService.upload(file);
-        return RestResponse.success(uploadPath);
     }
 
     @PostMapping("verify_schema")

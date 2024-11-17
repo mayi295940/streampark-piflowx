@@ -30,74 +30,76 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 
 @Getter
 public class RoleManagementPage extends NavBarPage implements SystemPage.Tab {
 
-    @FindBy(xpath = "//span[contains(., 'Role List')]/..//button[contains(@class, 'ant-btn-primary')]/span[contains(text(), 'Add New')]")
-    private WebElement buttonCreateRole;
+    @FindBy(id = "e2e-role-create-btn")
+    public WebElement buttonCreateRole;
 
-    @FindBy(xpath = "//tbody[contains(@class, 'ant-table-tbody')]")
-    private List<WebElement> roleList;
+    @FindBy(className = "ant-table-tbody")
+    public List<WebElement> roleList;
 
     @FindBy(className = "ant-form-item-explain-error")
-    private List<WebElement> errorMessageList;
+    public List<WebElement> errorMessageList;
 
-    @FindBy(xpath = "//button[contains(@class, 'ant-btn')]/span[contains(., 'OK')]")
-    private WebElement deleteConfirmButton;
+    @FindBy(className = "e2e-role-delete-confirm")
+    public WebElement deleteConfirmButton;
 
-    private final CreateRoleForm createRoleForm = new CreateRoleForm();
+    public final CreateRoleForm createRoleForm = new CreateRoleForm();
 
     public RoleManagementPage(RemoteWebDriver driver) {
         super(driver);
     }
 
-    public RoleManagementPage createRole(String roleName, String description, String menuName) {
+    public RoleManagementPage createRole(String roleName, String description,
+                                         String menuName) {
         waitForPageLoading();
 
         new WebDriverWait(driver, Constants.DEFAULT_WEBDRIVER_WAIT_DURATION)
             .until(ExpectedConditions.elementToBeClickable(buttonCreateRole));
+
         buttonCreateRole.click();
 
-        createRoleForm.inputRoleName().sendKeys(roleName);
-        createRoleForm.inputDescription().sendKeys(description);
+        createRoleForm.inputRoleName.sendKeys(roleName);
+        createRoleForm.inputDescription.sendKeys(description);
         editRoleMenu(menuName);
 
-        createRoleForm.buttonSubmit().click();
+        createRoleForm.buttonSubmit.click();
         return this;
     }
 
-    public RoleManagementPage editRole(String roleName, String description, String menuName) {
+    public RoleManagementPage editRole(String roleName, String description,
+                                       String menuName) {
         waitForPageLoading();
-        new WebDriverWait(driver, Duration.ofSeconds(2));
 
-        roleList().stream()
+        roleList.stream()
             .filter(it -> it.getText().contains(roleName))
             .flatMap(
-                it -> it.findElements(By.xpath("//button[contains(@tooltip,'Edit Role')]"))
+                it -> it.findElements(By.className("e2e-role-edit-btn"))
                     .stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No edit button in role list"))
             .click();
 
-        createRoleForm.inputDescription().sendKeys(description);
+        createRoleForm.inputDescription.sendKeys(description);
         editRoleMenu(menuName);
 
-        createRoleForm.buttonSubmit().click();
-
+        createRoleForm.buttonSubmit.click();
         return this;
     }
 
     public RoleManagementPage deleteRole(String roleName) {
+
         waitForPageLoading();
-        roleList().stream()
+
+        roleList.stream()
             .filter(it -> it.getText().contains(roleName))
             .flatMap(
-                it -> it.findElements(By.xpath("//button[contains(@tooltip,'Delete Role')]"))
+                it -> it.findElements(By.className("e2e-role-delete-btn"))
                     .stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
@@ -108,7 +110,6 @@ public class RoleManagementPage extends NavBarPage implements SystemPage.Tab {
             .until(ExpectedConditions.elementToBeClickable(deleteConfirmButton));
 
         deleteConfirmButton.click();
-
         return this;
     }
 
@@ -117,7 +118,7 @@ public class RoleManagementPage extends NavBarPage implements SystemPage.Tab {
             .until(ExpectedConditions.urlContains("/system/role"));
     }
 
-    private void editRoleMenu(String menuName) {
+    private RoleManagementPage editRoleMenu(String menuName) {
         createRoleForm.inputMenus.stream()
             .filter(e -> Objects.equals(
                 e.findElement(By.xpath(
@@ -130,6 +131,7 @@ public class RoleManagementPage extends NavBarPage implements SystemPage.Tab {
                     String.format("No %s in menus checkbox tree", menuName)))
             .findElement(By.className("ant-tree-checkbox-inner"))
             .click();
+        return this;
     }
 
     @Getter
@@ -139,22 +141,22 @@ public class RoleManagementPage extends NavBarPage implements SystemPage.Tab {
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(xpath = "//div[@class='scrollbar__view']//*[@id='form_item_roleName']")
-        private WebElement inputRoleName;
+        @FindBy(id = "role_form_roleName")
+        public WebElement inputRoleName;
 
-        @FindBy(id = "form_item_description")
-        private WebElement inputDescription;
+        @FindBy(id = "role_form_description")
+        public WebElement inputDescription;
 
         @FindBys({
                 @FindBy(className = "ant-tree-list"),
                 @FindBy(className = "ant-tree-treenode")
         })
-        private List<WebElement> inputMenus;
+        public List<WebElement> inputMenus;
 
-        @FindBy(xpath = "//button[contains(@class, 'ant-btn')]//span[contains(., 'Submit')]")
-        private WebElement buttonSubmit;
+        @FindBy(className = "e2e-role-pop-ok")
+        public WebElement buttonSubmit;
 
-        @FindBy(xpath = "//button[contains(@class, 'ant-btn')]//span[contains(., 'Cancel')]")
-        private WebElement buttonCancel;
+        @FindBy(className = "e2e-role-pop-cancel")
+        public WebElement buttonCancel;
     }
 }

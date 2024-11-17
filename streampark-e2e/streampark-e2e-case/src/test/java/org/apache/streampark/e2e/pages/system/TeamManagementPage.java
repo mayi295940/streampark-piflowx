@@ -35,47 +35,46 @@ import java.util.List;
 @Getter
 public class TeamManagementPage extends NavBarPage implements SystemPage.Tab {
 
-    @FindBy(xpath = "//span[contains(., 'Team List')]/..//button[contains(@class, 'ant-btn-primary')]/span[contains(text(), 'Add New')]")
-    private WebElement buttonCreateTeam;
+    @FindBy(id = "e2e-team-create-btn")
+    public WebElement buttonCreateTeam;
 
-    @FindBy(xpath = "//tbody[contains(@class, 'ant-table-tbody')]")
-    private List<WebElement> teamList;
+    @FindBy(className = "ant-table-tbody")
+    public List<WebElement> teamList;
 
     @FindBy(className = "swal2-html-container")
-    private List<WebElement> errorMessageList;
+    public List<WebElement> errorMessageList;
 
     @FindBy(xpath = "//button[contains(text(), 'OK')]")
-    private WebElement errorMessageConfirmButton;
+    public WebElement errorMessageConfirmButton;
 
     @FindBy(xpath = "//button[contains(@class, 'ant-btn')]/span[contains(., 'OK')]")
-    private WebElement deleteConfirmButton;
+    public WebElement deleteConfirmButton;
 
-    private final CreateTeamForm createTeamForm = new CreateTeamForm();
+    public final CreateTeamForm createTeamForm = new CreateTeamForm();
 
     public TeamManagementPage(RemoteWebDriver driver) {
         super(driver);
     }
 
-    public TeamManagementPage createTeam(String teamName, String description) {
+    public void createTeam(String teamName, String description) {
         waitForPageLoading();
 
         new WebDriverWait(driver, Constants.DEFAULT_WEBDRIVER_WAIT_DURATION)
             .until(ExpectedConditions.elementToBeClickable(buttonCreateTeam));
         buttonCreateTeam.click();
-        createTeamForm.inputTeamName().sendKeys(teamName);
-        createTeamForm.inputDescription().sendKeys(description);
+        createTeamForm.inputTeamName.sendKeys(teamName);
+        createTeamForm.inputDescription.sendKeys(description);
 
-        createTeamForm.buttonSubmit().click();
-        return this;
+        createTeamForm.buttonSubmit.click();
     }
 
     public TeamManagementPage editTeam(String teamName, String description) {
         waitForPageLoading();
 
-        teamList().stream()
+        teamList.stream()
             .filter(it -> it.getText().contains(teamName))
             .flatMap(
-                it -> it.findElements(By.xpath("//button[contains(@tooltip,'Modify Team')]"))
+                it -> it.findElements(By.className("e2e-team-edit-btn"))
                     .stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
@@ -84,11 +83,11 @@ public class TeamManagementPage extends NavBarPage implements SystemPage.Tab {
 
         new WebDriverWait(driver, Constants.DEFAULT_WEBDRIVER_WAIT_DURATION)
             .until(ExpectedConditions.elementToBeClickable(createTeamForm.buttonSubmit));
-        createTeamForm.inputDescription().sendKeys(Keys.CONTROL + "a");
-        createTeamForm.inputDescription().sendKeys(Keys.BACK_SPACE);
-        createTeamForm.inputDescription().sendKeys(description);
+        createTeamForm.inputDescription.sendKeys(Keys.CONTROL + "a");
+        createTeamForm.inputDescription.sendKeys(Keys.BACK_SPACE);
+        createTeamForm.inputDescription.sendKeys(description);
 
-        createTeamForm.buttonSubmit().click();
+        createTeamForm.buttonSubmit.click();
 
         return this;
     }
@@ -96,10 +95,10 @@ public class TeamManagementPage extends NavBarPage implements SystemPage.Tab {
     public TeamManagementPage deleteTeam(String teamName) {
         waitForPageLoading();
 
-        teamList().stream()
+        teamList.stream()
             .filter(it -> it.getText().contains(teamName))
             .flatMap(
-                it -> it.findElements(By.xpath("//button[contains(@tooltip,'Delete Team')]"))
+                it -> it.findElements(By.className("e2e-team-delete-btn"))
                     .stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
@@ -110,7 +109,6 @@ public class TeamManagementPage extends NavBarPage implements SystemPage.Tab {
             .until(ExpectedConditions.elementToBeClickable(deleteConfirmButton));
 
         deleteConfirmButton.click();
-
         return this;
     }
 
@@ -127,15 +125,15 @@ public class TeamManagementPage extends NavBarPage implements SystemPage.Tab {
         }
 
         @FindBy(id = "TeamEditForm_teamName")
-        private WebElement inputTeamName;
+        public WebElement inputTeamName;
 
         @FindBy(id = "TeamEditForm_description")
-        private WebElement inputDescription;
+        public WebElement inputDescription;
 
-        @FindBy(xpath = "//button[contains(@class, 'ant-btn')]//span[contains(., 'Submit')]")
-        private WebElement buttonSubmit;
+        @FindBy(className = "e2e-team-submit-btn")
+        public WebElement buttonSubmit;
 
-        @FindBy(xpath = "//button[contains(@class, 'ant-btn')]//span[contains(., 'Cancel')]")
-        private WebElement buttonCancel;
+        @FindBy(className = "e2e-team-cancel-btn")
+        public WebElement buttonCancel;
     }
 }

@@ -35,19 +35,19 @@ import java.util.List;
 @Getter
 public class TokenManagementPage extends NavBarPage implements SystemPage.Tab {
 
-    @FindBy(xpath = "//span[contains(., 'Token List')]/..//button[contains(@class, 'ant-btn-primary')]/span[contains(text(), 'Add New')]")
-    private WebElement buttonCreateToken;
+    @FindBy(id = "e2e-token-create-btn")
+    public WebElement buttonCreateToken;
 
-    @FindBy(xpath = "//tbody[contains(@class, 'ant-table-tbody')]")
-    private List<WebElement> tokenList;
+    @FindBy(className = "ant-table-tbody")
+    public List<WebElement> tokenList;
 
-    @FindBy(xpath = "//button[contains(@class, 'ant-btn')]/span[contains(., 'OK')]")
-    private WebElement deleteConfirmButton;
+    @FindBy(className = "e2e-token-delete-confirm")
+    public WebElement deleteConfirmButton;
 
     @FindBy(className = "ant-form-item-explain-error")
-    private WebElement errorMessageSearchLayout;
+    public WebElement errorMessageSearchLayout;
 
-    private final CreateTokenForm createTokenForm = new CreateTokenForm();
+    public final CreateTokenForm createTokenForm = new CreateTokenForm();
 
     public TokenManagementPage(RemoteWebDriver driver) {
         super(driver);
@@ -61,37 +61,36 @@ public class TokenManagementPage extends NavBarPage implements SystemPage.Tab {
         buttonCreateToken.click();
 
         new WebDriverWait(driver, Constants.DEFAULT_WEBDRIVER_WAIT_DURATION)
-            .until(ExpectedConditions.elementToBeClickable(createTokenForm.inputUserName()));
-        createTokenForm.inputUserName().sendKeys(existUserName);
-        createTokenForm.inputUserName().sendKeys(Keys.RETURN);
+            .until(ExpectedConditions.elementToBeClickable(createTokenForm.inputUserName));
+        createTokenForm.inputUserName.sendKeys(existUserName);
+        createTokenForm.inputUserName.sendKeys(Keys.RETURN);
 
-        createTokenForm.inputDescription().sendKeys(description);
-        createTokenForm.buttonSubmit().click();
+        createTokenForm.inputDescription.sendKeys(description);
+        createTokenForm.buttonSubmit.click();
         return this;
     }
 
     public TokenManagementPage copyToken(String existUserName) {
         waitForPageLoading();
 
-        tokenList().stream()
+        tokenList.stream()
             .filter(it -> it.getText().contains(existUserName))
             .flatMap(
-                it -> it.findElements(By.xpath("//button[contains(@tooltip,'Copy Token')]")).stream())
+                it -> it.findElements(By.className("e2e-token-copy-btn")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No Copy button in token list"))
             .click();
-
         return this;
     }
 
     public TokenManagementPage deleteToken(String existUserName) {
         waitForPageLoading();
 
-        tokenList().stream()
+        tokenList.stream()
             .filter(it -> it.getText().contains(existUserName))
             .flatMap(
-                it -> it.findElements(By.xpath("//button[contains(@tooltip,'Delete Token')]")).stream())
+                it -> it.findElements(By.className("e2e-token-delete-btn")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No delete button in token list"))
@@ -117,15 +116,15 @@ public class TokenManagementPage extends NavBarPage implements SystemPage.Tab {
         }
 
         @FindBy(id = "form_item_userId")
-        private WebElement inputUserName;
+        public WebElement inputUserName;
 
         @FindBy(id = "form_item_description")
-        private WebElement inputDescription;
+        public WebElement inputDescription;
 
-        @FindBy(xpath = "//button[contains(@class, 'ant-btn')]//span[contains(., 'Submit')]")
-        private WebElement buttonSubmit;
+        @FindBy(className = "e2e-token-submit-btn")
+        public WebElement buttonSubmit;
 
-        @FindBy(xpath = "//button[contains(@class, 'ant-btn')]//span[contains(., 'Cancel')]")
-        private WebElement buttonCancel;
+        @FindBy(className = "e2e-token-cancel-btn")
+        public WebElement buttonCancel;
     }
 }

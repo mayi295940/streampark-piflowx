@@ -273,10 +273,10 @@
             createMessage.warning(t('flink.app.editStreamPark.sqlCheck'));
             throw new Error(access);
           }
-          handleSubmitSQL(formValue);
         }
+        await handleSubmitSQL(formValue);
       } else {
-        handleSubmitCustomJob(formValue);
+        await handleSubmitCustomJob(formValue);
       }
     } catch (error) {
       submitLoading.value = false;
@@ -287,7 +287,7 @@
     const param = {};
     for (const k in params) {
       const v = params[k];
-      if (v != null && v !== undefined) {
+      if (v != null) {
         param[k] = v;
       }
     }

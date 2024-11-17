@@ -38,13 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @StreamPark(composeFiles = "docker/flink-1.16-on-yarn/docker-compose.yaml")
 public class Flink116OnYarnClusterDeployTest {
 
-    private static RemoteWebDriver browser;
-
-    private static final String userName = "admin";
-
-    private static final String password = "streampark";
-
-    private static final String teamName = "default";
+    public static RemoteWebDriver browser;
 
     private static final String flinkName = "flink-1.16.3";
 
@@ -56,12 +50,12 @@ public class Flink116OnYarnClusterDeployTest {
 
     private static final String flinkClusterNameEdited = "flink_1.16.3_cluster_e2e_edited";
 
-    private static final ClusterDetailForm.ExecutionMode executionMode = ClusterDetailForm.ExecutionMode.YARN_SESSION;
+    private static final ClusterDetailForm.DeployMode deployMode = ClusterDetailForm.DeployMode.YARN_SESSION;
 
     @BeforeAll
-    public static void setup() {
+    public static void setUp() {
         FlinkHomePage flinkHomePage = new LoginPage(browser)
-            .login(userName, password, teamName)
+            .login()
             .goToNav(ApacheFlinkPage.class)
             .goToTab(FlinkHomePage.class);
 
@@ -72,45 +66,44 @@ public class Flink116OnYarnClusterDeployTest {
     }
 
     @Test
-    @Order(10)
+    @Order(1)
     public void testCreateFlinkCluster() {
-        final FlinkClustersPage flinkClustersPage = new FlinkClustersPage(browser);
+        FlinkClustersPage flinkClustersPage = new FlinkClustersPage(browser);
 
         flinkClustersPage.createFlinkCluster()
-            .<YarnSessionForm>addCluster(executionMode)
-            .resolveOrder(YarnSessionForm.ResolveOrder.CHILD_FIRST)
+            .<YarnSessionForm>addCluster(deployMode)
             .clusterName(flinkClusterName)
             .flinkVersion(flinkName)
             .submit();
 
         Awaitility.await()
             .untilAsserted(
-                () -> assertThat(flinkClustersPage.flinkClusterList())
+                () -> assertThat(flinkClustersPage.flinkClusterList)
                     .as("Flink clusters list should contain newly-created application")
                     .extracting(WebElement::getText)
                     .anyMatch(it -> it.contains(flinkClusterName)));
     }
 
     @Test
-    @Order(20)
+    @Order(2)
     public void testEditFlinkCluster() {
         final FlinkClustersPage flinkClustersPage = new FlinkClustersPage(browser);
 
         flinkClustersPage.editFlinkCluster(flinkClusterName)
-            .<YarnSessionForm>addCluster(executionMode)
+            .<YarnSessionForm>addCluster(deployMode)
             .clusterName(flinkClusterNameEdited)
             .submit();
 
         Awaitility.await()
             .untilAsserted(
-                () -> assertThat(flinkClustersPage.flinkClusterList())
+                () -> assertThat(flinkClustersPage.flinkClusterList)
                     .as("Flink clusters list should contain edited application")
                     .extracting(WebElement::getText)
                     .anyMatch(it -> it.contains(flinkClusterNameEdited)));
     }
 
     @Test
-    @Order(30)
+    @Order(3)
     public void testStartFlinkCluster() {
         final FlinkClustersPage flinkClustersPage = new FlinkClustersPage(browser);
 
@@ -118,14 +111,14 @@ public class Flink116OnYarnClusterDeployTest {
 
         Awaitility.await()
             .untilAsserted(
-                () -> assertThat(flinkClustersPage.flinkClusterList())
+                () -> assertThat(flinkClustersPage.flinkClusterList)
                     .as("Flink clusters list should contain running application")
                     .extracting(WebElement::getText)
                     .anyMatch(it -> it.contains("RUNNING")));
     }
 
     @Test
-    @Order(40)
+    @Order(4)
     public void testStopFlinkCluster() {
         final FlinkClustersPage flinkClustersPage = new FlinkClustersPage(browser);
 
@@ -133,14 +126,14 @@ public class Flink116OnYarnClusterDeployTest {
 
         Awaitility.await()
             .untilAsserted(
-                () -> assertThat(flinkClustersPage.flinkClusterList())
+                () -> assertThat(flinkClustersPage.flinkClusterList)
                     .as("Flink clusters list should contain canceled application")
                     .extracting(WebElement::getText)
                     .anyMatch(it -> it.contains("CANCELED")));
     }
 
     @Test
-    @Order(50)
+    @Order(5)
     public void testDeleteFlinkCluster() {
         final FlinkClustersPage flinkClustersPage = new FlinkClustersPage(browser);
 
@@ -151,7 +144,7 @@ public class Flink116OnYarnClusterDeployTest {
                 () -> {
                     browser.navigate().refresh();
                     Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
-                    assertThat(flinkClustersPage.flinkClusterList())
+                    assertThat(flinkClustersPage.flinkClusterList)
                         .noneMatch(it -> it.getText().contains(flinkClusterNameEdited));
                 });
     }

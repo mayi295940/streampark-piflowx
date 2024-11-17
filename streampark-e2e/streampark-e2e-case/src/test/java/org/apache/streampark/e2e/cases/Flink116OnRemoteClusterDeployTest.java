@@ -38,13 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @StreamPark(composeFiles = "docker/flink-1.16-on-remote/docker-compose.yaml")
 public class Flink116OnRemoteClusterDeployTest {
 
-    private static RemoteWebDriver browser;
-
-    private static final String userName = "admin";
-
-    private static final String password = "streampark";
-
-    private static final String teamName = "default";
+    public static RemoteWebDriver browser;
 
     private static final String flinkName = "flink-1.16.3";
 
@@ -56,12 +50,12 @@ public class Flink116OnRemoteClusterDeployTest {
 
     private static final String flinkJobManagerUrl = "http://jobmanager:8081";
 
-    private static final ClusterDetailForm.ExecutionMode executionMode = ClusterDetailForm.ExecutionMode.REMOTE;
+    private static final ClusterDetailForm.DeployMode deployMode = ClusterDetailForm.DeployMode.STANDALONE;
 
     @BeforeAll
     public static void setUp() {
         FlinkHomePage flinkHomePage = new LoginPage(browser)
-            .login(userName, password, teamName)
+            .login()
             .goToNav(ApacheFlinkPage.class)
             .goToTab(FlinkHomePage.class);
 
@@ -72,12 +66,12 @@ public class Flink116OnRemoteClusterDeployTest {
     }
 
     @Test
-    @Order(10)
+    @Order(1)
     public void testCreateFlinkCluster() {
         FlinkClustersPage flinkClustersPage = new FlinkClustersPage(browser);
 
         flinkClustersPage.createFlinkCluster()
-            .<RemoteForm>addCluster(executionMode)
+            .<RemoteForm>addCluster(deployMode)
             .jobManagerURL(flinkJobManagerUrl)
             .clusterName(flinkClusterName)
             .flinkVersion(flinkName)
@@ -85,14 +79,14 @@ public class Flink116OnRemoteClusterDeployTest {
 
         Awaitility.await()
             .untilAsserted(
-                () -> assertThat(flinkClustersPage.flinkClusterList())
+                () -> assertThat(flinkClustersPage.flinkClusterList)
                     .as("Flink clusters list should contain newly-created application")
                     .extracting(WebElement::getText)
                     .anyMatch(it -> it.contains(flinkClusterName)));
     }
 
     @Test
-    @Order(50)
+    @Order(2)
     public void testDeleteFlinkCluster() {
         final FlinkClustersPage flinkClustersPage = new FlinkClustersPage(browser);
 
@@ -103,7 +97,7 @@ public class Flink116OnRemoteClusterDeployTest {
                 () -> {
                     browser.navigate().refresh();
                     Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
-                    assertThat(flinkClustersPage.flinkClusterList())
+                    assertThat(flinkClustersPage.flinkClusterList)
                         .noneMatch(it -> it.getText().contains(flinkClusterName));
                 });
     }

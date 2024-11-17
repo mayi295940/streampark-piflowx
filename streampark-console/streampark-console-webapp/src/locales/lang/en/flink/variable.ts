@@ -23,6 +23,8 @@ export default {
   add: 'Add',
   success: ' successful',
   fail: ' failed',
+  searchByCode: 'Search by var code',
+  searchByDesc: 'Search by description',
   table: {
     title: 'Variable List',
     variableCode: 'Variable Code',
@@ -49,7 +51,7 @@ export default {
   },
   depend: {
     title: 'Variable Depend Apps',
-    jobName: 'Application Name',
+    jobName: 'Job Name',
     nickName: 'Owner',
     headerTitle: 'Variable " {0} " used list',
   },

@@ -21,33 +21,35 @@ import org.apache.streampark.e2e.pages.common.Constants;
 import org.apache.streampark.e2e.pages.common.NavBarPage;
 
 import lombok.Getter;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Getter
 public class FlinkHomePage extends NavBarPage implements ApacheFlinkPage.Tab {
 
-    @FindBy(xpath = "//span[contains(., 'Flink Home')]/..//button[contains(@class, 'ant-btn')]/span[contains(text(), 'Add New')]")
-    private WebElement buttonCreateFlinkHome;
+    @FindBy(className = "ant-table-tbody")
+    public List<WebElement> flinkHomeList;
 
-    @FindBy(xpath = "//div[contains(@class, 'ant-spin-container')]")
-    private List<WebElement> flinkHomeList;
+    @FindBy(id = "e2e-env-add-btn")
+    public WebElement buttonCreateFlinkHome;
 
-    @FindBy(xpath = "//button[contains(@class, 'ant-btn')]/span[contains(., 'Yes')]")
-    private WebElement deleteConfirmButton;
+    @FindBy(className = "e2e-flinkenv-delete-confirm")
+    public WebElement deleteConfirmButton;
 
-    private final CreateFlinkHomeForm createFlinkHomeForm = new CreateFlinkHomeForm();
+    public CreateFlinkHomeForm createFlinkHomeForm;
 
     public FlinkHomePage(RemoteWebDriver driver) {
         super(driver);
+        createFlinkHomeForm = new CreateFlinkHomeForm();
     }
 
     public FlinkHomePage createFlinkHome(String flinkName, String flinkHome, String description) {
@@ -55,79 +57,26 @@ public class FlinkHomePage extends NavBarPage implements ApacheFlinkPage.Tab {
 
         new WebDriverWait(driver, Constants.DEFAULT_WEBDRIVER_WAIT_DURATION)
             .until(ExpectedConditions.elementToBeClickable(buttonCreateFlinkHome));
+
         buttonCreateFlinkHome.click();
-        createFlinkHomeForm.inputFlinkName().sendKeys(flinkName);
-        createFlinkHomeForm.inputFlinkHome().sendKeys(flinkHome);
-        createFlinkHomeForm.inputDescription().sendKeys(description);
-        createFlinkHomeForm.buttonSubmit().click();
+        createFlinkHomeForm.inputFlinkName.sendKeys(flinkName);
+        createFlinkHomeForm.inputFlinkHome.sendKeys(flinkHome);
+        createFlinkHomeForm.inputDescription.sendKeys(description);
+        createFlinkHomeForm.buttonSubmit.click();
 
-        waitForClickFinish("create successful");
-        return this;
-    }
+        Awaitility.await()
+            .untilAsserted(
+                () -> assertThat(flinkHomeList)
+                    .as("FlinkEnv list should contain newly-created env")
+                    .extracting(WebElement::getText)
+                    .anyMatch(it -> it.contains(flinkName)));
 
-    public FlinkHomePage editFlinkHome(String oldFlinkName, String newFlinkName) {
-        waitForPageLoading();
-
-        flinkHomeList().stream()
-            .filter(it -> it.getText().contains(oldFlinkName))
-            .flatMap(
-                it -> it
-                    .findElements(
-                        By.xpath(
-                            "//button[contains(@class,'ant-btn')]/span[contains(@aria-label,'edit')]"))
-                    .stream())
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No edit button in flink home list"))
-            .click();
-
-        createFlinkHomeForm.inputFlinkName().sendKeys(Keys.CONTROL + "a");
-        createFlinkHomeForm.inputFlinkName().sendKeys(Keys.BACK_SPACE);
-        createFlinkHomeForm.inputFlinkName().sendKeys(newFlinkName);
-        createFlinkHomeForm.buttonSubmit().click();
-
-        waitForClickFinish("update successful");
-        return this;
-    }
-
-    public FlinkHomePage deleteFlinkHome(String flinkName) {
-        waitForPageLoading();
-
-        flinkHomeList().stream()
-            .filter(it -> it.getText().contains(flinkName))
-            .flatMap(
-                it -> it
-                    .findElements(
-                        By.xpath(
-                            "//button[contains(@class,'ant-btn')]/span[contains(@aria-label,'delete')]"))
-                    .stream())
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No delete button in flink home list"))
-            .click();
-
-        deleteConfirmButton.click();
-
-        waitForClickFinish("flink home is removed");
         return this;
     }
 
     private void waitForPageLoading() {
         new WebDriverWait(driver, Constants.DEFAULT_WEBDRIVER_WAIT_DURATION)
             .until(ExpectedConditions.urlContains("/flink/home"));
-    }
-
-    private void waitForClickFinish(String message) {
-        new WebDriverWait(driver, Constants.DEFAULT_WEBDRIVER_WAIT_DURATION)
-            .until(
-                ExpectedConditions.visibilityOfElementLocated(
-                    By.xpath(String.format("//*[contains(text(),'%s')]",
-                        message))));
-        new WebDriverWait(driver, Constants.DEFAULT_WEBDRIVER_WAIT_DURATION)
-            .until(
-                ExpectedConditions.invisibilityOfElementLocated(
-                    By.xpath(String.format("//*[contains(text(),'%s')]",
-                        message))));
     }
 
     @Getter
@@ -137,19 +86,16 @@ public class FlinkHomePage extends NavBarPage implements ApacheFlinkPage.Tab {
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "form_item_flinkName")
-        private WebElement inputFlinkName;
+        @FindBy(id = "flink_env_flinkName")
+        public WebElement inputFlinkName;
 
-        @FindBy(id = "form_item_flinkHome")
-        private WebElement inputFlinkHome;
+        @FindBy(id = "flink_env_flinkHome")
+        public WebElement inputFlinkHome;
 
-        @FindBy(id = "form_item_description")
-        private WebElement inputDescription;
+        @FindBy(id = "flink_env_description")
+        public WebElement inputDescription;
 
-        @FindBy(xpath = "//button[contains(@class, 'ant-btn')]//span[contains(text(), 'OK')]")
-        private WebElement buttonSubmit;
-
-        @FindBy(xpath = "//button[contains(@class, 'ant-btn')]//span[contains(text(), 'Cancel')]")
-        private WebElement buttonCancel;
+        @FindBy(id = "e2e-flinkenv-submit-btn")
+        public WebElement buttonSubmit;
     }
 }

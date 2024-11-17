@@ -22,16 +22,16 @@ import org.apache.streampark.common.util.DeflaterUtils;
 import org.apache.streampark.common.util.ExceptionUtils;
 import org.apache.streampark.console.base.domain.RestRequest;
 import org.apache.streampark.console.base.mybatis.pager.MybatisPager;
-import org.apache.streampark.console.core.entity.Application;
+import org.apache.streampark.console.core.entity.FlinkApplication;
 import org.apache.streampark.console.core.entity.FlinkEnv;
 import org.apache.streampark.console.core.entity.FlinkSql;
 import org.apache.streampark.console.core.enums.CandidateTypeEnum;
 import org.apache.streampark.console.core.enums.EffectiveTypeEnum;
 import org.apache.streampark.console.core.mapper.FlinkSqlMapper;
-import org.apache.streampark.console.core.service.ApplicationBackUpService;
-import org.apache.streampark.console.core.service.EffectiveService;
+import org.apache.streampark.console.core.service.FlinkEffectiveService;
 import org.apache.streampark.console.core.service.FlinkEnvService;
 import org.apache.streampark.console.core.service.FlinkSqlService;
+import org.apache.streampark.console.core.service.application.FlinkApplicationBackupService;
 import org.apache.streampark.flink.core.FlinkSqlValidationResult;
 import org.apache.streampark.flink.proxy.FlinkShimsProxy;
 
@@ -58,10 +58,10 @@ public class FlinkSqlServiceImpl extends ServiceImpl<FlinkSqlMapper, FlinkSql>
         FlinkSqlService {
 
     @Autowired
-    private EffectiveService effectiveService;
+    private FlinkEffectiveService effectiveService;
 
     @Autowired
-    private ApplicationBackUpService backUpService;
+    private FlinkApplicationBackupService backUpService;
 
     @Autowired
     private FlinkEnvService flinkEnvService;
@@ -171,7 +171,7 @@ public class FlinkSqlServiceImpl extends ServiceImpl<FlinkSqlMapper, FlinkSql>
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
-    public void rollback(Application application) {
+    public void rollback(FlinkApplication application) {
         FlinkSql sql = getCandidate(application.getId(), CandidateTypeEnum.HISTORY);
         AssertUtils.notNull(sql);
         try {

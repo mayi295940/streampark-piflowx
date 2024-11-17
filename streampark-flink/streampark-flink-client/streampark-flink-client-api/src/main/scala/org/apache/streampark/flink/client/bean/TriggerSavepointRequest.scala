@@ -17,9 +17,9 @@
 
 package org.apache.streampark.flink.client.bean
 
-import org.apache.streampark.common.Constant
 import org.apache.streampark.common.conf.FlinkVersion
-import org.apache.streampark.common.enums.FlinkExecutionMode
+import org.apache.streampark.common.constants.Constants
+import org.apache.streampark.common.enums.FlinkDeployMode
 import org.apache.streampark.common.util.Implicits.JavaMap
 
 import javax.annotation.Nullable
@@ -28,11 +28,11 @@ import javax.annotation.Nullable
 case class TriggerSavepointRequest(
     id: Long,
     flinkVersion: FlinkVersion,
-    executionMode: FlinkExecutionMode,
+    deployMode: FlinkDeployMode,
     @Nullable properties: JavaMap[String, Any],
     clusterId: String,
     jobId: String,
     savepointPath: String,
     nativeFormat: Boolean,
-    override val kubernetesNamespace: String = Constant.DEFAULT)
+    override val kubernetesNamespace: String = Constants.DEFAULT)
   extends SavepointRequestTrait

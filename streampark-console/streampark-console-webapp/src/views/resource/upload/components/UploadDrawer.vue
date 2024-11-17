@@ -16,6 +16,8 @@
 -->
 <template>
   <BasicDrawer
+    :okButtonProps="{ class: 'e2e-upload-submit-btn' }"
+    :cancelButtonProps="{ class: 'e2e-upload-cancel-btn' }"
     :okText="t('common.submitText')"
     @register="registerDrawer"
     showFooter
@@ -26,11 +28,13 @@
       <SvgIcon name="resource" />
       {{ getTitle }}
     </template>
-    <BasicForm @register="registerForm" :schemas="getResourceFormSchema">
-      <template #resource="{ model, field }">
-        <Upload ref="resourceRef" v-model:value="model[field]" :form-model="model" />
-      </template>
-    </BasicForm>
+    <div class="mt-3">
+      <BasicForm @register="registerForm" :schemas="getResourceFormSchema">
+        <template #resource="{ model, field }">
+          <Upload ref="resourceRef" v-model:value="model[field]" :form-model="model" />
+        </template>
+      </BasicForm>
+    </div>
   </BasicDrawer>
 </template>
 <script lang="ts">
@@ -131,8 +135,7 @@
         label: t('flink.app.mainClass'),
         component: 'Input',
         componentProps: { placeholder: t('flink.app.addAppTips.mainClassPlaceholder') },
-        ifShow: ({ values }) => values?.resourceType === ResourceTypeEnum.FLINK_APP,
-        rules: [{ required: true, message: t('flink.app.addAppTips.mainClassIsRequiredMessage') }],
+        ifShow: ({ values }) => values?.resourceType === ResourceTypeEnum.APP,
       },
       {
         field: 'description',
@@ -145,12 +148,11 @@
   });
 
   const [registerForm, { resetFields, setFieldsValue, validate }] = useForm({
-    name: 'ResourceForm',
     colon: true,
+    layout: 'vertical',
+    name: 'upload_form',
+    baseColProps: { span: 22, offset: 1 },
     showActionButtonGroup: false,
-    baseColProps: { span: 24 },
-    labelCol: { lg: { span: 5, offset: 0 }, sm: { span: 7, offset: 0 } },
-    wrapperCol: { lg: { span: 16, offset: 0 }, sm: { span: 17, offset: 0 } },
   });
 
   const [registerDrawer, { setDrawerProps, closeDrawer }] = useDrawerInner(
@@ -240,7 +242,7 @@
             }
             break;
           case 2:
-            if (values.resourceType == ResourceTypeEnum.FLINK_APP) {
+            if (values.resourceType == ResourceTypeEnum.APP) {
               Swal.fire('Failed', t('flink.resource.mainNullTip'), 'error');
             }
             if (values.resourceType == ResourceTypeEnum.CONNECTOR) {

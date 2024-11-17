@@ -17,8 +17,8 @@
 
 package org.apache.streampark.spark.client.proxy
 
-import org.apache.streampark.common.Constant
 import org.apache.streampark.common.conf.{ConfigKeys, SparkVersion}
+import org.apache.streampark.common.constants.Constants
 import org.apache.streampark.common.util.{ChildFirstClassLoader, ClassLoaderObjectInputStream, ClassLoaderUtils, Logger}
 import org.apache.streampark.common.util.Implicits._
 
@@ -56,7 +56,8 @@ object SparkShimsProxy extends Logger {
     "ch.qos.logback",
     "org.xml",
     "org.w3c",
-    "org.apache.hadoop")
+    "org.apache.hadoop",
+    "org.apache.spark.launcher")
 
   def proxy[T](sparkVersion: SparkVersion, func: ClassLoader => T): T = {
     val shimsClassLoader = getSparkShimsClassLoader(sparkVersion)
@@ -75,17 +76,10 @@ object SparkShimsProxy extends Logger {
     logInfo(s"Add verify sql lib,spark version: $sparkVersion")
     VERIFY_SQL_CLASS_LOADER_CACHE.getOrElseUpdate(
       s"${sparkVersion.fullVersion}", {
-        val getSparkTable: File => Boolean = _.getName.startsWith("spark-table")
-        // 1) spark/lib/spark-table*
-        val libTableURL =
-          getSparkHomeLib(sparkVersion.sparkHome, "lib", getSparkTable)
+        val libUrl = getSparkHomeLib(sparkVersion.sparkHome, "jars")
+        val shimsUrls = ListBuffer[URL](libUrl: _*)
 
-        // 2) After version 1.15 need add spark/opt/spark-table*
-        val optTableURL =
-          getSparkHomeLib(sparkVersion.sparkHome, "opt", getSparkTable)
-        val shimsUrls = ListBuffer[URL](libTableURL ++ optTableURL: _*)
-
-        // 3) add only streampark shims jar
+        // TODO If there are compatibility issues with different versions
         addShimsUrls(
           sparkVersion,
           file => {
@@ -123,7 +117,7 @@ object SparkShimsProxy extends Logger {
       .listFiles()
       .foreach((jar: File) => {
         val jarName = jar.getName
-        if (jarName.endsWith(Constant.JAR_SUFFIX)) {
+        if (jarName.endsWith(Constants.JAR_SUFFIX)) {
           if (jarName.startsWith(SPARK_SHIMS_PREFIX)) {
             val prefixVer =
               s"$SPARK_SHIMS_PREFIX-${majorVersion}_$scalaVersion"
@@ -135,7 +129,7 @@ object SparkShimsProxy extends Logger {
             if (INCLUDE_PATTERN.matcher(jarName).matches()) {
               addShimUrl(jar)
               logInfo(s"Include jar lib: $jarName")
-            } else if (jarName.matches(s"^streampark-.*_$scalaVersion.*$$")) {
+            } else if (jarName.matches(s"^streampark-(?!flink).*_$scalaVersion.*$$")) {
               addShimUrl(jar)
               logInfo(s"Include streampark lib: $jarName")
             }
@@ -156,9 +150,8 @@ object SparkShimsProxy extends Logger {
     SHIMS_CLASS_LOADER_CACHE.getOrElseUpdate(
       s"${sparkVersion.fullVersion}", {
         // 1) spark/lib
-        val libUrl = getSparkHomeLib(sparkVersion.sparkHome, "jars", f => !f.getName.startsWith("log4j") && !f.getName.startsWith("slf4j"))
+        val libUrl = getSparkHomeLib(sparkVersion.sparkHome, "jars")
         val shimsUrls = ListBuffer[URL](libUrl: _*)
-
         // 2) add all shims jar
         addShimsUrls(
           sparkVersion,
@@ -179,10 +172,18 @@ object SparkShimsProxy extends Logger {
   private[this] def getSparkHomeLib(
       sparkHome: String,
       childDir: String,
-      filterFun: File => Boolean): List[URL] = {
+      filterFun: File => Boolean = null): List[URL] = {
     val file = new File(sparkHome, childDir)
     require(file.isDirectory, s"SPARK_HOME $file does not exist")
-    file.listFiles.filter(filterFun).map(_.toURI.toURL).toList
+    file.listFiles
+      .filter(f => !f.getName.startsWith("log4j") && !f.getName.startsWith("slf4j"))
+      .filter(f => {
+        if (filterFun != null) {
+          filterFun(f)
+        } else {
+          true
+        }
+      }).map(_.toURI.toURL).toList
   }
 
   @throws[Exception]

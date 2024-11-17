@@ -17,9 +17,10 @@
 
 package org.apache.streampark.console.core.service.impl;
 
-import org.apache.streampark.common.Constant;
 import org.apache.streampark.common.conf.Workspace;
+import org.apache.streampark.common.constants.Constants;
 import org.apache.streampark.common.fs.FsOperator;
+import org.apache.streampark.common.fs.LfsOperator;
 import org.apache.streampark.common.util.ExceptionUtils;
 import org.apache.streampark.common.util.Utils;
 import org.apache.streampark.console.base.domain.RestRequest;
@@ -32,14 +33,15 @@ import org.apache.streampark.console.base.util.WebUtils;
 import org.apache.streampark.console.core.bean.Dependency;
 import org.apache.streampark.console.core.bean.FlinkConnector;
 import org.apache.streampark.console.core.bean.MavenPom;
-import org.apache.streampark.console.core.entity.Application;
+import org.apache.streampark.console.core.bean.UploadResponse;
+import org.apache.streampark.console.core.entity.FlinkApplication;
 import org.apache.streampark.console.core.entity.FlinkSql;
 import org.apache.streampark.console.core.entity.Resource;
 import org.apache.streampark.console.core.enums.ResourceTypeEnum;
 import org.apache.streampark.console.core.mapper.ResourceMapper;
 import org.apache.streampark.console.core.service.FlinkSqlService;
 import org.apache.streampark.console.core.service.ResourceService;
-import org.apache.streampark.console.core.service.application.ApplicationManageService;
+import org.apache.streampark.console.core.service.application.FlinkApplicationManageService;
 import org.apache.streampark.console.core.util.ServiceHelper;
 import org.apache.streampark.flink.packer.maven.Artifact;
 import org.apache.streampark.flink.packer.maven.MavenTool;
@@ -73,7 +75,9 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +88,8 @@ import java.util.ServiceLoader;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
+
+import static org.apache.streampark.common.enums.StorageType.LFS;
 
 @Slf4j
 @Service
@@ -96,7 +102,7 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource>
     public static final String EXCEPTION = "exception";
 
     @Autowired
-    private ApplicationManageService applicationManageService;
+    private FlinkApplicationManageService applicationManageService;
 
     @Autowired
     private FlinkSqlService flinkSqlService;
@@ -147,7 +153,8 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource>
             String resourcePath = jars.get(0);
             resource.setResourcePath(resourcePath);
             // copy jar to team upload directory
-            String upFile = resourcePath.split("->")[1];
+            String upFile = resourcePath.split(":", 2)[1];
+            // String upFile = resourcePath.split("->")[1];
             transferTeamResource(resource.getTeamId(), upFile);
         }
 
@@ -174,7 +181,7 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource>
         ApiAlertException.throwIfTrue(
             jars.isEmpty() && poms.isEmpty(), "Please add pom or jar resource.");
         ApiAlertException.throwIfTrue(
-            resource.getResourceType() == ResourceTypeEnum.FLINK_APP && jars.isEmpty(),
+            resource.getResourceType() == ResourceTypeEnum.APP && jars.isEmpty(),
             "Please upload jar for Flink_App resource");
         ApiAlertException.throwIfTrue(
             jars.size() + poms.size() > 1, "Please do not add multi dependency at one time.");
@@ -201,12 +208,13 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource>
 
             Dependency dependency = Dependency.toDependency(resource.getResource());
             if (!dependency.getJar().isEmpty()) {
-                String jarFile = dependency.getJar().get(0).split("->")[1];
+                String jarFile = dependency.getJar().get(0).split(":", 2)[1];
+                //String jarFile = dependency.getJar().get(0).split("->")[1];
                 transferTeamResource(findResource.getTeamId(), jarFile);
             }
         }
 
-        if (resource.getResourceType() == ResourceTypeEnum.FLINK_APP) {
+        if (resource.getResourceType() == ResourceTypeEnum.APP) {
             findResource.setMainClass(resource.getMainClass());
         }
         findResource.setDescription(resource.getDescription());
@@ -257,7 +265,7 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource>
      * @return
      */
     @Override
-    public String upload(MultipartFile file) throws IOException {
+    public UploadResponse upload(MultipartFile file) throws IOException {
         File temp = WebUtils.getAppTempDir();
         String fileName = FilenameUtils.getName(Objects.requireNonNull(file.getOriginalFilename()));
         File saveFile = new File(temp, fileName);
@@ -269,19 +277,38 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource>
                 throw new ApiDetailException(e);
             }
         }
-        return saveFile.getAbsolutePath();
+        String mainClass = null;
+        try {
+            mainClass = Utils.getJarManClass(saveFile);
+        } catch (Exception ignored) {
+        }
+        String path = saveFile.getAbsolutePath();
+        UploadResponse uploadResponse = new UploadResponse();
+        uploadResponse.setMainClass(mainClass);
+        uploadResponse.setPath(path);
+        return uploadResponse;
     }
 
     @Override
     public RestResponse checkResource(Resource resourceParam) throws JsonProcessingException {
         ResourceTypeEnum type = resourceParam.getResourceType();
         switch (type) {
-            case FLINK_APP:
+            case APP:
                 return checkFlinkApp(resourceParam);
             case CONNECTOR:
                 return checkConnector(resourceParam);
         }
         return RestResponse.success().data(ImmutableMap.of(STATE, 0));
+    }
+
+    @Override
+    public List<String> listHistoryUploadJars() {
+        return Arrays.stream(LfsOperator.listDir(Workspace.of(LFS).APP_UPLOADS()))
+            .filter(File::isFile)
+            .sorted(Comparator.comparingLong(File::lastModified).reversed())
+            .map(File::getName)
+            .filter(fn -> fn.endsWith(Constants.JAR_SUFFIX))
+            .collect(Collectors.toList());
     }
 
     private RestResponse checkConnector(Resource resourceParam) throws JsonProcessingException {
@@ -349,14 +376,6 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource>
             jarFile == null || !jarFile.exists(), "flink app jar must exist.");
         Map<String, Serializable> resp = new HashMap<>(0);
         resp.put(STATE, 0);
-        if (jarFile.getName().endsWith(Constant.PYTHON_SUFFIX)) {
-            return RestResponse.success().data(resp);
-        }
-        String mainClass = Utils.getJarManClass(jarFile);
-        if (mainClass == null) {
-            // main class is null
-            return buildExceptResponse(new RuntimeException("main class is null"), 2);
-        }
         return RestResponse.success().data(resp);
     }
 
@@ -429,7 +448,8 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource>
             return null;
         }
         if (!dependency.getJar().isEmpty()) {
-            String jar = dependency.getJar().get(0).split("->")[1];
+            String jar = dependency.getJar().get(0).split(":", 2)[1];
+            //String jar = dependency.getJar().get(0).split("->")[1];
             return new File(jar);
         } else {
             Artifact artifact = dependency.toArtifact().get(0);
@@ -469,19 +489,26 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource>
         return CollectionUtils.isNotEmpty(getResourceApplicationsById(resource));
     }
 
-    private List<Application> getResourceApplicationsById(Resource resource) {
-        List<Application> dependApplications = new ArrayList<>();
-        List<Application> applications = applicationManageService.listByTeamId(resource.getTeamId());
-        Map<Long, Application> applicationMap = applications.stream()
-            .collect(Collectors.toMap(Application::getId, application -> application));
+    private List<FlinkApplication> getResourceApplicationsById(Resource resource) {
+        List<FlinkApplication> dependApplications = new ArrayList<>();
+        List<FlinkApplication> applications = applicationManageService.listByTeamId(resource.getTeamId());
+        Map<Long, FlinkApplication> applicationMap = applications.stream()
+            .collect(Collectors.toMap(FlinkApplication::getId, application -> application));
 
         // Get the application that depends on this resource
+        for (FlinkApplication app : applications) {
+            if (resource.getResourceName().equals(app.getJar())
+                && !dependApplications.contains(app)) {
+                dependApplications.add(app);
+            }
+        }
+
         List<FlinkSql> flinkSqls = flinkSqlService.listByTeamId(resource.getTeamId());
         for (FlinkSql flinkSql : flinkSqls) {
             String sqlTeamResource = flinkSql.getTeamResource();
             if (sqlTeamResource != null
-                && sqlTeamResource.contains(String.valueOf(resource.getTeamId()))) {
-                Application app = applicationMap.get(flinkSql.getAppId());
+                && sqlTeamResource.contains(String.valueOf(resource.getId()))) {
+                FlinkApplication app = applicationMap.get(flinkSql.getAppId());
                 if (!dependApplications.contains(app)) {
                     dependApplications.add(applicationMap.get(flinkSql.getAppId()));
                 }

@@ -24,8 +24,10 @@ export default {
   flinkNamePlaceholder: 'Please enter flink name',
   flinkHome: 'Flink Home',
   flinkHomePlaceholder: 'Please enter flink home',
-  description: 'description',
+  description: 'Description',
   descriptionPlaceholder: 'Please enter description',
+  flinkVersion: 'Flink Version',
+  searchByName: 'Search by flink name',
   operateMessage: {
     flinkNameTips: 'The flink name, e.g: flink-1.12',
     flinkNameIsRepeated: 'Flink name already exists',

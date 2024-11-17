@@ -27,12 +27,7 @@ import {
 } from '/@/api/spark/app';
 import { fetchAppOwners } from '/@/api/system/user';
 import { SvgIcon } from '/@/components/Icon';
-import {
-  AppExistsStateEnum,
-  AppStateEnum,
-  ExecModeEnum,
-  OptionStateEnum,
-} from '/@/enums/sparkEnum';
+import { AppExistsStateEnum, AppStateEnum, DeployMode, OptionStateEnum } from '/@/enums/sparkEnum';
 import { useI18n } from '/@/hooks/web/useI18n';
 import { useMessage } from '/@/hooks/web/useMessage';
 import { fetchBuildSparkApp, fetchBuildProgressDetail } from '/@/api/spark/build';
@@ -55,8 +50,8 @@ export const useSparkAction = (optionApps: Recordable) => {
       createWarningModal({
         title: 'WARNING',
         content: `
-          <p class="pt-10px">${t('flink.app.release.releaseTitle')}</p>
-          <p>${t('flink.app.release.releaseDesc')}</p>
+          <p class="pt-10px">${t('spark.app.release.releaseTitle')}</p>
+          <p>${t('spark.app.release.releaseDesc')}</p>
         `,
         okType: 'danger',
         onOk: () => handleReleaseApp(app, true),
@@ -73,13 +68,13 @@ export const useSparkAction = (optionApps: Recordable) => {
     if (!res.data) {
       let message = res.message || '';
       if (!message) {
-        message = t('flink.app.release.releaseFail') + message.replaceAll(/\[StreamPark]/g, '');
+        message = t('spark.app.release.releaseFail') + message.replaceAll(/\[StreamPark]/g, '');
       }
-      Swal.fire('Failed', message, 'error');
+      await Swal.fire('Failed', message, 'error');
     } else {
-      Swal.fire({
+      await Swal.fire({
         icon: 'success',
-        title: t('flink.app.release.releasing'),
+        title: t('spark.app.release.releasing'),
         showConfirmButton: false,
         timer: 2000,
       });
@@ -255,18 +250,16 @@ export const useSparkAction = (optionApps: Recordable) => {
       ],
       content: () => {
         return (
-          <Form class="!pt-50px">
+          <Form class="!pt-50px" layout="vertical" baseColProps={{ span: 22, offset: 1 }}>
             <Form.Item
-              label="Application Name"
-              labelCol={{ lg: { span: 7 }, sm: { span: 7 } }}
-              wrapperCol={{ lg: { span: 16 }, sm: { span: 4 } }}
+              label="Job Name"
               validateStatus={unref(validateStatus)}
               help={help}
               rules={[{ required: true }]}
             >
               <Input
                 type="text"
-                placeholder="New Application Name"
+                placeholder="New Job Name"
                 onInput={(e) => {
                   copyAppName = e.target.value;
                 }}
@@ -281,7 +274,7 @@ export const useSparkAction = (optionApps: Recordable) => {
         //1) check empty
         if (copyAppName == null) {
           validateStatus.value = 'error';
-          help = 'Sorry, Application Name cannot be empty';
+          help = 'Sorry, Job Name cannot be empty';
           return Promise.reject('copy application error');
         }
         //2) check name
@@ -290,11 +283,11 @@ export const useSparkAction = (optionApps: Recordable) => {
         const code = parseInt(resp);
         if (code === 0) {
           try {
-            const { data } = await fetchCopySparkApp({
+            const res = await fetchCopySparkApp({
               id: item.id,
               appName: copyAppName,
             });
-            const status = data.status || 'error';
+            const status = res.status || 'error';
             if (status === 'success') {
               Swal.fire({
                 icon: 'success',
@@ -315,13 +308,13 @@ export const useSparkAction = (optionApps: Recordable) => {
         } else {
           validateStatus.value = 'error';
           if (code === 1) {
-            help = t('flink.app.addAppTips.appNameNotUniqueMessage');
+            help = t('spark.app.addAppTips.appNameNotUniqueMessage');
           } else if (code === 2) {
-            help = t('flink.app.addAppTips.appNameExistsInYarnMessage');
+            help = t('spark.app.addAppTips.appNameExistsInYarnMessage');
           } else if (code === 3) {
-            help = t('flink.app.addAppTips.appNameExistsInK8sMessage');
+            help = t('spark.app.addAppTips.appNameExistsInK8sMessage');
           } else {
-            help = t('flink.app.addAppTips.appNameNotValid');
+            help = t('spark.app.addAppTips.appNameNotValid');
           }
           return Promise.reject('copy application error');
         }
@@ -348,20 +341,24 @@ export const useSparkAction = (optionApps: Recordable) => {
             class="!pt-40px"
             ref={mappingRef}
             name="mappingForm"
-            labelCol={{ lg: { span: 7 }, sm: { span: 7 } }}
-            wrapperCol={{ lg: { span: 16 }, sm: { span: 4 } }}
+            layout="vertical"
+            baseColProps={{ span: 22, offset: 1 }}
             v-model:model={formValue}
           >
-            <Form.Item label="Application Name">
-              <Alert message={app.jobName} type="info" />
+            <Form.Item label="Job Name">
+              <Alert message={app.appName} type="info" />
             </Form.Item>
-            {[ExecModeEnum.YARN_CLIENT, ExecModeEnum.YARN_CLUSTER].includes(app.executionMode) && (
+            {[DeployMode.YARN_CLIENT, DeployMode.YARN_CLUSTER].includes(app.deployMode) && (
               <Form.Item
                 label="YARN Application Id"
-                name="appId"
+                name="clusterId"
                 rules={[{ required: true, message: 'YARN ApplicationId is required' }]}
               >
-                <Input type="text" placeholder="ApplicationId" v-model:value={formValue.appId} />
+                <Input
+                  type="text"
+                  placeholder="ApplicationId"
+                  v-model:value={formValue.clusterId}
+                />
               </Form.Item>
             )}
             <Form.Item
@@ -381,7 +378,7 @@ export const useSparkAction = (optionApps: Recordable) => {
           await mappingRef.value.validate();
           await fetchSparkMapping({
             id: app.id,
-            appId: formValue.appId,
+            clusterId: formValue.clusterId,
           });
           Swal.fire({
             icon: 'success',

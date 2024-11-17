@@ -21,12 +21,13 @@ export default {
   start: 'Start Cluster',
   edit: 'Edit Cluster',
   delete: 'Are you sure delete this cluster ?',
+  searchByName: 'Search by cluster name',
   form: {
     clusterName: 'Cluster Name',
     address: 'Cluster URL',
     runState: 'Run State',
     internal: 'internal cluster',
-    executionMode: 'Execution Mode',
+    deployMode: 'Deploy Mode',
     versionId: 'Flink Version',
     addExisting: 'existing cluster',
     addNew: 'new cluster',
@@ -49,7 +50,7 @@ export default {
   placeholder: {
     addType: 'Please select cluster Add Type',
     clusterName: 'Please enter cluster name',
-    executionMode: 'Please enter execution mode',
+    deployMode: 'Please enter deploy mode',
     versionId: 'Please select flink version',
     addressRemoteMode: 'Please enter jobManager URL',
     addressNoRemoteMode: 'Please enter cluster address,  e.g: http://host:port',
@@ -66,7 +67,7 @@ export default {
   },
   required: {
     address: 'Cluster address is required',
-    executionMode: 'Execution Mode is required',
+    deployMode: 'Deploy Mode is required',
     clusterId: 'Yarn Session Cluster is required',
     versionId: 'Flink Version is required',
     flinkImage: 'Flink Base Docker Image is required',

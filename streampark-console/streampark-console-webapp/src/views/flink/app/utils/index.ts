@@ -15,17 +15,16 @@
  * limitations under the License.
  */
 import { optionsKeyMapping } from '../data/option';
-import { fetchYarn } from '/@/api/flink/app';
 import { AppListRecord } from '/@/api/flink/app.type';
-import { fetchRemoteURL } from '/@/api/flink/flinkCluster';
 import {
   AppStateEnum,
   ConfigTypeEnum,
-  ExecModeEnum,
+  DeployMode,
   ReleaseStateEnum,
   OptionStateEnum,
   PipelineStepEnum,
 } from '/@/enums/flinkEnum';
+import { baseUrl } from '/@/api';
 
 export function handleAppBuildStatusColor(statusCode: number) {
   switch (statusCode) {
@@ -103,27 +102,8 @@ export function descriptionFilter(option) {
   }
 }
 
-export async function handleView(app: AppListRecord, yarn: Nullable<string>) {
-  const executionMode = app['executionMode'];
-  if (executionMode == ExecModeEnum.REMOTE) {
-    const res = await fetchRemoteURL(app.flinkClusterId);
-    window.open(res + '/#/job/' + app.jobId + '/overview');
-  } else if (
-    [ExecModeEnum.YARN_PER_JOB, ExecModeEnum.YARN_SESSION, ExecModeEnum.YARN_APPLICATION].includes(
-      executionMode,
-    )
-  ) {
-    if (!yarn) {
-      const res = await fetchYarn();
-      window.open(res + '/proxy/' + app['clusterId'] + '/');
-    } else {
-      window.open(yarn + '/proxy/' + app['clusterId'] + '/');
-    }
-  } else {
-    if (app.flinkRestUrl) {
-      window.open(app.flinkRestUrl);
-    }
-  }
+export async function handleView(app: AppListRecord) {
+  window.open(baseUrl() + '/proxy/flink/' + app.id + '/');
 }
 
 export function handleIsStart(app: Recordable, optionApps: Recordable) {
@@ -162,8 +142,8 @@ export function handleIsStart(app: Recordable, optionApps: Recordable) {
 
 export function handleYarnQueue(values: Recordable) {
   if (
-    values.executionMode == ExecModeEnum.YARN_APPLICATION ||
-    values.executionMode == ExecModeEnum.YARN_PER_JOB
+    values.deployMode == DeployMode.YARN_APPLICATION ||
+    values.deployMode == DeployMode.YARN_PER_JOB
   ) {
     const queue = values['yarnQueue'];
     if (queue != null && queue !== '' && queue !== undefined) {
@@ -266,13 +246,13 @@ export function handleDependencyJsonToPom(json, pomMap, jarMap) {
 }
 
 function getFlinkClusterId(values: Recordable) {
-  if (values.executionMode == ExecModeEnum.YARN_SESSION) {
+  if (values.deployMode == DeployMode.YARN_SESSION) {
     return values.yarnSessionClusterId;
   }
-  if (values.executionMode == ExecModeEnum.REMOTE) {
+  if (values.deployMode == DeployMode.STANDALONE) {
     return values.remoteClusterId;
   }
-  if (values.executionMode == ExecModeEnum.KUBERNETES_SESSION) {
+  if (values.deployMode == DeployMode.KUBERNETES_SESSION) {
     return values.k8sSessionClusterId;
   }
   return null;
@@ -285,7 +265,7 @@ export function handleSubmitParams(
 ) {
   const options = handleFormValue(values);
   Object.assign(params, {
-    executionMode: values.executionMode,
+    deployMode: values.deployMode,
     versionId: values.versionId,
     jobName: values.jobName,
     tags: values.tags,
@@ -306,7 +286,7 @@ export function handleSubmitParams(
     flinkClusterId: getFlinkClusterId(values),
     flinkImage: values.flinkImage || null,
   });
-  if (params.executionMode == ExecModeEnum.KUBERNETES_APPLICATION) {
+  if (params.deployMode == DeployMode.KUBERNETES_APPLICATION) {
     Object.assign(params, {
       serviceAccount: values.serviceAccount,
       k8sPodTemplate: k8sTemplate.podTemplate,
@@ -322,8 +302,8 @@ export const filterOption = (input: string, options: Recordable) => {
 };
 
 // k8s mode
-export function isK8sExecMode(mode: number): boolean {
-  return [ExecModeEnum.KUBERNETES_SESSION, ExecModeEnum.KUBERNETES_APPLICATION].includes(mode);
+export function isK8sDeployMode(mode: number): boolean {
+  return [DeployMode.KUBERNETES_SESSION, DeployMode.KUBERNETES_APPLICATION].includes(mode);
 }
 
 export function handleTeamResource(resource: string) {

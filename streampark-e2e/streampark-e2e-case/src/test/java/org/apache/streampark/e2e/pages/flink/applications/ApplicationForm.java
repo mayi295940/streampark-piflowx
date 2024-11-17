@@ -35,49 +35,49 @@ import java.util.List;
 @Getter
 public final class ApplicationForm {
 
-    private WebDriver driver;
+    public WebDriver driver;
 
     @FindBy(xpath = "//div[contains(@codefield, 'jobType')]//div[contains(@class, 'ant-select-selector')]")
-    private WebElement buttonDevelopmentModeDropdown;
+    public WebElement buttonJobTypeDropdown;
 
     @FindBys({
             @FindBy(css = "[codefield=jobType]"),
             @FindBy(className = "ant-select-item-option-content")
     })
-    private List<WebElement> selectDevelopmentMode;
+    public List<WebElement> selectJobType;
 
-    @FindBy(xpath = "//div[contains(@codefield, 'executionMode')]//div[contains(@class, 'ant-select-selector')]")
-    private WebElement buttonExecutionModeDropdown;
+    @FindBy(xpath = "//div[contains(@codefield, 'deployMode')]//div[contains(@class, 'ant-select-selector')]")
+    public WebElement buttonDeployModeDropdown;
 
     @FindBys({
-            @FindBy(css = "[codefield=executionMode]"),
+            @FindBy(css = "[codefield=deployMode]"),
             @FindBy(className = "ant-select-item-option-content")
     })
-    private List<WebElement> selectExecutionMode;
+    public List<WebElement> selectDeployMode;
 
     @FindBy(id = "form_item_jobName")
-    private WebElement inputApplicationName;
+    public WebElement inputApplicationName;
 
     @FindBy(xpath = "//div[contains(@codefield, 'yarnSessionClusterId')]//div[contains(@class, 'ant-select-selector')]")
-    private WebElement buttonFlinkClusterDropdown;
+    public WebElement buttonFlinkClusterDropdown;
 
     @FindBy(className = "ant-select-item-option-content")
     private List<WebElement> selectFlinkCluster;
 
     @FindBy(xpath = "//div[contains(@codefield, 'versionId')]//div[contains(@class, 'ant-select-selector')]")
-    private WebElement buttonFlinkVersionDropdown;
+    public WebElement buttonFlinkVersionDropdown;
 
     @FindBys({
             @FindBy(css = "[codefield=versionId]"),
             @FindBy(className = "ant-select-item-option-content")
     })
-    private List<WebElement> selectFlinkVersion;
+    public List<WebElement> selectFlinkVersion;
 
     @FindBy(xpath = "//button[contains(@class, 'ant-btn')]//span[contains(text(), 'Submit')]")
-    private WebElement buttonSubmit;
+    public WebElement buttonSubmit;
 
     @FindBy(xpath = "//button[contains(@class, 'ant-btn')]//span[contains(text(), 'Cancel')]")
-    private WebElement buttonCancel;
+    public WebElement buttonCancel;
 
     public ApplicationForm(WebDriver driver) {
         this.driver = driver;
@@ -86,120 +86,120 @@ public final class ApplicationForm {
     }
 
     @SneakyThrows
-    public ApplicationForm addApplication(DevelopmentMode developmentMode,
-                                          ExecutionMode executionMode,
+    public ApplicationForm addApplication(FlinkJobType jobType,
+                                          DeployMode deployMode,
                                           String applicationName) {
         Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
         new WebDriverWait(driver, Constants.DEFAULT_WEBDRIVER_WAIT_DURATION)
-            .until(ExpectedConditions.elementToBeClickable(buttonDevelopmentModeDropdown));
-        buttonDevelopmentModeDropdown.click();
+            .until(ExpectedConditions.elementToBeClickable(buttonJobTypeDropdown));
+        buttonJobTypeDropdown.click();
         new WebDriverWait(driver, Constants.DEFAULT_WEBDRIVER_WAIT_DURATION)
-            .until(ExpectedConditions.visibilityOfAllElements(selectDevelopmentMode));
-        switch (developmentMode) {
+            .until(ExpectedConditions.visibilityOfAllElements(selectJobType));
+        switch (jobType) {
             case CUSTOM_CODE:
-                selectDevelopmentMode.stream()
-                    .filter(e -> e.getText().equalsIgnoreCase(DevelopmentMode.CUSTOM_CODE.desc()))
+                selectJobType.stream()
+                    .filter(e -> e.getText().equalsIgnoreCase(FlinkJobType.CUSTOM_CODE.desc))
                     .findFirst()
                     .orElseThrow(
                         () -> new IllegalArgumentException(
                             String.format("Development mode not found: %s",
-                                developmentMode.desc())))
+                                jobType.desc)))
                     .click();
                 break;
             case FLINK_SQL:
-                selectDevelopmentMode.stream()
-                    .filter(e -> e.getText().equalsIgnoreCase(DevelopmentMode.FLINK_SQL.desc()))
+                selectJobType.stream()
+                    .filter(e -> e.getText().equalsIgnoreCase(FlinkJobType.FLINK_SQL.desc))
                     .findFirst()
                     .orElseThrow(
                         () -> new IllegalArgumentException(
                             String.format("Development mode not found: %s",
-                                developmentMode.desc())))
+                                jobType.desc)))
                     .click();
-                buttonExecutionModeDropdown.click();
-                switch (executionMode) {
+                buttonDeployModeDropdown.click();
+                switch (deployMode) {
                     case REMOTE:
-                        selectExecutionMode.stream()
-                            .filter(e -> e.getText().equalsIgnoreCase(ExecutionMode.REMOTE.desc()))
+                        selectDeployMode.stream()
+                            .filter(e -> e.getText().equalsIgnoreCase(DeployMode.REMOTE.desc))
                             .findFirst()
                             .orElseThrow(
                                 () -> new IllegalArgumentException(
                                     String.format("Execution mode not found: %s",
-                                        executionMode.desc())))
+                                        deployMode.desc)))
                             .click();
                         break;
                     case YARN_APPLICATION:
-                        selectExecutionMode.stream()
+                        selectDeployMode.stream()
                             .filter(e -> e.getText()
-                                .equalsIgnoreCase(ExecutionMode.YARN_APPLICATION.desc()))
+                                .equalsIgnoreCase(DeployMode.YARN_APPLICATION.desc))
                             .findFirst()
                             .orElseThrow(
                                 () -> new IllegalArgumentException(
                                     String.format("Execution mode not found: %s",
-                                        executionMode.desc())))
+                                        deployMode.desc)))
                             .click();
 
                         break;
                     case YARN_SESSION:
-                        selectExecutionMode.stream()
-                            .filter(e -> e.getText().equalsIgnoreCase(ExecutionMode.YARN_SESSION.desc()))
+                        selectDeployMode.stream()
+                            .filter(e -> e.getText().equalsIgnoreCase(DeployMode.YARN_SESSION.desc))
                             .findFirst()
                             .orElseThrow(
                                 () -> new IllegalArgumentException(
                                     String.format("Execution mode not found: %s",
-                                        executionMode.desc())))
+                                        deployMode.desc)))
                             .click();
                         break;
                     case KUBERNETES_SESSION:
-                        selectExecutionMode.stream()
+                        selectDeployMode.stream()
                             .filter(e -> e.getText()
-                                .equalsIgnoreCase(ExecutionMode.KUBERNETES_SESSION.desc()))
+                                .equalsIgnoreCase(DeployMode.KUBERNETES_SESSION.desc))
                             .findFirst()
                             .orElseThrow(
                                 () -> new IllegalArgumentException(
                                     String.format("Execution mode not found: %s",
-                                        executionMode.desc())))
+                                        deployMode.desc)))
                             .click();
                         break;
                     case KUBERNETES_APPLICATION:
-                        selectExecutionMode.stream()
+                        selectDeployMode.stream()
                             .filter(
                                 e -> e.getText().equalsIgnoreCase(
-                                    ExecutionMode.KUBERNETES_APPLICATION.desc()))
+                                    DeployMode.KUBERNETES_APPLICATION.desc))
                             .findFirst()
                             .orElseThrow(
                                 () -> new IllegalArgumentException(
                                     String.format("Execution mode not found: %s",
-                                        executionMode.desc())))
+                                        deployMode.desc)))
                             .click();
                         break;
                     case YARN_PER_JOB:
-                        selectExecutionMode.stream()
-                            .filter(e -> e.getText().equalsIgnoreCase(ExecutionMode.YARN_PER_JOB.desc()))
+                        selectDeployMode.stream()
+                            .filter(e -> e.getText().equalsIgnoreCase(DeployMode.YARN_PER_JOB.desc))
                             .findFirst()
                             .orElseThrow(
                                 () -> new IllegalArgumentException(
                                     String.format("Execution mode not found: %s",
-                                        executionMode.desc())))
+                                        deployMode.desc)))
                             .click();
                         break;
                     default:
                         throw new IllegalArgumentException(
-                            String.format("Unknown execution mode: %s", executionMode.desc()));
+                            String.format("Unknown execution mode: %s", deployMode.desc));
                 }
                 break;
             case PYTHON_FLINK:
-                selectDevelopmentMode.stream()
-                    .filter(e -> e.getText().equalsIgnoreCase(DevelopmentMode.PYTHON_FLINK.toString()))
+                selectJobType.stream()
+                    .filter(e -> e.getText().equalsIgnoreCase(FlinkJobType.PYTHON_FLINK.toString()))
                     .findFirst()
                     .orElseThrow(
                         () -> new IllegalArgumentException(
                             String.format("Development mode not found: %s",
-                                developmentMode)))
+                                jobType)))
                     .click();
                 break;
             default:
                 throw new IllegalArgumentException(
-                    String.format("Unknown development mode: %s", developmentMode));
+                    String.format("Unknown development mode: %s", jobType));
         }
         inputApplicationName.sendKeys(applicationName);
 
@@ -248,30 +248,32 @@ public final class ApplicationForm {
     }
 
     @Getter
-    public enum DevelopmentMode {
+    public enum FlinkJobType {
 
-        CUSTOM_CODE("custom code"), FLINK_SQL("flink sql"), PYTHON_FLINK("python flink"),
-        ;
+        CUSTOM_CODE("custom code"),
+        FLINK_SQL("flink sql"),
+        PYTHON_FLINK("python flink");
 
         private final String desc;
 
-        DevelopmentMode(String desc) {
+        FlinkJobType(String desc) {
             this.desc = desc;
         }
     }
 
     @Getter
-    public enum ExecutionMode {
+    public enum DeployMode {
 
-        REMOTE("remote"), YARN_APPLICATION("yarn application"), YARN_SESSION("yarn session"), KUBERNETES_SESSION(
-            "kubernetes session"),
-        KUBERNETES_APPLICATION("kubernetes application"), YARN_PER_JOB(
-            "yarn per-job (deprecated, please use yarn-application mode)"),
-            ;
+        REMOTE("remote"),
+        YARN_APPLICATION("yarn application"),
+        YARN_SESSION("yarn session"),
+        KUBERNETES_SESSION("kubernetes session"),
+        KUBERNETES_APPLICATION("kubernetes application"),
+        YARN_PER_JOB("yarn per-job (deprecated, please use yarn-application mode)");
 
         private final String desc;
 
-        ExecutionMode(String desc) {
+        DeployMode(String desc) {
             this.desc = desc;
         }
     }

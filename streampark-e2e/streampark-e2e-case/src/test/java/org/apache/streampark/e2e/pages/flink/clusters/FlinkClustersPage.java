@@ -30,23 +30,19 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.time.Duration;
 import java.util.List;
-
-import static org.apache.streampark.e2e.pages.common.CommonFactory.WebDriverWaitForElementVisibilityAndInvisibility;
-import static org.apache.streampark.e2e.pages.common.CommonFactory.WebDriverWaitForElementVisibilityAndInvisibilityWithDuration;
 
 @Getter
 public class FlinkClustersPage extends NavBarPage implements ApacheFlinkPage.Tab {
 
-    @FindBy(xpath = "//span[contains(., 'Flink Cluster')]/..//button[contains(@class, 'ant-btn')]/span[contains(text(), 'Add New')]")
-    private WebElement buttonCreateFlinkCluster;
+    @FindBy(id = "e2e-flinkcluster-create-btn")
+    public WebElement buttonCreateFlinkCluster;
 
-    @FindBy(xpath = "//div[contains(@class, 'ant-spin-container')]")
-    private List<WebElement> flinkClusterList;
+    @FindBy(className = "ant-table-tbody")
+    public List<WebElement> flinkClusterList;
 
-    @FindBy(xpath = "//button[contains(@class, 'ant-btn')]/span[contains(., 'Yes')]")
-    private WebElement deleteConfirmButton;
+    @FindBy(className = "e2e-flinkcluster-delete-confirm")
+    public WebElement deleteConfirmButton;
 
     public FlinkClustersPage(RemoteWebDriver driver) {
         super(driver);
@@ -58,6 +54,7 @@ public class FlinkClustersPage extends NavBarPage implements ApacheFlinkPage.Tab
         new WebDriverWait(driver, Constants.DEFAULT_WEBDRIVER_WAIT_DURATION)
             .until(ExpectedConditions.elementToBeClickable(buttonCreateFlinkCluster));
         buttonCreateFlinkCluster.click();
+
         new WebDriverWait(driver, Constants.DEFAULT_WEBDRIVER_WAIT_DURATION)
             .until(ExpectedConditions.urlContains("/flink/add_cluster"));
 
@@ -67,12 +64,11 @@ public class FlinkClustersPage extends NavBarPage implements ApacheFlinkPage.Tab
     public ClusterDetailForm editFlinkCluster(String flinkClusterName) {
         waitForPageLoading();
 
-        flinkClusterList().stream()
+        flinkClusterList.stream()
             .filter(it -> it.getText().contains(flinkClusterName))
             .flatMap(
-                it -> it
-                    .findElements(
-                        By.className("anticon-edit"))
+                it -> it.findElements(
+                    By.className("e2e-flinkcluster-edit-btn"))
                     .stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
@@ -81,6 +77,7 @@ public class FlinkClustersPage extends NavBarPage implements ApacheFlinkPage.Tab
 
         new WebDriverWait(driver, Constants.DEFAULT_WEBDRIVER_WAIT_DURATION)
             .until(ExpectedConditions.urlContains("/flink/edit_cluster"));
+
         return new ClusterDetailForm(driver);
     }
 
@@ -88,52 +85,48 @@ public class FlinkClustersPage extends NavBarPage implements ApacheFlinkPage.Tab
     public FlinkClustersPage startFlinkCluster(String flinkClusterName) {
         waitForPageLoading();
         Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
-        flinkClusterList().stream()
+        flinkClusterList.stream()
             .filter(it -> it.getText().contains(flinkClusterName))
             .flatMap(
                 it -> it
                     .findElements(
-                        By.className("anticon-play-circle"))
+                        By.className("e2e-flinkcluster-start-btn"))
                     .stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No start button in flink clusters list"))
             .click();
 
-        String startMessage = "The current cluster is started";
-        WebDriverWaitForElementVisibilityAndInvisibilityWithDuration(driver, startMessage, Duration.ofMinutes(1));
         return this;
     }
 
     public FlinkClustersPage stopFlinkCluster(String flinkClusterName) {
         waitForPageLoading();
 
-        flinkClusterList().stream()
+        flinkClusterList.stream()
             .filter(it -> it.getText().contains(flinkClusterName))
             .flatMap(
                 it -> it
                     .findElements(
-                        By.className("anticon-pause-circle"))
+                        By.className("e2e-flinkcluster-shutdown-btn"))
                     .stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No stop button in flink clusters list"))
             .click();
 
-        String stopMessage = "The current cluster is shutdown";
-        WebDriverWaitForElementVisibilityAndInvisibility(driver, stopMessage);
         return this;
     }
 
     public FlinkClustersPage deleteFlinkCluster(String flinkName) {
         waitForPageLoading();
 
-        flinkClusterList().stream()
+        flinkClusterList.stream()
             .filter(it -> it.getText().contains(flinkName))
             .flatMap(
                 it -> it
                     .findElements(
-                        By.className("anticon-delete"))
+                        By.className("e2e-flinkcluster-delete-btn"))
                     .stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
@@ -141,8 +134,6 @@ public class FlinkClustersPage extends NavBarPage implements ApacheFlinkPage.Tab
             .click();
 
         deleteConfirmButton.click();
-        String deleteMessage = "The current cluster is remove";
-        WebDriverWaitForElementVisibilityAndInvisibility(driver, deleteMessage);
         return this;
     }
 

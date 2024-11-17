@@ -16,6 +16,12 @@
  */
 export default {
   title: 'Spark Home',
+  sparkVersion: 'Spark Version',
+  searchByName: 'Search by Spark Name',
+  conf: 'Spark Conf',
+  sync: 'Sync Conf',
+  edit: 'Edit Spark Home',
+  delete: 'Are you sure delete this spark home ?',
   tips: {
     remove: 'The current spark home has been successfully deleted.',
     setDefault: 'Successfully set the default spark home.',
@@ -34,7 +40,7 @@ export default {
   },
   form: {
     sparkName: 'Spark Name',
-    sparkHome: 'Installation Path',
+    sparkHome: 'Spark Home',
     description: 'Description',
   },
   placeholder: {

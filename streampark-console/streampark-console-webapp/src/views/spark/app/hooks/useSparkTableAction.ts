@@ -23,11 +23,7 @@ import { AppStateEnum, JobTypeEnum, OptionStateEnum } from '/@/enums/sparkEnum';
 import { usePermission } from '/@/hooks/web/usePermission';
 import { useI18n } from '/@/hooks/web/useI18n';
 import { isFunction, isNullAndUnDef, isObject } from '/@/utils/is';
-import {
-  fetchSparkAppForcedStop,
-  fetchSparkAppRecord,
-  fetchSparkAppRemove,
-} from '/@/api/spark/app';
+import { fetchSparkAppCancel, fetchSparkAppRecord, fetchSparkAppRemove } from '/@/api/spark/app';
 import type { SparkApplication } from '/@/api/spark/app.type';
 import { useSparkAction } from './useSparkAction';
 import { useDrawer } from '/@/components/Drawer';
@@ -98,7 +94,10 @@ export const useSparkTableAction = (handlePageDataReload: Fn, optionApps: Record
       {
         tooltip: { title: t('spark.app.operation.cancel') },
         ifShow:
-          record.state == AppStateEnum.RUNNIN && record['optionState'] == OptionStateEnum.NONE,
+          (record.state == AppStateEnum.ACCEPTED ||
+            record.state == AppStateEnum.RUNNING ||
+            record.state == AppStateEnum.SUBMITTED) &&
+          record['optionState'] == OptionStateEnum.NONE,
         auth: 'app:cancel',
         icon: 'ant-design:pause-circle-outlined',
         popConfirm: {
@@ -136,12 +135,12 @@ export const useSparkTableAction = (handlePageDataReload: Fn, optionApps: Record
         label: t('spark.app.operation.remapping'),
         ifShow: [
           AppStateEnum.ADDED,
-          AppStateEnum.FAILE,
+          AppStateEnum.FAILED,
           AppStateEnum.STOPPING,
           AppStateEnum.KILLED,
           AppStateEnum.SUCCEEDED,
-          AppStateEnum.FINISHE,
-          AppStateEnum.LOS,
+          AppStateEnum.FINISHED,
+          AppStateEnum.LOST,
         ].includes(record.state as AppStateEnum),
         auth: 'app:mapping',
         icon: 'ant-design:deployment-unit-outlined',
@@ -157,9 +156,9 @@ export const useSparkTableAction = (handlePageDataReload: Fn, optionApps: Record
           !isNullAndUnDef(record.state) &&
           [
             AppStateEnum.ADDED,
-            AppStateEnum.FAILE,
-            AppStateEnum.FINISHE,
-            AppStateEnum.LOS,
+            AppStateEnum.FAILED,
+            AppStateEnum.FINISHED,
+            AppStateEnum.LOST,
             AppStateEnum.SUCCEEDED,
             AppStateEnum.KILLED,
           ].includes(record.state),
@@ -218,7 +217,7 @@ export const useSparkTableAction = (handlePageDataReload: Fn, optionApps: Record
   // click stop application
   async function handleCancel(app: SparkApplication) {
     if (!optionApps.stopping.get(app.id) || app['optionState'] == OptionStateEnum.NONE) {
-      await fetchSparkAppForcedStop({
+      await fetchSparkAppCancel({
         id: app.id,
       });
       Swal.fire({
@@ -253,7 +252,7 @@ export const useSparkTableAction = (handlePageDataReload: Fn, optionApps: Record
       showSubmitButton: false,
       showResetButton: false,
       async resetFunc() {
-        router.push({ path: '/spark/app/create' });
+        router.push({ path: '/spark/app/add' });
       },
       schemas: [
         {
@@ -297,7 +296,7 @@ export const useSparkTableAction = (handlePageDataReload: Fn, optionApps: Record
         },
         {
           label: t('spark.app.searchName'),
-          field: 'jobName',
+          field: 'appName',
           component: 'Input',
           componentProps: {
             placeholder: t('spark.app.searchName'),

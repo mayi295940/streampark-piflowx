@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 import { BasicColumn } from '/@/components/Table/src/types/table';
-import { Tag, TypographyParagraph } from 'ant-design-vue';
+import { TypographyParagraph } from 'ant-design-vue';
 import { DescItem } from '/@/components/Description';
 import { h } from 'vue';
 import State from '../components/State';
@@ -23,6 +23,7 @@ import Icon from '/@/components/Icon';
 import { dateToDuration } from '/@/utils/dateUtil';
 import { JobTypeEnum } from '/@/enums/sparkEnum';
 import { useI18n } from '/@/hooks/web/useI18n';
+import { sparkJobTypeMap } from '../hooks/useSparkRender';
 
 const { t } = useI18n();
 export const getDescSchema = (): DescItem[] => {
@@ -36,19 +37,12 @@ export const getDescSchema = (): DescItem[] => {
     { field: 'appName', label: t('spark.app.appName') },
     {
       field: 'jobType',
-      label: t('spark.app.developmentMode'),
-      render: (curVal) =>
-        h(
-          'div',
-          { class: 'bold-tag' },
-          h(Tag, { color: curVal === 1 ? '#545454' : '#0C7EF2', class: 'mr-8px' }, () =>
-            curVal === 1 ? 'Custom Code' : 'Spark SQL',
-          ),
-        ),
+      label: t('spark.app.jobType'),
+      render: (curVal) => sparkJobTypeMap[+curVal]?.label || '-',
     },
     {
-      field: 'module',
-      label: t('spark.app.module'),
+      field: 'jar',
+      label: t('spark.app.resource'),
       show: (data) => data.jobType != JobTypeEnum.SQL,
     },
     {
@@ -118,9 +112,9 @@ export const getBackupColumns = (): BasicColumn[] => [
 ];
 
 export const getOptionLogColumns = (): BasicColumn[] => [
-  { title: 'Operation Name', dataIndex: 'optionName', width: 150 },
-  { title: 'Cluster Id', dataIndex: 'yarnAppId' },
-  { title: 'JobManager URL', dataIndex: 'jobManagerUrl' },
-  { title: 'Start Status', dataIndex: 'success', width: 120 },
-  { title: 'Option Time', dataIndex: 'optionTime', width: 200 },
+  { title: 'Operation Name', dataIndex: 'optionName' },
+  { title: 'Application Id', dataIndex: 'clusterId' },
+  { title: 'Tracking Url', dataIndex: 'trackingUrl' },
+  { title: 'Start Status', dataIndex: 'success' },
+  { title: 'Option Time', dataIndex: 'optionTime' },
 ];

@@ -26,7 +26,8 @@
   import { Button, Steps, Step } from 'ant-design-vue';
   import { AppListRecord } from '/@/api/flink/app.type';
   import configOptions from './data/option';
-  import { fetchMain, fetchUpload, fetchUpdate, fetchGet } from '/@/api/flink/app';
+  import { fetchUpdate, fetchGet } from '/@/api/flink/app';
+  import { fetchUpload } from '/@/api/resource/upload';
   import { useRoute } from 'vue-router';
   import { getAppConfType, handleSubmitParams, handleTeamResource } from './utils';
   import { fetchFlinkHistory } from '/@/api/flink/flinkSql';
@@ -49,7 +50,7 @@
   import { useGo } from '/@/hooks/web/usePage';
   import ProgramArgs from './components/ProgramArgs.vue';
   import VariableReview from './components/VariableReview.vue';
-  import { ExecModeEnum, JobTypeEnum, UseStrategyEnum } from '/@/enums/flinkEnum';
+  import { DeployMode, JobTypeEnum, UseStrategyEnum } from '/@/enums/flinkEnum';
 
   const route = useRoute();
   const go = useGo();
@@ -96,7 +97,7 @@
   const [registerReviewDrawer, { openDrawer: openReviewDrawer }] = useDrawer();
 
   /* Form reset */
-  function handleReset(executionMode?: string) {
+  function handleReset(deployMode?: string) {
     let selectAlertId = '';
     if (app.alertId) {
       selectAlertId = unref(alerts).filter((t) => t.id == app.alertId)[0]?.id;
@@ -125,21 +126,21 @@
         k8sNamespace: app.k8sNamespace,
         ...resetParams,
       };
-      switch (app.executionMode) {
-        case ExecModeEnum.REMOTE:
+      switch (app.deployMode) {
+        case DeployMode.STANDALONE:
           defaultParams['remoteClusterId'] = app.flinkClusterId;
           break;
-        case ExecModeEnum.YARN_SESSION:
+        case DeployMode.YARN_SESSION:
           defaultParams['yarnSessionClusterId'] = app.flinkClusterId;
           break;
-        case ExecModeEnum.KUBERNETES_SESSION:
+        case DeployMode.KUBERNETES_SESSION:
           defaultParams['k8sSessionClusterId'] = app.flinkClusterId;
           break;
         default:
           break;
       }
-      if (!executionMode) {
-        Object.assign(defaultParams, { executionMode: app.executionMode });
+      if (!deployMode) {
+        Object.assign(defaultParams, { deployMode: app.deployMode });
       }
       setFieldsValue(defaultParams);
       app.args && programArgRef.value?.setContent(app.args);
@@ -150,11 +151,10 @@
     const formData = new FormData();
     formData.append('file', data.file);
     try {
-      const path = await fetchUpload(formData);
+      const resp = await fetchUpload(formData);
       uploadJar.value = data.file.name;
-      const res = await fetchMain({ jar: path });
       uploadLoading.value = false;
-      setFieldsValue({ jar: uploadJar.value, mainClass: res });
+      setFieldsValue({ jar: uploadJar.value, mainClass: resp.mainClass });
     } catch (error) {
       console.error(error);
       uploadLoading.value = false;
@@ -307,7 +307,7 @@
     setFieldsValue({
       jobType: res.jobType,
       appType: res.appType,
-      executionMode: res.executionMode,
+      deployMode: res.deployMode,
       flinkSql: res.flinkSql ? decodeByBase64(res.flinkSql) : '',
       dependency: '',
       module: res.module,

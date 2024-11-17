@@ -22,30 +22,25 @@ set names utf8mb4;
 set foreign_key_checks = 0;
 
 -- ----------------------------
--- table structure for t_app_backup
+-- Table structure for t_app
 -- ----------------------------
-drop table if exists `t_app_backup`;
-create table `t_app_backup` (
-  `id` bigint not null auto_increment,
-  `app_id` bigint default null,
-  `sql_id` bigint default null,
-  `config_id` bigint default null,
-  `version` int default null,
-  `path` varchar(128) collate utf8mb4_general_ci default null,
-  `description` varchar(255) collate utf8mb4_general_ci default null,
-  `create_time` datetime default null comment 'create time',
-  primary key (`id`) using btree
-) engine=innodb auto_increment=100000 default charset=utf8mb4 collate=utf8mb4_general_ci;
+create table if not exists `t_app` (
+`id` bigint not null,
+`job_type` tinyint default null,
+`create_time` datetime default null comment 'create time',
+`modify_time` datetime default null comment 'modify time',
+primary key(`id`)
+);
 
 -- ----------------------------
 -- Table structure for t_flink_app
 -- ----------------------------
 drop table if exists `t_flink_app`;
 create table `t_flink_app` (
-  `id` bigint not null auto_increment,
+  `id` bigint not null,
   `team_id` bigint not null,
   `job_type` tinyint default null,
-  `execution_mode` tinyint default null,
+  `deploy_mode` tinyint default null,
   `resource_from` tinyint default null,
   `project_id` bigint default null,
   `job_name` varchar(255) collate utf8mb4_general_ci default null,
@@ -111,6 +106,23 @@ create table `t_flink_app` (
 
 
 -- ----------------------------
+-- table structure for t_flink_app_backup
+-- ----------------------------
+drop table if exists `t_flink_app_backup`;
+create table `t_flink_app_backup` (
+`id` bigint not null,
+`app_id` bigint default null,
+`sql_id` bigint default null,
+`config_id` bigint default null,
+`version` int default null,
+`path` varchar(128) collate utf8mb4_general_ci default null,
+`description` varchar(255) collate utf8mb4_general_ci default null,
+`create_time` datetime default null comment 'create time',
+primary key (`id`) using btree
+) engine=innodb auto_increment=100000 default charset=utf8mb4 collate=utf8mb4_general_ci;
+
+
+-- ----------------------------
 -- table structure for t_flink_config
 -- ----------------------------
 drop table if exists `t_flink_config`;
@@ -161,14 +173,14 @@ create table `t_flink_env` (
 
 
 -- ----------------------------
--- table structure for t_flink_log
+-- table structure for t_app_log
 -- ----------------------------
-drop table if exists `t_flink_log`;
-create table `t_flink_log` (
+drop table if exists `t_app_log`;
+create table `t_app_log` (
   `id` bigint not null auto_increment,
   `app_id` bigint default null,
-  `yarn_app_id` varchar(64) collate utf8mb4_general_ci default null,
-  `job_manager_url` varchar(255) collate utf8mb4_general_ci default null,
+  `cluster_id` varchar(64) collate utf8mb4_general_ci default null,
+  `tracking_url` varchar(255) collate utf8mb4_general_ci default null,
   `success` tinyint default null,
   `exception` text collate utf8mb4_general_ci,
   `option_time` datetime default null,
@@ -236,6 +248,19 @@ create table `t_flink_sql` (
   `version` int default null,
   `candidate` tinyint not null default 1,
   `create_time` datetime default null comment 'create time',
+  primary key (`id`) using btree
+) engine=innodb auto_increment=100000 default charset=utf8mb4 collate=utf8mb4_general_ci;
+
+
+-- ----------------------------
+-- Table structure for t_distributed_task
+-- ----------------------------
+drop table if exists `t_distributed_task`;
+create table `t_distributed_task` (
+  `id` bigint not null auto_increment,
+  `action` tinyint not null,
+  `engine_type` tinyint not null,
+  `properties` text collate utf8mb4_general_ci,
   primary key (`id`) using btree
 ) engine=innodb auto_increment=100000 default charset=utf8mb4 collate=utf8mb4_general_ci;
 
@@ -427,7 +452,7 @@ create table `t_flink_cluster` (
   `cluster_name` varchar(128) not null comment 'cluster name',
   `options` text comment 'json form of parameter collection ',
   `yarn_queue` varchar(128) default null comment 'the yarn queue where the task is located',
-  `execution_mode` tinyint not null default 1 comment 'k8s execution session mode(1:remote,3:yarn-session,5:kubernetes-session)',
+  `deploy_mode` tinyint not null default 1 comment 'k8s execution session mode(1:remote,3:yarn-session,5:kubernetes-session)',
   `version_id` bigint not null comment 'flink version id',
   `k8s_namespace` varchar(63) default 'default' comment 'k8s namespace',
   `service_account` varchar(64) default null comment 'k8s service account',
@@ -446,7 +471,7 @@ create table `t_flink_cluster` (
   `end_time` datetime default null comment 'end time',
   `alert_id` bigint default null comment 'alert id',
   primary key (`id`,`cluster_name`),
-  unique key `id` (`cluster_id`,`address`,`execution_mode`)
+  unique key `id` (`cluster_id`,`address`,`deploy_mode`)
 ) engine=innodb auto_increment=100000 default charset=utf8mb4 collate=utf8mb4_general_ci;
 
 
@@ -571,7 +596,7 @@ create table `t_spark_app` (
   `app_type` tinyint default null comment '(1)Apache Spark(2)StreamPark Spark',
   `version_id` bigint default null comment 'spark version',
   `app_name` varchar(255) collate utf8mb4_general_ci default null comment 'spark.app.name',
-  `execution_mode` tinyint default null comment 'spark.submit.deployMode(1)cluster(2)client',
+  `deploy_mode` tinyint default null comment 'spark.submit.deployMode(1)cluster(2)client',
   `resource_from` tinyint default null,
   `project_id` bigint default null,
   `module` varchar(255) collate utf8mb4_general_ci default null,
@@ -641,6 +666,21 @@ create table `t_spark_log` (
   primary key (`id`) using btree
 ) engine=innodb auto_increment=100000 default charset=utf8mb4 collate=utf8mb4_general_ci;
 
+-- ----------------------------
+-- table structure for t_flink_catalog
+-- ----------------------------
+drop table if exists `t_flink_catalog`;
+CREATE TABLE `t_flink_catalog` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `team_id` BIGINT NOT NULL,
+    `user_id` BIGINT DEFAULT NULL,
+    `catalog_type` VARCHAR(255) NOT NULL,
+    `catalog_name` VARCHAR(255) NOT NULL,
+    `configuration` TEXT,
+    `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `update_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_catalog_name (`catalog_name`)
+) ENGINE=InnoDB auto_increment=100000 default charset=utf8mb4 collate=utf8mb4_general_ci;
 
 -- ----------------------------
 -- table structure for t_spark_effective

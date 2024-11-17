@@ -20,7 +20,7 @@ import { Icon, SvgIcon } from '/@/components/Icon';
 import Mergely from '../components/Mergely.vue';
 import { Alert, Dropdown, Input, Menu, Select, Switch, Tag } from 'ant-design-vue';
 import { SettingTwoTone } from '@ant-design/icons-vue';
-import { unref } from 'vue';
+import { h, unref } from 'vue';
 import { decodeByBase64 } from '/@/utils/cipher';
 import { SelectValue } from 'ant-design-vue/lib/select';
 import { useI18n } from '/@/hooks/web/useI18n';
@@ -28,6 +28,7 @@ import { fetchYarnQueueList } from '/@/api/setting/yarnQueue';
 import { ApiSelect } from '/@/components/Form';
 import { ResourceTypeEnum } from '/@/views/resource/upload/upload.data';
 import { fetchSparkConfTemplate } from '/@/api/spark/conf';
+import { JobTypeEnum } from '/@/enums/sparkEnum';
 
 const { t } = useI18n();
 /* render input dropdown component */
@@ -94,38 +95,9 @@ export const renderYarnQueue = ({ model, field }: RenderCallbackParams) => {
       <p class="conf-desc mt-10px">
         <span class="note-info">
           <Tag color="#2db7f5" class="tag-note">
-            {t('flink.app.noteInfo.note')}
+            {t('spark.app.noteInfo.note')}
           </Tag>
           {t('setting.yarnQueue.selectionHint')}
-        </span>
-      </p>
-    </div>
-  );
-};
-
-/* render memory option */
-export const renderDynamicProperties = ({ model, field }: RenderCallbackParams) => {
-  return (
-    <div>
-      <Input.TextArea
-        rows={8}
-        name="dynamicProperties"
-        placeholder="$key=$value,If there are multiple parameters,you can new line enter them (-D <arg>)"
-        value={model[field]}
-        onInput={(e: ChangeEvent) => (model[field] = e?.target?.value)}
-      />
-      <p class="conf-desc mt-10px">
-        <span class="note-info">
-          <Tag color="#2db7f5" class="tag-note">
-            {t('flink.app.noteInfo.note')}
-          </Tag>
-          <a
-            href="https://ci.apache.org/projects/flink/flink-docs-stable/ops/config.html"
-            target="_blank"
-            class="pl-5px"
-          >
-            Flink {t('flink.app.noteInfo.officialDoc')}
-          </a>
         </span>
       </p>
     </div>
@@ -248,11 +220,11 @@ export const renderResourceFrom = (model: Recordable) => {
 export const renderStreamParkResource = ({ model, resources }) => {
   const renderOptions = () => {
     return (resources || [])
-      .filter((item) => item.resourceType !== ResourceTypeEnum.FLINK_APP)
+      .filter((item) => item.resourceType === ResourceTypeEnum.APP)
       .map((resource) => {
         return (
           <Select.Option
-            key={resource.id}
+            key={resource.resourceName}
             label={resource.resourceType + '-' + resource.resourceName}
           >
             <div>
@@ -272,11 +244,9 @@ export const renderStreamParkResource = ({ model, resources }) => {
         show-search
         allow-clear
         optionFilterProp="label"
-        mode="multiple"
-        max-tag-count={3}
-        onChange={(value) => (model.teamResource = value)}
-        value={model.teamResource}
-        placeholder={t('flink.app.resourcePlaceHolder')}
+        onChange={(value) => (model.jar = value)}
+        value={model.jar}
+        placeholder={t('spark.app.resourcePlaceHolder')}
       >
         {renderOptions()}
       </Select>
@@ -294,7 +264,7 @@ export const renderStreamParkJarApp = ({ model, resources }) => {
   const renderOptions = () => {
     console.log('resources', resources);
     return (resources || [])
-      .filter((item) => item.resourceType == ResourceTypeEnum.FLINK_APP)
+      .filter((item) => item.resourceType == ResourceTypeEnum.APP)
       .map((resource) => {
         return (
           <Select.Option key={resource.id} label={resource.resourceName}>
@@ -317,10 +287,34 @@ export const renderStreamParkJarApp = ({ model, resources }) => {
         optionFilterProp="label"
         onChange={handleAppChange}
         value={model.uploadJobJar}
-        placeholder={t('flink.app.selectAppPlaceHolder')}
+        placeholder={t('spark.app.selectAppPlaceHolder')}
       >
         {renderOptions()}
       </Select>
     </div>
   );
+};
+
+export const sparkJobTypeMap = {
+  [JobTypeEnum.JAR]: {
+    label: h('div', {}, [
+      h(SvgIcon, { name: 'spark', color: '#108ee9' }, ''),
+      h('span', { class: 'pl-10px' }, 'Spark Jar'),
+    ]),
+    value: JobTypeEnum.JAR,
+  },
+  [JobTypeEnum.SQL]: {
+    label: h('div', {}, [
+      h(SvgIcon, { name: 'sparksql', color: '#108ee9' }, ''),
+      h('span', { class: 'pl-10px' }, 'Spark SQL'),
+    ]),
+    value: JobTypeEnum.SQL,
+  },
+  [JobTypeEnum.PYSPARK]: {
+    label: h('div', {}, [
+      h(SvgIcon, { name: 'pyspark', color: '#108ee9' }, ''),
+      h('span', { class: 'pl-10px' }, 'PySpark'),
+    ]),
+    value: JobTypeEnum.PYSPARK,
+  },
 };

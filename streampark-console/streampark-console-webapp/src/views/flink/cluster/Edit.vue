@@ -14,14 +14,9 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<script lang="ts">
-  import { defineComponent, unref, ref } from 'vue';
-  import { useGo } from '/@/hooks/web/usePage';
-  export default defineComponent({
-    name: 'EditCluster',
-  });
-</script>
 <script setup lang="ts" name="EditCluster">
+  import { unref, ref } from 'vue';
+  import { useGo } from '/@/hooks/web/usePage';
   import { PageWrapper } from '/@/components/Page';
   import { BasicForm, useForm } from '/@/components/Form';
   import { useMessage } from '/@/hooks/web/useMessage';
@@ -49,6 +44,7 @@
   const { getLoading, changeLoading, getClusterSchema, handleSubmitParams } = useClusterSetting();
 
   const [registerForm, { submit, setFieldsValue }] = useForm({
+    name: 'flink_cluster',
     labelWidth: 120,
     colon: true,
     labelCol: { lg: { span: 5, offset: 0 }, sm: { span: 7, offset: 0 } },
@@ -107,7 +103,7 @@
       setFieldsValue({
         clusterName: cluster.clusterName,
         clusterId: cluster.clusterId,
-        executionMode: cluster.executionMode,
+        deployMode: cluster.deployMode,
         address: cluster.address,
         description: cluster.description,
         dynamicProperties: cluster.dynamicProperties,
@@ -132,14 +128,25 @@
   });
 </script>
 <template>
-  <PageWrapper content-background content-class="py-30px">
-    <BasicForm @register="registerForm" @submit="handleSubmitCluster" :schemas="getClusterSchema">
+  <PageWrapper content-background content-full-height>
+    <BasicForm
+      @register="registerForm"
+      @submit="handleSubmitCluster"
+      :schemas="getClusterSchema"
+      class="!my-30px"
+    >
       <template #formFooter>
         <div class="flex items-center w-full justify-center">
           <a-button @click="go('/flink/cluster')">
             {{ t('common.cancelText') }}
           </a-button>
-          <a-button class="ml-4" :loading="getLoading" type="primary" @click="submit()">
+          <a-button
+            id="e2e-flinkcluster-submit-btn"
+            class="ml-4"
+            :loading="getLoading"
+            type="primary"
+            @click="submit()"
+          >
             {{ t('common.submitText') }}
           </a-button>
         </div>

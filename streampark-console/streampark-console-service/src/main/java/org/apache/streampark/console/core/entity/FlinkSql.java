@@ -25,13 +25,15 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Base64;
 import java.util.Date;
 import java.util.Objects;
 
-@Data
+@Getter
+@Setter
 @TableName("t_flink_sql")
 public class FlinkSql {
 
@@ -61,10 +63,12 @@ public class FlinkSql {
     /** dependency diff */
     private transient boolean dependencyDifference = false;
 
+    private transient Long teamId;
+
     public FlinkSql() {
     }
 
-    public FlinkSql(Application application) {
+    public FlinkSql(FlinkApplication application) {
         this.appId = application.getId();
         this.sql = application.getFlinkSql();
         this.teamResource = application.getTeamResource();
@@ -84,7 +88,7 @@ public class FlinkSql {
         this.setSql(DeflaterUtils.unzipString(this.sql));
     }
 
-    public void setToApplication(Application application) {
+    public void setToApplication(FlinkApplication application) {
         String encode = Base64.getEncoder().encodeToString(this.sql.getBytes());
         application.setFlinkSql(encode);
         application.setDependency(this.dependency);

@@ -14,13 +14,6 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<script lang="ts">
-  import { defineComponent } from 'vue';
-
-  export default defineComponent({
-    name: 'AddCluster',
-  });
-</script>
 <script setup lang="ts" name="AddCluster">
   import { PageWrapper } from '/@/components/Page';
   import { BasicForm, useForm } from '/@/components/Form';
@@ -37,6 +30,7 @@
   const { getLoading, changeLoading, getClusterSchema, handleSubmitParams } = useClusterSetting();
 
   const [registerForm, { submit }] = useForm({
+    name: 'flink_cluster',
     labelWidth: 120,
     colon: true,
     labelCol: { lg: { span: 5, offset: 0 }, sm: { span: 7, offset: 0 } },
@@ -44,6 +38,7 @@
     baseColProps: { span: 24 },
     showActionButtonGroup: false,
   });
+
   async function handleSubmitCluster(values: Recordable) {
     try {
       changeLoading(true);
@@ -82,14 +77,25 @@
   }
 </script>
 <template>
-  <PageWrapper content-background content-class="py-30px">
-    <BasicForm @register="registerForm" @submit="handleSubmitCluster" :schemas="getClusterSchema">
+  <PageWrapper content-full-height content-background>
+    <BasicForm
+      @register="registerForm"
+      @submit="handleSubmitCluster"
+      :schemas="getClusterSchema"
+      class="!my-30px"
+    >
       <template #formFooter>
         <div class="flex items-center w-full justify-center">
           <a-button @click="go('/flink/cluster')">
             {{ t('common.cancelText') }}
           </a-button>
-          <a-button class="ml-4" :loading="getLoading" type="primary" @click="submit()">
+          <a-button
+            id="e2e-flinkcluster-submit-btn"
+            class="ml-4"
+            :loading="getLoading"
+            type="primary"
+            @click="submit()"
+          >
             {{ t('common.submitText') }}
           </a-button>
         </div>

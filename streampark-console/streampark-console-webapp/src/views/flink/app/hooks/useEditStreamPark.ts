@@ -16,7 +16,7 @@
  */
 import { FormSchema } from '/@/components/Table';
 import { computed, h, Ref, ref, unref } from 'vue';
-import { ExecModeEnum, JobTypeEnum, UseStrategyEnum } from '/@/enums/flinkEnum';
+import { DeployMode, JobTypeEnum, UseStrategyEnum } from '/@/enums/flinkEnum';
 import { useCreateAndEditSchema } from './useCreateAndEditSchema';
 import { renderSqlHistory } from './useFlinkRender';
 import { Alert } from 'ant-design-vue';
@@ -46,7 +46,7 @@ export const useEditStreamParkSchema = (
     getFlinkClusterSchemas,
     getFlinkFormOtherSchemas,
     getFlinkTypeSchema,
-    getExecutionModeSchema,
+    getDeployModeSchema,
     suggestions,
   } = useCreateAndEditSchema(dependencyRef, {
     appId: appId,
@@ -123,7 +123,7 @@ export const useEditStreamParkSchema = (
         show: false,
       },
       ...getFlinkTypeSchema.value,
-      ...getExecutionModeSchema.value,
+      ...getDeployModeSchema.value,
       ...getFlinkClusterSchemas.value,
       {
         field: 'flinkSqlHistory',
@@ -186,7 +186,7 @@ export const useEditStreamParkSchema = (
         component: 'Switch',
         slot: 'useSysHadoopConf',
         defaultValue: false,
-        ifShow: ({ values }) => values.executionMode == ExecModeEnum.KUBERNETES_APPLICATION,
+        ifShow: ({ values }) => values.deployMode == DeployMode.KUBERNETES_APPLICATION,
       },
       ...getFlinkFormOtherSchemas.value,
     ];

@@ -11,6 +11,12 @@ export enum JobTypeEnum {
   SQL = 2,
   PYSPARK = 3,
 }
+
+export enum OperationEnum {
+  RELEASE,
+  START,
+  STOP,
+}
 export enum OptionStateEnum {
   /** Application which is currently action: none. */
   NONE = 0,
@@ -22,8 +28,8 @@ export enum OptionStateEnum {
   STOPPING = 3,
 }
 
-/* ExecutionMode  */
-export enum ExecModeEnum {
+/* DeployMode  */
+export enum DeployMode {
   /** remote (standalone) */
   REMOTE = 1,
   /** yarn per-job (deprecated, please use yarn-application mode) */
@@ -63,22 +69,22 @@ export enum AppStateEnum {
   STARTING = 3,
 
   /** (From Yarn)Application which has been submitted. */
-  SUBMITTE = 4,
+  SUBMITTED = 4,
 
   /** (From Yarn)Application has been accepted by the scheduler. */
-  ACCEPTE = 5,
+  ACCEPTED = 5,
 
   /** The job has failed and is currently waiting for the cleanup to complete. */
-  RUNNIN = 6,
+  RUNNING = 6,
 
   /** (From Yarn)Application which finished successfully. */
-  FINISHE = 7,
+  FINISHED = 7,
 
   /** (From Yarn)Application which failed. */
-  FAILE = 8,
+  FAILED = 8,
 
   /** Loss of mapping. */
-  LOS = 9,
+  LOST = 9,
 
   /** Mapping. */
   MAPPING = 10,

@@ -17,20 +17,22 @@
 
 package org.apache.streampark.console.core.entity;
 
-import org.apache.streampark.common.Constant;
+import org.apache.streampark.common.constants.Constants;
 import org.apache.streampark.console.base.mybatis.entity.BaseEntity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = true)
 @TableName("t_variable")
 public class Variable extends BaseEntity {
@@ -62,7 +64,7 @@ public class Variable extends BaseEntity {
 
     public void dataMasking() {
         if (desensitization) {
-            this.setVariableValue(Constant.DEFAULT_DATAMASK_STRING);
+            this.setVariableValue(Constants.DEFAULT_DATAMASK_STRING);
         }
     }
 }

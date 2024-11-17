@@ -15,15 +15,21 @@
   limitations under the License.
 -->
 <template>
-  <div>
-    <BasicTable @register="registerTable">
-      <template #toolbar>
-        <a-button type="primary" @click="handleCreate" v-auth="'resource:add'">
-          <Icon icon="ant-design:plus-outlined" />
-          {{ t('common.add') }}
-        </a-button>
+  <PageWrapper contentFullHeight fixed-height>
+    <BasicTable @register="registerTable" class="flex flex-col">
+      <template #form-formFooter>
+        <Col :span="4" :offset="14" class="text-right">
+          <a-button
+            id="e2e-upload-create-btn"
+            type="primary"
+            @click="handleCreate"
+            v-auth="'resource:add'"
+          >
+            <Icon icon="ant-design:plus-outlined" />
+            {{ t('common.add') }}
+          </a-button>
+        </Col>
       </template>
-      <template #resetBefore> 1111 </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'engineType'">
           <span v-if="record.engineType === EngineTypeEnum.FLINK">
@@ -34,11 +40,15 @@
           </span>
         </template>
         <template v-if="column.dataIndex === 'resourceType'">
-          <Tag color="processing" v-if="record.resourceType === ResourceTypeEnum.FLINK_APP">
-            <template #icon>
+          <Tag color="processing" v-if="record.resourceType === ResourceTypeEnum.APP">
+            <span v-if="record.engineType === EngineTypeEnum.FLINK">
               <img :src="flinkAppSvg" class="svg-icon" alt="Flink App" />
-            </template>
-            Flink App
+              Flink App
+            </span>
+            <span v-else>
+              <img :src="sparkAppSvg" class="svg-icon" alt="Spark App" />
+              Spark App
+            </span>
           </Tag>
 
           <Tag color="processing" v-if="record.resourceType === ResourceTypeEnum.CONNECTOR">
@@ -73,17 +83,22 @@
           <TableAction
             :actions="[
               {
+                class: 'e2e-upload-edit-btn',
                 icon: 'clarity:note-edit-line',
                 auth: 'resource:update',
                 tooltip: t('flink.resource.modifyResource'),
                 onClick: handleEdit.bind(null, record),
               },
               {
+                class: 'e2e-upload-delete-btn',
                 icon: 'ant-design:delete-outlined',
                 color: 'error',
                 tooltip: t('flink.resource.deleteResource'),
                 auth: 'resource:delete',
                 popConfirm: {
+                  okButtonProps: {
+                    class: 'e2e-upload-delete-confirm',
+                  },
                   title: t('flink.resource.deletePopConfirm'),
                   confirm: handleDelete.bind(null, record),
                 },
@@ -98,7 +113,7 @@
       @register="registerDrawer"
       @success="handleSuccess"
     />
-  </div>
+  </PageWrapper>
 </template>
 <script lang="ts">
   export default defineComponent({
@@ -120,26 +135,32 @@
     fetchResourceList,
     fetchTeamResource,
   } from '/@/api/resource/upload';
-  import { Tag } from 'ant-design-vue';
+  import { Col, Tag } from 'ant-design-vue';
   import SvgIcon from '/@/components/Icon/src/SvgIcon.vue';
 
   import flinkAppSvg from '/@/assets/icons/flink2.svg';
+  import sparkAppSvg from '/@/assets/icons/spark.svg';
+
   import connectorSvg from '/@/assets/icons/connector.svg';
   import udxfSvg from '/@/assets/icons/fx.svg';
   import jarSvg from '/@/assets/icons/jar.svg';
   import groupSvg from '/@/assets/icons/group.svg';
+  import { PageWrapper } from '/@/components/Page';
 
   const teamResource = ref<Array<any>>([]);
   const [registerDrawer, { openDrawer }] = useDrawer();
   const { createMessage } = useMessage();
   const { t } = useI18n();
   const [registerTable, { reload }] = useTable({
-    title: t('flink.resource.table.title'),
     api: fetchResourceList,
     columns,
     formConfig: {
-      baseColProps: { style: { paddingRight: '30px' } },
       schemas: searchFormSchema,
+      rowProps: {
+        gutter: 14,
+      },
+      submitOnChange: true,
+      showActionButtonGroup: false,
     },
     sortFn: (sortInfo: SorterResult) => {
       const { field, order } = sortInfo;
@@ -157,7 +178,7 @@
     rowKey: 'id',
     pagination: true,
     useSearchForm: true,
-    showTableSetting: true,
+    showTableSetting: false,
     showIndexColumn: false,
     canResize: false,
     actionColumn: {

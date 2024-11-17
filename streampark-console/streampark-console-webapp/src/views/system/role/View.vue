@@ -15,19 +15,27 @@
   limitations under the License.
 -->
 <template>
-  <div>
-    <BasicTable @register="registerTable">
-      <template #toolbar>
-        <a-button type="primary" @click="handleCreate" v-auth="'role:add'">
-          <Icon icon="ant-design:plus-outlined" />
-          {{ t('common.add') }}
-        </a-button>
+  <PageWrapper content-full-height fixed-height>
+    <BasicTable @register="registerTable" class="flex flex-col">
+      <template #form-formFooter>
+        <Col :span="5" :offset="13" class="text-right">
+          <a-button
+            id="e2e-role-create-btn"
+            type="primary"
+            @click="handleCreate"
+            v-auth="'role:add'"
+          >
+            <Icon icon="ant-design:plus-outlined" />
+            {{ t('common.add') }}
+          </a-button>
+        </Col>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'action'">
           <TableAction
             :actions="[
               {
+                class: 'e2e-role-edit-btn',
                 icon: 'clarity:note-edit-line',
                 tooltip: t('system.role.form.edit'),
                 auth: 'role:update',
@@ -40,12 +48,16 @@
                 onClick: handleView.bind(null, record),
               },
               {
+                class: 'e2e-role-delete-btn',
                 icon: 'ant-design:delete-outlined',
                 color: 'error',
                 auth: 'role:delete',
                 tooltip: t('system.role.form.delete'),
                 ifShow: record.roleName !== 'admin',
                 popConfirm: {
+                  okButtonProps: {
+                    class: 'e2e-role-delete-confirm',
+                  },
                   title: t('system.role.deleteTip'),
                   placement: 'left',
                   confirm: handleDelete.bind(null, record),
@@ -62,12 +74,12 @@
       @success="handleSuccess"
     />
     <RoleInfo @register="registerInfo" />
-  </div>
+  </PageWrapper>
 </template>
 
 <script lang="ts">
   import { defineComponent } from 'vue';
-
+  import { Col } from 'ant-design-vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { getRoleListByPage } from '/@/api/base/system';
 
@@ -83,10 +95,11 @@
   import { RoleListRecord } from '/@/api/system/model/roleModel';
   import { useI18n } from '/@/hooks/web/useI18n';
   import Icon from '/@/components/Icon';
+  import { PageWrapper } from '/@/components/Page';
 
   export default defineComponent({
     name: 'RoleManagement',
-    components: { BasicTable, RoleInfo, RoleDrawer, TableAction, Icon },
+    components: { BasicTable, RoleInfo, RoleDrawer, TableAction, Icon, PageWrapper, Col },
     setup() {
       const { t } = useI18n();
       const [registerDrawer, { openDrawer }] = useDrawer();
@@ -94,15 +107,18 @@
       const { createMessage } = useMessage();
       const useStore = useUserStoreWithOut();
       const [registerTable, { reload }] = useTable({
-        title: t('system.role.tableTitle'),
+        rowKey: 'roleId',
         api: getRoleListByPage,
         columns,
         formConfig: {
-          baseColProps: { style: { paddingRight: '30px' } },
           schemas: searchFormSchema,
-          fieldMapToTime: [['createTime', ['createTimeFrom', 'createTimeTo'], 'YYYY-MM-DD']],
+          rowProps: {
+            gutter: 14,
+          },
+          submitOnChange: true,
+          showActionButtonGroup: false,
         },
-        showTableSetting: true,
+        showTableSetting: false,
         useSearchForm: true,
         showIndexColumn: false,
         canResize: false,

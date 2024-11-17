@@ -44,7 +44,7 @@ import {
   FailoverStrategyEnum,
   RestoreModeEnum,
   ClusterStateEnum,
-  ExecModeEnum,
+  DeployMode,
 } from '/@/enums/flinkEnum';
 import { useI18n } from '/@/hooks/web/useI18n';
 import { fetchYarnQueueList } from '/@/api/setting/yarnQueue';
@@ -315,7 +315,7 @@ export const renderJobName = ({ model, field }: RenderCallbackParams) => {
           <Tag color="#2db7f5" class="tag-note">
             {t('flink.app.noteInfo.note')}
           </Tag>
-          {model.executionMode == ExecModeEnum.KUBERNETES_APPLICATION && (
+          {model.deployMode == DeployMode.KUBERNETES_APPLICATION && (
             <span>
               {t('flink.app.addAppTips.appNameK8sClusterIdRole')}
               <div>
@@ -328,7 +328,7 @@ export const renderJobName = ({ model, field }: RenderCallbackParams) => {
               </div>
             </span>
           )}
-          {model.executionMode != ExecModeEnum.KUBERNETES_APPLICATION && (
+          {model.deployMode != DeployMode.KUBERNETES_APPLICATION && (
             <span>
               <span>{t('flink.app.addAppTips.appNameRole')}</span>
               <span>{t('flink.app.addAppTips.appNameRoleContent')}</span>
@@ -609,7 +609,7 @@ export const renderResourceFrom = (model: Recordable) => {
 export const renderStreamParkResource = ({ model, resources }) => {
   const renderOptions = () => {
     return (resources || [])
-      .filter((item) => item.resourceType !== ResourceTypeEnum.FLINK_APP)
+      .filter((item) => item.resourceType !== ResourceTypeEnum.APP)
       .map((resource) => {
         return (
           <Select.Option
@@ -655,7 +655,7 @@ export const renderStreamParkJarApp = ({ model, resources }) => {
   const renderOptions = () => {
     console.log('resources', resources);
     return (resources || [])
-      .filter((item) => item.resourceType == ResourceTypeEnum.FLINK_APP)
+      .filter((item) => item.resourceType == ResourceTypeEnum.APP)
       .map((resource) => {
         return (
           <Select.Option key={resource.id} label={resource.resourceName}>

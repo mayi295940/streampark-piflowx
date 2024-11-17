@@ -26,7 +26,7 @@ import { useMessage } from '/@/hooks/web/useMessage';
 import {
   AppStateEnum,
   AppTypeEnum,
-  ExecModeEnum,
+  DeployMode,
   JobTypeEnum,
   OptionStateEnum,
   ReleaseStateEnum,
@@ -78,6 +78,7 @@ export const useAppTableAction = (
         onClick: handleEdit.bind(null, record, currentPageNo),
       },
       {
+        class: 'e2e-flinkapp-release-btn',
         tooltip: { title: t('flink.app.operation.release') },
         ifShow:
           [
@@ -99,6 +100,7 @@ export const useAppTableAction = (
         onClick: () => openBuildDrawer(true, { appId: record.id }),
       },
       {
+        class: 'e2e-flinkapp-startup-btn',
         tooltip: { title: t('flink.app.operation.start') },
         ifShow: handleIsStart(record, optionApps),
         auth: 'app:start',
@@ -106,6 +108,7 @@ export const useAppTableAction = (
         onClick: handleAppCheckStart.bind(null, record),
       },
       {
+        class: 'e2e-flinkapp-cancel-btn',
         tooltip: { title: t('flink.app.operation.cancel') },
         ifShow:
           record.state == AppStateEnum.RUNNING && record['optionState'] == OptionStateEnum.NONE,
@@ -115,14 +118,15 @@ export const useAppTableAction = (
       },
       {
         tooltip: { title: t('flink.app.operation.detail') },
+        class: 'e2e-flinkapp-detail-btn',
         auth: 'app:detail',
         icon: 'carbon:data-view-alt',
         onClick: handleDetail.bind(null, record),
       },
       {
         tooltip: { title: t('flink.app.operation.startLog') },
-        ifShow: [ExecModeEnum.KUBERNETES_SESSION, ExecModeEnum.KUBERNETES_APPLICATION].includes(
-          record.executionMode,
+        ifShow: [DeployMode.KUBERNETES_SESSION, DeployMode.KUBERNETES_APPLICATION].includes(
+          record.deployMode,
         ),
         auth: 'app:detail',
         icon: 'ant-design:code-outlined',
@@ -146,6 +150,7 @@ export const useAppTableAction = (
       {
         label: t('flink.app.operation.copy'),
         auth: 'app:copy',
+        class: 'e2e-flinkapp-copy-btn',
         icon: 'ant-design:copy-outlined',
         onClick: handleCopy.bind(null, record),
       },
@@ -164,15 +169,16 @@ export const useAppTableAction = (
           AppStateEnum.LOST,
         ].includes(record.state),
         auth: 'app:mapping',
+        class: 'e2e-flinkapp-remapping-btn',
         icon: 'ant-design:deployment-unit-outlined',
         onClick: handleMapping.bind(null, record),
       },
       {
-        popConfirm: {
-          title: t('flink.app.operation.deleteTip'),
-          confirm: handleDelete.bind(null, record),
-        },
+        class: 'e2e-flinkapp-delete-btn',
         label: t('common.delText'),
+        auth: 'app:delete',
+        icon: 'ant-design:delete-outlined',
+        color: 'error',
         ifShow: [
           AppStateEnum.ADDED,
           AppStateEnum.FAILED,
@@ -184,9 +190,13 @@ export const useAppTableAction = (
           AppStateEnum.SUCCEEDED,
           AppStateEnum.KILLED,
         ].includes(record.state),
-        auth: 'app:delete',
-        icon: 'ant-design:delete-outlined',
-        color: 'error',
+        popConfirm: {
+          okButtonProps: {
+            class: 'e2e-flinkapp-delete-confirm',
+          },
+          title: t('flink.app.operation.deleteTip'),
+          confirm: handleDelete.bind(null, record),
+        },
       },
     ];
   }
@@ -275,9 +285,6 @@ export const useAppTableAction = (
       actionColOptions: { span: 4 },
       showSubmitButton: false,
       showResetButton: false,
-      async resetFunc() {
-        router.push({ path: '/flink/app/add' });
-      },
       schemas: [
         {
           label: t('flink.app.tags'),
@@ -330,16 +337,6 @@ export const useAppTableAction = (
         },
       ],
     };
-    if (hasPermission('app:create')) {
-      Object.assign(tableFormConfig, {
-        showResetButton: true,
-        resetButtonOptions: {
-          text: t('common.add'),
-          color: 'primary',
-          preIcon: 'ant-design:plus-outlined',
-        },
-      });
-    }
     return tableFormConfig;
   });
 
@@ -376,5 +373,5 @@ export const useAppTableAction = (
   onMounted(() => {
     handleInitTagsOptions();
   });
-  return { getTableActions, formConfig };
+  return { getTableActions, formConfig, tagsOptions, users };
 };

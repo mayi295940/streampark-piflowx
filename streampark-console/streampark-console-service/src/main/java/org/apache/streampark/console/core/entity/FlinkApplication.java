@@ -444,6 +444,11 @@ public class FlinkApplication extends BaseEntity {
     }
 
     @JsonIgnore
+    public boolean isPipelineJob() {
+        return FlinkJobType.FLINK_PIPELINE.getMode().equals(this.getJobType());
+    }
+
+    @JsonIgnore
     public boolean isFlinkSqlJobOrPyFlinkJob() {
         return FlinkJobType.FLINK_SQL.getMode().equals(this.getJobType())
             || FlinkJobType.PYFLINK.getMode().equals(this.getJobType());

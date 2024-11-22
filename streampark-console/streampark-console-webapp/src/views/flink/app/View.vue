@@ -349,6 +349,7 @@
           <template v-if="column.dataIndex === 'jobName'">
             <span class="app_type app_jar" v-if="record['jobType'] === JobTypeEnum.JAR"> JAR </span>
             <span class="app_type app_sql" v-if="record['jobType'] === JobTypeEnum.SQL"> SQL </span>
+            <span class="app_type app_sql" v-if="record['jobType'] === JobTypeEnum.PIPELINE"> Flink Pipeline </span>
             <span class="link cursor-pointer" @click="handleJobView(record)">
               <Popover :title="t('common.detailText')">
                 <template #content>
@@ -361,6 +362,7 @@
                     <Tag color="blue">
                       <span v-if="record['jobType'] == JobTypeEnum.JAR"> JAR </span>
                       <span v-if="record['jobType'] == JobTypeEnum.SQL"> SQL </span>
+                      <span v-if="record['jobType'] == JobTypeEnum.PIPELINE"> Flink Pipeline </span>
                     </Tag>
                   </div>
                   <div class="pt-2px flex">
@@ -371,55 +373,6 @@
                 {{ record.jobName }}
               </Popover>
             </span>
-    <BasicTable
-      @register="registerTable"
-      :columns="getAppColumns"
-      @resize-column="onTableColumnResize"
-      class="app_list !px-0 pt-20px"
-      :formConfig="formConfig"
-    >
-      <template #bodyCell="{ column, record }">
-        <template v-if="column.dataIndex === 'jobName'">
-          <span class="app_type app_jar" v-if="record['jobType'] == JobTypeEnum.JAR"> JAR </span>
-          <span class="app_type app_sql" v-if="record['jobType'] == JobTypeEnum.SQL"> SQL </span>
-          <span class="app_type app_py" v-if="record['jobType'] == JobTypeEnum.PYFLINK">
-            PyFlink
-          </span>
-          <span class="app_type app_py" v-if="record['jobType'] == JobTypeEnum.PIPELINE">
-            Flink Pipeline
-          </span>
-          <span
-            class="link"
-            :class="{
-              'cursor-pointer':
-                [AppStateEnum.RESTARTING, AppStateEnum.RUNNING].includes(record.state) ||
-                record['optionState'] === OptionStateEnum.SAVEPOINTING,
-            }"
-            @click="handleJobView(record)"
-          >
-            <Popover :title="t('common.detailText')">
-              <template #content>
-                <div class="flex">
-                  <span class="pr-6px font-bold">{{ t('flink.app.appName') }}:</span>
-                  <div class="max-w-300px break-words">{{ record.jobName }}</div>
-                </div>
-                <div class="pt-2px">
-                  <span class="pr-6px font-bold">{{ t('flink.app.jobType') }}:</span>
-                  <Tag color="blue">
-                    <span v-if="record['jobType'] == JobTypeEnum.JAR"> JAR </span>
-                    <span v-if="record['jobType'] == JobTypeEnum.SQL"> SQL </span>
-                    <span v-if="record['jobType'] == JobTypeEnum.PYFLINK"> PyFlink </span>
-                    <span v-if="record['jobType'] == JobTypeEnum.PIPELINE"> Flink Pipeline </span>
-                  </Tag>
-                </div>
-                <div class="pt-2px flex">
-                  <span class="pr-6px font-bold">{{ t('common.description') }}:</span>
-                  <div class="max-w-300px break-words">{{ record.description }}</div>
-                </div>
-              </template>
-              {{ record.jobName }}
-            </Popover>
-          </span>
 
             <template v-if="record['jobType'] === JobTypeEnum.JAR">
               <Badge

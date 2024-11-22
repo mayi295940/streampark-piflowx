@@ -489,7 +489,7 @@ trait FlinkClientTrait extends Logger {
               .getOrElse(true) =>
           programArgs += PARAM_KEY_APP_CONF += submitRequest.appConf
       }
-    } else if (submitRequest.developmentMode == FlinkDevelopmentMode.FLINK_PIPELINE) {
+    } else if (submitRequest.deployMode == FlinkJobType.FLINK_PIPELINE) {
       val flowFileName = submitRequest.appName + new Date().getTime
       val path = System.getProperty("user.dir") + "/flowFile/" + flowFileName + ".json"
       val file = new File(path)

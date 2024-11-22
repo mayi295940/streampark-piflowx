@@ -58,6 +58,13 @@ const getJobTypeOptions = () => {
       ]),
       value: String(JobTypeEnum.PYFLINK),
     },
+    {
+      label: h('div', {}, [
+        h(SvgIcon, { name: 'py', color: '#108ee9' }, ''),
+        h('span', { class: 'pl-10px' }, 'Flink Pipeline'),
+      ]),
+      value: String(JobTypeEnum.PIPELINE),
+    },
   ];
 };
 

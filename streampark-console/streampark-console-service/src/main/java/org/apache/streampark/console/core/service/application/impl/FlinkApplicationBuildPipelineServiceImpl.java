@@ -494,13 +494,13 @@ public class FlinkApplicationBuildPipelineServiceImpl
                 return FlinkK8sApplicationBuildPipeline.of(k8sApplicationBuildRequest);
             default:
                 throw new UnsupportedOperationException(
-                    "Unsupported Building Application for ExecutionMode: " + app.getFlinkExecutionMode());
+                    "Unsupported Building Application for DeployMode: " + app.getDeployModeEnum());
         }
     }
 
     @Nonnull
     private FlinkYarnApplicationBuildRequest buildFlinkYarnApplicationBuildRequest(
-                                                                                   @Nonnull Application app,
+                                                                                   @Nonnull FlinkApplication app,
                                                                                    String mainClass,
                                                                                    String localWorkspace,
                                                                                    String yarnProvidedPath) {
@@ -509,13 +509,13 @@ public class FlinkApplicationBuildPipelineServiceImpl
             mainClass,
             localWorkspace,
             yarnProvidedPath,
-            app.getDevelopmentMode(),
+            app.getJobTypeEnum(),
             getMergedDependencyInfo(app));
     }
 
     @Nonnull
     private FlinkK8sApplicationBuildRequest buildFlinkK8sApplicationBuildRequest(
-                                                                                 @Nonnull Application app,
+                                                                                 @Nonnull FlinkApplication app,
                                                                                  String mainClass,
                                                                                  String flinkUserJar,
                                                                                  FlinkEnv flinkEnv,
@@ -525,8 +525,8 @@ public class FlinkApplicationBuildPipelineServiceImpl
             app.getLocalAppHome(),
             mainClass,
             flinkUserJar,
-            app.getFlinkExecutionMode(),
-            app.getDevelopmentMode(),
+            app.getDeployModeEnum(),
+            app.getJobTypeEnum(),
             flinkEnv.getFlinkVersion(),
             getMergedDependencyInfo(app),
             app.getJobName(),
@@ -545,15 +545,16 @@ public class FlinkApplicationBuildPipelineServiceImpl
 
     @Nonnull
     private FlinkK8sSessionBuildRequest buildFlinkK8sSessionBuildRequest(
-                                                                         @Nonnull Application app, String mainClass,
+                                                                         @Nonnull FlinkApplication app,
+                                                                         String mainClass,
                                                                          String flinkUserJar, FlinkEnv flinkEnv) {
         FlinkK8sSessionBuildRequest k8sSessionBuildRequest = new FlinkK8sSessionBuildRequest(
             app.getJobName(),
             app.getLocalAppHome(),
             mainClass,
             flinkUserJar,
-            app.getFlinkExecutionMode(),
-            app.getDevelopmentMode(),
+            app.getDeployModeEnum(),
+            app.getJobTypeEnum(),
             flinkEnv.getFlinkVersion(),
             getMergedDependencyInfo(app),
             app.getClusterId(),
@@ -563,7 +564,8 @@ public class FlinkApplicationBuildPipelineServiceImpl
 
     @Nonnull
     private FlinkRemotePerJobBuildRequest buildFlinkRemotePerJobBuildRequest(
-                                                                             @Nonnull Application app, String mainClass,
+                                                                             @Nonnull FlinkApplication app,
+                                                                             String mainClass,
                                                                              String flinkUserJar, FlinkEnv flinkEnv) {
         return new FlinkRemotePerJobBuildRequest(
             app.getJobName(),
@@ -571,20 +573,20 @@ public class FlinkApplicationBuildPipelineServiceImpl
             mainClass,
             flinkUserJar,
             app.isCustomCodeJob(),
-            app.getFlinkExecutionMode(),
-            app.getDevelopmentMode(),
+            app.getDeployModeEnum(),
+            app.getJobTypeEnum(),
             flinkEnv.getFlinkVersion(),
             getMergedDependencyInfo(app));
     }
 
-    /** copy from {@link ApplicationActionService#start(Application, boolean)} */
-    private String retrieveFlinkUserJar(FlinkEnv flinkEnv, Application app) {
-        switch (app.getDevelopmentMode()) {
+    /** copy from {@link FlinkApplicationActionService#start(FlinkApplication, boolean)} */
+    private String retrieveFlinkUserJar(FlinkEnv flinkEnv, FlinkApplication app) {
+        switch (app.getJobTypeEnum()) {
             case CUSTOM_CODE:
                 switch (app.getApplicationType()) {
                     case STREAMPARK_FLINK:
                         return String.format(
-                            "%s/%s", app.getAppLib(), app.getModule().concat(Constant.JAR_SUFFIX));
+                            "%s/%s", app.getAppLib(), app.getModule().concat(Constants.JAR_SUFFIX));
                     case APACHE_FLINK:
                         return String.format("%s/%s", app.getAppHome(), app.getJar());
                     default:
@@ -596,19 +598,19 @@ public class FlinkApplicationBuildPipelineServiceImpl
                 return String.format("%s/%s", app.getAppHome(), app.getJar());
             case FLINK_SQL:
                 String sqlDistJar = ServiceHelper.getFlinkSqlClientJar(flinkEnv);
-                if (app.getFlinkExecutionMode() == FlinkExecutionMode.YARN_APPLICATION) {
+                if (app.getDeployModeEnum() == FlinkDeployMode.YARN_APPLICATION) {
                     String clientPath = Workspace.remote().APP_CLIENT();
                     return String.format("%s/%s", clientPath, sqlDistJar);
                 }
                 return Workspace.local().APP_CLIENT().concat("/").concat(sqlDistJar);
             default:
                 throw new UnsupportedOperationException(
-                    "[StreamPark] unsupported JobType: " + app.getDevelopmentMode());
+                    "[StreamPark] unsupported JobType: " + app.getJobTypeEnum());
         }
     }
 
     @Override
-    public Optional<AppBuildPipeline> getCurrentBuildPipeline(@Nonnull Long appId) {
+    public Optional<ApplicationBuildPipeline> getCurrentBuildPipeline(@Nonnull Long appId) {
         return Optional.ofNullable(getById(appId));
     }
 
@@ -632,21 +634,21 @@ public class FlinkApplicationBuildPipelineServiceImpl
         if (CollectionUtils.isEmpty(appIds)) {
             return new HashMap<>();
         }
-        LambdaQueryWrapper<AppBuildPipeline> queryWrapper = new LambdaQueryWrapper<AppBuildPipeline>()
-            .in(AppBuildPipeline::getAppId, appIds);
+        LambdaQueryWrapper<ApplicationBuildPipeline> queryWrapper = new LambdaQueryWrapper<ApplicationBuildPipeline>()
+            .in(ApplicationBuildPipeline::getAppId, appIds);
 
-        List<AppBuildPipeline> appBuildPipelines = baseMapper.selectList(queryWrapper);
+        List<ApplicationBuildPipeline> appBuildPipelines = baseMapper.selectList(queryWrapper);
         if (CollectionUtils.isEmpty(appBuildPipelines)) {
             return new HashMap<>();
         }
         return appBuildPipelines.stream()
-            .collect(Collectors.toMap(AppBuildPipeline::getAppId, AppBuildPipeline::getPipelineStatus));
+            .collect(Collectors.toMap(ApplicationBuildPipeline::getAppId, ApplicationBuildPipeline::getPipelineStatus));
     }
 
     @Override
     public void removeByAppId(Long appId) {
         baseMapper.delete(
-            new LambdaQueryWrapper<AppBuildPipeline>().eq(AppBuildPipeline::getAppId, appId));
+            new LambdaQueryWrapper<ApplicationBuildPipeline>().eq(ApplicationBuildPipeline::getAppId, appId));
     }
 
     /**
@@ -655,8 +657,8 @@ public class FlinkApplicationBuildPipelineServiceImpl
      * @param pipe application build pipeline
      * @return value after the save or update
      */
-    public boolean saveEntity(AppBuildPipeline pipe) {
-        AppBuildPipeline old = getById(pipe.getAppId());
+    public boolean saveEntity(ApplicationBuildPipeline pipe) {
+        ApplicationBuildPipeline old = getById(pipe.getAppId());
         if (old == null) {
             return save(pipe);
         }
@@ -689,7 +691,7 @@ public class FlinkApplicationBuildPipelineServiceImpl
      * @param application
      * @return DependencyInfo
      */
-    private DependencyInfo getMergedDependencyInfo(Application application) {
+    private DependencyInfo getMergedDependencyInfo(FlinkApplication application) {
         DependencyInfo dependencyInfo = application.getDependencyInfo();
         if (StringUtils.isBlank(application.getTeamResource())) {
             return dependencyInfo;
@@ -734,7 +736,7 @@ public class FlinkApplicationBuildPipelineServiceImpl
     }
 
     private static void mergeDependency(
-                                        Application application,
+                                        FlinkApplication application,
                                         List<Artifact> mvnArtifacts,
                                         List<String> jarLibs,
                                         Resource resource) {

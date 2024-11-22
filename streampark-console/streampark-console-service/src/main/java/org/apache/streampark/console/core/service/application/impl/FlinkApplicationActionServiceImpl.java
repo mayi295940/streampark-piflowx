@@ -198,8 +198,6 @@ public class FlinkApplicationActionServiceImpl
     @Autowired
     private IFlowService flowService;
 
-    private final Map<Long, CompletableFuture<SubmitResponse>> startFutureMap = new ConcurrentHashMap<>();
-
     private final Map<Long, CompletableFuture<CancelResponse>> cancelFutureMap =
         new ConcurrentHashMap<>();
 

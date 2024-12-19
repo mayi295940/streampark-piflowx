@@ -583,6 +583,7 @@ public class FlinkApplicationBuildPipelineServiceImpl
     private String retrieveFlinkUserJar(FlinkEnv flinkEnv, FlinkApplication app) {
         switch (app.getJobTypeEnum()) {
             case CUSTOM_CODE:
+            case FLINK_PIPELINE:
                 switch (app.getApplicationType()) {
                     case STREAMPARK_FLINK:
                         return String.format(

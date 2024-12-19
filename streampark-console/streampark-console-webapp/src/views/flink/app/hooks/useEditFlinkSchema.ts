@@ -132,9 +132,7 @@ export const useEditFlinkSchema = (jars: Ref) => {
         component: 'Input',
         dynamicDisabled: true,
         show: ({ model }) =>
-          model.resourceFrom != ResourceFromEnum.PROJECT &&
-          model?.jobType != JobTypeEnum.PIPELINE &&
-          model?.stepCurrent == 1,
+          model.resourceFrom != ResourceFromEnum.PROJECT && model?.stepCurrent == 1,
       },
       {
         field: 'mainClass',

@@ -30,7 +30,7 @@ if (document.cookie && document.cookie != '') {
 
 }
 
-var basePath = localStorage.getItem('basePath');
+var basePath = localStorage.getItem('basePath') || '/basic-api';
 var web_header_prefix = basePath.indexOf(window.location.origin) || basePath.indexOf('http') > -1 ? basePath : web_base_origin + basePath; //与 .env.production 内容同步
 
 /**

@@ -93,6 +93,9 @@ export const useCreateSchema = (dependencyRef: Ref) => {
   //   });
   // }
   function handleCheckConfig(_rule: RuleObject, value: StoreValue) {
+    if (!_rule.required) {
+      return Promise.resolve();
+    }
     if (value) {
       const confType = getAppConfType(value);
       if (confType === ConfigTypeEnum.UNKNOWN) {

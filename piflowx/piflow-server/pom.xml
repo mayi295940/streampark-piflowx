@@ -243,10 +243,6 @@
                     <artifactId>commons-lang3</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.reflections</groupId>
-                    <artifactId>reflections</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>io.netty</groupId>
                     <artifactId>netty-handler</artifactId>
                 </exclusion>

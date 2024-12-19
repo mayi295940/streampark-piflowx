@@ -39,7 +39,7 @@
   import ProgramArgs from './components/ProgramArgs.vue';
   import VariableReview from './components/VariableReview.vue';
   import { useDrawer } from '/@/components/Drawer';
-  import { DeployMode, ResourceFromEnum } from '/@/enums/flinkEnum';
+  import { DeployMode, JobTypeEnum, ResourceFromEnum } from '/@/enums/flinkEnum';
 
   const route = useRoute();
   const { t } = useI18n();

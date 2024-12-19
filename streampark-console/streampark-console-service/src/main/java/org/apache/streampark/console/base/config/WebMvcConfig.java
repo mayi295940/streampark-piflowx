@@ -31,26 +31,36 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
+import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
 import java.util.List;
 
-/** Customize the SpringMVC configuration */
 @Configuration
-public class WebMvcConfig implements WebMvcConfigurer {
+public class WebMvcConfig extends OncePerRequestFilter implements WebMvcConfigurer {
 
     @Autowired
     private UploadFileTypeInterceptor uploadFileTypeInterceptor;
 
-    private static final String[] CORS_MAPPINGS_ALLOWED_METHODS = {
-            HttpMethod.POST.name(),
-            HttpMethod.GET.name(),
-            HttpMethod.PUT.name(),
-            HttpMethod.OPTIONS.name(),
-            HttpMethod.DELETE.name()
-    };
+    @Override
+    protected void doFilterInternal(
+                                    HttpServletRequest request, HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+        if (request.getMethod().equals(HttpMethod.TRACE.name())) {
+            response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        } else {
+            filterChain.doFilter(request, response);
+        }
+    }
 
     @Override
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -60,20 +70,25 @@ public class WebMvcConfig implements WebMvcConfigurer {
         converters.add(new AllEncompassingFormHttpMessageConverter());
     }
 
-    /**
-     * Used to solve cross-domain problems
-     *
-     * @param registry
-     */
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry
             .addMapping("/**")
             .allowedOriginPatterns("*")
-            .allowedMethods(CORS_MAPPINGS_ALLOWED_METHODS)
+            .allowedMethods(
+                HttpMethod.GET.name(),
+                HttpMethod.POST.name(),
+                HttpMethod.PUT.name(),
+                HttpMethod.DELETE.name(),
+                HttpMethod.OPTIONS.name())
             .allowedHeaders("*")
             .allowCredentials(true)
             .maxAge(3600);
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(uploadFileTypeInterceptor).addPathPatterns("/flink/app/upload");
     }
 
     @Bean
@@ -84,15 +99,41 @@ public class WebMvcConfig implements WebMvcConfigurer {
         return module;
     }
 
-    /**
-     * Add an interceptor.
-     *
-     * @param registry
-     */
     @Override
-    public void addInterceptors(InterceptorRegistry registry) {
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+
         registry
-            .addInterceptor(uploadFileTypeInterceptor)
-            .addPathPatterns("/flink/app/upload", "/resource/upload");
+            .addResourceHandler("swagger-ui.html")
+            .addResourceLocations("classpath:/META-INF/resources/");
+        registry
+            .addResourceHandler("/webjars/**")
+            .addResourceLocations("classpath:/META-INF/resources/webjars/");
+        registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
+
+        String storagePathHead = System.getProperty("user.dir");
+
+        String imagesPathFlink = ("file:" + storagePathHead + "/storage/flink/image/");
+        // String videosPathFlink = ("file:" + storagePathHead + "/storage/flink/video/");
+        // String xmlPathFlink = ("file:" + storagePathHead + "/storage/flink/xml/");
+        String imagesPathSpark = ("file:" + storagePathHead + "/storage/spark/image/");
+        // String videosPathSpark = ("file:" + storagePathHead + "/storage/spark/video/");
+        // String xmlPathSpark = ("file:" + storagePathHead + "/storage/spark/xml/");
+
+        registry.addResourceHandler("/assets/**").addResourceLocations("classpath:/static/assets/");
+        registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/static/");
+        registry
+            .addResourceHandler("/imagtes/**")
+            .addResourceLocations("classpath:/static/images/", imagesPathFlink, imagesPathSpark);
+
+        // registry
+        // .addResourceHandler("/images/**", "/videos/**", "/xml/**")
+        // .addResourceLocations(
+        // imagesPathFlink,
+        // videosPathFlink,
+        // xmlPathFlink,
+        // imagesPathSpark,
+        // videosPathSpark,
+        // xmlPathSpark);
+
     }
 }

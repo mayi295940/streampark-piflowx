@@ -109,7 +109,7 @@ export const useCreateAndEditSchema = (
         label: 'Flink SQL',
         component: 'Input',
         slot: 'flinkSql',
-        ifShow: ({ values }) => values?.jobType == JobTypeEnum.SQL,
+        show: ({ values }) => values?.jobType == JobTypeEnum.SQL && values?.stepCurrent == 1,
         rules: [{ required: true, message: t('flink.app.addAppTips.flinkSqlIsRequiredMessage') }],
       },
       {
@@ -117,7 +117,7 @@ export const useCreateAndEditSchema = (
         label: t('flink.app.resource'),
         component: 'Select',
         render: ({ model }) => renderStreamParkResource({ model, resources: unref(teamResource) }),
-        ifShow: ({ values }) => values.jobType == JobTypeEnum.SQL,
+        show: ({ values }) => values.jobType == JobTypeEnum.SQL && values?.stepCurrent == 1,
       },
       {
         field: 'dependency',
@@ -207,8 +207,8 @@ export const useCreateAndEditSchema = (
         field: 'remoteClusterId',
         label: t('flink.app.flinkCluster'),
         component: 'Select',
-        render: (param) => renderFlinkCluster(getExecutionCluster(DeployMode.DeployMode), param),
-        ifShow: ({ values }) =>
+        render: (param) => renderFlinkCluster(getExecutionCluster(DeployMode.STANDALONE), param),
+        show: ({ values }) =>
           values.deployMode == DeployMode.STANDALONE && values?.stepCurrent == 0,
         rules: [
           { required: true, message: t('flink.app.addAppTips.flinkClusterIsRequiredMessage') },
@@ -219,7 +219,8 @@ export const useCreateAndEditSchema = (
         label: t('flink.app.flinkCluster'),
         component: 'Select',
         render: (param) => renderFlinkCluster(getExecutionCluster(DeployMode.YARN_SESSION), param),
-        ifShow: ({ values }) => values.deployMode == DeployMode.YARN_SESSION && values?.stepCurrent == 0,
+        show: ({ values }) =>
+          values.deployMode == DeployMode.YARN_SESSION && values?.stepCurrent == 0,
         rules: [
           { required: true, message: t('flink.app.addAppTips.flinkClusterIsRequiredMessage') },
         ],
@@ -230,7 +231,8 @@ export const useCreateAndEditSchema = (
         component: 'Select',
         render: (param) =>
           renderFlinkCluster(getExecutionCluster(DeployMode.KUBERNETES_SESSION), param),
-        ifShow: ({ values }) => values.deployMode == DeployMode.KUBERNETES_SESSION && values?.stepCurrent == 0,
+        show: ({ values }) =>
+          values.deployMode == DeployMode.KUBERNETES_SESSION && values?.stepCurrent == 0,
         rules: [
           { required: true, message: t('flink.app.addAppTips.flinkClusterIsRequiredMessage') },
         ],
@@ -239,7 +241,8 @@ export const useCreateAndEditSchema = (
         field: 'k8sNamespace',
         label: t('flink.app.kubernetesNamespace'),
         component: 'Input',
-        ifShow: ({ values }) => values.deployMode == DeployMode.KUBERNETES_APPLICATION && values?.stepCurrent == 0,
+        show: ({ values }) =>
+          values.deployMode == DeployMode.KUBERNETES_APPLICATION && values?.stepCurrent == 0,
         render: ({ model, field }) =>
           renderInputDropdown(model, field, {
             placeholder: t('flink.app.addAppTips.kubernetesNamespacePlaceholder'),
@@ -250,7 +253,8 @@ export const useCreateAndEditSchema = (
         field: 'serviceAccount',
         label: t('setting.flinkCluster.form.serviceAccount'),
         component: 'Input',
-        ifShow: ({ values }) => values.deployMode == DeployMode.KUBERNETES_APPLICATION && values?.stepCurrent == 0,
+        show: ({ values }) =>
+          values.deployMode == DeployMode.KUBERNETES_APPLICATION && values?.stepCurrent == 0,
         render: ({ model, field }) =>
           renderInputDropdown(model, field, {
             placeholder: t('flink.app.addAppTips.serviceAccountPlaceholder'),
@@ -261,7 +265,8 @@ export const useCreateAndEditSchema = (
         field: 'flinkImage',
         label: t('flink.app.flinkBaseDockerImage'),
         component: 'Input',
-        ifShow: ({ values }) => values.deployMode == DeployMode.KUBERNETES_APPLICATION && values?.stepCurrent == 0,
+        show: ({ values }) =>
+          values.deployMode == DeployMode.KUBERNETES_APPLICATION && values?.stepCurrent == 0,
         render: ({ model, field }) =>
           renderInputDropdown(model, field, {
             placeholder: t('flink.app.addAppTips.flinkImagePlaceholder'),
@@ -272,7 +277,8 @@ export const useCreateAndEditSchema = (
       {
         field: 'k8sRestExposedType',
         label: t('flink.app.restServiceExposedType'),
-        ifShow: ({ values }) => values.deployMode == DeployMode.KUBERNETES_APPLICATION && values?.stepCurrent == 0,
+        show: ({ values }) =>
+          values.deployMode == DeployMode.KUBERNETES_APPLICATION && values?.stepCurrent == 0,
         component: 'Select',
         componentProps: {
           placeholder: t('flink.app.addAppTips.k8sRestExposedTypePlaceholder'),
@@ -335,6 +341,7 @@ export const useCreateAndEditSchema = (
             },
           ];
         },
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       {
         field: 'tags',
@@ -343,6 +350,7 @@ export const useCreateAndEditSchema = (
         componentProps: {
           placeholder: t('flink.app.addAppTips.tagsPlaceholder'),
         },
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       {
         field: 'resolveOrder',
@@ -350,6 +358,7 @@ export const useCreateAndEditSchema = (
         component: 'Select',
         componentProps: { placeholder: 'classloader.resolve-order', options: resolveOrder },
         rules: [{ required: true, message: 'Resolve Order is required', type: 'number' }],
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       {
         field: 'parallelism',
@@ -359,6 +368,7 @@ export const useCreateAndEditSchema = (
           placeholder: t('flink.app.addAppTips.parallelismPlaceholder'),
           ...commonInputNum,
         },
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       {
         field: 'slot',
@@ -373,8 +383,10 @@ export const useCreateAndEditSchema = (
       {
         field: 'restartSize',
         label: t('flink.app.restartSize'),
-        ifShow: ({ values }) =>
-          edit?.mode == 'flink' ? true : !isK8sDeployMode(values.deployMode) && values?.stepCurrent == 2,
+        show: ({ values }) =>
+          edit?.mode == 'flink'
+            ? true
+            : !isK8sDeployMode(values.deployMode) && values?.stepCurrent == 2,
         component: 'InputNumber',
         componentProps: {
           placeholder: t('flink.app.addAppTips.restartSizePlaceholder'),
@@ -397,7 +409,9 @@ export const useCreateAndEditSchema = (
         label: t('flink.app.checkPointFailureOptions'),
         component: 'InputNumber',
         renderColContent: renderInputGroup,
-        show: ({ values }) => ((edit?.mode == 'flink' ? true : !isK8sDeployMode(values.deployMode))) && values?.stepCurrent == 2,
+        show: ({ values }) =>
+          (edit?.mode == 'flink' ? true : !isK8sDeployMode(values.deployMode)) &&
+          values?.stepCurrent == 2,
       },
       ...getConfigSchemas(),
       {
@@ -465,9 +479,10 @@ export const useCreateAndEditSchema = (
         field: 'yarnQueue',
         label: t('flink.app.yarnQueue'),
         component: 'Input',
-        ifShow: ({ values }) =>
+        show: ({ values }) =>
           (values.deployMode == DeployMode.YARN_APPLICATION ||
-          values.deployMode == DeployMode.YARN_PER_JOB) && values?.stepCurrent == 2,
+            values.deployMode == DeployMode.YARN_PER_JOB) &&
+          values?.stepCurrent == 2,
         render: (renderCallbackParams) => renderYarnQueue(renderCallbackParams),
       },
       {
@@ -475,7 +490,8 @@ export const useCreateAndEditSchema = (
         label: t('flink.app.podTemplate'),
         component: 'Input',
         slot: 'podTemplate',
-        ifShow: ({ values }) => values.deployMode == DeployMode.KUBERNETES_APPLICATION && values?.stepCurrent == 2,
+        show: ({ values }) =>
+          values.deployMode == DeployMode.KUBERNETES_APPLICATION && values?.stepCurrent == 2,
       },
       {
         field: 'dynamicProperties',

@@ -2110,27 +2110,28 @@ function ClickSlider() {
 
 //Request interface to reload'stops'
 function reloadStops() {
+    // 从当前页面的URL中获取参数
+    const params = new URLSearchParams(window.location.search);
+    const flowId = params.get('load');
     // $('#fullScreen').show();
     window.parent.postMessage(true);
     ajaxRequest({
-        data: {"load": loadId},
-        cache: true,//Keep cached data
-        type: "POST",//Request type post
+        data: {"load": flowId},
+        cache: true,
+        type: "POST",
         url: "/stops/reloadStops",
-        error: function (request) {//Operation after request failure
+        error: function (request) {
             // $('#fullScreen').hide();
             window.parent.postMessage(false);
-            //alert("reload fail");
             layer.msg("reload fail", {icon: 2, shade: 0, time: 2000}, function () {
             });
             return;
         },
-        success: function (data) {//Operation after request successful
+        success: function (data) {
             var dataMap = JSON.parse(data);
             if (200 === dataMap.code) {
-                window_location_href("/page/flow/mxGraph/index.html?drawingBoardType=TASK&load=" + dataMap.load + "&_" + new Date().getTime());
+                window_location_href("/page/flow/mxGraph/index.html?drawingBoardType=TASK&load=" + flowId + "&_" + new Date().getTime());
             } else {
-                //alert("reload fail");
                 layer.msg("reload fail", {icon: 2, shade: 0, time: 2000}, function () {
                 });
                 // $('#fullScreen').hide();

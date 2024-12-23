@@ -124,7 +124,10 @@ trait FlinkClientTrait extends Logger {
         }
       case _ =>
         if (submitRequest.userJarFile != null) {
-          val uri = PackagedProgramUtils.resolveURI(submitRequest.userJarFile.getAbsolutePath)
+          var path = submitRequest.userJarFile.getAbsolutePath
+          // windows system path replace '\' into '/'
+          path = path.replaceAll("\\\\", "/")
+          val uri = PackagedProgramUtils.resolveURI(path)
           val programOptions = ProgramOptions.create(commandLine)
           val executionParameters = ExecutionConfigAccessor.fromProgramOptions(
             programOptions,
@@ -472,7 +475,8 @@ trait FlinkClientTrait extends Logger {
     val programArgs = new ArrayBuffer[String]()
     programArgs ++= PropertiesUtils.extractArguments(submitRequest.args)
 
-    if (submitRequest.applicationType == ApplicationType.STREAMPARK_FLINK) {
+    if (submitRequest.applicationType == ApplicationType.STREAMPARK_FLINK
+      || (submitRequest.jobType == FlinkJobType.FLINK_PIPELINE)) {
 
       programArgs += PARAM_KEY_FLINK_CONF += submitRequest.flinkYaml
       programArgs += PARAM_KEY_APP_NAME += DeflaterUtils.zipString(submitRequest.effectiveAppName)
@@ -484,36 +488,36 @@ trait FlinkClientTrait extends Logger {
           if (submitRequest.appConf != null) {
             programArgs += PARAM_KEY_APP_CONF += submitRequest.appConf
           }
+        case FlinkJobType.FLINK_PIPELINE =>
+          val flowFileName = submitRequest.appName + new Date().getTime
+          val path = System.getProperty("user.dir") + "/flowFile/" + flowFileName + ".json"
+          val file = new File(path)
+          FileUtils.writeFile(submitRequest.pipelineJson, file)
+          programArgs += PARAM_KEY_FLINK_PIPELINE += flowFileName
         case _
             if Try(!submitRequest.appConf.startsWith("json:"))
               .getOrElse(true) =>
           programArgs += PARAM_KEY_APP_CONF += submitRequest.appConf
       }
-    } else if (submitRequest.deployMode == FlinkJobType.FLINK_PIPELINE) {
-      val flowFileName = submitRequest.appName + new Date().getTime
-      val path = System.getProperty("user.dir") + "/flowFile/" + flowFileName + ".json"
-      val file = new File(path)
-      FileUtils.writeFile(submitRequest.pipelineJson, file)
-      programArgs += PARAM_KEY_FLINK_PIPELINE += flowFileName
-    }
 
-    // execution.runtime-mode
-    Try(
-      submitRequest
-        .properties(ExecutionOptions.RUNTIME_MODE.key())
-        .toString) match {
-      case Success(runtimeMode) =>
-        programArgs += s"--${ExecutionOptions.RUNTIME_MODE.key()}"
-        programArgs += runtimeMode
-      case _ =>
-    }
+      // execution.runtime-mode
+      Try(
+        submitRequest
+          .properties(ExecutionOptions.RUNTIME_MODE.key())
+          .toString) match {
+        case Success(runtimeMode) =>
+          programArgs += s"--${ExecutionOptions.RUNTIME_MODE.key()}"
+          programArgs += runtimeMode
+        case _ =>
+      }
 
-    if (submitRequest.jobType == FlinkJobType.PYFLINK) {
-      // TODO why deployMode is not yarn-application ???
-      if (submitRequest.deployMode != FlinkDeployMode.YARN_APPLICATION) {
-        // python file
-        programArgs.add("-py")
-        programArgs.add(submitRequest.userJarFile.getAbsolutePath)
+      if (submitRequest.jobType == FlinkJobType.PYFLINK) {
+        // TODO why deployMode is not yarn-application ???
+        if (submitRequest.deployMode != FlinkDeployMode.YARN_APPLICATION) {
+          // python file
+          programArgs.add("-py")
+          programArgs.add(submitRequest.userJarFile.getAbsolutePath)
+        }
       }
     }
 

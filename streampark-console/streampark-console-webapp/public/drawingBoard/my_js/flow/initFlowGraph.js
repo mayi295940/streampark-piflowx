@@ -571,7 +571,6 @@ function distributeDelete(publishingId){
 
 //query Flow path
 function queryPathInfo(stopPageId, loadId) {
-  debugger;
     ajaxRequest({
         type: "POST",
         url: "/path/queryPathInfo",
@@ -612,7 +611,6 @@ function queryPathInfo(stopPageId, loadId) {
 
 //query Stops info and property
 function queryStopsProperty(stopPageId, loadId) {
-    debugger;
     $("#div_datasource_html").hide();
     $("#div_propertiesVo_html").hide();
     $("#div_customized_html").hide();

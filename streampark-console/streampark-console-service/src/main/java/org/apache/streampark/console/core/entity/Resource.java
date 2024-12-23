@@ -83,7 +83,7 @@ public class Resource extends BaseEntity {
         if (StringUtils.isBlank(resourcePath)) {
             throw new IllegalArgumentException("resource path cannot be null.");
         }
-        String[] namePath = resourcePath.split(":", 2);
+        String[] namePath = resourcePath.split("->");
         if (namePath.length != 2) {
             throw new IllegalArgumentException("resource path invalid, format: $name:$path");
         }
@@ -94,13 +94,13 @@ public class Resource extends BaseEntity {
         if (StringUtils.isBlank(this.resourcePath)) {
             return null;
         }
-        return resourcePath.split(":")[0];
+        return resourcePath.split("->")[0];
     }
 
     public String getFilePath() {
         if (StringUtils.isBlank(this.resourcePath)) {
             return null;
         }
-        return resourcePath.split(":", 2)[1];
+        return resourcePath.split("->")[1];
     }
 }

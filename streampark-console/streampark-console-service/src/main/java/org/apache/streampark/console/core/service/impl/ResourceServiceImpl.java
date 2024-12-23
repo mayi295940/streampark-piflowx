@@ -153,8 +153,8 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource>
             String resourcePath = jars.get(0);
             resource.setResourcePath(resourcePath);
             // copy jar to team upload directory
-            String upFile = resourcePath.split(":", 2)[1];
-            // String upFile = resourcePath.split("->")[1];
+            // String upFile = resourcePath.split(":", 2)[1];
+            String upFile = resourcePath.split("->")[1];
             transferTeamResource(resource.getTeamId(), upFile);
         }
 
@@ -208,8 +208,8 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource>
 
             Dependency dependency = Dependency.toDependency(resource.getResource());
             if (!dependency.getJar().isEmpty()) {
-                String jarFile = dependency.getJar().get(0).split(":", 2)[1];
-                // String jarFile = dependency.getJar().get(0).split("->")[1];
+                // String jarFile = dependency.getJar().get(0).split(":", 2)[1];
+                String jarFile = dependency.getJar().get(0).split("->")[1];
                 transferTeamResource(findResource.getTeamId(), jarFile);
             }
         }
@@ -285,7 +285,7 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource>
         String path = saveFile.getAbsolutePath();
         UploadResponse uploadResponse = new UploadResponse();
         uploadResponse.setMainClass(mainClass);
-        uploadResponse.setPath(path);
+        uploadResponse.setPath(path.replaceAll("\\\\", "/"));
         return uploadResponse;
     }
 
@@ -448,8 +448,8 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource>
             return null;
         }
         if (!dependency.getJar().isEmpty()) {
-            String jar = dependency.getJar().get(0).split(":", 2)[1];
-            // String jar = dependency.getJar().get(0).split("->")[1];
+            // String jar = dependency.getJar().get(0).split(":", 2)[1];
+            String jar = dependency.getJar().get(0).split("->")[1];
             return new File(jar);
         } else {
             Artifact artifact = dependency.toArtifact().get(0);

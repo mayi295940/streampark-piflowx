@@ -17,24 +17,11 @@
 
 package org.apache.streampark.console.core.service.application.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.google.common.annotations.VisibleForTesting;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.streampark.common.conf.Workspace;
 import org.apache.streampark.common.enums.ClusterState;
 import org.apache.streampark.common.enums.FlinkDeployMode;
 import org.apache.streampark.common.enums.StorageType;
 import org.apache.streampark.common.fs.HdfsOperator;
-import org.apache.streampark.common.util.DateUtils;
 import org.apache.streampark.common.util.DeflaterUtils;
 import org.apache.streampark.console.base.domain.RestRequest;
 import org.apache.streampark.console.base.exception.ApiAlertException;
@@ -97,6 +84,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -105,7 +93,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -113,7 +100,7 @@ import java.util.stream.Collectors;
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
 public class FlinkApplicationManageServiceImpl extends ServiceImpl<FlinkApplicationMapper, FlinkApplication>
     implements
-    FlinkApplicationManageService {
+        FlinkApplicationManageService {
 
     private static final String ERROR_APP_QUEUE_HINT =
         "Queue label '%s' isn't available for teamId '%d', please add it into the team first.";
@@ -278,7 +265,7 @@ public class FlinkApplicationManageServiceImpl extends ServiceImpl<FlinkApplicat
 
         if (ArrayUtils.isNotEmpty(appParam.getStateArray())
             && Arrays.stream(appParam.getStateArray())
-            .anyMatch(x -> x == FlinkAppStateEnum.FINISHED.getValue())) {
+                .anyMatch(x -> x == FlinkAppStateEnum.FINISHED.getValue())) {
             Integer[] newArray = ArrayUtils.insert(
                 appParam.getStateArray().length,
                 appParam.getStateArray(),
@@ -394,7 +381,7 @@ public class FlinkApplicationManageServiceImpl extends ServiceImpl<FlinkApplicat
                 String username = SessionUserUtil.getCurrentUsername();
                 FlowInfoVoRequestAdd flowVo = new FlowInfoVoRequestAdd();
                 flowVo.setId(String.valueOf(appParam.getId()));
-                flowVo.setName(appParam.getJobName() + "_" + DateUtils.now(DateUtils.format_yyyyMMdd(), TimeZone.getDefault()));
+                flowVo.setName(appParam.getJobName());
                 flowVo.setEngineType(EngineTypeEnum.FLINK.name().toLowerCase());
                 flowServiceImpl.addFlow(username, flowVo);
             }
@@ -850,7 +837,7 @@ public class FlinkApplicationManageServiceImpl extends ServiceImpl<FlinkApplicat
      *
      * @param application application entity.
      * @return If the deployMode is (Yarn PerJob or application mode) and the queue label is not
-     *     (empty or default), return true, false else.
+     * (empty or default), return true, false else.
      */
     private boolean isYarnNotDefaultQueue(FlinkApplication application) {
         return FlinkDeployMode.isYarnPerJobOrAppMode(application.getDeployModeEnum())

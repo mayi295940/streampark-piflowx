@@ -330,6 +330,7 @@ public class SparkApplicationActionServiceImpl
         String appConf = userJarAndAppConf.f1;
 
         BuildResult buildResult = buildPipeline.getBuildResult();
+
         if (SparkDeployMode.isYarnMode(application.getDeployModeEnum())) {
             buildResult = new ShadedBuildResponse(null, sparkUserJar, true);
             if (StringUtils.isNotBlank(application.getYarnQueueName())) {
@@ -342,6 +343,11 @@ public class SparkApplicationActionServiceImpl
 
         // Get the args after placeholder replacement
         String applicationArgs = variableService.replaceVariable(application.getTeamId(), application.getAppArgs());
+        if (application.isSparkSqlJob()) {
+            applicationArgs = applicationArgs == null ? "" : applicationArgs;
+            applicationArgs +=
+                " --" + ConfigKeys.KEY_SPARK_SQL(null) + " " + extraParameter.get(ConfigKeys.KEY_SPARK_SQL(null));
+        }
 
         SubmitRequest submitRequest = new SubmitRequest(
             sparkEnv.getSparkVersion(),
@@ -391,8 +397,8 @@ public class SparkApplicationActionServiceImpl
                 application.resolveScheduleConf(response.sparkProperties());
                 if (StringUtils.isNoneEmpty(response.sparkAppId())) {
                     application.setClusterId(response.sparkAppId());
+                    applicationLog.setClusterId(response.sparkAppId());
                 }
-                applicationLog.setClusterId(response.sparkAppId());
                 applicationLog.setTrackingUrl(response.trackingUrl());
                 application.setStartTime(new Date());
                 application.setEndTime(null);

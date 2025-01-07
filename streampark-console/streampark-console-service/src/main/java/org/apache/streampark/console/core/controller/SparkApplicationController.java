@@ -17,6 +17,9 @@
 
 package org.apache.streampark.console.core.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.streampark.common.util.Utils;
 import org.apache.streampark.common.util.YarnUtils;
 import org.apache.streampark.console.base.domain.RestRequest;
@@ -27,17 +30,13 @@ import org.apache.streampark.console.core.entity.ApplicationLog;
 import org.apache.streampark.console.core.entity.FlinkApplicationBackup;
 import org.apache.streampark.console.core.entity.SparkApplication;
 import org.apache.streampark.console.core.enums.AppExistsStateEnum;
+import org.apache.streampark.console.core.enums.SparkAppStateEnum;
 import org.apache.streampark.console.core.service.ResourceService;
 import org.apache.streampark.console.core.service.application.ApplicationLogService;
 import org.apache.streampark.console.core.service.application.FlinkApplicationBackupService;
 import org.apache.streampark.console.core.service.application.SparkApplicationActionService;
 import org.apache.streampark.console.core.service.application.SparkApplicationInfoService;
 import org.apache.streampark.console.core.service.application.SparkApplicationManageService;
-
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -202,7 +201,7 @@ public class SparkApplicationController {
     }
 
     @PostMapping("opt_log")
-    public RestResponse optionlog(ApplicationLog applicationLog, RestRequest request) {
+    public RestResponse optionLog(ApplicationLog applicationLog, RestRequest request) {
         IPage<ApplicationLog> applicationList = applicationLogService.getPage(applicationLog, request);
         return RestResponse.success(applicationList);
     }
@@ -258,5 +257,13 @@ public class SparkApplicationController {
             restResponse = RestResponse.success(false).message(error);
         }
         return restResponse;
+    }
+
+    @PostMapping("persistMetrics")
+    public RestResponse persistMetrics(SparkApplication app) throws InternalException {
+        SparkAppStateEnum sparkAppStateEnum = SparkAppStateEnum.of(app.getAppStatus());
+        app.setState(sparkAppStateEnum.getValue());
+        applicationManageService.persistMetrics(app);
+        return RestResponse.success(true);
     }
 }

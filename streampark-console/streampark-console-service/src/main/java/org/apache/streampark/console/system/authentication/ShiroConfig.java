@@ -83,6 +83,9 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/mxGraph/**", "anon");
         filterChainDefinitionMap.put("/", "anon");
         filterChainDefinitionMap.put("/proxy/**", "anon");
+
+        filterChainDefinitionMap.put("/spark/app/persistMetrics", "anon");
+
         filterChainDefinitionMap.put("/**", "jwt");
 
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);

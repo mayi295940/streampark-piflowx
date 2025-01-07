@@ -62,6 +62,7 @@ export const k8sRestExposedType = [
 ];
 
 export const deployModes = [
+  { label: 'Local', value: DeployMode.LOCAL, disabled: false },
   { label: 'Standalone', value: DeployMode.REMOTE, disabled: false },
   { label: 'Yarn-Cluster', value: DeployMode.YARN_CLUSTER, disabled: false },
   { label: 'Yarn-Client', value: DeployMode.YARN_CLIENT, disabled: false },

@@ -115,6 +115,15 @@ case class FlinkRemotePerJobBuildRequest(
     dependencyInfo: DependencyInfo)
   extends FlinkBuildParam
 
+case class SparkLocalBuildRequest(
+    appName: String,
+    mainClass: String,
+    localWorkspace: String,
+    customSparkUserJar: String,
+    jobType: SparkJobType,
+    deployMode: SparkDeployMode,
+    dependencyInfo: DependencyInfo) extends BuildParam
+
 case class FlinkYarnApplicationBuildRequest(
     appName: String,
     mainClass: String,

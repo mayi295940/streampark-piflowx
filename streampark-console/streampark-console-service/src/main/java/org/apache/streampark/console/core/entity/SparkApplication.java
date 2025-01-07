@@ -234,6 +234,8 @@ public class SparkApplication extends BaseEntity {
 
     private transient AppControl appControl;
 
+    private transient String appStatus;
+
     public void setK8sNamespace(String k8sNamespace) {
         this.k8sNamespace = StringUtils.isBlank(k8sNamespace) ? Constants.DEFAULT : k8sNamespace;
     }
@@ -410,6 +412,11 @@ public class SparkApplication extends BaseEntity {
     }
 
     @JsonIgnore
+    public boolean isSparkOnLocalJob() {
+        return SparkDeployMode.LOCAL.getMode() == (this.getDeployMode());
+    }
+
+    @JsonIgnore
     public boolean isSparkSqlJob() {
         return SparkJobType.SPARK_SQL.getMode().equals(this.getJobType());
     }
@@ -484,6 +491,7 @@ public class SparkApplication extends BaseEntity {
             case KUBERNETES_NATIVE_CLUSTER:
             case KUBERNETES_NATIVE_CLIENT:
             case REMOTE:
+            case LOCAL:
                 return StorageType.LFS;
             default:
                 throw new UnsupportedOperationException("Unsupported ".concat(deployModeEnum.getName()));

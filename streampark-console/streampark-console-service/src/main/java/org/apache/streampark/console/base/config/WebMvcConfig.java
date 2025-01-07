@@ -17,10 +17,11 @@
 
 package org.apache.streampark.console.base.config;
 
+import org.apache.streampark.console.base.interceptor.UploadFileTypeInterceptor;
+
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import org.apache.streampark.console.base.interceptor.UploadFileTypeInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,6 +41,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -51,8 +53,8 @@ public class WebMvcConfig extends OncePerRequestFilter implements WebMvcConfigur
 
     @Override
     protected void doFilterInternal(
-        HttpServletRequest request, HttpServletResponse response,
-        FilterChain filterChain) throws ServletException, IOException {
+                                    HttpServletRequest request, HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
         if (request.getMethod().equals(HttpMethod.TRACE.name())) {
             response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         } else {

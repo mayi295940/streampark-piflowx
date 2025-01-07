@@ -27,6 +27,7 @@ import SparkDeployMode._
 object SparkClientEndpoint {
 
   private[this] val clients: Map[SparkDeployMode, SparkClientTrait] = Map(
+    LOCAL -> LocalClient,
     YARN_CLUSTER -> YarnClient,
     YARN_CLIENT -> YarnClient)
 

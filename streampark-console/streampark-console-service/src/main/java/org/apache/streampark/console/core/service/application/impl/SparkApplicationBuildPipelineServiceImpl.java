@@ -66,8 +66,10 @@ import org.apache.streampark.flink.packer.pipeline.PipeWatcher;
 import org.apache.streampark.flink.packer.pipeline.PipelineSnapshot;
 import org.apache.streampark.flink.packer.pipeline.PipelineStatusEnum;
 import org.apache.streampark.flink.packer.pipeline.SparkK8sApplicationBuildRequest;
+import org.apache.streampark.flink.packer.pipeline.SparkLocalBuildRequest;
 import org.apache.streampark.flink.packer.pipeline.SparkYarnBuildRequest;
 import org.apache.streampark.flink.packer.pipeline.impl.SparkK8sApplicationBuildPipeline;
+import org.apache.streampark.flink.packer.pipeline.impl.SparkLocalBuildPipeline;
 import org.apache.streampark.flink.packer.pipeline.impl.SparkYarnBuildPipeline;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -144,7 +146,7 @@ public class SparkApplicationBuildPipelineServiceImpl
     /**
      * Build application. This is an async call method.
      *
-     * @param appId application id
+     * @param appId      application id
      * @param forceBuild forced start pipeline or not
      * @return Whether the pipeline was successfully started
      */
@@ -295,7 +297,7 @@ public class SparkApplicationBuildPipelineServiceImpl
                             // If the current task is not running, or the task has just been added, directly
                             // set
                             // the candidate version to the official version
-                            if (app.isSparkOnYarnJob()) {
+                            if (app.isSparkOnYarnJob() || app.isSparkOnLocalJob()) {
                                 applicationManageService.toEffective(app);
                             } else {
                                 if (app.isStreamParkJob()) {
@@ -346,7 +348,7 @@ public class SparkApplicationBuildPipelineServiceImpl
     /**
      * check the build environment
      *
-     * @param appId application id
+     * @param appId      application id
      * @param forceBuild forced start pipeline or not
      */
     private void checkBuildEnv(Long appId, boolean forceBuild) {
@@ -369,7 +371,9 @@ public class SparkApplicationBuildPipelineServiceImpl
             "The job is invalid, or the job cannot be built while it is running");
     }
 
-    /** create building pipeline instance */
+    /**
+     * create building pipeline instance
+     */
     private BuildPipeline createPipelineInstance(@Nonnull SparkApplication app) {
         SparkEnv sparkEnv = sparkEnvService.getByIdOrDefault(app.getVersionId());
         String sparkUserJar = retrieveSparkUserJar(sparkEnv, app);
@@ -383,11 +387,12 @@ public class SparkApplicationBuildPipelineServiceImpl
 
         SparkDeployMode deployModeEnum = app.getDeployModeEnum();
         String mainClass = Constants.STREAMPARK_SPARKSQL_CLIENT_CLASS;
+        String localWorkspace = app.getLocalAppHome().concat("/lib");
         switch (deployModeEnum) {
             case YARN_CLIENT:
             case YARN_CLUSTER:
+            case REMOTE:
                 String yarnProvidedPath = app.getAppLib();
-                String localWorkspace = app.getLocalAppHome().concat("/lib");
                 if (ApplicationType.APACHE_SPARK == app.getApplicationType()) {
                     yarnProvidedPath = app.getAppHome();
                     localWorkspace = app.getLocalAppHome();
@@ -402,6 +407,21 @@ public class SparkApplicationBuildPipelineServiceImpl
                     getMergedDependencyInfo(app));
                 log.info("Submit params to building pipeline : {}", yarnAppRequest);
                 return SparkYarnBuildPipeline.of(yarnAppRequest);
+            case LOCAL:
+                if (ApplicationType.APACHE_SPARK == app.getApplicationType()) {
+                    localWorkspace = app.getLocalAppHome();
+                }
+                sparkUserJar = String.format("file:///%s", sparkUserJar);
+                SparkLocalBuildRequest localAppRequest = new SparkLocalBuildRequest(
+                    app.getAppName(),
+                    mainClass,
+                    localWorkspace,
+                    sparkUserJar,
+                    app.getJobTypeEnum(),
+                    deployModeEnum,
+                    getMergedDependencyInfo(app));
+                log.info("Submit params to building pipeline : {}", localAppRequest);
+                return SparkLocalBuildPipeline.of(localAppRequest);
             case KUBERNETES_NATIVE_CLUSTER:
             case KUBERNETES_NATIVE_CLIENT:
                 DockerConfig dockerConfig = settingService.getDockerConfig();
@@ -410,6 +430,7 @@ public class SparkApplicationBuildPipelineServiceImpl
                 log.info("Submit params to building pipeline : {}", k8sApplicationBuildRequest);
                 return SparkK8sApplicationBuildPipeline.of(k8sApplicationBuildRequest);
             default:
+                log.error("Unsupported Building Application for DeployMode: {}", app.getDeployModeEnum());
                 throw new UnsupportedOperationException(
                     "Unsupported Building Application for DeployMode: " + app.getDeployModeEnum());
         }
@@ -422,7 +443,7 @@ public class SparkApplicationBuildPipelineServiceImpl
                                                                                  String mainJar,
                                                                                  SparkEnv sparkEnv,
                                                                                  DockerConfig dockerConfig) {
-        SparkK8sApplicationBuildRequest k8sApplicationBuildRequest = new SparkK8sApplicationBuildRequest(
+        return new SparkK8sApplicationBuildRequest(
             app.getAppName(),
             app.getAppHome(),
             mainClass,
@@ -440,7 +461,6 @@ public class SparkApplicationBuildPipelineServiceImpl
                 dockerConfig.getNamespace(),
                 dockerConfig.getUsername(),
                 dockerConfig.getPassword()));
-        return k8sApplicationBuildRequest;
     }
 
     private String retrieveSparkUserJar(SparkEnv sparkEnv, SparkApplication app) {

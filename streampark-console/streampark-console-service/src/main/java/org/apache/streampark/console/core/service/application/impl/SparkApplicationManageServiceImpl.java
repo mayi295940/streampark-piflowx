@@ -147,6 +147,12 @@ public class SparkApplicationManageServiceImpl
 
     @Override
     public void persistMetrics(SparkApplication appParam) {
+        ApiAlertException.throwIfNull(
+            appParam.getId(),
+            "[StreamPark] Application id can't be null, persistMetrics failed.");
+        ApiAlertException.throwIfNull(
+            appParam.getState(),
+            "[StreamPark] Application state can't be null, persistMetrics failed.");
         this.baseMapper.persistMetrics(appParam);
     }
 

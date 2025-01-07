@@ -67,7 +67,13 @@ case class SubmitRequest(
 
   lazy val userJarPath: String = {
     checkBuildResult()
-    buildResult.asInstanceOf[ShadedBuildResponse].shadedJarPath
+    // buildResult.asInstanceOf[ShadedBuildResponse].shadedJarPath
+    getShadedJarPath(buildResult).getOrElse("")
+  }
+
+  private def getShadedJarPath(buildResult: Any): Option[String] = buildResult match {
+    case response: ShadedBuildResponse => Some(response.shadedJarPath)
+    case _ => None
   }
 
   def hasExtra(key: String): Boolean = MapUtils.isNotEmpty(extraParameter) && extraParameter.containsKey(key)

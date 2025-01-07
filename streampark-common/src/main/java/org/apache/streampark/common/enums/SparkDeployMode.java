@@ -122,4 +122,14 @@ public enum SparkDeployMode {
     public static boolean isRemoteMode(@Nullable SparkDeployMode mode) {
         return REMOTE == mode;
     }
+
+    /** Judge the given spark execution mode value whether is local execution mode. */
+    public static boolean isLocalMode(@Nullable Integer value) {
+        return isLocalMode(of(value));
+    }
+
+    /** Judge the given spark execution mode whether is local execution mode. */
+    public static boolean isLocalMode(@Nullable SparkDeployMode mode) {
+        return REMOTE == mode;
+    }
 }

@@ -31,7 +31,11 @@ trait SparkBatch extends Spark {
   protected lazy val context: SparkContext = sparkSession.sparkContext
 
   override def destroy(): Unit = {
-    context.stop()
+    try {
+      context.stop()
+    } catch {
+      case ex: Exception => ex.printStackTrace()
+    }
   }
 
 }

@@ -103,12 +103,12 @@ public class SparkAppHttpWatcher {
     private static final Cache<Long, Byte> STARTING_CACHE =
         Caffeine.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build();
 
-    /** tracking task list */
+    /**
+     * tracking task list
+     */
     private static final Map<Long, SparkApplication> WATCHING_APPS = new ConcurrentHashMap<>(0);
 
     /**
-     *
-     *
      * <pre>
      * StopFrom: Recording spark application stopped by streampark or stopped by other actions
      * </pre>
@@ -180,14 +180,105 @@ public class SparkAppHttpWatcher {
     }
 
     private void watch(Long id, SparkApplication application) {
-        executorService.execute(
-            () -> {
-                try {
+        executorService.execute(() -> {
+            try {
+                if (application.isSparkOnYarnJob()) {
+                    // YARN 模式的监控逻辑
                     getStateFromYarn(application);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
                 }
-            });
+            } catch (Exception e) {
+                log.error("[StreamPark][SparkAppHttpWatcher] watch failed for appId: {}", id, e);
+            }
+        });
+    }
+
+    /**
+     * 监控 Local 模式下的 Spark 任务
+     */
+    private void getStateFromLocal(SparkApplication application) throws Exception {
+        // 获取 Spark REST API 的 URL（默认端口为 4040）
+        String sparkUrl = "http://localhost:4040/api/v1/applications";
+        String appId = application.getClusterId();
+
+        // 1. 获取任务状态
+        String appStatus = getSparkAppStatus(sparkUrl, appId);
+        SparkAppStateEnum sparkAppStateEnum = SparkAppStateEnum.of(appStatus);
+
+        if (sparkAppStateEnum == null) {
+            log.warn("[StreamPark][SparkAppHttpWatcher] Unknown app status: {}", appStatus);
+            return;
+        }
+
+        // 2. 更新任务状态
+        application.setState(sparkAppStateEnum.getValue());
+
+        if (SparkAppStateEnum.isEndState(sparkAppStateEnum.getValue())) {
+            log.info("[StreamPark][SparkAppHttpWatcher] Local app {} ended, state: {}", appId, sparkAppStateEnum);
+            application.setEndTime(new Date());
+        } else if (SparkAppStateEnum.RUNNING == sparkAppStateEnum) {
+            // 3. 获取任务进度和资源使用情况
+            SparkApplicationSummary summary = getSparkAppSummary(sparkUrl, appId);
+            if (summary != null) {
+                application.fillRunningMetrics(summary);
+            }
+        }
+
+        // 4. 持久化任务状态和资源使用情况
+        doPersistMetrics(application, false);
+
+        // 5. 触发告警（如果任务失败或丢失）
+        if (SparkAppStateEnum.FAILED == sparkAppStateEnum || SparkAppStateEnum.LOST == sparkAppStateEnum) {
+            doAlert(application, sparkAppStateEnum);
+        }
+    }
+
+    /**
+     * 通过 Spark REST API 获取任务状态
+     */
+    private String getSparkAppStatus(String sparkUrl, String appId) throws IOException {
+        String url = sparkUrl + "/" + appId;
+        String response = YarnUtils.restRequest(url, HTTP_TIMEOUT);
+        if (response == null) {
+            throw new IOException("Failed to get app status from Spark REST API");
+        }
+        return JacksonUtils.read(response, Map.class).get("state").toString();
+    }
+
+    /**
+     * 通过 Spark REST API 获取任务进度和资源使用情况
+     */
+    private SparkApplicationSummary getSparkAppSummary(String sparkUrl, String appId) throws IOException {
+        String jobsUrl = sparkUrl + "/" + appId + "/jobs";
+        String response = YarnUtils.restRequest(jobsUrl, HTTP_TIMEOUT);
+        if (response == null) {
+            throw new IOException("Failed to get app summary from Spark REST API");
+        }
+
+        Job[] jobs = JacksonUtils.read(response, Job[].class);
+        if (jobs == null || jobs.length == 0) {
+            return null;
+        }
+
+        // 计算任务进度和资源使用情况
+        long numTasks = 0;
+        long numCompletedTasks = 0;
+        long numStages = 0;
+        long numCompletedStages = 0;
+
+        for (Job job : jobs) {
+            numTasks += job.getNumTasks();
+            numCompletedTasks += job.getNumCompletedTasks();
+            numStages += job.getStageIds().size();
+            numCompletedStages += job.getNumCompletedStages();
+        }
+
+        return new SparkApplicationSummary(
+            numTasks,
+            numCompletedTasks,
+            numStages,
+            numCompletedStages,
+            null,
+            null);
     }
 
     private StopFromEnum getAppStopFrom(Long appId) {
@@ -285,7 +376,9 @@ public class SparkAppHttpWatcher {
         }
     }
 
-    /** set current option state */
+    /**
+     * set current option state
+     */
     public static void setOptionState(Long appId, SparkOptionStateEnum state) {
         log.info("[StreamPark][SparkAppHttpWatcher] setOptioning");
         OPTIONING.put(appId, state);
@@ -324,6 +417,7 @@ public class SparkAppHttpWatcher {
         String reqURL = "ws/v1/cluster/apps/".concat(application.getClusterId());
         return yarnRestRequest(reqURL, YarnAppInfo.class);
     }
+
     private Job[] httpJobsStatus(SparkApplication application) throws IOException {
         String format = "proxy/%s/api/v1/applications/%s/jobs";
         String reqURL = String.format(format, application.getClusterId(), application.getClusterId());
@@ -372,7 +466,7 @@ public class SparkAppHttpWatcher {
      * Describes the alarming behavior under abnormal operation for jobs running in yarn mode.
      *
      * @param application spark application
-     * @param appState spark application state
+     * @param appState    spark application state
      */
     private void doAlert(SparkApplication application, SparkAppStateEnum appState) {
         AlertTemplate alertTemplate = AlertTemplateUtils.createAlertTemplate(application, appState);

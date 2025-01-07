@@ -17,7 +17,7 @@
 
 package org.apache.streampark.common.conf
 
-import org.apache.streampark.common.util.{CommandUtils, Logger}
+import org.apache.streampark.common.util.{CommandUtils, Logger, Utils}
 import org.apache.streampark.common.util.Implicits._
 
 import java.io.File
@@ -38,7 +38,17 @@ class SparkVersion(val sparkHome: String) extends Serializable with Logger {
   val (version, scalaVersion) = {
     var sparkVersion: String = null
     var scalaVersion: String = null
-    val cmd = List(s"export SPARK_HOME=$sparkHome&&$sparkHome/bin/spark-submit --version")
+    val cmd = if (Utils.isWindows) {
+      // For Windows
+      //      List(
+      //        "set SPARK_HOME='" + sparkHome.replaceAll("\\\\", "/") + "'; " +
+      //          sparkHome.replaceAll("\\\\", "/") + "/bin/spark-submit --version")
+      List(sparkHome.replaceAll("\\\\", "/") + "/bin/spark-submit --version")
+    } else {
+      // For Unix/Linux/macOS
+      List(s"export SPARK_HOME=$sparkHome && $sparkHome/bin/spark-submit --version")
+    }
+
     val buffer = new mutable.StringBuilder
 
     CommandUtils.execute(

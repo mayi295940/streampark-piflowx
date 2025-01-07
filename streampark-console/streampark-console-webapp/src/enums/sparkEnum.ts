@@ -30,6 +30,8 @@ export enum OptionStateEnum {
 
 /* DeployMode  */
 export enum DeployMode {
+  /** local mode */
+  LOCAL = 0,
   /** remote (standalone) */
   REMOTE = 1,
   /** yarn per-job (deprecated, please use yarn-application mode) */

@@ -103,7 +103,17 @@ public enum PipelineTypeEnum {
             .put(6, "Build spark app docker image")
             .put(7, "Push spark app docker image")
             .build(),
-        DockerImageBuildResponse.class);
+        DockerImageBuildResponse.class),
+
+    SPARK_LOCAL(
+        8,
+        "spark local mode task building pipeline",
+        ImmutableMap.<Integer, String>builder()
+            .put(1, "Prepare local environment and building workspace")
+            .put(2, "Resolve maven dependencies")
+            .put(3, "upload jar to lfs")
+            .build(),
+        ShadedBuildResponse.class);
 
     private final Integer code;
     /** short description of pipeline type. */

@@ -10,6 +10,7 @@ export enum JobTypeEnum {
   JAR = 1,
   SQL = 2,
   PYSPARK = 3,
+  SPARK_PIPELINE = 4,
 }
 
 export enum OperationEnum {

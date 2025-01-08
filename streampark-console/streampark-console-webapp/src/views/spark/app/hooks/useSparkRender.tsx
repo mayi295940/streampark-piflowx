@@ -317,4 +317,11 @@ export const sparkJobTypeMap = {
     ]),
     value: JobTypeEnum.PYSPARK,
   },
+  [JobTypeEnum.SPARK_PIPELINE]: {
+    label: h('div', {}, [
+      h(SvgIcon, { name: 'pyspark', color: '#108ee9' }, ''),
+      h('span', { class: 'pl-10px' }, 'Spark Pipeline'),
+    ]),
+    value: JobTypeEnum.SPARK_PIPELINE,
+  },
 };

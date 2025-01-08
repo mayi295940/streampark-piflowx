@@ -33,7 +33,10 @@ public enum SparkJobType {
     SPARK_SQL("Spark SQL", 2),
 
     /** Py spark Mode */
-    PYSPARK("Python Spark", 3);
+    PYSPARK("Python Spark", 3),
+
+    /** Spark Pipeline */
+    SPARK_PIPELINE("Spark Pipeline", 4);
 
     private final String name;
 

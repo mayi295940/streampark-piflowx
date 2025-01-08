@@ -51,9 +51,28 @@ export const useSparkTableAction = (handlePageDataReload: Fn, optionApps: Record
     users,
   } = useSparkAction(optionApps);
 
+  /**
+   * pipeline design
+   */
+  function handleDesignPipeline(app: SparkApplication) {
+    router.push({
+      path: '/flow/dag',
+      query: {
+        src: '/drawingBoard/page/flow/mxGraph/index.html?load=' + app.id,
+      },
+    });
+  }
+
   /* Operation button list */
   function getActionList(record: SparkApplication, currentPageNo: number): ActionItem[] {
     return [
+      {
+        tooltip: { title: t('flow.flow.flow_table.enter') },
+        icon: 'fluent:hand-draw-28-regular',
+        auth: 'flow:update',
+        onClick: handleDesignPipeline.bind(null, record),
+        ifShow: record.jobType == JobTypeEnum.SPARK_PIPELINE,
+      },
       {
         tooltip: { title: t('spark.app.operation.edit') },
         auth: 'app:update',
@@ -290,6 +309,7 @@ export const useSparkTableAction = (handlePageDataReload: Fn, optionApps: Record
               { label: 'JAR', value: JobTypeEnum.JAR },
               { label: 'SQL', value: JobTypeEnum.SQL },
               { label: 'PySpark', value: JobTypeEnum.PYSPARK },
+              { label: 'Spark Pipeline', value: JobTypeEnum.SPARK_PIPELINE },
             ],
             onChange: handlePageDataReload.bind(null, false),
           },

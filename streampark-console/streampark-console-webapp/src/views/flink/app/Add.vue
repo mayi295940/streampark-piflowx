@@ -261,7 +261,6 @@
   }
   /* Submit to create */
   async function handleAppCreate(formValue: Recordable) {
-    console.log('formValue', formValue);
     try {
       submitLoading.value = true;
       if (formValue.jobType == JobTypeEnum.SQL) {

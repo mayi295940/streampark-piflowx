@@ -27,6 +27,7 @@
   import { useSparkSchema } from '../hooks/useAppFormSchema';
   import { SparkEnv } from '/@/api/spark/home.type';
   import { decodeByBase64 } from '/@/utils/cipher';
+  import { Button, Steps, Step } from 'ant-design-vue';
 
   const SparkSqlEditor = createAsyncComponent(() => import('./SparkSql.vue'), {
     loading: true,
@@ -92,40 +93,81 @@
     }
   }
 
+  const stepCurrent = ref<number>(0);
+  const next = async () => {
+    //await validate();
+    submitLoading.value = false;
+    stepCurrent.value++;
+    setFieldsValue({ stepCurrent: stepCurrent.value });
+  };
+  const prev = () => {
+    submitLoading.value = false;
+    stepCurrent.value--;
+    setFieldsValue({ stepCurrent: stepCurrent.value });
+  };
+  const steps = [
+    {
+      title: 'First',
+    },
+    {
+      title: 'Second',
+    },
+    {
+      title: 'Last',
+    },
+  ];
+
   onMounted(async () => {
     handleInitForm();
+    setFieldsValue({ stepCurrent: stepCurrent.value });
   });
 </script>
 
 <template>
-  <BasicForm @register="registerAppForm" @submit="handleAppSubmit" :schemas="formSchema">
-    <template #sparkSql="{ model, field }">
-      <SparkSqlEditor
-        ref="sparkSql"
-        v-model:value="model[field]"
-        :versionId="model['versionId']"
-        :suggestions="suggestions"
-        @preview="(value) => openReviewDrawer(true, { value, suggestions })"
-      />
-    </template>
-    <template #args="{ model }">
-      <ProgramArgs
-        ref="programArgsRef"
-        v-model:value="model.args"
-        :suggestions="suggestions"
-        @preview="(value) => openReviewDrawer(true, { value, suggestions })"
-      />
-    </template>
-    <template #formFooter>
-      <div class="flex items-center w-full justify-center">
-        <a-button @click="go('/spark/app')">
-          {{ t('common.cancelText') }}
-        </a-button>
-        <a-button class="ml-4" :loading="submitLoading" type="primary" @click="submitForm()">
-          {{ t('common.submitText') }}
-        </a-button>
-      </div>
-    </template>
-  </BasicForm>
+  <Steps :current="stepCurrent">
+    <Step v-for="item in steps" :key="item.title" :title="item.title" />
+  </Steps>
+  <div class="steps-content">
+    <BasicForm @register="registerAppForm" @submit="handleAppSubmit" :schemas="formSchema">
+      <template #sparkSql="{ model, field }">
+        <SparkSqlEditor
+          ref="sparkSql"
+          v-model:value="model[field]"
+          :versionId="model['versionId']"
+          :suggestions="suggestions"
+          @preview="(value) => openReviewDrawer(true, { value, suggestions })"
+        />
+      </template>
+      <template #args="{ model }">
+        <ProgramArgs
+          ref="programArgsRef"
+          v-model:value="model.args"
+          :suggestions="suggestions"
+          @preview="(value) => openReviewDrawer(true, { value, suggestions })"
+        />
+      </template>
+    </BasicForm>
+  </div>
+  <div class="steps-action flex items-center w-full justify-center">
+    <Button v-if="stepCurrent > 0" @click="prev">Previous</Button>
+    <Button class="ml-4" v-if="stepCurrent < steps.length - 1" type="primary" @click="next"
+      >Next</Button
+    >
+    <Button
+      class="ml-4"
+      :loading="submitLoading"
+      type="primary"
+      @click="submitForm()"
+      v-if="stepCurrent == steps.length - 1"
+    >
+      {{ t('common.submitText') }}
+    </Button>
+    <Button class="ml-4" @click="go('/spark/app')">
+      {{ t('common.cancelText') }}
+    </Button>
+  </div>
   <VariableReview @register="registerReviewDrawer" />
 </template>
+<style lang="less">
+  @import url('../styles/Add.less');
+</style>

@@ -251,6 +251,11 @@ public class FlinkApplicationManageServiceImpl extends ServiceImpl<FlinkApplicat
             if (HdfsOperator.exists(path)) {
                 HdfsOperator.delete(path);
             }
+
+            if (application.isPipelineJob()) {
+                String username = SessionUserUtil.getCurrentUsername();
+                flowServiceImpl.deleteFLowInfo(username, true, String.valueOf(appId));
+            }
         } catch (Exception e) {
             // skip
         }

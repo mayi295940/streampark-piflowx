@@ -61,7 +61,7 @@ case class SubmitRequest(
 
   lazy val appMain: String = this.jobType match {
     case SparkJobType.SPARK_SQL => Constants.STREAMPARK_SPARKSQL_CLIENT_CLASS
-    case SparkJobType.SPARK_JAR | SparkJobType.PYSPARK => mainClass
+    case SparkJobType.SPARK_JAR | SparkJobType.PYSPARK | SparkJobType.SPARK_PIPELINE => mainClass
     case SparkJobType.UNKNOWN => throw new IllegalArgumentException("Unknown deployment Mode")
   }
 

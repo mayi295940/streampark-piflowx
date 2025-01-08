@@ -71,6 +71,12 @@ export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
     if (route.query.appId) {
       return [
         {
+          field: 'stepCurrent',
+          label: 'stepCurrent',
+          component: 'Input',
+          show: false,
+        },
+        {
           field: 'jobType',
           label: t('spark.app.jobType'),
           component: 'InputNumber',
@@ -85,10 +91,17 @@ export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
               ></Alert>
             );
           },
+          show: ({ values }) => values?.stepCurrent == 0,
         },
       ];
     } else {
       return [
+        {
+          field: 'stepCurrent',
+          label: 'stepCurrent',
+          component: 'Input',
+          show: false,
+        },
         {
           field: 'jobType',
           label: t('spark.app.jobType'),
@@ -112,6 +125,7 @@ export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
               type: 'number',
             },
           ],
+          show: ({ values }) => values?.stepCurrent == 0,
         },
       ];
     }
@@ -142,6 +156,7 @@ export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
             },
           },
         ],
+        show: ({ values }) => values?.stepCurrent == 0,
       },
       {
         field: 'versionId',
@@ -155,13 +170,14 @@ export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
         rules: [
           { required: true, message: t('spark.app.addAppTips.sparkVersionIsRequiredMessage') },
         ],
+        show: ({ values }) => values?.stepCurrent == 0,
       },
       {
         field: 'sparkSql',
         label: 'Spark SQL',
         component: 'Input',
         slot: 'sparkSql',
-        ifShow: ({ values }) => values?.jobType == JobTypeEnum.SQL,
+        show: ({ values }) => values?.jobType == JobTypeEnum.SQL && values?.stepCurrent == 1,
         rules: [{ required: true, message: t('spark.app.addAppTips.sparkSqlIsRequiredMessage') }],
       },
       {
@@ -169,7 +185,9 @@ export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
         label: t('spark.app.resource'),
         component: 'Select',
         render: ({ model }) => renderStreamParkResource({ model, resources: unref(teamResource) }),
-        ifShow: ({ values }) => values.jobType == JobTypeEnum.JAR,
+        show: ({ values }) =>
+          (values.jobType == JobTypeEnum.JAR || values?.jobType == JobTypeEnum.SPARK_PIPELINE) &&
+          values?.stepCurrent == 1,
         rules: [{ required: true, message: t('spark.app.addAppTips.sparkAppRequire') }],
       },
       {
@@ -177,7 +195,9 @@ export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
         label: t('spark.app.mainClass'),
         component: 'Input',
         componentProps: { placeholder: t('spark.app.addAppTips.mainClassPlaceholder') },
-        ifShow: ({ values }) => values?.jobType == JobTypeEnum.JAR,
+        show: ({ values }) =>
+          (values.jobType == JobTypeEnum.JAR || values?.jobType == JobTypeEnum.SPARK_PIPELINE) &&
+          values?.stepCurrent == 1,
         rules: [{ required: true, message: t('spark.app.addAppTips.mainClassIsRequiredMessage') }],
       },
       {
@@ -195,6 +215,7 @@ export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
             },
           ];
         },
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       {
         field: 'args',
@@ -202,7 +223,9 @@ export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
         component: 'InputTextArea',
         defaultValue: '',
         slot: 'args',
-        ifShow: ({ model }) => [JobTypeEnum.JAR, JobTypeEnum.PYSPARK].includes(model?.jobType),
+        show: ({ model }) =>
+          [JobTypeEnum.JAR, JobTypeEnum.PYSPARK].includes(model?.jobType) &&
+          model?.stepCurrent == 2,
       },
       {
         field: 'appProperties',
@@ -212,6 +235,7 @@ export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
           rows: 4,
           placeholder: '--conf, -c PROP=VALUE Arbitrary Spark configuration property.',
         },
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       { field: 'configOverride', label: '', component: 'Input', show: false },
       {
@@ -221,6 +245,7 @@ export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
         render({ model, field }) {
           return renderIsSetConfig(model, field, registerConfDrawer, openConfDrawer);
         },
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       {
         field: 'tags',
@@ -229,22 +254,25 @@ export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
         componentProps: {
           placeholder: t('spark.app.addAppTips.tagsPlaceholder'),
         },
+        show: ({ values }) => values?.stepCurrent == 2,
       },
       {
         field: 'hadoopUser',
         label: t('spark.app.hadoopUser'),
         component: 'Input',
-        ifShow: ({ values }) =>
-          values?.deployMode == DeployMode.YARN_CLIENT ||
-          values?.deployMode == DeployMode.YARN_CLUSTER,
+        show: ({ values }) =>
+          (values?.deployMode == DeployMode.YARN_CLIENT ||
+            values?.deployMode == DeployMode.YARN_CLUSTER) &&
+          values?.stepCurrent == 2,
       },
       {
         field: 'yarnQueue',
         label: t('spark.app.yarnQueue'),
         component: 'Input',
-        ifShow: ({ values }) =>
-          values?.deployMode == DeployMode.YARN_CLIENT ||
-          values?.deployMode == DeployMode.YARN_CLUSTER,
+        show: ({ values }) =>
+          (values?.deployMode == DeployMode.YARN_CLIENT ||
+            values?.deployMode == DeployMode.YARN_CLUSTER) &&
+          values?.stepCurrent == 2,
         render: ({ model, field }) => {
           return (
             <div>
@@ -271,6 +299,7 @@ export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
         field: 'description',
         label: t('common.description'),
         component: 'InputTextArea',
+        show: ({ values }) => values?.stepCurrent == 2,
         componentProps: { rows: 4, placeholder: t('spark.app.addAppTips.descriptionPlaceholder') },
       },
     ];

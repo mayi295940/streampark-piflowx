@@ -21,6 +21,7 @@ import org.apache.streampark.common.conf.ConfigKeys;
 import org.apache.streampark.common.conf.Workspace;
 import org.apache.streampark.common.constants.Constants;
 import org.apache.streampark.common.enums.ApplicationType;
+import org.apache.streampark.common.enums.FlinkJobType;
 import org.apache.streampark.common.enums.SparkDeployMode;
 import org.apache.streampark.common.enums.SparkJobType;
 import org.apache.streampark.common.enums.StorageType;
@@ -419,6 +420,11 @@ public class SparkApplication extends BaseEntity {
     @JsonIgnore
     public boolean isSparkSqlJob() {
         return SparkJobType.SPARK_SQL.getMode().equals(this.getJobType());
+    }
+
+    @JsonIgnore
+    public boolean isPipelineJob() {
+        return SparkJobType.SPARK_PIPELINE.getMode().equals(this.getJobType());
     }
 
     @JsonIgnore

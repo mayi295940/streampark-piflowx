@@ -58,7 +58,7 @@
   /* custom mode */
   async function handleCustomJobMode(values: Recordable) {
     const params = {
-      jobType: JobTypeEnum.JAR,
+      jobType: values.jobType,
       deployMode: values.deployMode,
       appType: AppTypeEnum.APACHE_SPARK,
       versionId: values.versionId,
@@ -80,7 +80,7 @@
   /* spark sql mode */
   async function handleSQLMode(values: Recordable) {
     await handleCreateAction({
-      jobType: JobTypeEnum.SQL,
+      jobType: values.jobType,
       deployMode: values.deployMode,
       appType: AppTypeEnum.APACHE_SPARK,
       versionId: values.versionId,

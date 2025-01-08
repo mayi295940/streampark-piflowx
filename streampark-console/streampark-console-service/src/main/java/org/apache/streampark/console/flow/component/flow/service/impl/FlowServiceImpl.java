@@ -668,8 +668,11 @@ public class FlowServiceImpl implements IFlowService {
     }
 
     @Override
-    public String drawingBoardData(
-                                   String username, boolean isAdmin, String flowId, String parentAccessPath) {
+    public String drawingBoardData(String username,
+                                   boolean isAdmin,
+                                   String flowId,
+                                   String parentAccessPath) {
+
         if (StringUtils.isBlank(username)) {
             return ReturnMapUtils.setFailedMsgRtnJsonStr(MessageConfig.ILLEGAL_USER_MSG());
         }

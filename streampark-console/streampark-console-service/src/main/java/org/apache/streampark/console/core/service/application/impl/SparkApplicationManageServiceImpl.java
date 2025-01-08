@@ -52,6 +52,9 @@ import org.apache.streampark.console.core.service.application.SparkApplicationBa
 import org.apache.streampark.console.core.service.application.SparkApplicationConfigService;
 import org.apache.streampark.console.core.service.application.SparkApplicationManageService;
 import org.apache.streampark.console.core.util.ServiceHelper;
+import org.apache.streampark.console.flow.base.utils.SessionUserUtil;
+import org.apache.streampark.console.flow.component.flow.service.IFlowService;
+import org.apache.streampark.console.flow.controller.requestVo.FlowInfoVoRequestAdd;
 import org.apache.streampark.flink.packer.pipeline.PipelineStatusEnum;
 
 import org.apache.commons.lang3.StringUtils;
@@ -123,6 +126,9 @@ public class SparkApplicationManageServiceImpl
     @Autowired
     private ResourceService resourceService;
 
+    @Autowired
+    private IFlowService flowServiceImpl;
+
     @PostConstruct
     public void resetOptionState() {
         this.baseMapper.resetOptionState();
@@ -190,6 +196,11 @@ public class SparkApplicationManageServiceImpl
 
         // 8) remove app
         removeApp(application);
+
+        if (application.isPipelineJob()) {
+            String username = SessionUserUtil.getCurrentUsername();
+            flowServiceImpl.deleteFLowInfo(username, true, String.valueOf(appId));
+        }
         return true;
     }
 
@@ -204,6 +215,10 @@ public class SparkApplicationManageServiceImpl
             String path = Workspace.of(StorageType.HDFS).APP_WORKSPACE().concat("/").concat(appId.toString());
             if (HdfsOperator.exists(path)) {
                 HdfsOperator.delete(path);
+            }
+            if (application.isPipelineJob()) {
+                String username = SessionUserUtil.getCurrentUsername();
+                flowServiceImpl.deleteFLowInfo(username, true, String.valueOf(appId));
             }
         } catch (Exception e) {
             // skip
@@ -306,6 +321,16 @@ public class SparkApplicationManageServiceImpl
             if (appParam.getConfig() != null) {
                 configService.create(appParam, true);
             }
+
+            if (appParam.isPipelineJob()) {
+                String username = SessionUserUtil.getCurrentUsername();
+                FlowInfoVoRequestAdd flowVo = new FlowInfoVoRequestAdd();
+                flowVo.setId(String.valueOf(appParam.getId()));
+                flowVo.setName(appParam.getAppName());
+                flowVo.setEngineType(EngineTypeEnum.SPARK.name().toLowerCase());
+                flowServiceImpl.addFlow(username, flowVo);
+            }
+
             return true;
         } else {
             throw new ApiAlertException("create application failed");

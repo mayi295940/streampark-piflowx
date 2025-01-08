@@ -212,6 +212,7 @@
       reload({ polling });
     });
   }
+
   const handleResetReload = useDebounceFn(() => {
     setPagination({
       current: 1,
@@ -333,6 +334,9 @@
             <span class="app_type app_py" v-if="record['jobType'] == JobTypeEnum.PYSPARK">
               PySpark
             </span>
+            <span class="app_type app_py" v-if="record['jobType'] == JobTypeEnum.SPARK_PIPELINE">
+              Spark Pipeline
+            </span>
             <span
               class="link"
               :class="{
@@ -352,6 +356,9 @@
                       <span v-if="record['jobType'] == JobTypeEnum.JAR"> Spark JAR </span>
                       <span v-if="record['jobType'] == JobTypeEnum.SQL"> Spark SQL </span>
                       <span v-if="record['jobType'] == JobTypeEnum.PYSPARK"> PySpark </span>
+                      <span v-if="record['jobType'] == JobTypeEnum.SPARK_PIPELINE">
+                        Spark Pipeline
+                      </span>
                     </Tag>
                   </div>
                   <div class="pt-2px flex">

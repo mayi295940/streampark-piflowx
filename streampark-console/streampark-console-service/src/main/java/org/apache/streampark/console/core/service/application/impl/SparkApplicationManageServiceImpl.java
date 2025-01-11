@@ -503,7 +503,7 @@ public class SparkApplicationManageServiceImpl
 
         if (application.isSparkSqlJob()) {
             updateSparkSqlJob(application, appParam);
-        } else if (application.isSparkJarJob()) {
+        } else if (application.isSparkJarJob() || application.isPipelineJob()) {
             application.setJar(appParam.getJar());
             application.setMainClass(appParam.getMainClass());
         }

@@ -58,6 +58,9 @@ import org.apache.streampark.console.core.service.application.SparkApplicationCo
 import org.apache.streampark.console.core.service.application.SparkApplicationInfoService;
 import org.apache.streampark.console.core.util.ServiceHelper;
 import org.apache.streampark.console.core.watcher.SparkAppHttpWatcher;
+import org.apache.streampark.console.flow.base.utils.SessionUserUtil;
+import org.apache.streampark.console.flow.common.Eunm.RunModeType;
+import org.apache.streampark.console.flow.component.flow.service.IFlowService;
 import org.apache.streampark.flink.packer.pipeline.BuildResult;
 import org.apache.streampark.flink.packer.pipeline.ShadedBuildResponse;
 import org.apache.streampark.spark.client.SparkClient;
@@ -134,6 +137,9 @@ public class SparkApplicationActionServiceImpl
 
     @Autowired
     private DistributedTaskService distributedTaskService;
+
+    @Autowired
+    private IFlowService flowService;
 
     private final Map<Long, CompletableFuture<SubmitResponse>> startJobFutureMap = new ConcurrentHashMap<>();
 
@@ -347,6 +353,14 @@ public class SparkApplicationActionServiceImpl
             applicationArgs = applicationArgs == null ? "" : applicationArgs;
             applicationArgs +=
                 " --" + ConfigKeys.KEY_SPARK_SQL(null) + " " + extraParameter.get(ConfigKeys.KEY_SPARK_SQL(null));
+        } else if (application.isPipelineJob()) {
+            // TODO 将流水线作业的定义json存放到数据库表
+            String username = SessionUserUtil.getCurrentUsername();
+            boolean isAdmin = SessionUserUtil.isAdmin();
+            String flowJson =
+                flowService.startFlowAndGetProcessJson(
+                    username, isAdmin, application.getId().toString(), RunModeType.RUN.getValue());
+            extraParameter.put(ConfigKeys.KEY_FLINK_PIPELINE_JSON(null), flowJson);
         }
 
         SubmitRequest submitRequest = new SubmitRequest(

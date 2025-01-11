@@ -80,6 +80,8 @@ case class SubmitRequest(
 
   def getExtra(key: String): Any = extraParameter.get(key)
 
+  lazy val pipelineJson: String = extraParameter.get(KEY_FLINK_PIPELINE_JSON()).toString
+
   private[this] def getParameterMap(prefix: String = ""): Map[String, String] = {
     if (this.appConf == null) {
       return Map.empty[String, String]

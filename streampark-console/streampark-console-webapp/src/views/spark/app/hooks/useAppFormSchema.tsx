@@ -224,8 +224,9 @@ export function useSparkSchema(sparkEnvs: Ref<SparkEnv[]>) {
         defaultValue: '',
         slot: 'args',
         show: ({ model }) =>
-          [JobTypeEnum.JAR, JobTypeEnum.PYSPARK].includes(model?.jobType) &&
-          model?.stepCurrent == 2,
+          [JobTypeEnum.JAR, JobTypeEnum.PYSPARK, JobTypeEnum.SPARK_PIPELINE].includes(
+            model?.jobType,
+          ) && model?.stepCurrent == 2,
       },
       {
         field: 'appProperties',

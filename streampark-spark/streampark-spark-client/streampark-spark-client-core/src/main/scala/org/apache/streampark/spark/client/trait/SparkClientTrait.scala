@@ -17,9 +17,13 @@
 
 package org.apache.streampark.spark.client.`trait`
 
+import org.apache.streampark.common.enums.SparkJobType
 import org.apache.streampark.common.util._
 import org.apache.streampark.common.util.Implicits._
 import org.apache.streampark.spark.client.bean._
+
+import java.nio.charset.StandardCharsets
+import java.nio.file.{Files, Paths, StandardOpenOption}
 
 import scala.util.{Failure, Success, Try}
 
@@ -98,6 +102,40 @@ trait SparkClientTrait extends Logger {
     submitRequest.appProperties.putAll(submitRequest.sparkParameterMap)
     // 4) put configuration from appProperties
     submitRequest.appProperties.putAll(userConfig)
+    // 5) add program args
+    addProgramArgs(submitRequest)
+  }
+
+  import java.io.File
+  import java.util.Date
+
+  import scala.util.Try
+
+  private[this] def addProgramArgs(submitRequest: SubmitRequest): Unit = {
+    if (submitRequest.jobType == SparkJobType.SPARK_PIPELINE) {
+      // 生成文件名：appName + 时间戳
+      val flowFileName = submitRequest.appName + "_" + new Date().getTime
+      val flowFileDir = new File(System.getProperty("user.dir") + "/flowFile")
+
+      // 确保目录存在，如果不存在则创建
+      if (!flowFileDir.exists()) {
+        flowFileDir.mkdirs()
+      }
+
+      // 构造文件路径
+      val path = flowFileDir.getAbsolutePath + "/" + flowFileName + ".json"
+      val file = new File(path)
+
+      // 尝试写入文件并处理可能的异常
+      Try {
+        Files.write(Paths.get(file.toURI), submitRequest.pipelineJson.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE)
+        submitRequest.appArgs.add(flowFileName) // 将文件名添加到参数列表
+      }.recover {
+        case e: Exception =>
+          // 处理异常，例如打印日志或抛出自定义异常
+          println(s"写入文件失败: ${e.getMessage}")
+      }
+    }
   }
 
 }

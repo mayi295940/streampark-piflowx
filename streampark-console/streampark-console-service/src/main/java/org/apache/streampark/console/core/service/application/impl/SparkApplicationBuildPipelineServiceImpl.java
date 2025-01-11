@@ -466,6 +466,7 @@ public class SparkApplicationBuildPipelineServiceImpl
     private String retrieveSparkUserJar(SparkEnv sparkEnv, SparkApplication app) {
         switch (app.getJobTypeEnum()) {
             case SPARK_JAR:
+            case SPARK_PIPELINE:
                 switch (app.getApplicationType()) {
                     case STREAMPARK_SPARK:
                         return String.format(

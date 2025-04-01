@@ -126,7 +126,8 @@ export const useCreateAndEditSchema = (
         component: 'Select',
         render: ({ model }) => renderStreamParkResource({ model, resources: unref(teamResource) }),
         show: ({ values }) =>
-          values.jobType == (JobTypeEnum.SQL || values.jobType == JobTypeEnum.CDC) && values?.stepCurrent == 1,
+          values.jobType == (JobTypeEnum.SQL || values.jobType == JobTypeEnum.CDC) &&
+          values?.stepCurrent == 1,
       },
       {
         field: 'dependency',
@@ -142,7 +143,8 @@ export const useCreateAndEditSchema = (
         component: 'Switch',
         show: ({ values }) =>
           (values?.jobType == JobTypeEnum.SQL || values?.jobType == JobTypeEnum.CDC) &&
-          !isK8sDeployMode(values.deployMode) && values?.stepCurrent == 1,
+          !isK8sDeployMode(values.deployMode) &&
+          values?.stepCurrent == 1,
         render({ model, field }) {
           return renderIsSetConfig(model, field, registerConfDrawer, openConfDrawer);
         },
@@ -517,7 +519,9 @@ export const useCreateAndEditSchema = (
         show: ({ values }) =>
           edit?.mode
             ? true
-            : values.jobType == JobTypeEnum.JAR && values.jobType == JobTypeEnum.PYFLINK && values?.stepCurrent == 2,
+            : values.jobType == JobTypeEnum.JAR &&
+              values.jobType == JobTypeEnum.PYFLINK &&
+              values?.stepCurrent == 2,
       },
       {
         field: 'hadoopUser',
@@ -558,7 +562,7 @@ export const useCreateAndEditSchema = (
             );
           } else if (model.jobType == JobTypeEnum.CDC) {
             return getAlertSvgIcon('cdc', 'Flink CDC');
-          }  else if (model.jobType == JobTypeEnum.PIPELINE) {
+          } else if (model.jobType == JobTypeEnum.PIPELINE) {
             return getAlertSvgIcon('py', 'Flink Pipeline');
           } else {
             return getAlertSvgIcon('fql', 'Flink SQL');

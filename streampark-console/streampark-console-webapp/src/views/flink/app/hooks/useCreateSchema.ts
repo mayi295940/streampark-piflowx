@@ -131,7 +131,11 @@ export const useCreateSchema = (dependencyRef: Ref) => {
             placeholder: t('flink.app.addAppTips.jobTypePlaceholder'),
             options: getJobTypeOptions(),
             onChange: (value) => {
-              if (value != JobTypeEnum.SQL && value != JobTypeEnum.CDC && value != JobTypeEnum.PIPELINE) {
+              if (
+                value != JobTypeEnum.SQL &&
+                value != JobTypeEnum.CDC &&
+                value != JobTypeEnum.PIPELINE
+              ) {
                 formModel.resourceFrom = String(ResourceFromEnum.PROJECT);
               }
             },
@@ -149,7 +153,7 @@ export const useCreateSchema = (dependencyRef: Ref) => {
         label: t('flink.app.resourceFrom'),
         component: 'Select',
         render: ({ model }) => renderResourceFrom(model),
-        show: ({ values }) => values?.jobType == JobTypeEnum.JAR && values?.stepCurrent == 1,,
+        show: ({ values }) => values?.jobType == JobTypeEnum.JAR && values?.stepCurrent == 1,
         dynamicRules: ({ values }) => [
           {
             required: values?.jobType != JobTypeEnum.SQL && values?.jobType != JobTypeEnum.PIPELINE,
@@ -163,7 +167,9 @@ export const useCreateSchema = (dependencyRef: Ref) => {
         component: 'Select',
         render: ({ model }) => renderStreamParkJarApp({ model, resources: unref(teamResource) }),
         show: ({ values }) =>
-          values?.jobType == JobTypeEnum.JAR && values?.resourceFrom == ResourceFromEnum.UPLOAD && values?.stepCurrent == 1,
+          values?.jobType == JobTypeEnum.JAR &&
+          values?.resourceFrom == ResourceFromEnum.UPLOAD &&
+          values?.stepCurrent == 1,
       },
       {
         field: 'mainClass',
@@ -171,7 +177,9 @@ export const useCreateSchema = (dependencyRef: Ref) => {
         component: 'Input',
         componentProps: { placeholder: t('flink.app.addAppTips.mainClassPlaceholder') },
         show: ({ values }) =>
-          values?.jobType == JobTypeEnum.JAR && values?.resourceFrom == ResourceFromEnum.UPLOAD && values?.stepCurrent == 1,
+          values?.jobType == JobTypeEnum.JAR &&
+          values?.resourceFrom == ResourceFromEnum.UPLOAD &&
+          values?.stepCurrent == 1,
         dynamicRules: ({ values }) => [
           {
             required:
@@ -375,7 +383,7 @@ export const useCreateSchema = (dependencyRef: Ref) => {
           values?.jobType == JobTypeEnum.JAR &&
           values?.resourceFrom != ResourceFromEnum.UPLOAD &&
           values.appType == String(AppTypeEnum.STREAMPARK_FLINK) &&
-           values?.jobType != JobTypeEnum.PIPELINE &&
+          values?.jobType != JobTypeEnum.PIPELINE &&
           values?.stepCurrent == 1,
         dynamicRules: () => [{ required: true, validator: handleCheckConfig }],
       },

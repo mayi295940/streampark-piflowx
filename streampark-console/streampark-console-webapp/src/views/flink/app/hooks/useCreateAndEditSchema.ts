@@ -113,11 +113,20 @@ export const useCreateAndEditSchema = (
         rules: [{ required: true, message: t('flink.app.addAppTips.flinkSqlIsRequiredMessage') }],
       },
       {
+        field: 'flinkSql',
+        label: 'CDC YAML',
+        component: 'Input',
+        slot: 'flinkSql',
+        ifShow: ({ values }) => values?.jobType == JobTypeEnum.CDC,
+        rules: [{ required: true, message: t('flink.app.addAppTips.flinkSqlIsRequiredMessage') }],
+      },
+      {
         field: 'teamResource',
         label: t('flink.app.resource'),
         component: 'Select',
         render: ({ model }) => renderStreamParkResource({ model, resources: unref(teamResource) }),
-        show: ({ values }) => values.jobType == JobTypeEnum.SQL && values?.stepCurrent == 1,
+        show: ({ values }) =>
+          values.jobType == (JobTypeEnum.SQL || values.jobType == JobTypeEnum.CDC) && values?.stepCurrent == 1,
       },
       {
         field: 'dependency',
@@ -132,9 +141,8 @@ export const useCreateAndEditSchema = (
         label: t('flink.app.appConf'),
         component: 'Switch',
         show: ({ values }) =>
-          values?.jobType == JobTypeEnum.SQL &&
-          !isK8sDeployMode(values.deployMode) &&
-          values?.stepCurrent == 1,
+          (values?.jobType == JobTypeEnum.SQL || values?.jobType == JobTypeEnum.CDC) &&
+          !isK8sDeployMode(values.deployMode) && values?.stepCurrent == 1,
         render({ model, field }) {
           return renderIsSetConfig(model, field, registerConfDrawer, openConfDrawer);
         },
@@ -507,7 +515,9 @@ export const useCreateAndEditSchema = (
         defaultValue: '',
         slot: 'args',
         show: ({ values }) =>
-          (edit?.mode ? true : values.jobType != JobTypeEnum.SQL) && values?.stepCurrent == 2,
+          edit?.mode
+            ? true
+            : values.jobType == JobTypeEnum.JAR && values.jobType == JobTypeEnum.PYFLINK && values?.stepCurrent == 2,
       },
       {
         field: 'hadoopUser',
@@ -542,18 +552,17 @@ export const useCreateAndEditSchema = (
                     icon: 'ant-design:code-outlined',
                     style: { color: '#108ee9' },
                   }),
-                  h('span', { class: 'pl-8px' }, 'Custom Code'),
+                  h('span', { class: 'pl-8px' }, 'Flink JAR'),
                 ],
               },
             );
-          } else if (model.jobType == JobTypeEnum.SQL) {
-            return getAlertSvgIcon('fql', 'Flink SQL');
-          } else if (model.jobType == JobTypeEnum.PYFLINK) {
-            return getAlertSvgIcon('py', 'Py Flink');
-          } else if (model.jobType == JobTypeEnum.PIPELINE) {
+          } else if (model.jobType == JobTypeEnum.CDC) {
+            return getAlertSvgIcon('cdc', 'Flink CDC');
+          }  else if (model.jobType == JobTypeEnum.PIPELINE) {
             return getAlertSvgIcon('py', 'Flink Pipeline');
+          } else {
+            return getAlertSvgIcon('fql', 'Flink SQL');
           }
-          return '';
         },
         show: ({ values }) => values?.stepCurrent == 0,
       },

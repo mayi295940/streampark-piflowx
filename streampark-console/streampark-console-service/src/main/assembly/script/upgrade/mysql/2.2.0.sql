@@ -46,12 +46,16 @@ alter table t_flink_log rename to t_app_log;
 alter table `t_app_log`
     change column `yarn_app_id` `cluster_id` varchar(64) default null,
     change column `job_manager_url` `tracking_url` varchar(255) default null,
+    change column `option_time` `create_time` datetime default null,
     add column `job_type` tinyint default null,
     add column `user_id` bigint default null comment 'operator user id';
 
 alter table `t_flink_project`
     add column `salt` varchar(26) collate utf8mb4_general_ci default null comment 'password salt',
     modify column `password` varchar(512) collate utf8mb4_general_ci default null comment 'password';
+
+ALTER TABLE `t_flink_project`
+    change column `branches` `refs` varchar(255) collate utf8mb4_general_ci default null;
 
 alter table `t_flink_sql`
     add column `team_resource` varchar(64) default null;

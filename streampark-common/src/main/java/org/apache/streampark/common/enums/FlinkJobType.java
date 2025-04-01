@@ -20,23 +20,38 @@ package org.apache.streampark.common.enums;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-/** The flink deployment mode enum. */
+/**
+ * The flink deployment mode enum.
+ */
 public enum FlinkJobType {
 
-    /** Unknown type replace null */
+    /**
+     * Unknown type replace null
+     */
     UNKNOWN("Unknown", -1),
 
-    /** custom code */
-    CUSTOM_CODE("Custom Code", 1),
+    /**
+     * Flink Jar
+     */
+    FLINK_JAR("Flink JAR", 1),
 
-    /** Flink SQL */
+    /**
+     * Flink SQL
+     */
     FLINK_SQL("Flink SQL", 2),
 
-    /** Py flink Mode */
+    /**
+     * Py flink Mode
+     */
     PYFLINK("Python Flink", 3),
 
+    /**
+     * Flink CDC
+     */
+    FLINK_CDC("Flink CDC", 4),
+
     /** flink pipeline */
-    FLINK_PIPELINE("Flink Pipeline", 4);
+    FLINK_PIPELINE("Flink Pipeline", 5);
 
     private final String name;
 
@@ -63,7 +78,9 @@ public enum FlinkJobType {
         return FlinkJobType.UNKNOWN;
     }
 
-    /** Get the mode value of the current {@link FlinkJobType} enum. */
+    /**
+     * Get the mode value of the current {@link FlinkJobType} enum.
+     */
     @Nonnull
     public Integer getMode() {
         return mode;

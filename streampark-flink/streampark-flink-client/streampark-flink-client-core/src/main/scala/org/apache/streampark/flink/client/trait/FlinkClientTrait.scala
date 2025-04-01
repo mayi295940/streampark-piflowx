@@ -294,13 +294,13 @@ trait FlinkClientTrait extends Logger {
       submitRequest.jobType match {
         case FlinkJobType.PYFLINK =>
           if (submitRequest.libs.nonEmpty) {
-            // BUG: https://github.com/apache/incubator-streampark/issues/3761
+            // BUG: https://github.com/apache/streampark/issues/3761
             // builder.setUserClassPaths(Lists.newArrayList(submitRequest.libs: _*))
           }
         case _ =>
           builder
             .setJarFile(jarFile)
-        // BUG: https://github.com/apache/incubator-streampark/issues/3761
+        // BUG: https://github.com/apache/streampark/issues/3761
         // .setUserClassPaths(Lists.newArrayList(submitRequest.classPaths: _*))
       }
       builder
@@ -483,7 +483,7 @@ trait FlinkClientTrait extends Logger {
       programArgs += PARAM_KEY_FLINK_PARALLELISM += getParallelism(submitRequest).toString
 
       submitRequest.jobType match {
-        case FlinkJobType.FLINK_SQL =>
+        case FlinkJobType.FLINK_SQL | FlinkJobType.FLINK_CDC =>
           programArgs += PARAM_KEY_FLINK_SQL += submitRequest.flinkSQL
           if (submitRequest.appConf != null) {
             programArgs += PARAM_KEY_APP_CONF += submitRequest.appConf

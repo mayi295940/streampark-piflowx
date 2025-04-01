@@ -205,8 +205,10 @@ export default {
   editStreamPark: {
     success: 'update successful',
     flinkSqlRequired: 'Flink Sql is required',
+    yamlRequired: 'Yaml is required',
     appidCheck: 'appid can not be empty',
     sqlCheck: 'SQL check error',
+    yamlCheck: 'Yaml check error',
   },
   operation: {
     edit: 'Edit Job',
@@ -281,7 +283,7 @@ export default {
     appNameValid: 'The job name is invalid',
     appNameRole: 'The job name must follow these rules: ',
     appNameNotValid:
-      'The job name is invalid, must be (Chinese or English or "-" or "_"), two consecutive spaces cannot appear.Please check',
+      'The job name is invalid, must be (Chinese or English or "-" or "_"), Spaces are not allowed. Please check',
     K8sSessionClusterIdRole: 'The Kubernetes clusterId must follow the following rules:',
     appNameK8sClusterIdRole:
       'The current deployment mode is kubernetes application mode, and the job name will be used as the clusterId in kubernetes. Therefore, the job name must follow the following rules:',
@@ -289,7 +291,7 @@ export default {
     appNameK8sClusterIdRoleRegexp:
       'must only contain lowercase alphanumeric characters and "-"，The required format is [a-z]([-a-z0-9]*[a-z0-9])',
     appNameRoleContent:
-      'must be (Chinese or English or "-" or "_"), two consecutive spaces cannot appear.Please check',
+      'must be (Chinese or English or "-" or "_"), Spaces are not allowed. Please check',
     flinkClusterIsRequiredMessage: 'Flink Cluster is required',
     flinkSqlIsRequiredMessage: 'Flink SQL is required',
     tagsPlaceholder: 'Please enter tags,if more than one, separate them with commas(,)',

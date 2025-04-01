@@ -42,19 +42,19 @@ export const getDescSchema = (): DescItem[] => {
           'div',
           { class: 'bold-tag' },
           h(Tag, { color: curVal === 1 ? '#545454' : '#0C7EF2', class: 'mr-8px' }, () =>
-            curVal === 1 ? 'Custom Code' : 'Flink SQL',
+            curVal === 1 ? 'Flink JAR' : 'Flink SQL',
           ),
         ),
     },
     {
       field: 'module',
       label: t('flink.app.module'),
-      show: (data) => data.jobType != JobTypeEnum.SQL,
+      show: (data) => data.jobType == JobTypeEnum.JAR,
     },
     {
       field: 'projectName',
       label: t('flink.app.project'),
-      show: (data) => data.jobType != JobTypeEnum.SQL,
+      show: (data) => data.jobType == JobTypeEnum.JAR,
     },
     {
       field: 'appType',

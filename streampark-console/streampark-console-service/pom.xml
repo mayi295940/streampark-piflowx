@@ -468,6 +468,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.streampark</groupId>
+            <artifactId>streampark-flink-cdcclient_${scala.binary.version}</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-scala_${scala.binary.version}</artifactId>
         </dependency>
@@ -703,7 +709,7 @@
                             <appendAssemblyId>false</appendAssemblyId>
                             <skipAssembly>false</skipAssembly>
                             <attach>false</attach>
-                            <finalName>apache-streampark-${project.version}-incubating-bin</finalName>
+                            <finalName>apache-streampark-${project.version}-bin</finalName>
                             <descriptors>
                                 <descriptor>${basedir}/src/main/assembly/assembly.xml</descriptor>
                             </descriptors>
@@ -839,7 +845,7 @@
                                 <phase>package</phase>
                                 <configuration>
                                     <target>
-                                        <copy file="${project.build.directory}/apache-streampark-${project.version}-incubating-bin.tar.gz" overwrite="true" tofile="${project.basedir}/../../dist/apache-streampark-${project.version}-incubating-bin.tar.gz"></copy>
+                                        <copy file="${project.build.directory}/apache-streampark-${project.version}-bin.tar.gz" overwrite="true" tofile="${project.basedir}/../../dist/apache-streampark-${project.version}-bin.tar.gz"></copy>
                                     </target>
                                 </configuration>
                             </execution>

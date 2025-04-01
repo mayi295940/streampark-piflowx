@@ -130,7 +130,8 @@ public class SparkApplicationManageServiceImpl
 
     @PostConstruct
     public void resetOptionState() {
-        this.baseMapper.resetOptionState();
+        this.lambdaUpdate().set(SparkApplication::getOptionState, OptionStateEnum.NONE.getValue())
+            .update();
     }
 
     @Override
@@ -163,7 +164,13 @@ public class SparkApplicationManageServiceImpl
 
     @Override
     public boolean mapping(SparkApplication appParam) {
-        return this.baseMapper.mapping(appParam);
+        return this.lambdaUpdate()
+            .set(SparkApplication::getClusterId, appParam.getClusterId())
+            .set(SparkApplication::getEndTime, null)
+            .set(SparkApplication::getState, SparkAppStateEnum.MAPPING.getValue())
+            .set(SparkApplication::getTracking, 1)
+            .eq(SparkApplication::getId, appParam.getId())
+            .update();
     }
 
     @Override
@@ -294,7 +301,7 @@ public class SparkApplicationManageServiceImpl
                 appParam.setMainClass(Constants.STREAMPARK_SPARKSQL_CLIENT_CLASS);
             }
         }
-        if (appParam.isUploadJob()) {
+        if (appParam.isFromUploadJob()) {
             String jarPath = String.format(
                 "%s/%d/%s", Workspace.local().APP_UPLOADS(), appParam.getTeamId(), appParam.getJar());
             if (!new File(jarPath).exists()) {
@@ -436,7 +443,7 @@ public class SparkApplicationManageServiceImpl
         application.setRelease(ReleaseStateEnum.NEED_RELEASE.get());
 
         // 1) jar job jar file changed
-        if (application.isUploadJob()) {
+        if (application.isFromUploadJob()) {
             if (!Objects.equals(application.getJar(), appParam.getJar())) {
                 application.setBuild(true);
             } else {
@@ -596,7 +603,7 @@ public class SparkApplicationManageServiceImpl
 
     @Override
     public List<SparkApplication> listByProjectId(Long id) {
-        return baseMapper.selectAppsByProjectId(id);
+        return this.lambdaQuery().eq(SparkApplication::getProjectId, id).list();
     }
 
     @Override
@@ -664,7 +671,7 @@ public class SparkApplicationManageServiceImpl
             }
             sparkSql.setToApplication(application);
         } else {
-            if (application.isCICDJob()) {
+            if (application.isFromBuildJob()) {
                 String path = this.projectService.getAppConfPath(application.getProjectId(), application.getModule());
                 application.setConfPath(path);
             }

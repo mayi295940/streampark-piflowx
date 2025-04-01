@@ -310,6 +310,7 @@
                       :options="[
                         { label: 'JAR', value: JobTypeEnum.JAR },
                         { label: 'SQL', value: JobTypeEnum.SQL },
+                        { label: 'FlinkCDC', value: JobTypeEnum.CDC },
                       ]"
                     />
                   </Form.Item>
@@ -349,6 +350,7 @@
           <template v-if="column.dataIndex === 'jobName'">
             <span class="app_type app_jar" v-if="record['jobType'] === JobTypeEnum.JAR"> JAR </span>
             <span class="app_type app_sql" v-if="record['jobType'] === JobTypeEnum.SQL"> SQL </span>
+            <span class="app_type app_sql" v-if="record['jobType'] === JobTypeEnum.CDC"> CDC </span>
             <span class="app_type app_sql" v-if="record['jobType'] === JobTypeEnum.PIPELINE"> Flink Pipeline </span>
             <span class="link cursor-pointer" @click="handleJobView(record)">
               <Popover :title="t('common.detailText')">
@@ -362,6 +364,7 @@
                     <Tag color="blue">
                       <span v-if="record['jobType'] == JobTypeEnum.JAR"> JAR </span>
                       <span v-if="record['jobType'] == JobTypeEnum.SQL"> SQL </span>
+                      <span v-if="record['jobType'] == JobTypeEnum.CDC"> FlinkCDC </span>
                       <span v-if="record['jobType'] == JobTypeEnum.PIPELINE"> Flink Pipeline </span>
                     </Tag>
                   </div>

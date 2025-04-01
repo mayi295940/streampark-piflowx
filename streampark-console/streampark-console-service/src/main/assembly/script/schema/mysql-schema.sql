@@ -111,7 +111,7 @@ create table `t_flink_app` (
 -- ----------------------------
 drop table if exists `t_flink_app_backup`;
 create table `t_flink_app_backup` (
-`id` bigint not null,
+`id` bigint not null auto_increment,
 `app_id` bigint default null,
 `sql_id` bigint default null,
 `config_id` bigint default null,
@@ -180,11 +180,12 @@ drop table if exists `t_app_log`;
 create table `t_app_log` (
   `id` bigint not null auto_increment,
   `app_id` bigint default null,
+  `job_type` tinyint default null,
   `cluster_id` varchar(64) collate utf8mb4_general_ci default null,
   `tracking_url` varchar(255) collate utf8mb4_general_ci default null,
   `success` tinyint default null,
   `exception` text collate utf8mb4_general_ci,
-  `option_time` datetime default null,
+  `create_time` datetime default null,
   `option_name` tinyint default null,
   `user_id` bigint default null,
   primary key (`id`) using btree
@@ -200,7 +201,7 @@ create table `t_flink_project` (
   `team_id` bigint not null,
   `name` varchar(255) collate utf8mb4_general_ci default null,
   `url` varchar(255) collate utf8mb4_general_ci default null,
-  `branches` varchar(64) collate utf8mb4_general_ci default null,
+  `refs` varchar(255) collate utf8mb4_general_ci default null,
   `user_name` varchar(64) collate utf8mb4_general_ci default null,
   `password` varchar(512) collate utf8mb4_general_ci default null,
   `prvkey_path` varchar(128) collate utf8mb4_general_ci default null,
@@ -593,7 +594,7 @@ drop table if exists `t_spark_app`;
 create table `t_spark_app` (
   `id` bigint not null auto_increment,
   `team_id` bigint not null,
-  `job_type` tinyint default null comment '(1)custom code(2)spark SQL',
+  `job_type` tinyint default null comment '(1) spark Jar(2) spark SQL',
   `app_type` tinyint default null comment '(1)Apache Spark(2)StreamPark Spark',
   `version_id` bigint default null comment 'spark version',
   `app_name` varchar(255) collate utf8mb4_general_ci default null comment 'spark.app.name',

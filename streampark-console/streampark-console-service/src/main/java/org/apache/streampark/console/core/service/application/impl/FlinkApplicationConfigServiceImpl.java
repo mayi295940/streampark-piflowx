@@ -99,7 +99,7 @@ public class FlinkApplicationConfigServiceImpl
     public synchronized void update(FlinkApplication appParam, Boolean latest) {
         // flink sql job
         FlinkApplicationConfig latestConfig = getLatest(appParam.getId());
-        if (appParam.isFlinkSqlJob()) {
+        if (appParam.isJobTypeFlinkSqlOrCDC()) {
             updateForFlinkSqlJob(appParam, latest, latestConfig);
         } else {
             updateForNonFlinkSqlJob(appParam, latest, latestConfig);
@@ -169,7 +169,9 @@ public class FlinkApplicationConfigServiceImpl
         }
     }
 
-    /** Not running tasks are set to Effective, running tasks are set to Latest */
+    /**
+     * Not running tasks are set to Effective, running tasks are set to Latest
+     */
     @Override
     public void setLatestOrEffective(Boolean latest, Long configId, Long appId) {
         if (latest) {
@@ -188,7 +190,9 @@ public class FlinkApplicationConfigServiceImpl
 
     @Override
     public FlinkApplicationConfig getLatest(Long appId) {
-        return baseMapper.selectLatest(appId);
+        return this.lambdaQuery().eq(FlinkApplicationConfig::getAppId, appId)
+            .eq(FlinkApplicationConfig::getLatest, true)
+            .one();
     }
 
     @Override
@@ -209,9 +213,13 @@ public class FlinkApplicationConfigServiceImpl
 
     @Override
     public IPage<FlinkApplicationConfig> getPage(FlinkApplicationConfig config, RestRequest request) {
-        request.setSortField("version");
         Page<FlinkApplicationConfig> page = MybatisPager.getPage(request);
-        IPage<FlinkApplicationConfig> configList = this.baseMapper.selectPageByAppId(page, config.getAppId());
+
+        IPage<FlinkApplicationConfig> configList = this.lambdaQuery()
+            .eq(FlinkApplicationConfig::getAppId, config.getAppId())
+            .orderByDesc(FlinkApplicationConfig::getVersion)
+            .page(page);
+
         fillEffectiveField(config.getAppId(), configList.getRecords());
         return configList;
     }

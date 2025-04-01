@@ -18,13 +18,12 @@
 name: "Build Docker Image"
 
 on:
-  schedule:
-    - cron: '0 10 * * *'
   push:
     branches:
       - release-*
-    tags:
-      - v*
+  release:
+    types:
+      - released
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -33,7 +32,7 @@ concurrency:
 jobs:
   build_image:
     runs-on: ubuntu-latest
-    if: ${{ github.repository == 'apache/incubator-streampark' }}
+    if: ${{ github.repository == 'apache/streampark' }}
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3

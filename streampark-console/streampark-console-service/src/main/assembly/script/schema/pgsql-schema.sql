@@ -411,11 +411,12 @@ create sequence "public"."streampark_t_app_log_id_seq"
 create table "public"."t_app_log" (
   "id" int8 not null default nextval('streampark_t_app_log_id_seq'::regclass),
   "app_id" int8,
+  "job_type" int2,
   "cluster_id" varchar(64) collate "pg_catalog"."default",
   "tracking_url" varchar(255) collate "pg_catalog"."default",
   "success" boolean,
   "exception" text collate "pg_catalog"."default",
-  "option_time" timestamp(6),
+  "create_time" timestamp(6),
   "option_name" int2,
   "user_id" int8
 )
@@ -434,7 +435,7 @@ create table "public"."t_flink_project" (
   "team_id" int8,
   "name" varchar(255) collate "pg_catalog"."default",
   "url" varchar(255) collate "pg_catalog"."default",
-  "branches" varchar(64) collate "pg_catalog"."default",
+  "refs" varchar(64) collate "pg_catalog"."default",
   "user_name" varchar(64) collate "pg_catalog"."default",
   "password" varchar(512) collate "pg_catalog"."default",
   "prvkey_path" varchar(128) collate "pg_catalog"."default",

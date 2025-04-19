@@ -19,7 +19,7 @@ package cn.piflow.launcher.flink
 
 import cn.piflow.Runner
 import cn.piflow.conf.bean.FlowBean
-import cn.piflow.conf.util.MapUtil
+import cn.piflow.conf.util.{FileUtil, MapUtil}
 import cn.piflow.util.JsonUtil
 import org.apache.flink.api.common.RuntimeExecutionMode
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
@@ -30,9 +30,9 @@ object FlinkFlowTestMain {
 
   def main(args: Array[String]): Unit = {
 
-    val flowJson = args(0)
-    println(flowJson)
-    val map = JsonUtil.jsonToMap(flowJson)
+    val jsonPath = args(0)
+    val flowJsonStr = FileUtil.fileReader(jsonPath)
+    val map = JsonUtil.jsonToMap(flowJsonStr)
     println(map)
 
     // create flow

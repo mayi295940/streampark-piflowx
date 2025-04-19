@@ -33,7 +33,7 @@ import java.util.Date
 /** Created by xjzhu@cnic.cn on 4/30/19 */
 object SparkFlowLauncher {
 
-  def launch(flow: Flow[DataFrame]): SparkLauncher = {
+  def launch(flow: Flow[DataFrame], isDebug: Boolean = false): SparkLauncher = {
 
     val flowJson = flow.getFlowJson
     println("FlowLauncher json:" + flowJson)

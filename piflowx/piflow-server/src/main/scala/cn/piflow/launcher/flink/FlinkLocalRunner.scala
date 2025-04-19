@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package cn.piflow.bundle.flink.test
+package cn.piflow.launcher.flink
 
 import cn.piflow.Runner
 import cn.piflow.conf.bean.FlowBean
@@ -27,9 +27,9 @@ import org.apache.flink.streaming.api.environment.{CheckpointConfig, StreamExecu
 import org.apache.flink.table.api.Table
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
 
-object BaseTest {
+object FlinkLocalRunner {
 
-  def testFlow(jsonPath: String, mode: RuntimeExecutionMode = RuntimeExecutionMode.STREAMING): Unit = {
+  def testFlow(jsonPath: String, mode: RuntimeExecutionMode = RuntimeExecutionMode.STREAMING): String = {
 
     // parse flow json
     val flowJsonStr = FileUtil.fileReader(jsonPath)
@@ -88,6 +88,7 @@ object BaseTest {
 
     val pid = process.pid()
     println(pid + "!!!!!!!!!!!!!!!!!!!!!")
+    pid
 
     // process.awaitTermination()
   }

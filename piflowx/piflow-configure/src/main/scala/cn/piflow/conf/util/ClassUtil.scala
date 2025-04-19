@@ -24,7 +24,6 @@ import javassist.Modifier
 import net.liftweb.json.{compactRender, JValue}
 import net.liftweb.json.JsonDSL._
 import org.reflections.Reflections
-import sun.misc.BASE64Encoder
 
 import scala.util.control.Breaks._
 
@@ -204,7 +203,7 @@ object ClassUtil {
     val stopName = bundle.split("\\.").last
     val propertyDescriptorList: List[PropertyDescriptor] = stop.getPropertyDescriptor()
     propertyDescriptorList.foreach(p => if (p.allowableValues == null || p.allowableValues == None) p.allowableValues = List(""))
-    val base64Encoder = new BASE64Encoder()
+    val base64Encoder = java.util.Base64.getEncoder;
     var iconArrayByte: Array[Byte] = Array[Byte]()
     try {
       iconArrayByte = stop.getIcon()
@@ -234,7 +233,7 @@ object ClassUtil {
           ("customizedAllowValue" -> "")*/
         // ("visualizationType" -> visualizationType) ~
         ("description" -> stop.description) ~
-        ("icon" -> base64Encoder.encode(iconArrayByte)) ~
+        ("icon" -> base64Encoder.encodeToString(iconArrayByte)) ~
         ("properties" ->
           propertyDescriptorList.map {
             property =>

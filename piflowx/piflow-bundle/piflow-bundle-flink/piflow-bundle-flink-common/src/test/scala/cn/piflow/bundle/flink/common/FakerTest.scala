@@ -25,7 +25,7 @@ class FakerTest {
   @Test
   def testFlow(): Unit = {
     // parse flow json
-    val file = "src/test/resources/common/Faker.json"
+    val file = "src/test/resources/common/Faker2.json"
     BaseTest.testFlow(file)
   }
 

@@ -228,7 +228,7 @@ object API {
     progress
   }
 
-  def startFlow(flowJson: String): (String, Any) = {
+  def startFlow(flowJson: String, isDebug: Boolean = false): (String, Any) = {
 
     println("StartFlow API get json: \n" + flowJson)
 
@@ -237,20 +237,20 @@ object API {
     val env = flowMap("flow").asInstanceOf[Map[String, String]]("engineType")
 
     if ("flink".equals(env)) {
-      val (appId, handle) = this.startFlinkFlow(flowMap)
+      val (appId, handle) = this.startFlinkFlow(flowMap, isDebug)
       (appId, handle)
     } else if ("spark".equals(env)) {
-      val (appId, handle) = this.startSparkFlow(flowMap)
+      val (appId, handle) = this.startSparkFlow(flowMap, isDebug)
       (appId, handle)
     } else if ("beam".equals(env)) {
-      val (appId, handle) = this.startBeamFlow(flowMap)
+      val (appId, handle) = this.startBeamFlow(flowMap, isDebug)
       (appId, handle)
     } else {
       throw new Exception("Unsupported engineType: " + env)
     }
   }
 
-  private def startSparkFlow(flowMap: Map[String, Any]): (String, SparkAppHandle) = {
+  private def startSparkFlow(flowMap: Map[String, Any], isDebug: Boolean = false): (String, SparkAppHandle) = {
 
     var appId: String = null
 
@@ -265,7 +265,7 @@ object API {
     val countDownLatch = new CountDownLatch(1)
 
     val handle = SparkFlowLauncher
-      .launch(flow)
+      .launch(flow, isDebug)
       .startApplication(new SparkAppHandle.Listener {
         override def stateChanged(handle: SparkAppHandle): Unit = {
           appId = handle.getAppId
@@ -301,7 +301,7 @@ object API {
 
   }
 
-  private def startFlinkFlow(flowMap: Map[String, Any]): (String, Any) = {
+  private def startFlinkFlow(flowMap: Map[String, Any], isDebug: Boolean = false): (String, Any) = {
 
     var appId: String = null
 
@@ -313,13 +313,13 @@ object API {
     val appName = flow.getFlowName
     val (stdout, stderr) = getLogFile(uuid, appName)
 
-    appId = FlinkFlowLauncher.launch(flow)
+    appId = FlinkFlowLauncher.launch(flow, isDebug)
 
     (appId, null)
 
   }
 
-  private def startBeamFlow(flowMap: Map[String, Any]): (String, Any) = {
+  private def startBeamFlow(flowMap: Map[String, Any], isDebug: Boolean = false): (String, Any) = {
 
     var appId: String = null
 
@@ -331,7 +331,7 @@ object API {
     val appName = flow.getFlowName
     val (stdout, stderr) = getLogFile(uuid, appName)
 
-    appId = BeamFlowLauncher.launch(flow)
+    appId = BeamFlowLauncher.launch(flow, isDebug)
 
     (appId, null)
 

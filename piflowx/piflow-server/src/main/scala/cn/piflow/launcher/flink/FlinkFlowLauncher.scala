@@ -33,10 +33,9 @@ import org.apache.http.util.EntityUtils
 import java.io.File
 import java.util.Date
 
-/** Created by xjzhu@cnic.cn on 4/30/19 */
 object FlinkFlowLauncher {
 
-  def launch[Table](flow: Flow[Table]): String = {
+  def launch[Table](flow: Flow[Table], isDebug: Boolean = false): String = {
 
     val flowJson = flow.getFlowJson
     println("FlowLauncher json:" + flowJson)
@@ -119,45 +118,43 @@ object FlinkFlowLauncher {
     //      })
     //    }
 
-    // 集群信息
-    val configuration = new Configuration()
-    configuration.setString(
-      JobManagerOptions.ADDRESS,
-      PropertyUtil.getPropertyValue("flink.jobmanager.rpc.address"))
-    configuration.setInteger(
-      JobManagerOptions.PORT,
-      PropertyUtil.getPropertyValue("flink.jobmanager.rpc.port").toInt)
-    configuration.setInteger(
-      RestOptions.PORT,
-      PropertyUtil.getPropertyValue("flink.rest.port").toInt)
+    if (isDebug) {
+      FlinkLocalRunner.testFlow(flowFile)
+    } else {
+      // 集群信息
+      val configuration = new Configuration()
+      configuration.setString(JobManagerOptions.ADDRESS, PropertyUtil.getPropertyValue("flink.jobmanager.rpc.address"))
+      configuration.setInteger(JobManagerOptions.PORT, PropertyUtil.getPropertyValue("flink.jobmanager.rpc.port").toInt)
+      configuration.setInteger(RestOptions.PORT, PropertyUtil.getPropertyValue("flink.rest.port").toInt)
 
-    val program = PackagedProgram
-      .newBuilder()
-      .setConfiguration(configuration)
-      .setEntryPointClassName("cn.piflow.launcher.flink.StartFlinkFlowMain")
-      .setArguments(flowFileName)
-      .setJarFile(new File(ConfigureUtil.getPiFlowBundlePath()))
-      .setSavepointRestoreSettings(SavepointRestoreSettings.none())
-      .build()
+      val program = PackagedProgram
+        .newBuilder()
+        .setConfiguration(configuration)
+        .setEntryPointClassName("cn.piflow.launcher.flink.StartFlinkFlowMain")
+        .setArguments(flowFileName)
+        .setJarFile(new File(ConfigureUtil.getPiFlowBundlePath()))
+        .setSavepointRestoreSettings(SavepointRestoreSettings.none())
+        .build()
 
-    val parallelism = 1
+      val parallelism = 1
 
-    var jobGraph: JobGraph = null
-    try jobGraph = PackagedProgramUtils.createJobGraph(program, configuration, parallelism, false)
-    catch {
-      case e: Throwable =>
-        e.printStackTrace()
-        throw new Exception("Flink jobGraph create failed")
+      var jobGraph: JobGraph = null
+      try jobGraph = PackagedProgramUtils.createJobGraph(program, configuration, parallelism, false)
+      catch {
+        case e: Throwable =>
+          e.printStackTrace()
+          throw new Exception("Flink jobGraph create failed")
+      }
+
+      val client =
+        new RestClusterClient[StandaloneClusterId](configuration, StandaloneClusterId.getInstance())
+      val result = client.submitJob(jobGraph)
+
+      val jobId = result.get()
+      println("提交完成")
+
+      jobId.toString
     }
-
-    val client =
-      new RestClusterClient[StandaloneClusterId](configuration, StandaloneClusterId.getInstance())
-    val result = client.submitJob(jobGraph)
-
-    val jobId = result.get()
-    println("提交完成")
-
-    jobId.toString
   }
 
   def stop(appID: String): String = {

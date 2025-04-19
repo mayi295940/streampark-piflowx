@@ -225,10 +225,25 @@ object HTTPService extends DefaultJsonProtocol with Directives with SprayJsonSup
 
     }
 
-    case HttpRequest(POST, Uri.Path("/flow/start"), headers, entity, protocol) => {
-
+    case HttpRequest(POST, Uri.Path("/flow/debugger"), headers, entity, protocol) => {
       try {
+        val bodyFeature = Unmarshal(entity).to[String]
+        val flowJson = Await.result(bodyFeature, scala.concurrent.duration.Duration(1, "second"))
+        val (appId, process) = API.startFlow(flowJson, isDebug = true)
+        processMap += (appId -> process)
+        val result = "{\"flow\":{\"id\":\"" + appId + "\"}}"
+        println("Start Flow Succeed : " + result + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        Future.successful(HttpResponse(SUCCESS_CODE, entity = result))
+      } catch {
+        case ex: Exception => {
+          println(ex)
+          Future.successful(HttpResponse(FAIL_CODE, entity = "Can not start flow!"))
+        }
+      }
+    }
 
+    case HttpRequest(POST, Uri.Path("/flow/start"), headers, entity, protocol) => {
+      try {
         val bodyFeature = Unmarshal(entity).to[String]
         val flowJson = Await.result(bodyFeature, scala.concurrent.duration.Duration(1, "second"))
         val (appId, process) = API.startFlow(flowJson)
@@ -585,7 +600,7 @@ object HTTPService extends DefaultJsonProtocol with Directives with SprayJsonSup
         val pluginInfo = API.getPluginInfo(pluginId)
         Future.successful(HttpResponse(SUCCESS_CODE, entity = pluginInfo))
       } catch {
-        case ex => {
+        case ex: Exception => {
           println(ex)
           Future.successful(HttpResponse(FAIL_CODE, entity = "Can not found plugins !"))
         }
@@ -600,7 +615,7 @@ object HTTPService extends DefaultJsonProtocol with Directives with SprayJsonSup
         val result = "{\"pluginPath\":\"" + pluginPath + "\"}"
         Future.successful(HttpResponse(SUCCESS_CODE, entity = result))
       } catch {
-        case ex => {
+        case ex: Exception => {
           println(ex)
           Future.successful(HttpResponse(FAIL_CODE, entity = "Can not found plugin path !"))
         }
@@ -614,7 +629,7 @@ object HTTPService extends DefaultJsonProtocol with Directives with SprayJsonSup
         val result = "{\"sparkJarPath\":\"" + sparkJarPath + "\"}"
         Future.successful(HttpResponse(SUCCESS_CODE, entity = result))
       } catch {
-        case ex => {
+        case ex: Exception => {
           println(ex)
           Future.successful(HttpResponse(FAIL_CODE, entity = "Can not found spark jar path !"))
         }
@@ -649,11 +664,9 @@ object HTTPService extends DefaultJsonProtocol with Directives with SprayJsonSup
       entity match {
         case HttpEntity.Strict(_, data) => {
           val data = toJson(entity)
-          val sparkJarId = data.get("sparkJarId").getOrElse("").asInstanceOf[String]
+          val sparkJarId = data.getOrElse("sparkJarId", "").asInstanceOf[String]
           val isOK = API.removeSparkJar(sparkJarId)
-
-          if (isOK == true) {
-
+          if (isOK) {
             val result = "{\"sparkJar\":{\"id\":\"" + sparkJarId + "\"}}"
             Future.successful(HttpResponse(SUCCESS_CODE, entity = result))
           } else {
@@ -702,7 +715,7 @@ object HTTPService extends DefaultJsonProtocol with Directives with SprayJsonSup
             SUCCESS_CODE,
             entity = HttpEntity(ContentTypes.`application/octet-stream`, returnValue)))
       } catch {
-        case ex => {
+        case ex: Exception => {
           println(ex)
           Future.successful(
             HttpResponse(FAIL_CODE, entity = "Can not found visualDataDirectory path !"))

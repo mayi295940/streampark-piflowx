@@ -28,7 +28,7 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
 
 import scala.collection.mutable.{Map => MMap}
 
-class Faker extends ConfigurableStop[Table] {
+class Faker extends ConfigurableStop[Table] with FlinkConfigurableStop {
 
   override val authorEmail: String = ""
   override val description: String = "根据每列提供的Data Faker表达式生成模拟数据。"
@@ -80,7 +80,7 @@ class Faker extends ConfigurableStop[Table] {
       .required(true)
       .language(Language.DataFakerSchema)
       .order(3)
-      .example("[{\"filedName\":\"name\",\"filedType\":\"STRING\",\"expression\":\"<superhero.name>\",\"comment\":\"姓名\"},{\"filedName\":\"power\",\"filedType\":\"STRING\",\"expression\":\"<superhero.power>\",\"nullRate\":0.5},{\"filedName\":\"age\",\"filedType\":\"INT\",\"expression\":\"<number.numberBetween ''0'',''1000''>\"},{\"filedName\":\"timeField\",\"computedColumnExpression\":\"PROCTIME()\"},{\"filedName\":\"timestamp1\",\"filedType\":\"TIMESTAMP(3)\",\"expression\":\"<date.past ''15'',''SECONDS''>\"},{\"filedName\":\"timestamp2\",\"filedType\":\"TIMESTAMP(3)\",\"expression\":\"<date.past ''15'',''5'',''SECONDS''>\"},{\"filedName\":\"timestamp3\",\"filedType\":\"TIMESTAMP(3)\",\"expression\":\"<date.future ''15'',''5'',''SECONDS''>\"},{\"filedName\":\"time\",\"filedType\":\"TIME\",\"expression\":\"<time.future ''15'',''5'',''SECONDS''>\"},{\"filedName\":\"date1\",\"filedType\":\"DATE\",\"expression\":\"<date.birthday>\"},{\"filedName\":\"date2\",\"filedType\":\"DATE\",\"expression\":\"<date.birthday ''1'',''100''>\"},{\"filedName\":\"order_status\",\"filedType\":\"STRING\",\"expression\":\"<Options.option ''RECEIVED'',''SHIPPED'',''CANCELLED'')>\"}]")
+      .example("[{\"filedName\":\"name\",\"filedType\":\"STRING\",\"expression\":\"superhero.name\",\"comment\":\"姓名\"},{\"filedName\":\"power\",\"filedType\":\"STRING\",\"expression\":\"superhero.power\",\"nullRate\":0.5},{\"filedName\":\"age\",\"filedType\":\"INT\",\"expression\":\"number.numberBetween ''0'',''1000''\"},{\"filedName\":\"timeField\",\"computedColumnExpression\":\"PROCTIME()\"},{\"filedName\":\"timestamp1\",\"filedType\":\"TIMESTAMP(3)\",\"expression\":\"date.past ''15'',''SECONDS''\"},{\"filedName\":\"timestamp2\",\"filedType\":\"TIMESTAMP(3)\",\"expression\":\"date.past ''15'',''5'',''SECONDS''\"},{\"filedName\":\"timestamp3\",\"filedType\":\"TIMESTAMP(3)\",\"expression\":\"date.future ''15'',''5'',''SECONDS''\"},{\"filedName\":\"time\",\"filedType\":\"TIME\",\"expression\":\"time.future ''15'',''5'',''SECONDS''\"},{\"filedName\":\"date1\",\"filedType\":\"DATE\",\"expression\":\"date.birthday\"},{\"filedName\":\"date2\",\"filedType\":\"DATE\",\"expression\":\"date.birthday ''1'',''100''\"},{\"filedName\":\"order_status\",\"filedType\":\"STRING\",\"expression\":\"Options.option ''RECEIVED'',''SHIPPED'',''CANCELLED'')\"}]")
 
     descriptor = schema :: descriptor
 
@@ -104,12 +104,24 @@ class Faker extends ConfigurableStop[Table] {
 
     val tableEnv = pec.get[StreamTableEnvironment]()
 
-    val (columns, conf) = getWithColumnsAndConf(schema)
-
     val tmpTable = this.getClass.getSimpleName
       .stripSuffix("$") + Constants.UNDERLINE_SIGN + IdGenerator.uuidWithoutSplit
 
-    // 生成数据源 DDL 语句
+    val sourceDDL = generateSql(tmpTable)
+    println(sourceDDL)
+
+    tableEnv.executeSql(sourceDDL)
+
+    val resultTable = tableEnv.sqlQuery(s"SELECT * FROM $tmpTable")
+    out.write(resultTable)
+
+  }
+
+  override def generateSql(tmpTable: String = this.getClass.getSimpleName
+    .stripSuffix("$") + Constants.UNDERLINE_SIGN + IdGenerator.uuidWithoutSplit): String = {
+
+    val (columns, conf) = getWithColumnsAndConf(schema)
+
     val sourceDDL =
       s""" CREATE TABLE $tmpTable ($columns) WITH (
          |'connector' = 'faker',
@@ -120,13 +132,7 @@ class Faker extends ConfigurableStop[Table] {
         .replaceAll("\r\n", " ")
         .replaceAll(Constants.LINE_SPLIT_N, " ")
 
-    println(sourceDDL)
-
-    tableEnv.executeSql(sourceDDL)
-
-    val resultTable = tableEnv.sqlQuery(s"SELECT * FROM $tmpTable")
-    out.write(resultTable)
-
+    sourceDDL
   }
 
   private def getWithColumnsAndConf(schema: List[Map[String, Any]]): (String, String) = {
@@ -159,7 +165,6 @@ class Faker extends ConfigurableStop[Table] {
 
       var expression = filedMap.getOrElse("expression", "").toString
       if (StringUtils.isNotBlank(expression)) {
-        expression = expression.trim.replaceFirst("<", "").dropRight(1)
         conf = s"'fields.$filedName.expression' = '#{$expression}'," :: conf
       }
 
@@ -179,5 +184,27 @@ class Faker extends ConfigurableStop[Table] {
   }
 
   override def getEngineType: String = Constants.ENGIN_FLINK
+
+  //  override def verify(): String = {
+  //    var env: StreamExecutionEnvironment = null
+  //    try {
+  //      val sql = generateSql()
+  //      env = StreamExecutionEnvironment.getExecutionEnvironment
+  //      val tableEnv = StreamTableEnvironment.create(env)
+  //      tableEnv.executeSql(sql)
+  //      "success"
+  //    } catch {
+  //      case e: Exception =>
+  //        s"${Option(e.getMessage).getOrElse("Unknown error")} [Stacktrace: ${getFullStackTrace(e)}]"
+  //    } finally {
+  //      try {
+  //        if (env != null) {
+  //          env.close()
+  //        }
+  //      } catch {
+  //        case e: Exception =>
+  //      }
+  //    }
+  //  }
 
 }

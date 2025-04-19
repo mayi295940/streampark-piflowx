@@ -29,7 +29,7 @@ import java.util.Date
 
 object BeamFlowLauncher {
 
-  def launch[PCollection[Row]](flow: Flow[PCollection[Row]]): String = {
+  def launch[PCollection[Row]](flow: Flow[PCollection[Row]], isDebug: Boolean = false): String = {
 
     val flowJson = flow.getFlowJson
     println("FlowLauncher json:" + flowJson)

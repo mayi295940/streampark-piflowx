@@ -19,21 +19,21 @@ package cn.piflow.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 
 public class SecurityUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityUtil.class);
+
     private static final String ENCODING = "UTF-8";
+
     private static final String PASSWORD = "46EBA22EF5204DD5B110A1F730513965";
 
     public static String encryptAES(String content) {
@@ -47,8 +47,8 @@ public class SecurityUtil {
     public static String decryptAES(String encryptResultStr) {
 
         try {
-            String decrpt = ebotongDecrypto(encryptResultStr);
-            byte[] decryptFrom = parseHexStr2Byte(decrpt);
+            String decrypt = ebotongDecrypto(encryptResultStr);
+            byte[] decryptFrom = parseHexStr2Byte(decrypt);
             byte[] decryptResult = decrypt(decryptFrom, PASSWORD);
             return new String(decryptResult);
         } catch (Exception e) {
@@ -57,12 +57,12 @@ public class SecurityUtil {
     }
 
     private static String ebotongEncrypto(String str) {
-        BASE64Encoder base64encoder = new BASE64Encoder();
+        java.util.Base64.Encoder base64encoder = java.util.Base64.getEncoder();
         String result = str;
-        if (str != null && str.length() > 0) {
+        if (str != null && !str.isEmpty()) {
             try {
                 byte[] encodeByte = str.getBytes(ENCODING);
-                result = base64encoder.encode(encodeByte);
+                result = base64encoder.encodeToString(encodeByte);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -71,11 +71,11 @@ public class SecurityUtil {
     }
 
     private static String ebotongDecrypto(String str) {
-        BASE64Decoder base64decoder = new BASE64Decoder();
+        java.util.Base64.Decoder base64decoder = java.util.Base64.getDecoder();
         try {
-            byte[] encodeByte = base64decoder.decodeBuffer(str);
+            byte[] encodeByte = base64decoder.decode(str);
             return new String(encodeByte);
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error("IO 异Exception", e);
             return str;
         }
@@ -93,10 +93,9 @@ public class SecurityUtil {
             byte[] enCodeFormat = secretKey.getEncoded();
             SecretKeySpec key = new SecretKeySpec(enCodeFormat, "AES");
             Cipher cipher = Cipher.getInstance("AES");
-            byte[] byteContent = content.getBytes("utf-8");
+            byte[] byteContent = content.getBytes(StandardCharsets.UTF_8);
             cipher.init(Cipher.ENCRYPT_MODE, key);
-            byte[] result = cipher.doFinal(byteContent);
-            return result;
+            return cipher.doFinal(byteContent);
         } catch (Exception e) {
             logger.error("Exception", e);
         }
@@ -116,18 +115,17 @@ public class SecurityUtil {
             SecretKeySpec key = new SecretKeySpec(enCodeFormat, "AES");
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.DECRYPT_MODE, key);
-            byte[] result = cipher.doFinal(content);
-            return result;
+            return cipher.doFinal(content);
         } catch (Exception e) {
             logger.error("Exception", e);
         }
         return null;
     }
 
-    private static String parseByte2HexStr(byte buf[]) {
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < buf.length; i++) {
-            String hex = Integer.toHexString(buf[i] & 0xFF);
+    private static String parseByte2HexStr(byte[] buf) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : buf) {
+            String hex = Integer.toHexString(b & 0xFF);
             if (hex.length() == 1) {
                 hex = '0' + hex;
             }
@@ -137,8 +135,9 @@ public class SecurityUtil {
     }
 
     private static byte[] parseHexStr2Byte(String hexStr) {
-        if (hexStr.length() < 1)
+        if (hexStr.isEmpty()) {
             return null;
+        }
         byte[] result = new byte[hexStr.length() / 2];
         for (int i = 0; i < hexStr.length() / 2; i++) {
             int high = Integer.parseInt(hexStr.substring(i * 2, i * 2 + 1), 16);

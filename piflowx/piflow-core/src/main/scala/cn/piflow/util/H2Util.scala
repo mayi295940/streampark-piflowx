@@ -863,7 +863,7 @@ object H2Util {
     val nowDate: String = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
     val updateSql =
       "select id from scheduleInstance where state = '" + ScheduleState.STARTED + "' and endDate != '' and endDate <= '" + nowDate + "'"
-    println(updateSql)
+    // println(updateSql)
 
     val scheduleRS: ResultSet = statement.executeQuery(updateSql)
     while (scheduleRS.next()) {

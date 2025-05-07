@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-package cn.piflow.spark.spark.normalization
+package cn.piflow.bundle.spark.common
 
-import cn.piflow.spark.spark.TestBase
+import cn.piflow.bundle.spark.TestBase
 import org.junit.Test
 
-class DiscretizationTest {
+class MockDataTest {
 
   @Test
-  def DiscretizationFlow(): Unit = {
-
+  def testFlow(): Unit = {
     // parse flow json
-    val filePath = "src/main/resources/flow/normalization/Discretization.json"
-    TestBase.testFlow(filePath)
+    val file = "src/test/resources/common/mockData.json"
+    TestBase.testFlow(file)
   }
+
 }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package cn.piflow.spark.spark.ceph
+package cn.piflow.bundle.spark.ceph
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 

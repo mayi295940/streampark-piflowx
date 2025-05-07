@@ -15,17 +15,18 @@
  * limitations under the License.
  */
 
-package cn.piflow.spark.spark.normalization
+package cn.piflow.bundle.spark.normalization
 
-import cn.piflow.spark.spark.TestBase
+import cn.piflow.bundle.spark.TestBase
 import org.junit.Test
 
-class ZScoreTest {
+class ScopeNormalizationTest {
 
   @Test
-  def ZScoreFlow(): Unit = {
+  def ScopeNormalizationFlow(): Unit = {
+
     // parse flow json
-    val filePath = "src/main/resources/flow/normalization/ZScore.json"
+    val filePath = "src/main/resources/flow/normalization/ScopeNormalization.json"
     TestBase.testFlow(filePath)
   }
 }

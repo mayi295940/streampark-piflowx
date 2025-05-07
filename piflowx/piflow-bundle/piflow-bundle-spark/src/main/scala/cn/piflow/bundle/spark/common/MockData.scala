@@ -17,16 +17,21 @@
 
 package cn.piflow.bundle.spark.common
 
-import cn.piflow.{Constants, JobContext, JobInputStream, JobOutputStream, ProcessContext}
-import cn.piflow.conf.{ConfigurableStop, Port, StopGroup}
+import cn.piflow._
+import cn.piflow.conf.{ConfigurableStop, Language, Port, StopGroup}
 import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
+import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
-import org.json4s
 import org.json4s.JsonAST._
 import org.json4s.jackson.JsonMethods._
 
+import java.time.{Instant, LocalDate, ZoneId}
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+
+import scala.collection.mutable
 import scala.util.Random
 
 class MockData extends ConfigurableStop[DataFrame] {
@@ -36,11 +41,11 @@ class MockData extends ConfigurableStop[DataFrame] {
   override val inportList: List[String] = List(Port.DefaultPort)
   override val outportList: List[String] = List(Port.DefaultPort)
 
-  var schema: String = _
+  private var schema: List[Map[String, Any]] = _
   var count: Int = _
 
   override def setProperties(map: Map[String, Any]): Unit = {
-    schema = MapUtil.get(map, "schema").asInstanceOf[String]
+    schema = MapUtil.get(map, "schema").asInstanceOf[List[Map[String, Any]]]
     count = MapUtil.get(map, "count").asInstanceOf[String].toInt
   }
 
@@ -49,15 +54,12 @@ class MockData extends ConfigurableStop[DataFrame] {
     val schema = new PropertyDescriptor()
       .name("schema")
       .displayName("Schema")
-      .description(
-        "The schema of mock data, " +
-          "format is column:columnType:isNullable. " +
-          "Separate multiple fields with commas. " +
-          "columnType can be String/Int/Long/Float/Double/Boolean. " +
-          "isNullable can be left blank, the default value is false. ")
+      .language(Language.MockDataSchema)
+      .description("The schema of mock data,columnType can be STRING/BYTE/INT/LONG/BIGINT/FLOAT/DOUBLE/DECIMAL/BOOLEAN/DATE/TIMESTAMP.")
       .defaultValue("")
       .required(true)
-      .example("id:String,name:String,age:Int")
+      .example(
+        "[{\"id\":\"317974\",\"filedName\":\"id\",\"filedType\":\"STRING\",\"index\":0},{\"id\":\"808911\",\"filedName\":\"age\",\"filedType\":\"INT\"}]")
     descriptor = schema :: descriptor
 
     val count = new PropertyDescriptor()
@@ -90,27 +92,32 @@ class MockData extends ConfigurableStop[DataFrame] {
     val spark = pec.get[SparkSession]()
     import spark.implicits._
 
-    val field = this.schema.split(Constants.COMMA)
-    val structFieldArray: Array[StructField] = new Array[StructField](field.size)
+    val field = schema.toArray
 
-    for (i <- 0 until field.size) {
-      val columnInfo = field(i).trim.split(Constants.COLON)
-      val column = columnInfo(0).trim
-      val columnType = columnInfo(1).trim
+    val structFieldArray: Array[StructField] = new Array[StructField](field.length)
+
+    for (i <- field.indices) {
+      val item = field(i)
+      val filedMap = mutable.Map(item.toSeq: _*)
+      val column = MapUtil.get(filedMap, "filedName").toString
+      val columnType = MapUtil.get(filedMap, "filedType").toString
       var isNullable = false
-      if (columnInfo.size == 3) {
-        isNullable = columnInfo(2).trim.toBoolean
+      if (StringUtils.isBlank(MapUtil.get(filedMap, "isNullable").toString)) {
+        isNullable = MapUtil.get(filedMap, "isNullable").toString.toBoolean
       }
 
       columnType match {
-        case "String" => structFieldArray(i) = StructField(column, StringType, isNullable)
-        case "Int" => structFieldArray(i) = StructField(column, IntegerType, isNullable)
-        case "Double" => structFieldArray(i) = StructField(column, DoubleType, isNullable)
-        case "Float" => structFieldArray(i) = StructField(column, FloatType, isNullable)
-        case "Long" => structFieldArray(i) = StructField(column, LongType, isNullable)
-        case "Boolean" => structFieldArray(i) = StructField(column, BooleanType, isNullable)
-        case "Date" => structFieldArray(i) = StructField(column, DateType, nullable = true)
-        case "Timestamp" =>
+        case "STRING" => structFieldArray(i) = StructField(column, StringType, isNullable)
+        case "BYTE" => structFieldArray(i) = StructField(column, ByteType, isNullable)
+        case "INT" => structFieldArray(i) = StructField(column, IntegerType, isNullable)
+        case "DOUBLE" => structFieldArray(i) = StructField(column, DoubleType, isNullable)
+        case "FLOAT" => structFieldArray(i) = StructField(column, FloatType, isNullable)
+        case "LONG" => structFieldArray(i) = StructField(column, LongType, isNullable)
+        case "BIGINT" => structFieldArray(i) = StructField(column, LongType, isNullable)
+        case "DECIMAL" => structFieldArray(i) = StructField(column, DecimalType.apply(10, 2), isNullable)
+        case "BOOLEAN" => structFieldArray(i) = StructField(column, BooleanType, isNullable)
+        case "DATE" => structFieldArray(i) = StructField(column, DateType, nullable = true)
+        case "TIMESTAMP" =>
           structFieldArray(i) = StructField(column, TimestampType, nullable = true)
       }
     }
@@ -125,13 +132,19 @@ class MockData extends ConfigurableStop[DataFrame] {
     out.write(df)
   }
 
+  private val alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+  private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+  private val startDate = LocalDate.of(1900, 1, 1)
+  private val endDate = LocalDate.of(2100, 1, 1)
+
   private def randomJson(rnd: Random, dataType: DataType): JValue = {
-    val alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     dataType match {
       case v: DoubleType =>
-        json4s.JDouble(rnd.nextDouble())
+        JDouble(rnd.nextDouble())
       case v: StringType =>
-        JString((1 to 10).map(x => alpha(Random.nextInt.abs % alpha.size)).mkString)
+        JString((1 to 10).map(x => alpha(Random.nextInt.abs % alpha.length)).mkString)
+      case v: ByteType =>
+        JInt(rnd.nextInt(100))
       case v: IntegerType =>
         JInt(rnd.nextInt(100))
       case v: LongType =>
@@ -140,6 +153,12 @@ class MockData extends ConfigurableStop[DataFrame] {
         JDouble(rnd.nextFloat())
       case v: BooleanType =>
         JBool(rnd.nextBoolean())
+      case v: DecimalType =>
+        JDecimal(rnd.nextInt(10))
+      case v: DateType =>
+        JString(startDate.plusDays(rnd.nextInt(endDate.toEpochDay.toInt - startDate.toEpochDay.toInt)).toString)
+      case v: TimestampType =>
+        JString(Instant.now().minus(rnd.nextLong().abs % 365, ChronoUnit.DAYS).atZone(ZoneId.systemDefault()).format(formatter))
       case v: ArrayType =>
         val size = rnd.nextInt(10)
         JArray(

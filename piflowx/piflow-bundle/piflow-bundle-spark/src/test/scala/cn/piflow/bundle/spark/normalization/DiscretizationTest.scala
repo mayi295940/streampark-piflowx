@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-package cn.piflow.conf
+package cn.piflow.bundle.spark.normalization
 
-object Language {
+import cn.piflow.bundle.spark.TestBase
+import org.junit.Test
 
-  val Text = "Text"
-  val Scala = "Scala"
-  val Python = "Python"
-  val Shell = "Shell"
-  val Sql = "Sql"
-  val DataGenSchema = "DataGenSchema"
-  val MockDataSchema = "MockDataSchema"
-  val DataFakerSchema = "DataFakerSchema"
-  val FlinkTableSchema = "FlinkTableSchema"
-  val CustomProperties = "CustomProperties"
+class DiscretizationTest {
+
+  @Test
+  def DiscretizationFlow(): Unit = {
+
+    // parse flow json
+    val filePath = "src/main/resources/flow/normalization/Discretization.json"
+    TestBase.testFlow(filePath)
+  }
 }

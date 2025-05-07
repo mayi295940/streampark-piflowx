@@ -43,6 +43,7 @@ object MapUtil {
       case None => None
       case Some(x: String) => x
       case Some(x: Integer) => x
+      case Some(x: Boolean) => x
       case Some(x: List[String]) => x
       case Some(x: List[Map[String, String]]) => x
       case Some(x: Map[String, Any]) => MMap(x.toSeq: _*)

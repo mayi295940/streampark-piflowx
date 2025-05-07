@@ -102,7 +102,8 @@ class MockData extends ConfigurableStop[DataFrame] {
       val column = MapUtil.get(filedMap, "filedName").toString
       val columnType = MapUtil.get(filedMap, "filedType").toString
       var isNullable = false
-      if (StringUtils.isBlank(MapUtil.get(filedMap, "isNullable").toString)) {
+      val isNullableValue = MapUtil.get(filedMap, "isNullable")
+      if (isNullableValue != null) {
         isNullable = MapUtil.get(filedMap, "isNullable").toString.toBoolean
       }
 

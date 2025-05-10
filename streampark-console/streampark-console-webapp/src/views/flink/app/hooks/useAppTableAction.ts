@@ -322,6 +322,7 @@ export const useAppTableAction = (
               { label: 'SQL', value: JobTypeEnum.SQL },
               { label: 'PYFLINK', value: JobTypeEnum.PYFLINK },
               { label: 'FLINK CDC', value: JobTypeEnum.CDC },
+              { label: 'PIPELINE', value: JobTypeEnum.PIPELINE },
             ],
             onChange: handlePageDataReload.bind(null, false),
           },

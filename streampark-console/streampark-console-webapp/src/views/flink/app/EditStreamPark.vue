@@ -23,7 +23,6 @@
   import { PageWrapper } from '/@/components/Page';
   import { BasicForm, useForm } from '/@/components/Form';
   import { onMounted, reactive, ref, nextTick, unref } from 'vue';
-  import { Button, Steps, Step } from 'ant-design-vue';
   import { AppListRecord } from '/@/api/flink/app.type';
   import configOptions from './data/option';
   import { fetchUpdate, fetchGet } from '/@/api/flink/app';
@@ -84,7 +83,7 @@
     suggestions,
   } = useEditStreamParkSchema(configVersions, flinkSqlHistory, dependencyRef);
 
-  const [registerForm, { setFieldsValue, getFieldsValue, submit, validate }] = useForm({
+  const [registerForm, { setFieldsValue, getFieldsValue, submit }] = useForm({
     labelWidth: 120,
     colon: true,
     baseColProps: { span: 24 },
@@ -162,7 +161,7 @@
   }
 
   /* Handling update parameters */
-  async function handleAppUpdate(values: Recordable) {
+  async function handleAppUpdate(values) {
     try {
       submitLoading.value = true;
       if (app.jobType == JobTypeEnum.SQL || app.jobType == JobTypeEnum.CDC) {
@@ -303,7 +302,7 @@
       configOverride = decodeByBase64(app.config);
       isSetConfig = true;
     }
-    const defaultFormValue = { isSetConfig, configOverride, stepCurrent: stepCurrent.value };
+    const defaultFormValue = { isSetConfig, configOverride };
     configOptions.forEach((item) => {
       Object.assign(defaultFormValue, {
         [item.key]: item.defaultValue,
@@ -350,31 +349,6 @@
       setFieldsValue({ isSetConfig: false });
     }
   }
-
-  const stepCurrent = ref<number>(0);
-  const next = async () => {
-    //await validate();
-    submitLoading.value = false;
-    stepCurrent.value++;
-    setFieldsValue({ stepCurrent: stepCurrent.value });
-  };
-  const prev = () => {
-    submitLoading.value = false;
-    stepCurrent.value--;
-    setFieldsValue({ stepCurrent: stepCurrent.value });
-  };
-  const steps = [
-    {
-      title: 'First',
-    },
-    {
-      title: 'Second',
-    },
-    {
-      title: 'Last',
-    },
-  ];
-
   onMounted(() => {
     if (!route?.query?.appId) {
       go('/flink/app');
@@ -386,82 +360,70 @@
 </script>
 <template>
   <PageWrapper contentBackground content-class="p-26px app_controller">
-    <Steps :current="stepCurrent">
-      <Step v-for="item in steps" :key="item.title" :title="item.title" />
-    </Steps>
-    <div class="steps-content">
-      <BasicForm
-        @register="registerForm"
-        @submit="handleAppUpdate"
-        :schemas="getEditStreamParkFormSchema"
-      >
-        <template #podTemplate>
-          <PomTemplateTab
-            ref="podTemplateRef"
-            v-model:podTemplate="k8sTemplate.podTemplate"
-            v-model:jmPodTemplate="k8sTemplate.jmPodTemplate"
-            v-model:tmPodTemplate="k8sTemplate.tmPodTemplate"
-          />
-        </template>
-        <template #args="{ model }">
-          <ProgramArgs
-            ref="programArgRef"
-            v-if="model.args != null && model.args != undefined"
-            v-model:value="model.args"
-            :suggestions="suggestions"
-            @preview="(value) => openReviewDrawer(true, { value, suggestions })"
-          />
-        </template>
-        <template #uploadJobJar>
-          <UploadJobJar :custom-request="handleCustomJobRequest" v-model:loading="uploadLoading" />
-        </template>
-        <template #flinkSql="{ model, field }">
-          <FlinkSqlEditor
-            ref="flinkSql"
-            v-model:value="model[field]"
-            :versionId="model['versionId']"
-            :suggestions="suggestions"
-            :jobType="Number(model['jobType'])"
-            @preview="(value) => openReviewDrawer(true, { value, suggestions })"
-          />
-        </template>
-        <template #dependency="{ model, field }">
-          <Dependency
-            ref="dependencyRef"
-            v-model:value="model[field]"
-            :form-model="model"
-            :flink-envs="flinkEnvs"
-          />
-        </template>
-        <template #appConf="{ model }">
-          <AppConf :model="model" :configVersions="configVersions" @open-mergely="handleMergely" />
-        </template>
-        <template #compareConf="{ model }">
-          <CompareConf v-model:value="model.compareConf" :configVersions="configVersions" />
-        </template>
-        <template #useSysHadoopConf="{ model, field }">
-          <UseSysHadoopConf v-model:hadoopConf="model[field]" />
-        </template>
-      </BasicForm>
-    </div>
-    <div class="steps-action flex items-center w-full justify-center">
-      <Button v-if="stepCurrent > 0" @click="prev">Previous</Button>
-      <Button class="ml-4" v-if="stepCurrent < steps.length - 1" type="primary" @click="next"
-        >Next</Button
-      >
-      <Button
-        class="ml-4"
-        :loading="submitLoading"
-        type="primary"
-        @click="submit()"
-        v-if="stepCurrent == steps.length - 1"
-      >
-        {{ t('common.submitText') }}
-      </Button>
-      <Button class="ml-4" @click="go('/flink/app')">
-        {{ t('common.cancelText') }}
-      </Button>
-    </div>
+    <BasicForm
+      @register="registerForm"
+      @submit="handleAppUpdate"
+      :schemas="getEditStreamParkFormSchema"
+    >
+      <template #podTemplate>
+        <PomTemplateTab
+          ref="podTemplateRef"
+          v-model:podTemplate="k8sTemplate.podTemplate"
+          v-model:jmPodTemplate="k8sTemplate.jmPodTemplate"
+          v-model:tmPodTemplate="k8sTemplate.tmPodTemplate"
+        />
+      </template>
+      <template #args="{ model }">
+        <ProgramArgs
+          ref="programArgRef"
+          v-if="model.args != null"
+          v-model:value="model.args"
+          :suggestions="suggestions"
+          @preview="(value) => openReviewDrawer(true, { value, suggestions })"
+        />
+      </template>
+      <template #uploadJobJar>
+        <UploadJobJar :custom-request="handleCustomJobRequest" v-model:loading="uploadLoading" />
+      </template>
+      <template #flinkSql="{ model, field }">
+        <FlinkSqlEditor
+          ref="flinkSql"
+          v-model:value="model[field]"
+          :versionId="model['versionId']"
+          :suggestions="suggestions"
+          :jobType="Number(model['jobType'])"
+          @preview="(value) => openReviewDrawer(true, { value, suggestions })"
+        />
+      </template>
+      <template #dependency="{ model, field }">
+        <Dependency
+          ref="dependencyRef"
+          v-model:value="model[field]"
+          :form-model="model"
+          :flink-envs="flinkEnvs"
+        />
+      </template>
+      <template #appConf="{ model }">
+        <AppConf :model="model" :configVersions="configVersions" @open-mergely="handleMergely" />
+      </template>
+      <template #compareConf="{ model }">
+        <CompareConf v-model:value="model.compareConf" :configVersions="configVersions" />
+      </template>
+      <template #useSysHadoopConf="{ model, field }">
+        <UseSysHadoopConf v-model:hadoopConf="model[field]" />
+      </template>
+
+      <template #formFooter>
+        <div class="flex items-center w-full justify-center">
+          <a-button @click="go('/flink/app')">
+            {{ t('common.cancelText') }}
+          </a-button>
+          <a-button class="ml-4" :loading="submitLoading" type="primary" @click="submit()">
+            {{ t('common.submitText') }}
+          </a-button>
+        </div>
+      </template>
+    </BasicForm>
     <Mergely
       @ok="(data) => setFieldsValue(data)"
       @close="handleEditConfClose"

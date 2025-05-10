@@ -76,6 +76,7 @@ public class FlinkApplication extends BaseEntity {
     private Integer jobType;
 
     private Long projectId;
+
     /**
      * creator
      */
@@ -119,12 +120,14 @@ public class FlinkApplication extends BaseEntity {
      * The exposed type of the rest service of K8s(kubernetes.rest-service.exposed.type)
      */
     private Integer k8sRestExposedType;
+
     /**
      * flink kubernetes pod template
      */
     private String k8sPodTemplate;
 
     private String k8sJmPodTemplate;
+
     private String k8sTmPodTemplate;
 
     @Getter
@@ -139,6 +142,7 @@ public class FlinkApplication extends BaseEntity {
     private Boolean k8sHadoopIntegration;
 
     private Integer state;
+
     /**
      * task release status
      */
@@ -170,6 +174,7 @@ public class FlinkApplication extends BaseEntity {
     private Long alertId;
 
     private String args;
+
     /**
      * application module
      */
@@ -240,9 +245,13 @@ public class FlinkApplication extends BaseEntity {
     private String hadoopUser;
 
     private Integer totalSlot;
+
     private Integer availableSlot;
+
     private Integer jmMemory;
+
     private Integer tmMemory;
+
     private Integer totalTask;
 
     /**
@@ -274,34 +283,61 @@ public class FlinkApplication extends BaseEntity {
     private transient JobsOverview.Task overview;
 
     private transient String teamResource;
+
     private transient String dependency;
+
     private transient Long sqlId;
+
     private transient String flinkSql;
 
     private transient Integer[] stateArray;
+
     private transient Integer[] jobTypeArray;
+
     private transient Boolean backUp = false;
+
     private transient Boolean restart = false;
+
     private transient String userName;
+
     private transient String nickName;
+
     private transient String config;
+
     private transient Long configId;
+
     private transient String flinkVersion;
+
     private transient String confPath;
+
     private transient Integer format;
+
     private transient String savepointPath;
+
     private transient Boolean restoreOrTriggerSavepoint = false;
+
     private transient Boolean drain = false;
+
     private transient Boolean nativeFormat = false;
+
     private transient Long savepointTimeout = 60L;
+
     private transient Boolean allowNonRestored = false;
+
     private transient Integer restoreMode;
+
     private transient String socketId;
+
     private transient String projectName;
+
     private transient String createTimeFrom;
+
     private transient String createTimeTo;
+
     private transient String backUpDescription;
+
     private transient String yarnQueue;
+
     private transient String serviceAccount;
 
     /**
@@ -475,6 +511,7 @@ public class FlinkApplication extends BaseEntity {
             case PYFLINK:
                 return Constants.PYTHON_FLINK_DRIVER_CLASS_NAME;
             case FLINK_JAR:
+            case FLINK_PIPELINE:
                 return mainClass;
             case UNKNOWN:
             default:
@@ -539,7 +576,7 @@ public class FlinkApplication extends BaseEntity {
     }
 
     public boolean isAppTypeStreamPark() {
-        return this.getAppType() == ApplicationType.STREAMPARK_FLINK.getType();
+        return this.getAppType() != null && this.getAppType() == ApplicationType.STREAMPARK_FLINK.getType();
     }
 
     @JsonIgnore

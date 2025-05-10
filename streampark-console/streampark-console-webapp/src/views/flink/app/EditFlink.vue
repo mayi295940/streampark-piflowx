@@ -23,7 +23,7 @@
   import { PageWrapper } from '/@/components/Page';
   import { BasicForm, useForm } from '/@/components/Form';
   import { onMounted, reactive, ref, nextTick, unref } from 'vue';
-  import { Alert, Button, Steps, Step } from 'ant-design-vue';
+  import { Alert } from 'ant-design-vue';
   import { fetchUpdate } from '/@/api/flink/app';
   import { fetchUpload } from '/@/api/resource/upload';
   import { handleSubmitParams } from './utils';
@@ -39,7 +39,7 @@
   import ProgramArgs from './components/ProgramArgs.vue';
   import VariableReview from './components/VariableReview.vue';
   import { useDrawer } from '/@/components/Drawer';
-  import { DeployMode, JobTypeEnum, ResourceFromEnum } from '/@/enums/flinkEnum';
+  import { DeployMode, ResourceFromEnum } from '/@/enums/flinkEnum';
 
   const route = useRoute();
   const { t } = useI18n();
@@ -174,30 +174,6 @@
     }
   }
 
-  const stepCurrent = ref<number>(0);
-  const next = async () => {
-    //await validate();
-    submitLoading.value = false;
-    stepCurrent.value++;
-    setFieldsValue({ stepCurrent: stepCurrent.value });
-  };
-  const prev = () => {
-    submitLoading.value = false;
-    stepCurrent.value--;
-    setFieldsValue({ stepCurrent: stepCurrent.value });
-  };
-  const steps = [
-    {
-      title: 'First',
-    },
-    {
-      title: 'Second',
-    },
-    {
-      title: 'Last',
-    },
-  ];
-
   onMounted(async () => {
     if (!route?.query?.appId) {
       go('/flink/app');
@@ -206,79 +182,62 @@
     }
     const value = await handleGetApplication();
     setFieldsValue(value);
-    if (app.resourceFrom == ResourceFromEnum.PROJECT && app.jobType != JobTypeEnum.PIPELINE) {
+    if (app.resourceFrom == ResourceFromEnum.PROJECT) {
       jars.value = await fetchListJars({
         id: app.projectId,
         module: app.module,
       });
     }
     handleReset();
-    setFieldsValue({ stepCurrent: stepCurrent.value });
   });
 </script>
 <template>
   <PageWrapper contentBackground content-class="p-26px app_controller">
-    <Steps :current="stepCurrent">
-      <Step v-for="item in steps" :key="item.title" :title="item.title" />
-    </Steps>
-    <div class="steps-content">
-      <BasicForm
-        @register="registerForm"
-        @submit="handleAppUpdate"
-        :schemas="getEditFlinkFormSchema"
-      >
-        <template #podTemplate>
-          <PomTemplateTab
-            ref="podTemplateRef"
-            v-model:podTemplate="k8sTemplate.podTemplate"
-            v-model:jmPodTemplate="k8sTemplate.jmPodTemplate"
-            v-model:tmPodTemplate="k8sTemplate.tmPodTemplate"
-          />
-        </template>
+    <BasicForm @register="registerForm" @submit="handleAppUpdate" :schemas="getEditFlinkFormSchema">
+      <template #podTemplate>
+        <PomTemplateTab
+          ref="podTemplateRef"
+          v-model:podTemplate="k8sTemplate.podTemplate"
+          v-model:jmPodTemplate="k8sTemplate.jmPodTemplate"
+          v-model:tmPodTemplate="k8sTemplate.tmPodTemplate"
+        />
+      </template>
 
-        <template #uploadJobJar>
-          <UploadJobJar :custom-request="handleCustomJobRequest" v-model:loading="uploadLoading">
-            <template #uploadInfo>
-              <Alert v-if="uploadJar" class="uploadjar-box" type="info">
-                <template #message>
-                  <span class="tag-dependency-pom">
-                    {{ uploadJar }}
-                  </span>
-                </template>
-              </Alert>
-            </template>
-          </UploadJobJar>
-        </template>
+      <template #uploadJobJar>
+        <UploadJobJar :custom-request="handleCustomJobRequest" v-model:loading="uploadLoading">
+          <template #uploadInfo>
+            <Alert v-if="uploadJar" class="uploadjar-box" type="info">
+              <template #message>
+                <span class="tag-dependency-pom">
+                  {{ uploadJar }}
+                </span>
+              </template>
+            </Alert>
+          </template>
+        </UploadJobJar>
+      </template>
 
-        <template #args="{ model }">
-          <ProgramArgs
-            ref="programArgRef"
-            v-if="model.args != null && model.args != undefined"
-            v-model:value="model.args"
-            :suggestions="suggestions"
-            @preview="(value) => openReviewDrawer(true, { value, suggestions })"
-          />
-        </template>
-      </BasicForm>
-    </div>
-    <div class="steps-action flex items-center w-full justify-center">
-      <Button v-if="stepCurrent > 0" @click="prev">Previous</Button>
-      <Button class="ml-4" v-if="stepCurrent < steps.length - 1" type="primary" @click="next"
-        >Next</Button
-      >
-      <Button
-        class="ml-4"
-        :loading="submitLoading"
-        type="primary"
-        @click="submit()"
-        v-if="stepCurrent == steps.length - 1"
-      >
-        {{ t('common.submitText') }}
-      </Button>
-      <Button class="ml-4" @click="go('/flink/app')">
-        {{ t('common.cancelText') }}
-      </Button>
-    </div>
+      <template #args="{ model }">
+        <ProgramArgs
+          ref="programArgRef"
+          v-if="model.args != null && model.args != undefined"
+          v-model:value="model.args"
+          :suggestions="suggestions"
+          @preview="(value) => openReviewDrawer(true, { value, suggestions })"
+        />
+      </template>
+
+      <template #formFooter>
+        <div class="flex items-center w-full justify-center">
+          <a-button @click="go('/flink/app')">
+            {{ t('common.cancelText') }}
+          </a-button>
+          <a-button class="ml-4" :loading="submitLoading" type="primary" @click="submit()">
+            {{ t('common.submitText') }}
+          </a-button>
+        </div>
+      </template>
+    </BasicForm>
     <VariableReview @register="registerReviewDrawer" />
   </PageWrapper>
 </template>

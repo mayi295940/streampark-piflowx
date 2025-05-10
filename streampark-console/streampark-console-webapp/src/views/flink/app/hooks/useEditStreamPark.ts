@@ -116,12 +116,6 @@ export const useEditStreamParkSchema = (
   }
   const getEditStreamParkFormSchema = computed((): FormSchema[] => {
     return [
-      {
-        field: 'stepCurrent',
-        label: 'stepCurrent',
-        component: 'Input',
-        show: false,
-      },
       ...getFlinkTypeSchema.value,
       ...getDeployModeSchema.value,
       ...getFlinkClusterSchemas.value,

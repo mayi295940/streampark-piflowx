@@ -1,0 +1,57 @@
+{
+  "flow": {
+    "name": "test",
+    "engineType": "flink",
+    "uuid": "18f37694f6a0438fa920db1a8cbafc5e",
+    "paths": [
+      {
+        "inport": "",
+        "from": "Gravitino",
+        "to": "SQLQuery",
+        "outport": ""
+      },
+      {
+        "inport": "",
+        "from": "SQLQuery",
+        "to": "ShowData",
+        "outport": ""
+      }
+    ],
+    "stops": [
+      {
+        "name": "Gravitino",
+        "bundle": "cn.piflow.bundle.flink.catalog.Gravitino",
+        "uuid": "22ffe6f153fd4322a83de5462bd92a39",
+        "properties": {
+          "metalake": "scaleph",
+          "gravitinoUri": "http://localhost:8090/"
+        },
+        "customizedProperties": {
+        }
+      },
+      {
+        "name": "SQLQuery",
+        "bundle": "cn.piflow.bundle.flink.common.SQLQuery",
+        "uuid": "b42fc07d326440b0a224c55d40b0b17c",
+        "properties": {
+          "useTableEnv": "true",
+          "registerSourceViewName": "",
+          "registerResultViewName": "",
+          "sql": "select * from local_data_service.test.`user`"
+        },
+        "customizedProperties": {
+        }
+      },
+      {
+        "name": "ShowData",
+        "bundle": "cn.piflow.bundle.flink.common.ShowData",
+        "uuid": "ed7c46b4552c4bc0960b91fdd0721d7e",
+        "properties": {
+          "showNumber": "100"
+        },
+        "customizedProperties": {
+        }
+      }
+    ]
+  }
+}

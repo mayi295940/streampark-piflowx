@@ -22,7 +22,7 @@ import cn.piflow.conf._
 import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.commons.lang3.StringUtils
-import org.apache.flink.table.api.{Table, TableResult}
+import org.apache.flink.table.api.{Table, TableEnvironment, TableResult}
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
 
 class SQLExecute extends ConfigurableStop[Table] {
@@ -32,6 +32,7 @@ class SQLExecute extends ConfigurableStop[Table] {
   val inportList: List[String] = List(Port.DefaultPort)
   val outportList: List[String] = List(Port.DefaultPort)
 
+  private var useTableEnv: Boolean = false
   private var sql: String = _
 
   override def perform(
@@ -39,7 +40,12 @@ class SQLExecute extends ConfigurableStop[Table] {
       out: JobOutputStream[Table],
       pec: JobContext[Table]): Unit = {
 
-    val tableEnv = pec.get[StreamTableEnvironment]()
+    var tableEnv: TableEnvironment = null
+    if (useTableEnv) {
+      tableEnv = pec.get[TableEnvironment]()
+    } else {
+      tableEnv = pec.get[StreamTableEnvironment]()
+    }
 
     if (StringUtils.isNotEmpty(sql)) {
       sql
@@ -53,6 +59,7 @@ class SQLExecute extends ConfigurableStop[Table] {
   }
 
   override def setProperties(map: Map[String, Any]): Unit = {
+    useTableEnv = MapUtil.get(map, "useTableEnv", "false").asInstanceOf[String].toBoolean
     sql = MapUtil.get(map, "sql").asInstanceOf[String]
   }
 
@@ -60,6 +67,19 @@ class SQLExecute extends ConfigurableStop[Table] {
 
   override def getPropertyDescriptor(): List[PropertyDescriptor] = {
     var descriptor: List[PropertyDescriptor] = List()
+
+    val useTableEnv = new PropertyDescriptor()
+      .name("useTableEnv")
+      .displayName("useTableEnv")
+      .description(
+        "是否使用TableEnvironment，如果为true，则使用TableEnvironment，否则使用StreamTableEnvironment。在Gravitino组件中创建的是TableEnvironment，后续组件如果需要和Gravitino集成，需设置为true。")
+      .defaultValue("false")
+      .required(false)
+      .allowableValues(Set("true", "false"))
+      .order(1)
+      .example("false")
+    descriptor = useTableEnv :: descriptor
+
     val sql = new PropertyDescriptor()
       .name("sql")
       .displayName("Sql")

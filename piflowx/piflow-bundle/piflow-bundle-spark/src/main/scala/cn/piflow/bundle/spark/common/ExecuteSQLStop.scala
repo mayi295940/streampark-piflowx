@@ -21,6 +21,7 @@ import cn.piflow._
 import cn.piflow.conf._
 import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
+import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 class ExecuteSQLStop extends ConfigurableStop[DataFrame] {
@@ -39,8 +40,16 @@ class ExecuteSQLStop extends ConfigurableStop[DataFrame] {
       pec: JobContext[DataFrame]): Unit = {
 
     val spark = pec.get[SparkSession]()
-    val inDF = in.read()
-    inDF.createOrReplaceTempView(ViewName)
+
+    if (StringUtils.isNotEmpty(ViewName)) {
+      try {
+        val inDF = in.read()
+        inDF.createOrReplaceTempView(ViewName)
+      } catch {
+        case e: Exception =>
+          println("Create temporary view table failed")
+      }
+    }
 
     val frame: DataFrame = spark.sql(sql)
     out.write(frame)
@@ -48,8 +57,7 @@ class ExecuteSQLStop extends ConfigurableStop[DataFrame] {
 
   override def setProperties(map: Map[String, Any]): Unit = {
     sql = MapUtil.get(map, "sql").asInstanceOf[String]
-    ViewName = MapUtil.get(map, "viewName").asInstanceOf[String]
-
+    ViewName = MapUtil.get(map, "viewName", "").asInstanceOf[String]
   }
 
   override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
@@ -71,7 +79,7 @@ class ExecuteSQLStop extends ConfigurableStop[DataFrame] {
       .displayName("ViewName")
       .description("Name of the temporary view table")
       .defaultValue("temp")
-      .required(true)
+      .required(false)
       .example("temp")
 
     descriptor = ViewName :: descriptor

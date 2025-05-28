@@ -32,6 +32,7 @@
         <module>piflow-configure</module>
         <module>piflow-bundle</module>
         <module>piflow-server</module>
+        <module>piflow-test</module>
     </modules>
 
     <properties>

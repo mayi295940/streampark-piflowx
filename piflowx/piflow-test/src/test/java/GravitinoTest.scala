@@ -15,5 +15,15 @@
  * limitations under the License.
  */
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://webservice.cscd.com", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
-package com.cscd.webservice;
+import org.junit.Test
+
+class GravitinoTest {
+
+  @Test
+  def testFlow(): Unit = {
+    // parse flow json
+    val file = "src/test/resources/gravitino/Gravitino.json"
+    TestBase.testFlow(file)
+  }
+
+}

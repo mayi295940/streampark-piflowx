@@ -32,6 +32,7 @@ class Gravitino extends ConfigurableStop[DataFrame] {
 
   private var metalake: String = _
   private var gravitinoUri: String = _
+  private var enableLineage: Boolean = _
 
   override def perform(
       in: JobInputStream[DataFrame],
@@ -49,6 +50,16 @@ class Gravitino extends ConfigurableStop[DataFrame] {
     conf.set("spark.sql.gravitino.metalake", metalake)
     // conf.set("spark.sql.gravitino.enableIcebergSupport", "true")
 
+    if (enableLineage) {
+      conf.set("spark.extraListeners", "io.openlineage.spark.agent.OpenLineageSparkListener")
+      conf.set("spark.openlineage.transport.type", "http")
+      conf.set("spark.openlineage.transport.url", gravitinoUri)
+      conf.set("spark.openlineage.transport.endpoint", "/api/lineage")
+      conf.set("spark.openlineage.namespace", metalake)
+      conf.set("spark.openlineage.appName", appName)
+      conf.set("spark.openlineage.columnLineage.datasetLineageEnabled", "true")
+    }
+
     val sparkSessionBuilder = SparkSession.builder().appName(appName)
     val sparkSession = sparkSessionBuilder.appName(appName).config(conf).getOrCreate()
     pec.getProcessContext.put(classOf[SparkSession].getName, sparkSession)
@@ -57,6 +68,7 @@ class Gravitino extends ConfigurableStop[DataFrame] {
   override def setProperties(map: Map[String, Any]): Unit = {
     metalake = MapUtil.get(map, "metalake").asInstanceOf[String]
     gravitinoUri = MapUtil.get(map, "gravitinoUri").asInstanceOf[String]
+    enableLineage = MapUtil.get(map, "enableLineage", "false").asInstanceOf[String].toBoolean
   }
 
   override def getPropertyDescriptor(): List[PropertyDescriptor] = {
@@ -81,6 +93,17 @@ class Gravitino extends ConfigurableStop[DataFrame] {
       .order(2)
       .example("http://localhost:8090")
     descriptor = gravitinoUri :: descriptor
+
+    val enableLineage = new PropertyDescriptor()
+      .name("enableLineage")
+      .displayName("enableLineage")
+      .description("enable lineage.")
+      .defaultValue("false")
+      .allowableValues(Set("true", "false"))
+      .required(false)
+      .order(2)
+      .example("false")
+    descriptor = enableLineage :: descriptor
 
     descriptor
   }

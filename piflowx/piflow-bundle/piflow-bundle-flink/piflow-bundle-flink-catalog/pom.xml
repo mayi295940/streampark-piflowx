@@ -42,6 +42,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.paimon</groupId>
+            <artifactId>paimon-flink-1.18</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.streampark</groupId>
             <artifactId>piflow-bundle-flink-common</artifactId>
             <version>${project.version}</version>

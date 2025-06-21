@@ -1,0 +1,134 @@
+{
+  "flow": {
+    "paths": [
+      {
+        "inport": "",
+        "from": "Gravitino_tuky5",
+        "to": "DataGen_r6QRQ",
+        "outport": ""
+      },
+      {
+        "inport": "",
+        "from": "DataGen_r6QRQ",
+        "to": "JDBCWrite__yYGc",
+        "outport": ""
+      },
+      {
+        "inport": "",
+        "from": "JDBCWrite__yYGc",
+        "to": "JDBCRead_WREvh",
+        "outport": ""
+      },
+      {
+        "inport": "",
+        "from": "JDBCRead_WREvh",
+        "to": "SQLExecute_bMeVm",
+        "outport": ""
+      },
+      {
+        "inport": "",
+        "from": "SQLExecute_bMeVm",
+        "to": "SQLQuery_8jwT7",
+        "outport": ""
+      },
+      {
+        "inport": "",
+        "from": "SQLQuery_8jwT7",
+        "to": "ShowData_aMIL3",
+        "outport": ""
+      }
+    ],
+    "name": "flink_gravition_paimon",
+    "engineType": "flink",
+    "stops": [
+      {
+        "customizedProperties": {},
+        "name": "Gravitino_tuky5",
+        "uuid": "Gravitino_tuky5",
+        "bundle": "cn.piflow.bundle.flink.catalog.Gravitino",
+        "properties": {
+          "gravitinoUri": "http://127.0.0.1:8092/",
+          "metalake": "metalake"
+        }
+      },
+      {
+        "customizedProperties": {},
+        "name": "DataGen_r6QRQ",
+        "uuid": "DataGen_r6QRQ",
+        "bundle": "cn.piflow.bundle.flink.common.DataGen",
+        "properties": {
+          "schema": "[{\"id\":\"323868\",\"filedName\":\"id\",\"filedType\":\"INT\",\"kind\":\"sequence\",\"start\":\"1\",\"end\":\"1000\"},{\"id\":\"479324\",\"filedName\":\"name\",\"filedType\":\"STRING\",\"kind\":\"random\",\"length\":\"5\",\"index\":1}]",
+          "registerTableName": "datagen_source",
+          "count": "100",
+          "ratio": "10"
+        }
+      },
+      {
+        "customizedProperties": {},
+        "name": "JDBCWrite__yYGc",
+        "uuid": "JDBCWrite__yYGc",
+        "bundle": "cn.piflow.bundle.flink.jdbc.JDBCWrite",
+        "properties": {
+          "password": "123456",
+          "driver": "com.mysql.jdbc.Driver",
+          "tableDefinition": "{\"tableBaseInfo\":{},\"physicalColumnDefinition\":[{\"columnName\":\"id\",\"columnType\":\"INT\",\"length\":null,\"precision\":null,\"scale\":null,\"nullable\":false,\"primaryKey\":false,\"partitionKey\":false,\"comment\":\"\"},{\"columnName\":\"name\",\"columnType\":\"STRING\",\"length\":null,\"precision\":null,\"scale\":null,\"nullable\":false,\"primaryKey\":false,\"partitionKey\":false,\"comment\":\"\"}],\"metadataColumnDefinition\":[],\"computedColumnDefinition\":[],\"watermarkDefinition\":{}}",
+          "url": "jdbc:mysql://127.0.0.1:3306/test2?characterEncoding=utf8&autoReconnect=true&tinyInt1isBit=false&serverTimezone=Asia/Shanghai",
+          "properties": "{}",
+          "username": "root",
+          "tableName": "user"
+        }
+      },
+      {
+        "customizedProperties": {},
+        "name": "JDBCRead_WREvh",
+        "uuid": "JDBCRead_WREvh",
+        "bundle": "cn.piflow.bundle.flink.jdbc.JDBCRead",
+        "properties": {
+          "password": "123456",
+          "driver": "com.mysql.jdbc.Driver",
+          "tableDefinition": "{\"tableBaseInfo\":{\"catalogName\":\"\",\"dbname\":\"\",\"schema\":\"\",\"registerTableName\":\"t_user_source\",\"registerTableComment\":\"\",\"ifNotExists\":true,\"selectStatement\":\"\",\"likeStatement\":\"\"},\"physicalColumnDefinition\":[{\"columnName\":\"id\",\"columnType\":\"INT\",\"length\":null,\"precision\":null,\"scale\":null,\"nullable\":false,\"primaryKey\":false,\"partitionKey\":false,\"comment\":\"\"},{\"columnName\":\"name\",\"columnType\":\"STRING\",\"length\":null,\"precision\":null,\"scale\":null,\"nullable\":false,\"primaryKey\":false,\"partitionKey\":false,\"comment\":\"\"}],\"metadataColumnDefinition\":[],\"computedColumnDefinition\":[],\"watermarkDefinition\":{}}",
+          "fetchSize": "10",
+          "useTableEnv": "true",
+          "url": "jdbc:mysql://127.0.0.1:3306/test2?characterEncoding=utf8&autoReconnect=true&tinyInt1isBit=false&serverTimezone=Asia/Shanghai",
+          "properties": "{}",
+          "username": "root",
+          "tableName": "user"
+        }
+      },
+      {
+        "customizedProperties": {},
+        "name": "SQLQuery_8jwT7",
+        "uuid": "SQLQuery_8jwT7",
+        "bundle": "cn.piflow.bundle.flink.common.SQLQuery",
+        "properties": {
+          "registerSourceViewName": "",
+          "registerResultViewName": "",
+          "useTableEnv": "true",
+          "sql": "select id, name from paimon.test.t_user"
+        }
+      },
+      {
+        "customizedProperties": {},
+        "name": "SQLExecute_bMeVm",
+        "uuid": "SQLExecute_bMeVm",
+        "bundle": "cn.piflow.bundle.flink.common.SQLExecute",
+        "properties": {
+          "useTableEnv": "true",
+          "sql": "create table if not exists paimon.test.t_user (\r\n id int,\r\n name string\r\n);\r\n\r\ninsert into paimon.test.t_user  select * from t_user_source;"
+        }
+      },
+      {
+        "customizedProperties": {},
+        "name": "ShowData_aMIL3",
+        "uuid": "ShowData_aMIL3",
+        "bundle": "cn.piflow.bundle.flink.common.ShowData",
+        "properties": {
+          "showNumber": "100",
+          "changeLog": "false"
+        }
+      }
+    ],
+    "uuid": "111",
+    "runMode": "DEBUG"
+  }
+}

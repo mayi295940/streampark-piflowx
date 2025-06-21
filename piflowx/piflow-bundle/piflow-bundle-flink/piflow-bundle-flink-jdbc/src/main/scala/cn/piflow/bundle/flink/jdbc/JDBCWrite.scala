@@ -26,7 +26,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import cn.piflow.enums.DataBaseType
 import cn.piflow.util.{IdGenerator, JsonUtil}
 import org.apache.commons.lang3.StringUtils
-import org.apache.flink.table.api.Table
+import org.apache.flink.table.api.{Table, TableResult}
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
 
 class JDBCWrite extends ConfigurableStop[Table] {
@@ -90,9 +90,14 @@ class JDBCWrite extends ConfigurableStop[Table] {
     println(ddl)
     tableEnv.executeSql(ddl)
 
-    if (tableDefinition.getAsSelectStatement != null &&
+    if (tableDefinition.getAsSelectStatement == null ||
       StringUtils.isEmpty(tableDefinition.getAsSelectStatement.getSelectStatement)) {
-      inputTable.insertInto(tmpTable).execute().print()
+      val inputTable = in.read()
+      inputTable.executeInsert(tmpTable)
+    } else {
+      val result: TableResult =
+        tableEnv.executeSql(s"INSERT INTO $tmpTable ${tableDefinition.getAsSelectStatement}")
+      result.print()
     }
 
   }

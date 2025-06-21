@@ -38,11 +38,13 @@ class Faker extends ConfigurableStop[Table] with FlinkConfigurableStop {
   private var schema: List[Map[String, Any]] = _
   private var count: Int = _
   private var ratio: Int = _
+  private var registerTableName: String = _
 
   override def setProperties(map: Map[String, Any]): Unit = {
     count = MapUtil.get(map, "count", "10").asInstanceOf[String].toInt
     ratio = MapUtil.get(map, "ratio", "1").asInstanceOf[String].toInt
     schema = MapUtil.get(map, "schema").asInstanceOf[List[Map[String, Any]]]
+    registerTableName = MapUtil.get(map, "registerTableName", "").asInstanceOf[String]
   }
 
   override def getPropertyDescriptor(): List[PropertyDescriptor] = {
@@ -84,6 +86,16 @@ class Faker extends ConfigurableStop[Table] with FlinkConfigurableStop {
 
     descriptor = schema :: descriptor
 
+    val registerTableName = new PropertyDescriptor()
+      .name("registerTableName")
+      .displayName("tableName")
+      .description("临时表名称.")
+      .required(false)
+      .dataType(Language.Text)
+      .example("tmp")
+      .order(4)
+    descriptor = registerTableName :: descriptor
+
     descriptor
   }
 
@@ -104,8 +116,13 @@ class Faker extends ConfigurableStop[Table] with FlinkConfigurableStop {
 
     val tableEnv = pec.get[StreamTableEnvironment]()
 
-    val tmpTable = this.getClass.getSimpleName
-      .stripSuffix("$") + Constants.UNDERLINE_SIGN + IdGenerator.uuidWithoutSplit
+    var tmpTable: String = ""
+    if (StringUtils.isEmpty(registerTableName)) {
+      tmpTable = this.getClass.getSimpleName
+        .stripSuffix("$") + Constants.UNDERLINE_SIGN + IdGenerator.uuidWithoutSplit
+    } else {
+      tmpTable += registerTableName
+    }
 
     val sourceDDL = generateSql(tmpTable)
     println(sourceDDL)
@@ -123,7 +140,7 @@ class Faker extends ConfigurableStop[Table] with FlinkConfigurableStop {
     val (columns, conf) = getWithColumnsAndConf(schema)
 
     val sourceDDL =
-      s""" CREATE TABLE $tmpTable ($columns) WITH (
+      s""" CREATE temporary TABLE $tmpTable ($columns) WITH (
          |'connector' = 'faker',
          | $conf
          | 'number-of-rows'='$count',
@@ -184,27 +201,5 @@ class Faker extends ConfigurableStop[Table] with FlinkConfigurableStop {
   }
 
   override def getEngineType: String = Constants.ENGIN_FLINK
-
-  //  override def verify(): String = {
-  //    var env: StreamExecutionEnvironment = null
-  //    try {
-  //      val sql = generateSql()
-  //      env = StreamExecutionEnvironment.getExecutionEnvironment
-  //      val tableEnv = StreamTableEnvironment.create(env)
-  //      tableEnv.executeSql(sql)
-  //      "success"
-  //    } catch {
-  //      case e: Exception =>
-  //        s"${Option(e.getMessage).getOrElse("Unknown error")} [Stacktrace: ${getFullStackTrace(e)}]"
-  //    } finally {
-  //      try {
-  //        if (env != null) {
-  //          env.close()
-  //        }
-  //      } catch {
-  //        case e: Exception =>
-  //      }
-  //    }
-  //  }
 
 }

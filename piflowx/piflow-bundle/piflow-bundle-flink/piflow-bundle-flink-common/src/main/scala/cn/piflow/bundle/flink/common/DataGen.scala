@@ -38,11 +38,13 @@ class DataGen extends ConfigurableStop[Table] {
   private var schema: List[Map[String, Any]] = _
   private var count: Int = _
   private var ratio: Int = _
+  private var registerTableName: String = _
 
   override def setProperties(map: Map[String, Any]): Unit = {
     schema = MapUtil.get(map, "schema").asInstanceOf[List[Map[String, Any]]]
     count = MapUtil.get(map, "count", "10").asInstanceOf[String].toInt
     ratio = MapUtil.get(map, "ratio", "1").asInstanceOf[String].toInt
+    registerTableName = MapUtil.get(map, "registerTableName", "").asInstanceOf[String]
   }
 
   override def getPropertyDescriptor(): List[PropertyDescriptor] = {
@@ -86,6 +88,16 @@ class DataGen extends ConfigurableStop[Table] {
 
     descriptor = schema :: descriptor
 
+    val registerTableName = new PropertyDescriptor()
+      .name("registerTableName")
+      .displayName("tableName")
+      .description("临时表名称.")
+      .required(false)
+      .dataType(Language.Text)
+      .example("tmp")
+      .order(4)
+    descriptor = registerTableName :: descriptor
+
     descriptor
   }
 
@@ -108,12 +120,17 @@ class DataGen extends ConfigurableStop[Table] {
 
     val (columns, conf) = getWithColumnsAndConf(schema)
 
-    val tmpTable = this.getClass.getSimpleName
-      .stripSuffix("$") + Constants.UNDERLINE_SIGN + IdGenerator.uuidWithoutSplit
+    var tmpTable: String = ""
+    if (StringUtils.isEmpty(registerTableName)) {
+      tmpTable = this.getClass.getSimpleName
+        .stripSuffix("$") + Constants.UNDERLINE_SIGN + IdGenerator.uuidWithoutSplit
+    } else {
+      tmpTable += registerTableName
+    }
 
     // 生成数据源 DDL 语句
     val sourceDDL =
-      s""" CREATE TABLE $tmpTable ($columns) WITH (
+      s""" CREATE temporary TABLE $tmpTable ($columns) WITH (
          |'connector' = 'datagen',
          | $conf
          | 'number-of-rows'='$count',

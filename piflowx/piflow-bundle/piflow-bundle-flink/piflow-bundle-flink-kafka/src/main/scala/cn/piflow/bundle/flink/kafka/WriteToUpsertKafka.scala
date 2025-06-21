@@ -88,7 +88,7 @@ class WriteToUpsertKafka extends ConfigurableStop[Table] {
 
     tableEnv.executeSql(ddl)
 
-    if (tableDefinition.getAsSelectStatement != null &&
+    if (tableDefinition.getAsSelectStatement == null ||
       StringUtils.isEmpty(tableDefinition.getAsSelectStatement.getSelectStatement)) {
       val inputTable = in.read()
       inputTable.executeInsert(tableName)

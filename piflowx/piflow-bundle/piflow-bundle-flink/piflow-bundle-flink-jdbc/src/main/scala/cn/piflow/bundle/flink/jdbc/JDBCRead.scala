@@ -26,7 +26,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import cn.piflow.enums.DataBaseType
 import cn.piflow.util.{IdGenerator, JsonUtil}
 import org.apache.commons.lang3.StringUtils
-import org.apache.flink.table.api.Table
+import org.apache.flink.table.api.{Table, TableEnvironment}
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
 
 class JDBCRead extends ConfigurableStop[Table] {
@@ -44,13 +44,19 @@ class JDBCRead extends ConfigurableStop[Table] {
   private var fetchSize: Int = _
   private var tableDefinition: FlinkTableDefinition = _
   private var properties: Map[String, Any] = _
+  private var useTableEnv: Boolean = false
 
   def perform(
       in: JobInputStream[Table],
       out: JobOutputStream[Table],
       pec: JobContext[Table]): Unit = {
 
-    val tableEnv = pec.get[StreamTableEnvironment]()
+    var tableEnv: TableEnvironment = null
+    if (useTableEnv) {
+      tableEnv = pec.get[TableEnvironment]()
+    } else {
+      tableEnv = pec.get[StreamTableEnvironment]()
+    }
 
     val (columns, ifNotExists, tableComment, partitionStatement, asSelectStatement, likeStatement) =
       RowTypeUtil.getTableSchema(tableDefinition)
@@ -81,6 +87,8 @@ class JDBCRead extends ConfigurableStop[Table] {
          |""".stripMargin
         .replaceAll("\r\n", " ")
         .replaceAll(Constants.LINE_SPLIT_N, " ")
+
+    println(ddl)
 
     tableEnv.executeSql(ddl)
 
@@ -123,10 +131,23 @@ class JDBCRead extends ConfigurableStop[Table] {
     tableDefinition =
       JsonUtil.mapToObject[FlinkTableDefinition](tableDefinitionMap, classOf[FlinkTableDefinition])
     properties = MapUtil.get(map, key = "properties", Map()).asInstanceOf[Map[String, Any]]
+    useTableEnv = MapUtil.get(map, "useTableEnv", "false").asInstanceOf[String].toBoolean
   }
 
   override def getPropertyDescriptor(): List[PropertyDescriptor] = {
     var descriptor: List[PropertyDescriptor] = List()
+
+    val useTableEnv = new PropertyDescriptor()
+      .name("useTableEnv")
+      .displayName("useTableEnv")
+      .description(
+        "是否使用TableEnvironment，如果为true，则使用TableEnvironment，否则使用StreamTableEnvironment。在Gravitino组件中创建的是TableEnvironment，后续组件如果需要和Gravitino集成，需设置为true。")
+      .defaultValue("false")
+      .required(false)
+      .allowableValues(Set("true", "false"))
+      .order(1)
+      .example("false")
+    descriptor = useTableEnv :: descriptor
 
     val url = new PropertyDescriptor()
       .name("url")

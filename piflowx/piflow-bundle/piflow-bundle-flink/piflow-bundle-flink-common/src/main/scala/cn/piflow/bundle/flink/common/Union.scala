@@ -23,7 +23,7 @@ import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.flink.table.api.Table
 
-class Union extends ConfigurableStop[Table] {
+class Union extends ConfigurableStop[Null, Table, Null] {
 
   override val authorEmail: String = ""
   override val description: String = "Union多个输入源，会删除重复记录。输入源必须具有相同的字段类型。"
@@ -33,9 +33,9 @@ class Union extends ConfigurableStop[Table] {
   var inports: List[String] = _
 
   override def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     out.write(in.ports().map(in.read).reduce((x, y) => x.union(y)))
   }
@@ -65,7 +65,7 @@ class Union extends ConfigurableStop[Table] {
     List(StopGroup.CommonGroup)
   }
 
-  override def initialize(ctx: ProcessContext[Table]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_FLINK
 

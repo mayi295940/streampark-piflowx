@@ -26,7 +26,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
 
-class CsvStringParser extends ConfigurableStop[DataFrame] {
+class CsvStringParser extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "yangqidong@cnic.cn"
   val inportList: List[String] = List(Port.DefaultPort)
@@ -38,9 +38,9 @@ class CsvStringParser extends ConfigurableStop[DataFrame] {
   var schema: String = _
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val session: SparkSession = pec.get[SparkSession]
     val context: SparkContext = session.sparkContext
@@ -120,7 +120,7 @@ class CsvStringParser extends ConfigurableStop[DataFrame] {
     List(StopGroup.CsvGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 

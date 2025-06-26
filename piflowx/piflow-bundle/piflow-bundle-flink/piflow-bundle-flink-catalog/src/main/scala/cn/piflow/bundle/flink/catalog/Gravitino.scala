@@ -24,7 +24,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.flink.configuration.Configuration
 import org.apache.flink.table.api.{EnvironmentSettings, Table, TableEnvironment}
 
-class Gravitino extends ConfigurableStop[Table] {
+class Gravitino extends ConfigurableStop[Null, Table, Null] {
 
   override val authorEmail: String = ""
   override val description: String = "Apache Gravitino Flink 连接器。"
@@ -35,9 +35,9 @@ class Gravitino extends ConfigurableStop[Table] {
   private var gravitinoUri: String = _
 
   override def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     val configuration = new Configuration()
     configuration.setString("table.catalog-store.kind", "gravitino")
@@ -87,7 +87,7 @@ class Gravitino extends ConfigurableStop[Table] {
     List(StopGroup.CatalogGroup)
   }
 
-  override def initialize(ctx: ProcessContext[Table]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_FLINK
 

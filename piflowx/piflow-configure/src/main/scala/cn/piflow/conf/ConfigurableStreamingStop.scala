@@ -20,5 +20,5 @@ package cn.piflow.conf
 import cn.piflow.StreamingStop
 
 abstract class ConfigurableStreamingStop[StreamingContext, DataType, DStream]
-  extends ConfigurableStop[DataType]
+  extends ConfigurableStop[StreamingContext, DataType, DStream]
   with StreamingStop[StreamingContext, DataType, DStream] {}

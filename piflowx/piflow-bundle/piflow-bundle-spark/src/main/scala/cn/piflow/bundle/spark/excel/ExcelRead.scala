@@ -23,7 +23,7 @@ import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class ExcelRead extends ConfigurableStop[DataFrame] {
+class ExcelRead extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "ygang@cnic.cn"
   val description: String = "Create a DataFrame from an Excel file"
@@ -38,9 +38,9 @@ class ExcelRead extends ConfigurableStop[DataFrame] {
   //  var excerptSize: String = _
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
 
@@ -140,7 +140,7 @@ class ExcelRead extends ConfigurableStop[DataFrame] {
     List(StopGroup.ExcelGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 

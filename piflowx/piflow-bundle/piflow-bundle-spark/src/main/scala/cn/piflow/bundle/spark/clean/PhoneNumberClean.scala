@@ -25,7 +25,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types.StructField
 
-class PhoneNumberClean extends ConfigurableStop[DataFrame] {
+class PhoneNumberClean extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "06whuxx@163.com"
   val description: String = "Cleaning data in mobile number format"
@@ -35,9 +35,9 @@ class PhoneNumberClean extends ConfigurableStop[DataFrame] {
   var columnName: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val sqlContext = spark.sqlContext
@@ -78,7 +78,7 @@ class PhoneNumberClean extends ConfigurableStop[DataFrame] {
     out.write(dfNew1)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     columnName = MapUtil.get(map, key = "columnName").asInstanceOf[String]

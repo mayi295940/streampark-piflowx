@@ -35,7 +35,7 @@ import java.util.Date
 
 import scala.collection.mutable.ArrayBuffer
 
-class spider extends ConfigurableStop[DataFrame] {
+class spider extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "yangqidong@cnic.cn"
   override val description: String = "Crawl data from websites"
@@ -53,9 +53,9 @@ class spider extends ConfigurableStop[DataFrame] {
   var countInt: Int = 0
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val session: SparkSession = pec.get[SparkSession]()
 
@@ -258,7 +258,7 @@ class spider extends ConfigurableStop[DataFrame] {
     List(StopGroup.Spider)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 

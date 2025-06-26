@@ -25,7 +25,7 @@ import org.apache.spark.sql.{DataFrame, SaveMode}
 
 import java.util.Properties
 
-class ClickhouseWrite extends ConfigurableStop[DataFrame] {
+class ClickhouseWrite extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "songdongze@cnic.cn"
   val description: String = "Write Data to Clickhouse Database"
@@ -39,9 +39,9 @@ class ClickhouseWrite extends ConfigurableStop[DataFrame] {
   var dbtable: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val jdbcDF: DataFrame = in.read()
     val properties: Properties = new Properties()
@@ -58,7 +58,7 @@ class ClickhouseWrite extends ConfigurableStop[DataFrame] {
     out.write(jdbcDF)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def setProperties(map: Map[String, Any]): Unit = {
     url = MapUtil.get(map, "url").asInstanceOf[String]

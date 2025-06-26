@@ -32,7 +32,7 @@ import java.util
 
 import scala.collection.mutable.ArrayBuffer
 
-class GetMongo extends ConfigurableStop[DataFrame] {
+class GetMongo extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "yangqidong@cnic.cn"
   override val description: String = "Get data from mongodb"
@@ -46,9 +46,9 @@ class GetMongo extends ConfigurableStop[DataFrame] {
   var sql: String = _
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val session: SparkSession = pec.get[SparkSession]()
     val addressesArr: util.ArrayList[ServerAddress] = new util.ArrayList[ServerAddress]()
@@ -182,7 +182,7 @@ class GetMongo extends ConfigurableStop[DataFrame] {
     List(StopGroup.Mongodb)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 

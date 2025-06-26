@@ -23,7 +23,7 @@ import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.DataFrame
 
-class DropField extends ConfigurableStop[DataFrame] {
+class DropField extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "ygang@cnic.cn"
   val description: String = "Delete one or more columns"
@@ -33,9 +33,9 @@ class DropField extends ConfigurableStop[DataFrame] {
   var columnNames: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     var df = in.read()
 
@@ -47,7 +47,7 @@ class DropField extends ConfigurableStop[DataFrame] {
     out.write(df)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     columnNames = MapUtil.get(map, "columnNames").asInstanceOf[String]

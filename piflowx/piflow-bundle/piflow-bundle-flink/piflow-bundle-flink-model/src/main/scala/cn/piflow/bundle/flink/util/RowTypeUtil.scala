@@ -89,21 +89,7 @@ object RowTypeUtil {
 
       fieldNames(i) = columnName
 
-      var filedType: DataType = null
-      columnType.toLowerCase() match {
-        case "string" => filedType = DataTypes.STRING
-        case "int" => filedType = DataTypes.INT
-        case "double" => filedType = DataTypes.DOUBLE
-        case "float" => filedType = DataTypes.FLOAT
-        case "long" => filedType = DataTypes.BIGINT
-        case "boolean" => filedType = DataTypes.BOOLEAN
-        case "date" => filedType = DataTypes.DATE
-        case "timestamp" => filedType = DataTypes.TIMESTAMP
-        case _ =>
-          throw new RuntimeException("Unsupported type: " + columnType)
-      }
-
-      val filed = DataTypes.FIELD(columnName, filedType)
+      val filed = DataTypes.FIELD(columnName, getDataTypeByType(columnType))
       fieldList.add(filed)
     }
 
@@ -124,22 +110,7 @@ object RowTypeUtil {
       if (columnInfo.size == 3) {
         isNullable = columnInfo(2).trim.toBoolean
       }
-
-      // todo more type
-      // todo date format
-
-      columnType.toLowerCase() match {
-        case "string" => schemaBuilder.column(columnName, DataTypes.STRING())
-        case "int" => schemaBuilder.column(columnName, DataTypes.INT())
-        case "double" => schemaBuilder.column(columnName, DataTypes.DOUBLE())
-        case "float" => schemaBuilder.column(columnName, DataTypes.FLOAT())
-        case "long" => schemaBuilder.column(columnName, DataTypes.BIGINT())
-        case "boolean" => schemaBuilder.column(columnName, DataTypes.BOOLEAN())
-        case "date" => schemaBuilder.column(columnName, DataTypes.DATE())
-        case "timestamp" => schemaBuilder.column(columnName, DataTypes.TIMESTAMP())
-        case _ =>
-          throw new RuntimeException("Unsupported type: " + columnType)
-      }
+      schemaBuilder.column(columnName, getDataTypeByType(columnType))
     }
     schemaBuilder.build()
   }
@@ -159,19 +130,7 @@ object RowTypeUtil {
       if (columnInfo.size == 3) {
         isNullable = columnInfo(2).trim.toBoolean
       }
-
-      columnType.toLowerCase() match {
-        case "string" => tableSchema += s"  `$columnName` ${DataTypes.STRING()},"
-        case "int" => tableSchema += s"  `$columnName` ${DataTypes.INT()},"
-        case "double" => tableSchema += s"  `$columnName` ${DataTypes.DOUBLE()},"
-        case "float" => tableSchema += s"  `$columnName` ${DataTypes.FLOAT()},"
-        case "long" => tableSchema += s"  `$columnName` ${DataTypes.BIGINT()},"
-        case "boolean" => tableSchema += s"  `$columnName` ${DataTypes.BOOLEAN()},"
-        case "date" => tableSchema += s"  `$columnName` ${DataTypes.DATE()},"
-        case "timestamp" => tableSchema += s"  `$columnName` ${DataTypes.TIMESTAMP()},"
-        case _ =>
-          throw new RuntimeException("Unsupported type: " + columnType)
-      }
+      tableSchema += s"  $columnName ${getDataTypeByType(columnType)},"
     }
 
     if (StringUtils.isNotBlank(primaryKey)) {
@@ -196,26 +155,37 @@ object RowTypeUtil {
     for (i <- 0 until fieldNum) {
       val columnName = fieldNames.get(i)
       val columnType = types.get(i).toString.toLowerCase
-      columnType match {
-        case "string" => tableSchema += s"  $columnName ${DataTypes.STRING()},"
-        case "int" => tableSchema += s"  $columnName ${DataTypes.INT()},"
-        case "double" => tableSchema += s"  $columnName ${DataTypes.DOUBLE()},"
-        case "float" => tableSchema += s"  $columnName ${DataTypes.FLOAT()},"
-        case "long" => tableSchema += s"  $columnName ${DataTypes.BIGINT()},"
-        case "boolean" => tableSchema += s"  $columnName ${DataTypes.BOOLEAN()},"
-        case "date" => tableSchema += s"  $columnName ${DataTypes.DATE()},"
-        case "timestamp" => tableSchema += s"  $columnName ${DataTypes.TIMESTAMP()},"
-        case _ =>
-          throw new RuntimeException("Unsupported type: " + columnType)
-      }
+      tableSchema += s"  $columnName ${getDataTypeByType(columnType)},"
     }
-
     s"( ${tableSchema.stripMargin.dropRight(1)} )"
   }
 
+  /**
+   * 根据columnType获取对应的DataType
+   *
+   * @param columnType 列类型
+   * @return DataType
+   */
+  def getDataTypeByType(columnType: String): DataType = {
+    if (StringUtils.isBlank(columnType)) {
+      throw new RuntimeException("type can not be null")
+    }
+    columnType.toLowerCase() match {
+      case "string" => DataTypes.STRING()
+      case "int" => DataTypes.INT()
+      case "double" => DataTypes.DOUBLE()
+      case "float" => DataTypes.FLOAT()
+      case "long" => DataTypes.BIGINT()
+      case "boolean" => DataTypes.BOOLEAN()
+      case "date" => DataTypes.DATE()
+      case "timestamp" => DataTypes.TIMESTAMP()
+      case _ =>
+        throw new RuntimeException("Unsupported type: " + columnType)
+    }
+  }
+
   /** 生成table Schema */
-  def getTableSchema(
-      definition: FlinkTableDefinition): (String, String, String, String, String, String) = {
+  def getTableSchema(definition: FlinkTableDefinition): (String, String, String, String, String, String) = {
 
     var columns = ""
     var primaryKeyList: List[String] = List()

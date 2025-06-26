@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 
 import scala.collection.JavaConverters;
 
-public class JDBCWrite extends ConfigurableStop<PCollection<Row>> {
+public class JDBCWrite extends ConfigurableStop<Void, PCollection<Row>, Void> {
 
     private String jdbcUrl = "";
     private String driver = "";
@@ -54,9 +54,9 @@ public class JDBCWrite extends ConfigurableStop<PCollection<Row>> {
 
     @Override
     public void perform(
-                        JobInputStream<PCollection<Row>> in,
-                        JobOutputStream<PCollection<Row>> out,
-                        JobContext<PCollection<Row>> pec) {
+                        JobInputStream<Void, PCollection<Row>, Void> in,
+                        JobOutputStream<Void, PCollection<Row>, Void> out,
+                        JobContext<Void, PCollection<Row>, Void> pec) {
 
         PCollection<Row> input = in.read();
         Schema schema = input.getSchema();
@@ -94,7 +94,7 @@ public class JDBCWrite extends ConfigurableStop<PCollection<Row>> {
     }
 
     @Override
-    public void initialize(ProcessContext<PCollection<Row>> ctx) {
+    public void initialize(ProcessContext<Void, PCollection<Row>, Void> ctx) {
     }
 
     @Override

@@ -23,7 +23,7 @@ import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class Histogram extends ConfigurableVisualizationStop[DataFrame] {
+class Histogram extends ConfigurableVisualizationStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "xjzhu@cnic.cn"
   override val description: String = "Show data with histogram. " +
@@ -74,12 +74,12 @@ class Histogram extends ConfigurableVisualizationStop[DataFrame] {
     List(StopGroup.Visualization)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val sqlContext = spark.sqlContext

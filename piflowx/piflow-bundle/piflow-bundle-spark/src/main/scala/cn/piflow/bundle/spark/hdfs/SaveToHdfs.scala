@@ -29,7 +29,7 @@ import org.apache.spark.sql.types.{StringType, StructField, StructType}
 
 import scala.collection.mutable.ArrayBuffer
 
-class SaveToHdfs extends ConfigurableStop[DataFrame] {
+class SaveToHdfs extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "ygang@cnic.cn"
   override val description: String = "Put data into hdfs "
@@ -47,9 +47,9 @@ class SaveToHdfs extends ConfigurableStop[DataFrame] {
   var oldFilePath: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val hdfsDir = hdfsUrl + hdfsDirPath
@@ -121,7 +121,7 @@ class SaveToHdfs extends ConfigurableStop[DataFrame] {
     }
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     hdfsUrl = MapUtil.get(map, key = "hdfsUrl").asInstanceOf[String]

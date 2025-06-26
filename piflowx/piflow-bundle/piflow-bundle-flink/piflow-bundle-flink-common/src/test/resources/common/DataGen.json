@@ -1,5 +1,8 @@
 {
   "flow": {
+    "environment": {
+      "jobId": "1234567890"
+    },
     "name": "DataGenTest",
     "uuid": "1234",
     "stops": [

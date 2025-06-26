@@ -17,7 +17,7 @@
 
 package cn.piflow.bundle.spark.script
 
-import cn.piflow.{Constants, JobContext, JobInputStream, JobOutputStream, ProcessContext}
+import cn.piflow._
 import cn.piflow.bundle.core.util.DockerStreamUtil
 import cn.piflow.conf._
 import cn.piflow.conf.bean.PropertyDescriptor
@@ -25,7 +25,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import cn.piflow.util.PropertyUtil
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class DockerExecute extends ConfigurableStop[DataFrame] {
+class DockerExecute extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "ygang@cnic.cn"
   val description: String = "docker runs Python"
@@ -37,9 +37,9 @@ class DockerExecute extends ConfigurableStop[DataFrame] {
   var ymlContent: String = _
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val appID: String = spark.sparkContext.applicationId
@@ -121,7 +121,7 @@ class DockerExecute extends ConfigurableStop[DataFrame] {
     ymlContent = MapUtil.get(map, key = "ymlContent").asInstanceOf[String]
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getPropertyDescriptor(): List[PropertyDescriptor] = {
     var descriptor: List[PropertyDescriptor] = List()

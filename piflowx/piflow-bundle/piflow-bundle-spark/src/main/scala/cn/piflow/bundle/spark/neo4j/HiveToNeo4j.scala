@@ -28,7 +28,7 @@ import org.neo4j.driver.v1._
 
 import scala.collection.mutable.ArrayBuffer
 
-class HiveToNeo4j extends ConfigurableStop[DataFrame] {
+class HiveToNeo4j extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "anhong12@cnic.cn"
   override val description: String = "Hive to Neo4j"
@@ -51,9 +51,9 @@ class HiveToNeo4j extends ConfigurableStop[DataFrame] {
   var cypher: String = ""
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     // selectHiveQL-----------------------------
     val spark = pec.get[SparkSession]()
@@ -278,7 +278,7 @@ class HiveToNeo4j extends ConfigurableStop[DataFrame] {
     List(StopGroup.Neo4jGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 

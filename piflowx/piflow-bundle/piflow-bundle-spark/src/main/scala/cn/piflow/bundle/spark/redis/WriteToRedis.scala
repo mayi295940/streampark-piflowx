@@ -26,7 +26,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import redis.clients.jedis.HostAndPort
 
-class WriteToRedis extends ConfigurableStop[DataFrame] {
+class WriteToRedis extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "06whuxx@163.com"
   val description: String = "Write data to redis"
@@ -39,9 +39,9 @@ class WriteToRedis extends ConfigurableStop[DataFrame] {
   var column_name: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val df = in.read()
@@ -58,7 +58,7 @@ class WriteToRedis extends ConfigurableStop[DataFrame] {
     println(v)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     redis_host = MapUtil.get(map, key = "redis_host").asInstanceOf[String]

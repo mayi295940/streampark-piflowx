@@ -21,7 +21,7 @@ import cn.piflow.{Condition, GroupImpl}
 import cn.piflow.conf.util.MapUtil
 
 /** Created by xjzhu@cnic.cn on 4/25/19 */
-class GroupBean[DataType] extends GroupEntryBean {
+class GroupBean[StreamingContext, DataType, DStream] extends GroupEntryBean {
 
   var uuid: String = _
   var name: String = _
@@ -65,17 +65,17 @@ class GroupBean[DataType] extends GroupEntryBean {
 
   }
 
-  def constructGroup(): GroupImpl[DataType] = {
-    val group = new GroupImpl[DataType]();
+  def constructGroup(): GroupImpl[StreamingContext, DataType, DStream] = {
+    val group = new GroupImpl[StreamingContext, DataType, DStream]();
     group.setGroupName(name)
 
     this.groupEntries.foreach(groupEntryBean => {
       if (!conditions.contains(groupEntryBean.name)) {
-        if (groupEntryBean.isInstanceOf[FlowBean[DataType]]) {
-          val bean = groupEntryBean.asInstanceOf[FlowBean[DataType]]
+        if (groupEntryBean.isInstanceOf[FlowBean[StreamingContext, DataType, DStream]]) {
+          val bean = groupEntryBean.asInstanceOf[FlowBean[StreamingContext, DataType, DStream]]
           group.addGroupEntry(groupEntryBean.name, bean.constructFlow())
         } else {
-          val groupBean = groupEntryBean.asInstanceOf[GroupBean[DataType]]
+          val groupBean = groupEntryBean.asInstanceOf[GroupBean[StreamingContext, DataType, DStream]]
           group.addGroupEntry(groupBean.name, groupBean.constructGroup())
         }
 
@@ -87,25 +87,25 @@ class GroupBean[DataType] extends GroupEntryBean {
           println(
             groupEntryBean.name + " do not have after flow " + "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 
-          if (groupEntryBean.isInstanceOf[FlowBean[DataType]]) {
-            val bean = groupEntryBean.asInstanceOf[FlowBean[DataType]]
+          if (groupEntryBean.isInstanceOf[FlowBean[StreamingContext, DataType, DStream]]) {
+            val bean = groupEntryBean.asInstanceOf[FlowBean[StreamingContext, DataType, DStream]]
             group.addGroupEntry(groupEntryBean.name, bean.constructFlow())
           } else {
-            val groupBean = groupEntryBean.asInstanceOf[GroupBean[DataType]]
+            val groupBean = groupEntryBean.asInstanceOf[GroupBean[StreamingContext, DataType, DStream]]
             group.addGroupEntry(groupBean.name, groupBean.constructGroup())
           }
         } else if (conditionBean.after.size == 1) {
           println(
             groupEntryBean.name + " after " + conditionBean.after.head + "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 
-          if (groupEntryBean.isInstanceOf[FlowBean[DataType]]) {
-            val bean = groupEntryBean.asInstanceOf[FlowBean[DataType]]
+          if (groupEntryBean.isInstanceOf[FlowBean[StreamingContext, DataType, DStream]]) {
+            val bean = groupEntryBean.asInstanceOf[FlowBean[StreamingContext, DataType, DStream]]
             group.addGroupEntry(
               groupEntryBean.name,
               bean.constructFlow(),
               Condition.after(conditionBean.after.head))
           } else {
-            val groupBean = groupEntryBean.asInstanceOf[GroupBean[DataType]]
+            val groupBean = groupEntryBean.asInstanceOf[GroupBean[StreamingContext, DataType, DStream]]
             group.addGroupEntry(
               groupBean.name,
               groupBean.constructGroup(),
@@ -119,14 +119,14 @@ class GroupBean[DataType] extends GroupEntryBean {
           var other = new Array[String](conditionBean.after.size - 1)
           conditionBean.after.copyToArray(other, 1)
 
-          if (groupEntryBean.isInstanceOf[FlowBean[DataType]]) {
-            val bean = groupEntryBean.asInstanceOf[FlowBean[DataType]]
+          if (groupEntryBean.isInstanceOf[FlowBean[StreamingContext, DataType, DStream]]) {
+            val bean = groupEntryBean.asInstanceOf[FlowBean[StreamingContext, DataType, DStream]]
             group.addGroupEntry(
               groupEntryBean.name,
               bean.constructFlow(),
               Condition.after(conditionBean.after.head, other: _*))
           } else {
-            val groupBean = groupEntryBean.asInstanceOf[GroupBean[DataType]]
+            val groupBean = groupEntryBean.asInstanceOf[GroupBean[StreamingContext, DataType, DStream]]
             group.addGroupEntry(
               groupBean.name,
               groupBean.constructGroup(),
@@ -143,9 +143,9 @@ class GroupBean[DataType] extends GroupEntryBean {
 }
 
 object GroupBean {
-  def apply[DataType](map: Map[String, Any]): GroupBean[DataType] = {
+  def apply[StreamingContext, DataType, DStream](map: Map[String, Any]): GroupBean[StreamingContext, DataType, DStream] = {
 
-    val groupBean = new GroupBean[DataType]()
+    val groupBean = new GroupBean[StreamingContext, DataType, DStream]()
     groupBean.init(map)
     groupBean
   }

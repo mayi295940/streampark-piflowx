@@ -23,7 +23,7 @@ import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class TidbRead extends ConfigurableStop[DataFrame] {
+class TidbRead extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "llei@cnic.com"
   override val description: String = "Read data from tidb"
@@ -37,9 +37,9 @@ class TidbRead extends ConfigurableStop[DataFrame] {
   var sql: String = _
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
 
@@ -125,7 +125,7 @@ class TidbRead extends ConfigurableStop[DataFrame] {
     List(StopGroup.JdbcGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 

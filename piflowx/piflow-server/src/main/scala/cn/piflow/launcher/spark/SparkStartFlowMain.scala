@@ -21,6 +21,8 @@ import cn.piflow.Runner
 import cn.piflow.conf.bean.FlowBean
 import cn.piflow.util.{ConfigureUtil, FlowFileUtil, JsonUtil, PropertyUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.streaming.StreamingContext
+import org.apache.spark.streaming.dstream.DStream
 
 import java.io.File
 
@@ -44,7 +46,7 @@ object SparkStartFlowMain {
     println(map)
 
     // create flow
-    val flowBean = FlowBean[DataFrame](map)
+    val flowBean = FlowBean[StreamingContext, DataFrame, DStream[_]](map)
     val flow = flowBean.constructFlow(false)
 
     // execute flow
@@ -56,18 +58,19 @@ object SparkStartFlowMain {
     }
 
     val spark = sparkSessionBuilder.getOrCreate()
-    println(
-      "hive.metastore.uris=" + spark.sparkContext.getConf.get("hive.metastore.uris") + "!!!!!!!")
+    val applicationId = spark.sparkContext.applicationId
+
+    println("hive.metastore.uris=" + spark.sparkContext.getConf.get("hive.metastore.uris") + "!!!!!!!")
 
     val process = Runner
-      .create[DataFrame]()
+      .create[StreamingContext, DataFrame, DStream[_]]()
       .bind(classOf[SparkSession].getName, spark)
       .bind("checkpoint.path", ConfigureUtil.getCheckpointPath())
       .bind("debug.path", ConfigureUtil.getDebugPath())
       .bind("environmentVariable", flowBean.environmentVariable)
+      .bind("applicationId", applicationId)
       .start(flow)
 
-    val applicationId = spark.sparkContext.applicationId
     process.awaitTermination()
     spark.close()
 

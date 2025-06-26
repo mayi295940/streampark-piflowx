@@ -17,14 +17,16 @@
 
 package cn.piflow.bundle.spark.jdbc
 
-import cn.piflow.{Constants, JobContext, JobInputStream, JobOutputStream, ProcessContext}
+import cn.piflow._
 import cn.piflow.conf.{ConfigurableIncrementalStop, Language, Port, StopGroup}
 import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.streaming.StreamingContext
+import org.apache.spark.streaming.dstream.DStream
 
 /** Created by xjzhu@cnic.cn on 7/15/19 */
-class MysqlReadIncremental extends ConfigurableIncrementalStop[DataFrame] {
+class MysqlReadIncremental extends ConfigurableIncrementalStop[StreamingContext, DataFrame, DStream[_]] {
 
   override var incrementalField: String = _
   override var incrementalStart: String = _
@@ -39,9 +41,9 @@ class MysqlReadIncremental extends ConfigurableIncrementalStop[DataFrame] {
   var sql: String = _
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[StreamingContext, DataFrame, DStream[_]],
+      out: JobOutputStream[StreamingContext, DataFrame, DStream[_]],
+      pec: JobContext[StreamingContext, DataFrame, DStream[_]]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val dbtable = "( " + sql + ") AS Temp"
@@ -136,7 +138,7 @@ class MysqlReadIncremental extends ConfigurableIncrementalStop[DataFrame] {
     List(StopGroup.JdbcGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[StreamingContext, DataFrame, DStream[_]]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 

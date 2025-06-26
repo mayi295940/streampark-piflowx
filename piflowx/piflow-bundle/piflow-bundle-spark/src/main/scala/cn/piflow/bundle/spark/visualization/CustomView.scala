@@ -17,14 +17,14 @@
 
 package cn.piflow.bundle.spark.visualization
 
-import cn.piflow.{Constants, JobContext, JobInputStream, JobOutputStream, ProcessContext}
+import cn.piflow._
 import cn.piflow.conf.{ConfigurableVisualizationStop, Port, StopGroup}
 import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.ImageUtil
 import cn.piflow.util.PropertyUtil
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class CustomView extends ConfigurableVisualizationStop[DataFrame] {
+class CustomView extends ConfigurableVisualizationStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "xjzhu@cnic.cn"
   override val description: String = "Save the custom view data as a csv file."
@@ -48,12 +48,12 @@ class CustomView extends ConfigurableVisualizationStop[DataFrame] {
     List(StopGroup.Visualization)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
 
@@ -75,7 +75,7 @@ class CustomView extends ConfigurableVisualizationStop[DataFrame] {
     this.stopName = stopName
   }
 
-  override def getVisualizationPath(processId: String): String = {
+  override def getVisualizationPath(): String = {
     visualizationPath = processId + Constants.SINGLE_SLASH + stopName
     visualizationPath
   }

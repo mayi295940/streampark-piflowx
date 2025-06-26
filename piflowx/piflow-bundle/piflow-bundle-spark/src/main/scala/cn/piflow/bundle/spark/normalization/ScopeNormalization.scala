@@ -24,7 +24,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions._
 
-class ScopeNormalization extends ConfigurableStop[DataFrame] {
+class ScopeNormalization extends ConfigurableStop[Null, DataFrame, Null] {
 
   // 组件的作者信息
   val authorEmail: String = "zljxnu@163.com"
@@ -44,9 +44,9 @@ class ScopeNormalization extends ConfigurableStop[DataFrame] {
 
   // 实际的数据处理逻辑
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     // 获取SparkSession
     val spark = pec.get[SparkSession]()
@@ -62,7 +62,7 @@ class ScopeNormalization extends ConfigurableStop[DataFrame] {
   }
 
   // 初始化方法
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   // 设置组件属性
   def setProperties(map: Map[String, Any]): Unit = {

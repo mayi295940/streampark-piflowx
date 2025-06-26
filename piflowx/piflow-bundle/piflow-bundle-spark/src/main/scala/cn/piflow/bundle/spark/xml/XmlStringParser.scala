@@ -31,7 +31,7 @@ import java.util
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
-class XmlStringParser extends ConfigurableStop[DataFrame] {
+class XmlStringParser extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "yangqidong@cnic.cn"
   val inportList: List[String] = List(Port.DefaultPort)
@@ -43,9 +43,9 @@ class XmlStringParser extends ConfigurableStop[DataFrame] {
   var schema: String = _
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
 
@@ -143,7 +143,7 @@ class XmlStringParser extends ConfigurableStop[DataFrame] {
     List(StopGroup.XmlGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 

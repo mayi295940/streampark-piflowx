@@ -24,7 +24,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class ExecuteSQLStop extends ConfigurableStop[DataFrame] {
+class ExecuteSQLStop extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "ygang@cnic.cn"
   val description: String = "Create temporary view table to execute sql"
@@ -35,9 +35,9 @@ class ExecuteSQLStop extends ConfigurableStop[DataFrame] {
   var ViewName: String = _
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
 
@@ -60,7 +60,7 @@ class ExecuteSQLStop extends ConfigurableStop[DataFrame] {
     ViewName = MapUtil.get(map, "viewName", "").asInstanceOf[String]
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getPropertyDescriptor(): List[PropertyDescriptor] = {
     var descriptor: List[PropertyDescriptor] = List()

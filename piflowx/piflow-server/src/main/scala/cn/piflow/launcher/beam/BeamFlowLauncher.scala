@@ -29,7 +29,7 @@ import java.util.Date
 
 object BeamFlowLauncher {
 
-  def launch[PCollection[Row]](flow: Flow[PCollection[Row]], isDebug: Boolean = false): String = {
+  def launch[PCollection[Row]](flow: Flow[Null, PCollection[Row], Null], isDebug: Boolean = false): String = {
 
     val flowJson = flow.getFlowJson
     println("FlowLauncher json:" + flowJson)
@@ -60,8 +60,8 @@ object BeamFlowLauncher {
 
     // update db
     println("Update flow state after Stop Flow !!!!!!!!!!!!!!!!!!!!!!!!!!")
-    H2Util.updateFlowState(appID, FlowState.KILLED)
-    H2Util.updateFlowFinishedTime(appID, new Date().toString)
+    DataBaseUtil.updateFlowState(appID, FlowState.KILLED)
+    DataBaseUtil.updateFlowFinishedTime(appID, new Date().toString)
 
     "ok"
   }

@@ -34,7 +34,7 @@ import java.time.temporal.ChronoUnit
 import scala.collection.mutable
 import scala.util.Random
 
-class MockData extends ConfigurableStop[DataFrame] {
+class MockData extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "xjzhu@cnic.cn"
   override val description: String = "Mock dataframe."
@@ -82,12 +82,12 @@ class MockData extends ConfigurableStop[DataFrame] {
     List(StopGroup.CommonGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     import spark.implicits._

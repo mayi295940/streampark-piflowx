@@ -25,7 +25,7 @@ import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 
 import java.util.Properties
 
-class TbaseWrite extends ConfigurableStop[DataFrame] {
+class TbaseWrite extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "bbbbbbyz1110@163.com"
   val description: String = "Write data into Tbase database with jdbc"
@@ -39,9 +39,9 @@ class TbaseWrite extends ConfigurableStop[DataFrame] {
   var saveMode: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val jdbcDF = in.read()
@@ -56,7 +56,7 @@ class TbaseWrite extends ConfigurableStop[DataFrame] {
     out.write(jdbcDF)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def setProperties(map: Map[String, Any]): Unit = {
     url = MapUtil.get(map, "url").asInstanceOf[String]

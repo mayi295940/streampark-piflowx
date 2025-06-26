@@ -25,7 +25,7 @@ import org.apache.spark.sql.{DataFrame, SaveMode}
 
 import scala.beans.BeanProperty
 
-class JsonSave extends ConfigurableStop[DataFrame] {
+class JsonSave extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "xjzhu@cnic.cn"
   val description: String = "Save data into json file"
@@ -35,15 +35,15 @@ class JsonSave extends ConfigurableStop[DataFrame] {
   var jsonSavePath: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val jsonDF = in.read()
     jsonDF.write.format("json").mode(SaveMode.Overwrite).save(jsonSavePath)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def setProperties(map: Map[String, Any]): Unit = {
     jsonSavePath = MapUtil.get(map, "jsonSavePath").asInstanceOf[String]

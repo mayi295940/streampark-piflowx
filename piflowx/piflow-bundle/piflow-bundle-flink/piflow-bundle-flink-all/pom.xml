@@ -87,6 +87,11 @@
             <artifactId>piflow-bundle-flink-es7</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.streampark</groupId>
+            <artifactId>piflow-bundle-flink-visualization</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
     </dependencies>
 

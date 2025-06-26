@@ -24,7 +24,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.graphx.{GraphLoader, PartitionStrategy}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class LoadGraph extends ConfigurableStop[DataFrame] {
+class LoadGraph extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "06whuxx@163.com"
   val description: String = "Load data and construct a graphx"
@@ -36,9 +36,9 @@ class LoadGraph extends ConfigurableStop[DataFrame] {
   var dataPath: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val sc = spark.sparkContext
@@ -53,7 +53,7 @@ class LoadGraph extends ConfigurableStop[DataFrame] {
 
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     dataPath = MapUtil.get(map, "dataPath").asInstanceOf[String]

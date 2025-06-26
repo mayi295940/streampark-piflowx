@@ -26,7 +26,7 @@ import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.fs.Path
 import org.apache.spark.sql.DataFrame
 
-class DeleteHdfs extends ConfigurableStop[DataFrame] {
+class DeleteHdfs extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "ygang@cnic.com"
   override val inportList: List[String] = List(Port.DefaultPort)
@@ -38,9 +38,9 @@ class DeleteHdfs extends ConfigurableStop[DataFrame] {
   var isCustomize: String = _
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     if (isCustomize.equals("false")) {
       val inDf = in.read()
@@ -127,7 +127,7 @@ class DeleteHdfs extends ConfigurableStop[DataFrame] {
     List(StopGroup.HdfsGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 

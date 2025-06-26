@@ -23,7 +23,7 @@ import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.ImageUtil
 import org.apache.flink.table.api.Table
 
-class MinusAll extends ConfigurableStop[Table] {
+class MinusAll extends ConfigurableStop[Null, Table, Null] {
 
   override val authorEmail: String = ""
   override val description: String = "MinusAll 返回右表中不存在的记录。" +
@@ -49,12 +49,12 @@ class MinusAll extends ConfigurableStop[Table] {
     List(StopGroup.CommonGroup)
   }
 
-  override def initialize(ctx: ProcessContext[Table]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   override def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     val leftTable: Table = in.read(Port.LeftPort)
     val rightTable: Table = in.read(Port.RightPort)

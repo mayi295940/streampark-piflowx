@@ -23,7 +23,7 @@ import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.DataFrame
 
-class Distinct extends ConfigurableStop[DataFrame] {
+class Distinct extends ConfigurableStop[Null, DataFrame, Null] {
   override val authorEmail: String = "yangqidong@cnic.cn"
   override val description: String =
     "Duplicate based on the specified column name or all column names"
@@ -60,12 +60,12 @@ class Distinct extends ConfigurableStop[DataFrame] {
     List(StopGroup.CommonGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val inDf: DataFrame = in.read()
     var outDf: DataFrame = null

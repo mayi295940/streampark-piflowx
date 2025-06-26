@@ -28,7 +28,7 @@ import java.util.Date
 
 import scala.util.control.Breaks.{break, breakable}
 
-object H2Util {
+object DataBaseUtil {
 
   private val QUERY_TIME = 300
 
@@ -61,15 +61,14 @@ object H2Util {
   private val CREATE_PLUGIN_TABLE = "create table if not exists plugin (id varchar(255), " +
     "name varchar(255), state varchar(255), createTime varchar(255), updateTime varchar(255))"
 
-  private val serverIP = ServerIpUtil.getServerIp() + ":" + PropertyUtil.getPropertyValue("h2.port")
-  private val CONNECTION_URL = "jdbc:h2:tcp://" + serverIP + "/~/piflow;AUTO_SERVER=true"
+  private val dbType = PropertyUtil.getPropertyValue("server.db.type")
+
   private var connection: Connection = _
 
   try {
-
     val statement = getConnectionInstance().createStatement()
     statement.setQueryTimeout(QUERY_TIME)
-    // statement.executeUpdate(CREATE_PROJECT_TABLE)
+    statement.executeUpdate(CREATE_PROJECT_TABLE)
     statement.executeUpdate(CREATE_GROUP_TABLE)
     statement.executeUpdate(CREATE_FLOW_TABLE)
     statement.executeUpdate(CREATE_STOP_TABLE)
@@ -82,23 +81,35 @@ object H2Util {
     case ex: Throwable => println(ex)
   }
 
-  def getConnectionInstance(): Connection = {
+  private def getConnectionInstance(): Connection = {
     if (connection == null) {
-      Class.forName("org.h2.Driver")
-      println(CONNECTION_URL)
-      connection = DriverManager.getConnection(CONNECTION_URL)
+      dbType match {
+        case "mysql" =>
+          Class.forName(PropertyUtil.getPropertyValue("server.db.driver"))
+          connection = DriverManager.getConnection(
+            PropertyUtil.getPropertyValue("server.db.url"),
+            PropertyUtil.getPropertyValue("server.db.username"),
+            PropertyUtil.getPropertyValue("server.db.password"))
+        case "h2" =>
+          val serverIP = ServerIpUtil.getServerIp() + ":" + PropertyUtil.getPropertyValue("server.db.port")
+          val CONNECTION_URL = "jdbc:h2:tcp://" + serverIP + "/~/piflow;AUTO_SERVER=true"
+          Class.forName(PropertyUtil.getPropertyValue("server.db.driver"))
+          println(CONNECTION_URL)
+          connection = DriverManager.getConnection(CONNECTION_URL)
+        case _ => throw new Exception("Database type is not supported")
+      }
     }
     connection
   }
 
   def cleanDatabase(): Unit = {
 
-    val h2Server = Server
+    val server = Server
       .createTcpServer(
         "-tcp",
         "-tcpAllowOthers",
         "-tcpPort",
-        PropertyUtil.getPropertyValue("h2.port"))
+        PropertyUtil.getPropertyValue("server.db.port"))
       .start()
 
     try {
@@ -115,12 +126,12 @@ object H2Util {
     } catch {
       case ex: Throwable => println(ex)
     } finally {
-      h2Server.shutdown()
+      server.shutdown()
     }
   }
 
   /*def updateToVersion6() = {
-    val h2Server = Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort",PropertyUtil.getPropertyValue("h2.port")).start()
+    val h2Server = Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort",PropertyUtil.getPropertyValue("server.db.port")).start()
     try{
 
       val ALTER_COLUMN = "alter table flowgroup add flowCount Int;"
@@ -139,12 +150,10 @@ object H2Util {
     }
   }*/
 
-  def addFlow(appId: String, pId: String, name: String): Unit = {
+  def addFlow(appId: String, pId: String, name: String, jobId: String): Unit = {
     val statement = getConnectionInstance().createStatement()
     statement.setQueryTimeout(QUERY_TIME)
-    statement.executeUpdate(
-      "insert into flow(id, pid, name) values('" +
-        appId + "','" + pId + "','" + name + "')")
+    statement.executeUpdate("insert into flow(id, pid, name, job_id) values('" + appId + "','" + pId + "','" + name + "','" + jobId + "')")
     statement.close()
   }
 
@@ -224,7 +233,6 @@ object H2Util {
     val rs: ResultSet = statement.executeQuery("select * from flow where id='" + appId + "'")
     while (rs.next()) {
       state = rs.getString("state")
-      // println("id:" + rs.getString("id") + "\tname:" + rs.getString("name") + "\tstate:" + rs.getString("state"))
     }
     rs.close()
     statement.close()
@@ -1181,7 +1189,7 @@ object H2Util {
     }catch {
       case ex => println(ex)
     }*/
-    val needStopSchedule = H2Util.getNeedStopSchedule()
+    val needStopSchedule = DataBaseUtil.getNeedStopSchedule()
     if (args.size != 1) {
       println("Error args!!! Please enter Clean or UpdateToVersion6")
     }

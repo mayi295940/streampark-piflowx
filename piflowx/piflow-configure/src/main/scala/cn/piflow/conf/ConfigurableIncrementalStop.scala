@@ -17,13 +17,13 @@
 
 package cn.piflow.conf
 
-import cn.piflow.{Constants, IncrementalStop, JobContext}
-import cn.piflow.util.{ConfigureUtil, HdfsUtil, PropertyUtil}
+import cn.piflow.{Constants, IncrementalStop}
+import cn.piflow.util.{ConfigureUtil, HdfsUtil}
 
 /** Created by xjzhu@cnic.cn on 7/15/19 */
-abstract class ConfigurableIncrementalStop[DataType]
-  extends ConfigurableStop[DataType]
-  with IncrementalStop[DataType] {
+abstract class ConfigurableIncrementalStop[StreamingContext, DataType, DStream]
+  extends ConfigurableStop[StreamingContext, DataType, DStream]
+  with IncrementalStop[StreamingContext, DataType, DStream] {
 
   override var incrementalPath: String = _
 

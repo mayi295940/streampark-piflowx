@@ -17,15 +17,13 @@
 
 package cn.piflow.bundle.spark.common
 
-import cn.piflow.{Constants, JobContext, JobInputStream, JobOutputStream, ProcessContext}
+import cn.piflow._
 import cn.piflow.conf.{ConfigurableStop, Port, StopGroup}
 import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.ImageUtil
-import org.apache.spark.api.java.JavaRDD
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.apache.spark.sql.types.StructType
+import org.apache.spark.sql.DataFrame
 
-class Subtract extends ConfigurableStop[DataFrame] {
+class Subtract extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "yangqidong@cnic.cn"
   override val description: String =
@@ -49,12 +47,12 @@ class Subtract extends ConfigurableStop[DataFrame] {
     List(StopGroup.CommonGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val leftDF = in.read(Port.LeftPort)
     val rightDF = in.read(Port.RightPort)

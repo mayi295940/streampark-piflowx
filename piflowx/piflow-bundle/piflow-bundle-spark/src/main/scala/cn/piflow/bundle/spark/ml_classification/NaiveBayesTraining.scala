@@ -24,7 +24,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.ml.classification.NaiveBayes
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class NaiveBayesTraining extends ConfigurableStop[DataFrame] {
+class NaiveBayesTraining extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "06whuxx@163.com"
   val description: String = "Train a NaiveBayes model"
@@ -35,9 +35,9 @@ class NaiveBayesTraining extends ConfigurableStop[DataFrame] {
   var model_save_path: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
 
@@ -63,7 +63,7 @@ class NaiveBayesTraining extends ConfigurableStop[DataFrame] {
 
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     training_data_path = MapUtil.get(map, key = "training_data_path").asInstanceOf[String]

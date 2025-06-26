@@ -24,7 +24,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.flink.table.api.{ApiExpression, Table}
 import org.apache.flink.table.api.Expressions.$
 
-class DropField extends ConfigurableStop[Table] {
+class DropField extends ConfigurableStop[Null, Table, Null] {
 
   val authorEmail: String = ""
   val description: String = "Delete one or more columns"
@@ -34,9 +34,9 @@ class DropField extends ConfigurableStop[Table] {
   var columnNames: String = _
 
   def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     val inputTable = in.read()
 
@@ -54,7 +54,7 @@ class DropField extends ConfigurableStop[Table] {
 
   }
 
-  def initialize(ctx: ProcessContext[Table]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     columnNames = MapUtil.get(map, "columnNames").asInstanceOf[String]

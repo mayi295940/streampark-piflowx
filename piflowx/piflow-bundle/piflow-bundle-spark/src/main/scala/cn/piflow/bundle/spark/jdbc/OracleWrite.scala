@@ -25,7 +25,7 @@ import org.apache.spark.sql._
 
 import java.sql.{Connection, DriverManager, Statement}
 
-class OracleWrite extends ConfigurableStop[DataFrame] {
+class OracleWrite extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "yangqidong@cnic.cn"
   val description: String = "Write data to oracle"
@@ -38,9 +38,9 @@ class OracleWrite extends ConfigurableStop[DataFrame] {
   var table: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val session = pec.get[SparkSession]()
     val inDF: DataFrame = in.read()
@@ -75,7 +75,7 @@ class OracleWrite extends ConfigurableStop[DataFrame] {
       })
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def setProperties(map: Map[String, Any]): Unit = {
     url = MapUtil.get(map, "url").asInstanceOf[String]

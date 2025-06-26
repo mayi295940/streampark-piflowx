@@ -36,7 +36,7 @@ import java.util
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
 
-class GetFromSolr extends ConfigurableStop[DataFrame] {
+class GetFromSolr extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "yangqidong@cnic.cn"
   override val description: String = "Read data from solr"
@@ -72,9 +72,9 @@ class GetFromSolr extends ConfigurableStop[DataFrame] {
   }
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     var url = solrURL + Constants.SINGLE_SLASH + SolrCollection
     ss = pec.get[SparkSession]()
@@ -155,7 +155,7 @@ class GetFromSolr extends ConfigurableStop[DataFrame] {
     List(StopGroup.SolrGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getPropertyDescriptor(): List[PropertyDescriptor] = {
     var descriptor: List[PropertyDescriptor] = List()

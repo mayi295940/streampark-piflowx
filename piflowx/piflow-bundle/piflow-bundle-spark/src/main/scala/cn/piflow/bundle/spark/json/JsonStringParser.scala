@@ -23,7 +23,7 @@ import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class JsonStringParser extends ConfigurableStop[DataFrame] {
+class JsonStringParser extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "xjzhu@cnic.cn"
   val description: String = "Parse json string"
@@ -33,9 +33,9 @@ class JsonStringParser extends ConfigurableStop[DataFrame] {
   var jsonString: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val jsonRDD = spark.sparkContext.makeRDD(jsonString :: Nil)
@@ -43,7 +43,7 @@ class JsonStringParser extends ConfigurableStop[DataFrame] {
     out.write(jsonDF)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def setProperties(map: Map[String, Any]): Unit = {
     jsonString = MapUtil.get(map, "jsonString").asInstanceOf[String]

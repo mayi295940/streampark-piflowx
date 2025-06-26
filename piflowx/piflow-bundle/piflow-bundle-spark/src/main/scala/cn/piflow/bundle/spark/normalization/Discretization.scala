@@ -27,7 +27,7 @@ import org.apache.spark.ml.feature.QuantileDiscretizer
 import org.apache.spark.ml.feature.VectorAssembler
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class Discretization extends ConfigurableStop[DataFrame] {
+class Discretization extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "zljxnu@163.com"
   val description: String = "continuous numerical discretization"
@@ -41,9 +41,9 @@ class Discretization extends ConfigurableStop[DataFrame] {
   var k: Int = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val df = in.read()
@@ -137,7 +137,7 @@ class Discretization extends ConfigurableStop[DataFrame] {
     clusteredDF.drop("features")
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     inputCol = MapUtil.get(map, "inputCol").asInstanceOf[String]

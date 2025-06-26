@@ -24,7 +24,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.flink.table.api.Table
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
 
-class ShowData extends ConfigurableStop[Table] {
+class ShowData extends ConfigurableStop[Null, Table, Null] {
 
   val authorEmail: String = ""
   val description: String = "Show Data"
@@ -35,14 +35,21 @@ class ShowData extends ConfigurableStop[Table] {
   private var changeLog: Boolean = _
 
   def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     val tableEnv = pec.get[StreamTableEnvironment]()
 
     val inputTable: Table = in.read()
+
+    if (inputTable == null) {
+      throw new RuntimeException("Input table is null")
+    }
+
     val resultTable = inputTable.limit(showNumber)
+
+    println("Result table schema: " + resultTable.getSchema)
 
     if (!changeLog) {
       tableEnv.toDataStream(resultTable).print()
@@ -53,7 +60,7 @@ class ShowData extends ConfigurableStop[Table] {
     out.write(inputTable)
   }
 
-  def initialize(ctx: ProcessContext[Table]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   // set customized properties of your Stop
   def setProperties(map: Map[String, Any]): Unit = {

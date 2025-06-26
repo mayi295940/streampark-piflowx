@@ -17,7 +17,7 @@
 
 package cn.piflow.bundle.spark.solr
 
-import cn.piflow.{Constants, JobContext, JobInputStream, JobOutputStream, ProcessContext}
+import cn.piflow._
 import cn.piflow.conf.{ConfigurableStop, Port, StopGroup}
 import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
@@ -27,7 +27,7 @@ import org.apache.solr.common.SolrInputDocument
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types.StructField
 
-class PutIntoSolr extends ConfigurableStop[DataFrame] {
+class PutIntoSolr extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "yangqidong@cnic.cn"
   override val description: String = "Write data to solr"
@@ -46,9 +46,9 @@ class PutIntoSolr extends ConfigurableStop[DataFrame] {
   var doc: SolrInputDocument = _
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val df: DataFrame = in.read()
 
@@ -68,7 +68,7 @@ class PutIntoSolr extends ConfigurableStop[DataFrame] {
       })
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getIcon(): Array[Byte] = {
     ImageUtil.getImage("icon/solr/PutSolr.png")

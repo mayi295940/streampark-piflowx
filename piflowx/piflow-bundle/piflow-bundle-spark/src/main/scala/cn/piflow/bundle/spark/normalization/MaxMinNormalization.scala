@@ -23,7 +23,7 @@ import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class MaxMinNormalization extends ConfigurableStop[DataFrame] {
+class MaxMinNormalization extends ConfigurableStop[Null, DataFrame, Null] {
 
   // 作者信息
   val authorEmail: String = "zljxnu@163.com"
@@ -41,13 +41,13 @@ class MaxMinNormalization extends ConfigurableStop[DataFrame] {
   var outputCol: String = _
 
   // 初始化方法
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   // 执行方法
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     // 获取 SparkSession
     val spark = pec.get[SparkSession]()

@@ -28,7 +28,7 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
 
 import scala.collection.mutable.{Map => MMap}
 
-class DataGen extends ConfigurableStop[Table] {
+class DataGen extends ConfigurableStop[Null, Table, Null] {
 
   override val authorEmail: String = ""
   override val description: String = "按数据生成规则进行读取。"
@@ -109,12 +109,12 @@ class DataGen extends ConfigurableStop[Table] {
     List(StopGroup.CommonGroup)
   }
 
-  override def initialize(ctx: ProcessContext[Table]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   override def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     val tableEnv = pec.get[StreamTableEnvironment]()
 

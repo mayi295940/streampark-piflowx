@@ -35,7 +35,7 @@ object BaseTest {
     println(map)
 
     // create flow
-    val flowBean = FlowBean.apply[PCollection[Row]](map)
+    val flowBean = FlowBean.apply[Null, PCollection[Row], Null](map)
     val flow = flowBean.constructFlow()
     println(flow)
 
@@ -47,7 +47,7 @@ object BaseTest {
     println("pipeline is " + pipeline + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
     val process = Runner
-      .create[PCollection[Row]]()
+      .create[Null, PCollection[Row], Null]()
       .bind(classOf[Pipeline].getName, pipeline)
       // .bind("checkpoint.path", ConfigureUtil.getCheckpointPath())
       // .bind("debug.path", ConfigureUtil.getDebugPath())

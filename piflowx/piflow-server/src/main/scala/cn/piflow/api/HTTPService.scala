@@ -110,7 +110,7 @@ object HTTPService extends DefaultJsonProtocol with Directives with SprayJsonSup
           } else {
             val newFlowState = StateUtil.getNewFlowState(flowState, flowYarnState)
             if (newFlowState != flowState) {
-              H2Util.updateFlowState(appID, newFlowState)
+              DataBaseUtil.updateFlowState(appID, newFlowState)
             }
             result = API.getFlowInfo(appID)
             Future.successful(HttpResponse(SUCCESS_CODE, entity = result))
@@ -471,7 +471,7 @@ object HTTPService extends DefaultJsonProtocol with Directives with SprayJsonSup
             }
             actorMap += (id -> flowActor)
 
-            H2Util.addScheduleInstance(
+            DataBaseUtil.addScheduleInstance(
               id,
               expression,
               startDateStr,
@@ -503,7 +503,7 @@ object HTTPService extends DefaultJsonProtocol with Directives with SprayJsonSup
           case Some(actorRef) =>
             system.stop(actorRef)
             processMap.-(scheduleId)
-            H2Util.updateScheduleInstanceStatus(scheduleId, ScheduleState.STOPED)
+            DataBaseUtil.updateScheduleInstanceStatus(scheduleId, ScheduleState.STOPED)
             Future.successful(HttpResponse(SUCCESS_CODE, entity = "Stop schedule ok!"))
           case ex => {
             println(ex)
@@ -571,7 +571,7 @@ object HTTPService extends DefaultJsonProtocol with Directives with SprayJsonSup
         case HttpEntity.Strict(_, data) => {
           val data = toJson(entity)
           val pluginId = data.getOrElse("pluginId", "").asInstanceOf[String]
-          val pluginName = H2Util.getPluginInfoMap(pluginId).getOrElse("name", "")
+          val pluginName = DataBaseUtil.getPluginInfoMap(pluginId).getOrElse("name", "")
           val stopsInfo = API.getConfigurableStopInfoInPlugin(pluginManager, pluginName)
 
           val isOk = API.removePlugin(pluginManager, pluginId)
@@ -744,7 +744,7 @@ object HTTPService extends DefaultJsonProtocol with Directives with SprayJsonSup
 
     override def run(): Unit = {
       while (true) {
-        val needStopSchedule = H2Util.getNeedStopSchedule()
+        val needStopSchedule = DataBaseUtil.getNeedStopSchedule()
         needStopSchedule.foreach {
           scheduleId =>
             {
@@ -756,7 +756,7 @@ object HTTPService extends DefaultJsonProtocol with Directives with SprayJsonSup
                   println(ex)
                 }
               }
-              H2Util.updateScheduleInstanceStatus(scheduleId, ScheduleState.STOPED)
+              DataBaseUtil.updateScheduleInstanceStatus(scheduleId, ScheduleState.STOPED)
             }
         }
         Thread.sleep(10000)
@@ -766,7 +766,7 @@ object HTTPService extends DefaultJsonProtocol with Directives with SprayJsonSup
 
   private def initSchedule(): Unit = {
 
-    val scheduleList = H2Util.getStartedSchedule()
+    val scheduleList = DataBaseUtil.getStartedSchedule()
     scheduleList.foreach(id => {
       val scheduleContent = FlowFileUtil.readFlowFile(FlowFileUtil.getScheduleFilePath(id))
       val dataMap = JsonUtil.jsonToMap(scheduleContent)
@@ -805,15 +805,25 @@ object HTTPService extends DefaultJsonProtocol with Directives with SprayJsonSup
 
 object Main {
 
-  private def flywayInit() = {
+  val dbType = PropertyUtil.getPropertyValue("server.db.type")
 
-    val ip = InetAddress.getLocalHost.getHostAddress
-    // Create the Flyway instance
+  private def flywayInit() = {
     val flyway: Flyway = new Flyway()
-    val url = "jdbc:h2:tcp://" + ip + Constants.COLON + PropertyUtil.getPropertyValue(
-      "h2.port") + "/~/piflow"
-    // Point it to the database
-    flyway.setDataSource(url, null, null)
+
+    dbType match {
+      case "mysql" =>
+        flyway.setDataSource(
+          PropertyUtil.getPropertyValue("server.db.url"),
+          PropertyUtil.getPropertyValue("server.db.username"),
+          PropertyUtil.getPropertyValue("server.db.password"))
+      case "h2" =>
+        val ip = InetAddress.getLocalHost.getHostAddress
+        val url = "jdbc:h2:tcp://" + ip + Constants.COLON + PropertyUtil.getPropertyValue("server.db.port") + "/~/piflow"
+        // Point it to the database
+        flyway.setDataSource(url, null, null)
+      case _ =>
+    }
+
     flyway.setLocations("db/migrations")
     flyway.setEncoding("UTF-8")
     flyway.setTable("FLYWAY_SCHEMA_HISTORY")
@@ -830,7 +840,7 @@ object Main {
 
   private def initPlugin(): Unit = {
 
-    val pluginOnList = H2Util.getPluginOn()
+    val pluginOnList = DataBaseUtil.getPluginOn()
     val classpathFile = new File(pluginManager.getPluginPath)
     val jarFile = FileUtil.getJarFile(classpathFile)
 
@@ -845,15 +855,18 @@ object Main {
   }
 
   def main(argv: Array[String]): Unit = {
-
-    val h2Server = Server
-      .createTcpServer(
-        "-tcp",
-        "-tcpAllowOthers",
-        "-ifNotExists",
-        "-tcpPort",
-        PropertyUtil.getPropertyValue("h2.port"))
-      .start()
+    dbType match {
+      case "h2" =>
+        val h2Server = Server
+          .createTcpServer(
+            "-tcp",
+            "-tcpAllowOthers",
+            "-ifNotExists",
+            "-tcpPort",
+            PropertyUtil.getPropertyValue("server.db.port"))
+          .start()
+      case _ =>
+    }
 
     flywayInit()
 

@@ -19,9 +19,11 @@ package cn.piflow.conf.util
 
 import cn.piflow.conf.bean.FlowBean
 import cn.piflow.util.{ConfigureUtil, PropertyUtil}
-import sys.process._
 
 import java.io.PrintWriter
+
+import scala.sys.process._
+
 object ScalaExecutorUtil {
 
   val userDir: String = System.getProperty("user.dir")
@@ -68,7 +70,7 @@ object ScalaExecutorUtil {
     jarFile
   }
 
-  def buildScalaExcutorJar[DataType](flowBean: FlowBean[DataType]): List[String] = {
+  def buildScalaExcutorJar[StreamingContext, DataType, DStream](flowBean: FlowBean[StreamingContext, DataType, DStream]): List[String] = {
     var scalaPluginList = List[String]()
     flowBean.stops.foreach {
       s =>

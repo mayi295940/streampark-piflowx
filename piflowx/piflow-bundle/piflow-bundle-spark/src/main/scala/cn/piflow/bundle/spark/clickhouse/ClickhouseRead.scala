@@ -23,7 +23,7 @@ import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class ClickhouseRead extends ConfigurableStop[DataFrame] {
+class ClickhouseRead extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "songdongze@cnic.cn"
   val description: String = "Read Data from Clickhouse Database with using JDBC"
@@ -37,9 +37,9 @@ class ClickhouseRead extends ConfigurableStop[DataFrame] {
   var sql: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark: SparkSession = pec.get[SparkSession]()
     val dbtable: String = "( " + sql + ") temp"
@@ -60,7 +60,7 @@ class ClickhouseRead extends ConfigurableStop[DataFrame] {
 
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def setProperties(map: Map[String, Any]): Unit = {
 

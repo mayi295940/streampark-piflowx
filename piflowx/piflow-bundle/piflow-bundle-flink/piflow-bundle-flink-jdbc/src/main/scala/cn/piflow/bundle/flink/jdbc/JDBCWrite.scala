@@ -29,7 +29,7 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.flink.table.api.{Table, TableResult}
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
 
-class JDBCWrite extends ConfigurableStop[Table] {
+class JDBCWrite extends ConfigurableStop[Null, Table, Null] {
 
   val authorEmail: String = ""
   val description: String = "使用JDBC驱动向任意类型的关系型数据库写入数据"
@@ -45,9 +45,9 @@ class JDBCWrite extends ConfigurableStop[Table] {
   private var properties: Map[String, Any] = _
 
   def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     val tableEnv = pec.get[StreamTableEnvironment]()
 
@@ -118,7 +118,7 @@ class JDBCWrite extends ConfigurableStop[Table] {
     result.mkString("")
   }
 
-  def initialize(ctx: ProcessContext[Table]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   override def setProperties(map: Map[String, Any]): Unit = {
     url = MapUtil.get(map, "url").asInstanceOf[String]

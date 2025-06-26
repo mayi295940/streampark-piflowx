@@ -25,7 +25,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import scala.beans.BeanProperty
 
-class PutHiveStreaming extends ConfigurableStop[DataFrame] {
+class PutHiveStreaming extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "xjzhu@cnic.cn"
   val description: String = "Save data to hive"
@@ -36,9 +36,9 @@ class PutHiveStreaming extends ConfigurableStop[DataFrame] {
   var table: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val inDF = in.read()
@@ -51,7 +51,7 @@ class PutHiveStreaming extends ConfigurableStop[DataFrame] {
 
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]) = {
     database = MapUtil.get(map, "database").asInstanceOf[String]

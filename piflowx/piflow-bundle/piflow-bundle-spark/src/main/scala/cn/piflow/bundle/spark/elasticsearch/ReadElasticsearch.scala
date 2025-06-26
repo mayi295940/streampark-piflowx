@@ -23,7 +23,7 @@ import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class ReadElasticsearch extends ConfigurableStop[DataFrame] {
+class ReadElasticsearch extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "ygang@cnic.cn"
   val description: String = "Query data from Elasticsearch"
@@ -36,9 +36,9 @@ class ReadElasticsearch extends ConfigurableStop[DataFrame] {
   var es_type: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
 
@@ -51,7 +51,7 @@ class ReadElasticsearch extends ConfigurableStop[DataFrame] {
     out.write(esDF)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     es_nodes = MapUtil.get(map, key = "es_nodes").asInstanceOf[String]

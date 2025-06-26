@@ -40,6 +40,7 @@
         <module>piflow-bundle-flink-doris</module>
         <module>piflow-bundle-flink-es7</module>
         <module>piflow-bundle-flink-hbase</module>
+        <module>piflow-bundle-flink-visualization</module>
         <module>piflow-bundle-flink-test</module>
     </modules>
 

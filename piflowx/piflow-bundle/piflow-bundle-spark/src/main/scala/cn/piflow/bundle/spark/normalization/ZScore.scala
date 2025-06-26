@@ -24,7 +24,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions._
 
-class ZScore extends ConfigurableStop[DataFrame] {
+class ZScore extends ConfigurableStop[Null, DataFrame, Null] {
 
   // 作者邮箱
   val authorEmail: String = "zljxnu@163.cn"
@@ -41,9 +41,9 @@ class ZScore extends ConfigurableStop[DataFrame] {
   var outputCols: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val df = in.read()
@@ -73,7 +73,7 @@ class ZScore extends ConfigurableStop[DataFrame] {
     out.write(finalDf)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     inputCols = MapUtil.get(map, key = "inputCols").asInstanceOf[String]

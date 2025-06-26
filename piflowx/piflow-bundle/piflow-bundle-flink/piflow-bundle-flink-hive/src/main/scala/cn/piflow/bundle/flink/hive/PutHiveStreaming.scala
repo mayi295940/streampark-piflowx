@@ -25,7 +25,7 @@ import org.apache.flink.table.api.Table
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
 import org.apache.flink.table.catalog.hive.HiveCatalog
 
-class PutHiveStreaming extends ConfigurableStop[Table] {
+class PutHiveStreaming extends ConfigurableStop[Null, Table, Null] {
 
   override val authorEmail: String = ""
   override val description: String = "Save data to hive"
@@ -36,9 +36,9 @@ class PutHiveStreaming extends ConfigurableStop[Table] {
   var table: String = _
 
   override def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     val tableEnv = pec.get[StreamTableEnvironment]()
 
@@ -98,7 +98,7 @@ class PutHiveStreaming extends ConfigurableStop[Table] {
     List(StopGroup.HiveGroup)
   }
 
-  override def initialize(ctx: ProcessContext[Table]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_FLINK
 

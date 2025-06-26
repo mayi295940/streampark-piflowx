@@ -37,7 +37,7 @@ object BaseTest {
     println(map)
 
     // create flow
-    val flowBean = FlowBean.apply[Table](map)
+    val flowBean = FlowBean.apply[Null, Table, Null](map)
     val flow = flowBean.constructFlow()
     println(flow)
 
@@ -77,11 +77,12 @@ object BaseTest {
     val tableEnv = StreamTableEnvironment.create(env)
 
     val process = Runner
-      .create[Table]()
+      .create[Null, Table, Null]()
       .bind(classOf[StreamExecutionEnvironment].getName, env)
       .bind(classOf[StreamTableEnvironment].getName, tableEnv)
       .bind("checkpoint.path", "")
       .bind("debug.path", "")
+      .bind("applicationId", tableEnv.getConfig.getConfiguration.getString("applicationId", System.currentTimeMillis().toString))
       .start(flow)
 
     env.execute(flow.getFlowName)
@@ -89,7 +90,7 @@ object BaseTest {
     val pid = process.pid()
     println(pid + "!!!!!!!!!!!!!!!!!!!!!")
 
-    // process.awaitTermination()
+    process.awaitTermination()
   }
 
 }

@@ -23,7 +23,7 @@ import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 
-class PutHiveMode extends ConfigurableStop[DataFrame] {
+class PutHiveMode extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "xjzhu@cnic.cn"
   val description: String = "Modes for saving data hive"
@@ -35,9 +35,9 @@ class PutHiveMode extends ConfigurableStop[DataFrame] {
   var saveMode: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val inDF = in.read()
@@ -45,7 +45,7 @@ class PutHiveMode extends ConfigurableStop[DataFrame] {
     inDF.write.format("hive").mode(saveMode).saveAsTable(database + "." + table)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]) = {
     database = MapUtil.get(map, "database").asInstanceOf[String]

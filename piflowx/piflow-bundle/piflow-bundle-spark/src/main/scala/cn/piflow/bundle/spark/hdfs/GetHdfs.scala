@@ -23,7 +23,7 @@ import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class GetHdfs extends ConfigurableStop[DataFrame] {
+class GetHdfs extends ConfigurableStop[Null, DataFrame, Null] {
   override val authorEmail: String = "ygang@cnic.com"
   override val description: String = "Get data from hdfs"
   override val inportList: List[String] = List(Port.DefaultPort)
@@ -34,9 +34,9 @@ class GetHdfs extends ConfigurableStop[DataFrame] {
   var types: String = _
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val sc = spark.sparkContext
@@ -119,7 +119,7 @@ class GetHdfs extends ConfigurableStop[DataFrame] {
     List(StopGroup.HdfsGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 

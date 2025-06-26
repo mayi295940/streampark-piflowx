@@ -25,7 +25,7 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.flink.table.api.Table
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
 
-class HiveCatalog extends ConfigurableStop[Table] {
+class HiveCatalog extends ConfigurableStop[Null, Table, Null] {
 
   override val authorEmail: String = ""
   override val description: String = "通过JDBC协议将Flink连接到关系数据库,目前支持Postgres Catalog和MySQL Catalog。"
@@ -39,9 +39,9 @@ class HiveCatalog extends ConfigurableStop[Table] {
   private var hiveVersion: String = _
 
   override def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     val tableEnv = pec.get[StreamTableEnvironment]()
 
@@ -153,7 +153,7 @@ class HiveCatalog extends ConfigurableStop[Table] {
     List(StopGroup.CatalogGroup)
   }
 
-  override def initialize(ctx: ProcessContext[Table]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_FLINK
 

@@ -25,7 +25,7 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.flink.table.api.{Table, TableEnvironment}
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
 
-class SQLQuery extends ConfigurableStop[Table] {
+class SQLQuery extends ConfigurableStop[Null, Table, Null] {
 
   val authorEmail: String = ""
   val description: String = "执行sql查询语句"
@@ -38,9 +38,9 @@ class SQLQuery extends ConfigurableStop[Table] {
   private var registerResultViewName: String = _
 
   override def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     var tableEnv: TableEnvironment = null
     if (useTableEnv) {
@@ -71,7 +71,7 @@ class SQLQuery extends ConfigurableStop[Table] {
     registerResultViewName = MapUtil.get(map, "registerResultViewName", "").asInstanceOf[String]
   }
 
-  override def initialize(ctx: ProcessContext[Table]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   override def getPropertyDescriptor(): List[PropertyDescriptor] = {
 

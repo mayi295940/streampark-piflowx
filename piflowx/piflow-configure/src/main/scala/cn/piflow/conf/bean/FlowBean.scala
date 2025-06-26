@@ -26,7 +26,7 @@ import net.liftweb.json.JsonDSL._
 import scala.collection.mutable.{Map => MMap}
 import scala.util.matching.Regex
 
-class FlowBean[DataType] extends GroupEntryBean {
+class FlowBean[StreamingContext, DataType, DStream] extends GroupEntryBean {
 
   /*@BeanProperty*/
   var uuid: String = _
@@ -36,7 +36,7 @@ class FlowBean[DataType] extends GroupEntryBean {
   private var runMode: String = _
   private var showData: String = _
 
-  var stops: List[StopBean[DataType]] = List()
+  var stops: List[StopBean[StreamingContext, DataType, DStream]] = List()
   var paths: List[PathBean] = List()
 
   private var environment: Map[String, Any] = _
@@ -93,12 +93,12 @@ class FlowBean[DataType] extends GroupEntryBean {
             }
         }
         stopMutableMap("properties") = stopPropertiesMap.toMap
-        val stop = StopBean[DataType](this.name, stopMutableMap.toMap)
+        val stop = StopBean[StreamingContext, DataType, DStream](this.name, stopMutableMap.toMap)
         this.stops = stop +: this.stops
       })
     } else { // no environment variables
       stopsList.foreach(stopMap => {
-        val stop = StopBean[DataType](this.name, stopMap)
+        val stop = StopBean[StreamingContext, DataType, DStream](this.name, stopMap)
         this.stops = stop +: this.stops
       })
     }
@@ -113,13 +113,13 @@ class FlowBean[DataType] extends GroupEntryBean {
   }
 
   // create Flow by FlowBean
-  def constructFlow(buildScalaJar: Boolean = true): FlowImpl[DataType] = {
+  def constructFlow(buildScalaJar: Boolean = true): FlowImpl[StreamingContext, DataType, DStream] = {
 
     if (buildScalaJar) {
       ScalaExecutorUtil.buildScalaExcutorJar(this)
     }
 
-    val flow = new FlowImpl[DataType]()
+    val flow = new FlowImpl[StreamingContext, DataType, DStream]()
 
     flow.setFlowJson(this.flowJson)
     flow.setFlowName(this.name)
@@ -173,8 +173,8 @@ class FlowBean[DataType] extends GroupEntryBean {
 }
 
 object FlowBean {
-  def apply[DataType](map: Map[String, Any]): FlowBean[DataType] = {
-    val flowBean = new FlowBean[DataType]()
+  def apply[StreamingContext, DataType, DStream](map: Map[String, Any]): FlowBean[StreamingContext, DataType, DStream] = {
+    val flowBean = new FlowBean[StreamingContext, DataType, DStream]()
     flowBean.init(map)
     flowBean
   }

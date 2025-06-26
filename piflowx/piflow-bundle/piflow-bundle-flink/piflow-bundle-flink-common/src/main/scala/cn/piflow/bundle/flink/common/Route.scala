@@ -25,7 +25,7 @@ import cn.piflow.util.IdGenerator
 import org.apache.flink.table.api.Table
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
 
-class Route extends ConfigurableStop[Table] {
+class Route extends ConfigurableStop[Null, Table, Null] {
 
   val authorEmail: String = ""
   val description: String = "Route data by custom properties,key is port,value is filter"
@@ -36,12 +36,12 @@ class Route extends ConfigurableStop[Table] {
 
   override def setProperties(map: Map[String, Any]): Unit = {}
 
-  override def initialize(ctx: ProcessContext[Table]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   override def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     val tableEnv = pec.get[StreamTableEnvironment]()
 

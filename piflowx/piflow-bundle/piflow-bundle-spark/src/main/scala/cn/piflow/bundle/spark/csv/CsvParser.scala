@@ -24,7 +24,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
 
-class CsvParser extends ConfigurableStop[DataFrame] {
+class CsvParser extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "xjzhu@cnic.cn"
   val description: String = "Parse csv file or folder"
@@ -37,9 +37,9 @@ class CsvParser extends ConfigurableStop[DataFrame] {
   var schema: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     var csvDF: DataFrame = null
@@ -72,7 +72,7 @@ class CsvParser extends ConfigurableStop[DataFrame] {
 
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     csvPath = MapUtil.get(map, "csvPath").asInstanceOf[String]

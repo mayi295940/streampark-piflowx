@@ -36,7 +36,7 @@ import java.util.Collections
 
 object BeamYarnClusterLauncher {
 
-  def launch[DataType](flow: Flow[DataType]): String = {
+  def launch[StreamingContext, DataType, DStream](flow: Flow[StreamingContext, DataType, DStream]): String = {
 
     val flowFileName = flow.getFlowName
     val flowFile = FlowFileUtil.getFlowFilePath(flowFileName)

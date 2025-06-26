@@ -20,7 +20,7 @@ package cn.piflow.conf.bean
 import cn.piflow.conf.ConfigurableStop
 import cn.piflow.conf.util.{ClassUtil, MapUtil}
 
-class StopBean[DataType] {
+class StopBean[StreamingContext, DataType, DStream] {
 
   private var flowName: String = _
   var uuid: String = _
@@ -44,11 +44,11 @@ class StopBean[DataType] {
 
   }
 
-  def constructStop(): ConfigurableStop[DataType] = {
+  def constructStop(): ConfigurableStop[StreamingContext, DataType, DStream] = {
 
     try {
       println("Construct stop: " + this.bundle + "!!!!!!!!!!!!!!!!!!!!!")
-      val stop = ClassUtil.findConfigurableStop[DataType](this.bundle)
+      val stop = ClassUtil.findConfigurableStop[StreamingContext, DataType, DStream](this.bundle)
       println("Construct stop: " + stop + "!!!!!!!!!!!!!!!!!!!!!")
 
       println("properties is " + this.properties + "!!!!!!!!!!!!!!!")
@@ -66,8 +66,8 @@ class StopBean[DataType] {
 
 object StopBean {
 
-  def apply[DataType](flowName: String, map: Map[String, Any]): StopBean[DataType] = {
-    val stopBean = new StopBean[DataType]()
+  def apply[StreamingContext, DataType, DStream](flowName: String, map: Map[String, Any]): StopBean[StreamingContext, DataType, DStream] = {
+    val stopBean = new StopBean[StreamingContext, DataType, DStream]()
     stopBean.init(flowName, map)
     stopBean
   }

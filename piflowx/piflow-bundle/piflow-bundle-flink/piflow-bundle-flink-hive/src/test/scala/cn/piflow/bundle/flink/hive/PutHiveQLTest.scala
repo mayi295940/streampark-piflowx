@@ -40,7 +40,7 @@ class PutHiveQLTest {
     println(map)
 
     // create flow
-    val flowBean = FlowBean.apply[Table](map)
+    val flowBean = FlowBean.apply[Null, Table, Null](map)
     val flow = flowBean.constructFlow()
 
     val h2Server = Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "50001").start()
@@ -60,7 +60,7 @@ class PutHiveQLTest {
     tableEnv.useCatalog("myhive")
 
     val process = Runner
-      .create[Table]()
+      .create[Null, Table, Null]()
       .bind(classOf[StreamExecutionEnvironment].getName, env)
       .bind("checkpoint.path", "")
       .bind("debug.path", "")

@@ -25,7 +25,7 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.FileSystem
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class PutHdfs extends ConfigurableStop[DataFrame] {
+class PutHdfs extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "ygang@cnic.com"
   override val description: String = "Put data into hdfs"
@@ -38,9 +38,9 @@ class PutHdfs extends ConfigurableStop[DataFrame] {
   var partition: String = _
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val inDF = in.read()
@@ -116,7 +116,7 @@ class PutHdfs extends ConfigurableStop[DataFrame] {
     List(StopGroup.HdfsGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 

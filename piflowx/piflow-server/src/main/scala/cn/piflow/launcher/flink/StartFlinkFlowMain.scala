@@ -49,7 +49,7 @@ object StartFlinkFlowMain {
     println(map)
 
     // create flow
-    val flowBean = FlowBean.apply[Table](map)
+    val flowBean = FlowBean.apply[Null, Table, Null](map)
     val flow = flowBean.constructFlow(false)
 
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -67,12 +67,13 @@ object StartFlinkFlowMain {
     println("StreamExecutionEnvironment is " + env + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
     val process = Runner
-      .create[Table]()
+      .create[Null, Table, Null]()
       .bind(classOf[StreamExecutionEnvironment].getName, env)
       .bind(classOf[StreamTableEnvironment].getName, tableEnv)
       // .bind("checkpoint.path", ConfigureUtil.getCheckpointPath())
       // .bind("debug.path", ConfigureUtil.getDebugPath())
       .bind("environmentVariable", flowBean.environmentVariable)
+      .bind("applicationId", environment.getOrElse("applicationId", System.currentTimeMillis().toString))
       .start(flow);
 
     println("pid is " + process.pid + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")

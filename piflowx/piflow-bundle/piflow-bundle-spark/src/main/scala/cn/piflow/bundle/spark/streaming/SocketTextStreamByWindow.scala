@@ -107,12 +107,12 @@ class SocketTextStreamByWindow
     List(StopGroup.StreamingGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[StreamingContext, DataFrame, DStream[String]]): Unit = {}
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {}
+      in: JobInputStream[StreamingContext, DataFrame, DStream[String]],
+      out: JobOutputStream[StreamingContext, DataFrame, DStream[String]],
+      pec: JobContext[StreamingContext, DataFrame, DStream[String]]): Unit = {}
 
   override def getDStream(ssc: StreamingContext): DStream[String] = {
     val dstream = ssc.socketTextStream(hostname, Integer.parseInt(port))

@@ -20,7 +20,7 @@ package cn.piflow.conf
 import cn.piflow.Stop
 import cn.piflow.conf.bean.PropertyDescriptor
 
-abstract class ConfigurableStop[DataType] extends Stop[DataType] {
+abstract class ConfigurableStop[StreamingContext, DataType, DStream] extends Stop[StreamingContext, DataType, DStream] {
 
   val authorEmail: String
   val description: String
@@ -36,6 +36,8 @@ abstract class ConfigurableStop[DataType] extends Stop[DataType] {
 
   var customizedProperties: Map[String, String] = _
 
+  val isDataSource = false
+
   def setProperties(map: Map[String, Any]): Unit
 
   def getPropertyDescriptor(): List[PropertyDescriptor]
@@ -50,6 +52,10 @@ abstract class ConfigurableStop[DataType] extends Stop[DataType] {
 
   def getCustomized(): Boolean = {
     this.isCustomized
+  }
+
+  def getIsDataSource(): Boolean = {
+    this.isDataSource
   }
 
   def getEngineType: String

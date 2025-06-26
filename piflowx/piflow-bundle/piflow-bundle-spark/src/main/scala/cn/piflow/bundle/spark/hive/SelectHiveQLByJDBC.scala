@@ -25,7 +25,7 @@ import org.apache.spark.SparkContext
 import org.apache.spark.sql.{DataFrame, Row, SparkSession, SQLContext}
 
 /** HIVE JDBC DRIVER DESIGN FOR HIVE 1.2.1 */
-class SelectHiveQLByJDBC extends ConfigurableStop[DataFrame] {
+class SelectHiveQLByJDBC extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "xiaomeng7890@gmail.com"
   override val description: String =
@@ -100,12 +100,12 @@ class SelectHiveQLByJDBC extends ConfigurableStop[DataFrame] {
     List(StopGroup.HiveGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val sc = pec.get[SparkSession]()
     val df = getDF(sc.sqlContext, sc.sparkContext, sql)

@@ -24,7 +24,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.ml.clustering.KMeansModel
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class KmeansPrediction extends ConfigurableStop[DataFrame] {
+class KmeansPrediction extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "06whuxx@163.com"
   val description: String = "Use an existing KmeansModel to predict"
@@ -34,9 +34,9 @@ class KmeansPrediction extends ConfigurableStop[DataFrame] {
   var model_path: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     // load data stored in libsvm format as a dataframe
@@ -52,7 +52,7 @@ class KmeansPrediction extends ConfigurableStop[DataFrame] {
 
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     test_data_path = MapUtil.get(map, key = "test_data_path").asInstanceOf[String]

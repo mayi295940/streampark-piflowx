@@ -26,7 +26,7 @@ import org.codehaus.jackson.map.ext.CoreXMLSerializers.XMLGregorianCalendarSeria
 
 import scala.beans.BeanProperty
 
-class XmlSave extends ConfigurableStop[DataFrame] {
+class XmlSave extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "xjzhu@cnic.cn"
   val description: String = "Save data to xml file"
@@ -36,16 +36,16 @@ class XmlSave extends ConfigurableStop[DataFrame] {
   var xmlSavePath: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val xmlDF = in.read()
 
     xmlDF.write.format("xml").save(xmlSavePath)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def setProperties(map: Map[String, Any]): Unit = {
     xmlSavePath = MapUtil.get(map, "xmlSavePath").asInstanceOf[String]

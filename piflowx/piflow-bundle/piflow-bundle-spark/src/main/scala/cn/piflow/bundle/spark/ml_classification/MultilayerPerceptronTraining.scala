@@ -24,7 +24,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.ml.classification.MultilayerPerceptronClassifier
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class MultilayerPerceptronTraining extends ConfigurableStop[DataFrame] {
+class MultilayerPerceptronTraining extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "xiaoxiao@cnic.cn"
   val description: String = "Train a multilayer perceptron model"
@@ -39,9 +39,9 @@ class MultilayerPerceptronTraining extends ConfigurableStop[DataFrame] {
   var minTol: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
 
@@ -105,7 +105,7 @@ class MultilayerPerceptronTraining extends ConfigurableStop[DataFrame] {
     out.write(dfOut)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     training_data_path = MapUtil.get(map, key = "training_data_path").asInstanceOf[String]

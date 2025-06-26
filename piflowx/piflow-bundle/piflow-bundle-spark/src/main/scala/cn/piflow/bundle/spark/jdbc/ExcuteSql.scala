@@ -25,7 +25,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import java.sql.{Connection, DriverManager, ResultSet}
 
-class ExcuteSql extends ConfigurableStop[DataFrame] {
+class ExcuteSql extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "xjzhu@cnic.cn"
   val description: String = "Read data from mysql database with jdbc"
@@ -39,9 +39,9 @@ class ExcuteSql extends ConfigurableStop[DataFrame] {
   var sql: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val dbtable = sql
@@ -56,7 +56,7 @@ class ExcuteSql extends ConfigurableStop[DataFrame] {
     out.write(jdbcDF)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def setProperties(map: Map[String, Any]): Unit = {
 

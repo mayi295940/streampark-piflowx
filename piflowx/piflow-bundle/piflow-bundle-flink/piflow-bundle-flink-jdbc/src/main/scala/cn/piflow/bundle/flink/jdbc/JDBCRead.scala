@@ -29,7 +29,7 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.flink.table.api.{Table, TableEnvironment}
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
 
-class JDBCRead extends ConfigurableStop[Table] {
+class JDBCRead extends ConfigurableStop[Null, Table, Null] {
 
   val authorEmail: String = ""
   val description: String = "使用JDBC驱动向任意类型的关系型数据库读取数据"
@@ -47,9 +47,9 @@ class JDBCRead extends ConfigurableStop[Table] {
   private var useTableEnv: Boolean = false
 
   def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     var tableEnv: TableEnvironment = null
     if (useTableEnv) {
@@ -117,7 +117,7 @@ class JDBCRead extends ConfigurableStop[Table] {
     result.mkString("")
   }
 
-  def initialize(ctx: ProcessContext[Table]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   override def setProperties(map: Map[String, Any]): Unit = {
     url = MapUtil.get(map, "url").asInstanceOf[String]

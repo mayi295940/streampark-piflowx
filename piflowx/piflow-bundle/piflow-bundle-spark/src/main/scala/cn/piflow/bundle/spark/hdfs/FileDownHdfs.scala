@@ -30,7 +30,7 @@ import org.apache.spark.sql.types.{StringType, StructField, StructType}
 import java.io.InputStream
 import java.net.{HttpURLConnection, URL}
 
-class FileDownHdfs extends ConfigurableStop[DataFrame] {
+class FileDownHdfs extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "yangqidong@cnic.cn"
   val description: String = "Download the data from the url to HDFS"
@@ -42,9 +42,9 @@ class FileDownHdfs extends ConfigurableStop[DataFrame] {
   var url_str: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
 
@@ -84,7 +84,7 @@ class FileDownHdfs extends ConfigurableStop[DataFrame] {
 
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     hdfsUrl = MapUtil.get(map, key = "hdfsUrl").asInstanceOf[String]

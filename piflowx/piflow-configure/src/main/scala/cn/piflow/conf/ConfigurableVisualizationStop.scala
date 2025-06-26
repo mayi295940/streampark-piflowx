@@ -20,9 +20,9 @@ package cn.piflow.conf
 import cn.piflow.{Constants, VisualizationStop}
 import cn.piflow.util.ConfigureUtil
 
-abstract class ConfigurableVisualizationStop[DataType]
-  extends ConfigurableStop[DataType]
-  with VisualizationStop[DataType] {
+abstract class ConfigurableVisualizationStop[StreamingContext, DataType, DStream]
+  extends ConfigurableStop[StreamingContext, DataType, DStream]
+  with VisualizationStop[StreamingContext, DataType, DStream] {
 
   override var visualizationPath: String = _
   override var processId: String = _
@@ -32,7 +32,7 @@ abstract class ConfigurableVisualizationStop[DataType]
     this.stopName = stopName
   }
 
-  override def getVisualizationPath(processId: String): String = {
+  override def getVisualizationPath(): String = {
     visualizationPath = ConfigureUtil
       .getVisualizationPath()
       .stripSuffix(

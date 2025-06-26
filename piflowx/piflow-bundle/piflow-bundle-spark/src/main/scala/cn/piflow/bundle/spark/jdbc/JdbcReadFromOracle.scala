@@ -30,7 +30,7 @@ import java.sql.{Blob, Clob, Connection, Date, DriverManager, NClob, PreparedSta
 
 import scala.collection.mutable.ArrayBuffer
 
-class JdbcReadFromOracle extends ConfigurableStop[DataFrame] {
+class JdbcReadFromOracle extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "yangqidong@cnic.cn"
   val description: String = "Read from oracle"
@@ -56,9 +56,9 @@ class JdbcReadFromOracle extends ConfigurableStop[DataFrame] {
   }
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val session = pec.get[SparkSession]()
 
@@ -157,7 +157,7 @@ class JdbcReadFromOracle extends ConfigurableStop[DataFrame] {
     out.write(df)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def setProperties(map: Map[String, Any]): Unit = {
     url = MapUtil.get(map, "url").asInstanceOf[String]

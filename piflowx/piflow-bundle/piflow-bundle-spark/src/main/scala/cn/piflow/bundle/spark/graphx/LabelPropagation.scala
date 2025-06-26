@@ -25,7 +25,7 @@ import org.apache.spark.graphx._
 import org.apache.spark.graphx.lib.LabelPropagation
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class LabelPropagation extends ConfigurableStop[DataFrame] {
+class LabelPropagation extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "06whuxx@163.com"
   val description: String = "Compute sub graphs"
@@ -39,9 +39,9 @@ class LabelPropagation extends ConfigurableStop[DataFrame] {
   var maxIter: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val sc = spark.sparkContext
@@ -61,7 +61,7 @@ class LabelPropagation extends ConfigurableStop[DataFrame] {
     out.write(vertexPortOut, res.vertices.toDF())
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     maxIter = MapUtil.get(map, "maxIter").asInstanceOf[String]

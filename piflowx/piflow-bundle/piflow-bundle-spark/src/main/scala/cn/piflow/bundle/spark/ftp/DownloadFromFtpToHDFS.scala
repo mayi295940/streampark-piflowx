@@ -24,7 +24,7 @@ import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.DataFrame
 
-class DownloadFromFtpToHDFS extends ConfigurableStop[DataFrame] {
+class DownloadFromFtpToHDFS extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "yangqidong@cnic.cn"
   override val description: String = "Download data from FTP and save to HDFS"
@@ -41,9 +41,9 @@ class DownloadFromFtpToHDFS extends ConfigurableStop[DataFrame] {
   var hdfsPath: String = _
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val ftpUtil = new FtpDownAndUploadUtil
 
@@ -133,7 +133,7 @@ class DownloadFromFtpToHDFS extends ConfigurableStop[DataFrame] {
     List(StopGroup.FtpGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 

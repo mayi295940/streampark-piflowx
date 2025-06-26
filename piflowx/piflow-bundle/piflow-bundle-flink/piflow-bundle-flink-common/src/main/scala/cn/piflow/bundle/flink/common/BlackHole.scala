@@ -26,7 +26,7 @@ import cn.piflow.util.IdGenerator
 import org.apache.flink.table.api.Table
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
 
-class BlackHole extends ConfigurableStop[Table] {
+class BlackHole extends ConfigurableStop[Null, Table, Null] {
 
   val authorEmail: String = ""
   val description: String = "接收所有输入记录"
@@ -34,9 +34,9 @@ class BlackHole extends ConfigurableStop[Table] {
   val outportList: List[String] = List(Port.DefaultPort)
 
   def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     val tableEnv = pec.get[StreamTableEnvironment]()
     val tmpTable = this.getClass.getSimpleName
@@ -58,7 +58,7 @@ class BlackHole extends ConfigurableStop[Table] {
     tableEnv.executeSql(ddl)
   }
 
-  def initialize(ctx: ProcessContext[Table]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {}
 

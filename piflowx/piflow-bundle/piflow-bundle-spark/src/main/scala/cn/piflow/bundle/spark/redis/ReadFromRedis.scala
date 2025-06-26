@@ -17,7 +17,7 @@
 
 package cn.piflow.bundle.spark.redis
 
-import cn.piflow.{Constants, JobContext, JobInputStream, JobOutputStream, ProcessContext}
+import cn.piflow._
 import cn.piflow.bundle.core.util.JedisClusterImplSer
 import cn.piflow.conf._
 import cn.piflow.conf.bean.PropertyDescriptor
@@ -28,7 +28,7 @@ import redis.clients.jedis.HostAndPort
 
 import scala.collection.mutable.ArrayBuffer
 
-class ReadFromRedis extends ConfigurableStop[DataFrame] {
+class ReadFromRedis extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "06whuxx@163.com"
   val description: String = "Read data from redis"
@@ -42,14 +42,14 @@ class ReadFromRedis extends ConfigurableStop[DataFrame] {
   var schema: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
 
-    var dfIn = in.read()
-    var colName = column_name
+    val dfIn = in.read()
+    val colName = column_name
 
     // connect to redis
     val jedisCluster = new JedisClusterImplSer(new HostAndPort(redis_host, port), password)
@@ -62,7 +62,6 @@ class ReadFromRedis extends ConfigurableStop[DataFrame] {
       newSchema.map(f => StructField(f, org.apache.spark.sql.types.StringType, true)))
 
     val newRDD = dfIn.rdd.map(line => {
-      import spark.implicits._
       val row = new ArrayBuffer[String]
       val key = line.getAs[String](colName)
       row += key
@@ -75,7 +74,7 @@ class ReadFromRedis extends ConfigurableStop[DataFrame] {
     out.write(df)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     redis_host = MapUtil.get(map, key = "redis_host").asInstanceOf[String]

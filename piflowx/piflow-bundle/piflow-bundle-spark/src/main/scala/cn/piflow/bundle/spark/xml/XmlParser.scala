@@ -25,7 +25,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import scala.beans.BeanProperty
 
-class XmlParser extends ConfigurableStop[DataFrame] {
+class XmlParser extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "xjzhu@cnic.cn"
   val description: String = "Parse xml file"
@@ -36,9 +36,9 @@ class XmlParser extends ConfigurableStop[DataFrame] {
   var rowTag: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
 
@@ -51,7 +51,7 @@ class XmlParser extends ConfigurableStop[DataFrame] {
     out.write(xmlDF)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]) = {
     xmlpath = MapUtil.get(map, "xmlpath").asInstanceOf[String]

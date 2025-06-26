@@ -28,7 +28,7 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.flink.table.api.Table
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
 
-class MongoDBCdc extends ConfigurableStop[Table] {
+class MongoDBCdc extends ConfigurableStop[Null, Table, Null] {
 
   val authorEmail: String = ""
   val description: String = "MongoDB CDC连接器允许从MongoDB读取快照数据和增量数据。"
@@ -44,9 +44,9 @@ class MongoDBCdc extends ConfigurableStop[Table] {
   private var properties: Map[String, Any] = _
 
   def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     val tableEnv = pec.get[StreamTableEnvironment]()
 
@@ -110,7 +110,7 @@ class MongoDBCdc extends ConfigurableStop[Table] {
     result.mkString("")
   }
 
-  def initialize(ctx: ProcessContext[Table]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   override def setProperties(map: Map[String, Any]): Unit = {
     hosts = MapUtil.get(map, "hosts").asInstanceOf[String]

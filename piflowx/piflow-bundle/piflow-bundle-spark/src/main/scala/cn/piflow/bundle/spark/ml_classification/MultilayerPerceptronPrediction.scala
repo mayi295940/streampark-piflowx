@@ -24,7 +24,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.ml.classification.MultilayerPerceptronClassificationModel
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class MultilayerPerceptronPrediction extends ConfigurableStop[DataFrame] {
+class MultilayerPerceptronPrediction extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "06whuxx@163.com"
   val description: String = "Use an existing multilayer perceptron model to predict"
@@ -34,9 +34,9 @@ class MultilayerPerceptronPrediction extends ConfigurableStop[DataFrame] {
   var model_path: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     // load data stored in libsvm format as a dataframe
@@ -50,7 +50,7 @@ class MultilayerPerceptronPrediction extends ConfigurableStop[DataFrame] {
     out.write(predictions)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     test_data_path = MapUtil.get(map, key = "test_data_path").asInstanceOf[String]

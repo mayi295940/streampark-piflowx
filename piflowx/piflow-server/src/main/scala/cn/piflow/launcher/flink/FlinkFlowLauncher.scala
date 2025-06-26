@@ -35,7 +35,7 @@ import java.util.Date
 
 object FlinkFlowLauncher {
 
-  def launch[Table](flow: Flow[Table], isDebug: Boolean = false): String = {
+  def launch[Table](flow: Flow[Null, Table, Null], isDebug: Boolean = false): String = {
 
     val flowJson = flow.getFlowJson
     println("FlowLauncher json:" + flowJson)
@@ -93,7 +93,7 @@ object FlinkFlowLauncher {
     FileUtil.writeFile(flowJson, flowFile)
 
     // add plugin jars for application
-    val pluginOnList = H2Util.getPluginOn()
+    val pluginOnList = DataBaseUtil.getPluginOn()
     val classPath = PropertyUtil.getClassPath()
     val classPathFile = new File(classPath)
     if (classPathFile.exists()) {
@@ -137,8 +137,8 @@ object FlinkFlowLauncher {
         .build()
 
       val parallelism = 1
-
       var jobGraph: JobGraph = null
+
       try jobGraph = PackagedProgramUtils.createJobGraph(program, configuration, parallelism, false)
       catch {
         case e: Throwable =>
@@ -146,8 +146,7 @@ object FlinkFlowLauncher {
           throw new Exception("Flink jobGraph create failed")
       }
 
-      val client =
-        new RestClusterClient[StandaloneClusterId](configuration, StandaloneClusterId.getInstance())
+      val client = new RestClusterClient[StandaloneClusterId](configuration, StandaloneClusterId.getInstance())
       val result = client.submitJob(jobGraph)
 
       val jobId = result.get()
@@ -173,8 +172,8 @@ object FlinkFlowLauncher {
 
     // update db
     println("Update flow state after Stop Flow !!!!!!!!!!!!!!!!!!!!!!!!!!")
-    H2Util.updateFlowState(appID, FlowState.KILLED)
-    H2Util.updateFlowFinishedTime(appID, new Date().toString)
+    DataBaseUtil.updateFlowState(appID, FlowState.KILLED)
+    DataBaseUtil.updateFlowFinishedTime(appID, new Date().toString)
 
     "ok"
   }

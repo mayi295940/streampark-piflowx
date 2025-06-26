@@ -29,7 +29,7 @@ import org.apache.spark.sql.types.{StringType, StructField, StructType}
 
 import scala.collection.mutable.ArrayBuffer
 
-class ListHdfs extends ConfigurableStop[DataFrame] {
+class ListHdfs extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "ygang@cnic.com"
   override val description: String = "Retrieve a list of files from hdfs"
@@ -41,9 +41,9 @@ class ListHdfs extends ConfigurableStop[DataFrame] {
   var pathARR: ArrayBuffer[String] = ArrayBuffer()
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val sc = spark.sparkContext
@@ -123,7 +123,7 @@ class ListHdfs extends ConfigurableStop[DataFrame] {
     List(StopGroup.HdfsGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 

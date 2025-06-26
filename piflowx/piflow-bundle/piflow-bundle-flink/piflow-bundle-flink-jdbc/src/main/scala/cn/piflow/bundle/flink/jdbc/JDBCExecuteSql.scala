@@ -27,7 +27,7 @@ import org.apache.flink.table.api.Table
 
 import java.sql.{Connection, DriverManager, Statement}
 
-class JDBCExecuteSql extends ConfigurableStop[Table] {
+class JDBCExecuteSql extends ConfigurableStop[Null, Table, Null] {
 
   val authorEmail: String = ""
   val description: String = "使用JDBC驱动执行关系型数据库SQL"
@@ -41,9 +41,9 @@ class JDBCExecuteSql extends ConfigurableStop[Table] {
   private var sql: String = _
 
   def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     if (StringUtils.isNotEmpty(sql)) {
       sql = sql.replaceAll("\n|\t", "")
@@ -72,7 +72,7 @@ class JDBCExecuteSql extends ConfigurableStop[Table] {
 
   }
 
-  def initialize(ctx: ProcessContext[Table]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   override def setProperties(map: Map[String, Any]): Unit = {
     url = MapUtil.get(map, "url").asInstanceOf[String]

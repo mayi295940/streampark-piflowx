@@ -22,6 +22,8 @@ import cn.piflow.conf.bean.FlowBean
 import cn.piflow.conf.util.FileUtil
 import cn.piflow.util.{JsonUtil, PropertyUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.streaming.StreamingContext
+import org.apache.spark.streaming.dstream.DStream
 import org.h2.tools.Server
 
 object TestBase {
@@ -33,7 +35,7 @@ object TestBase {
     println(map)
 
     // create flow
-    val flowBean = FlowBean.apply[DataFrame](map)
+    val flowBean = FlowBean.apply[StreamingContext, DataFrame, DStream[_]](map)
     val flow = flowBean.constructFlow()
 
     Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "50001").start()
@@ -54,15 +56,16 @@ object TestBase {
       .getOrCreate()
 
     val process = Runner
-      .create[DataFrame]()
+      .create[StreamingContext, DataFrame, DStream[_]]()
       .bind(classOf[SparkSession].getName, spark)
-      // .bind("checkpoint.path", "")
-      // .bind("debug.path", "")
+      .bind("checkpoint.path", "")
+      .bind("debug.path", "")
+      .bind("applicationId", spark.sparkContext.applicationId)
       .start(flow)
 
-    // process.awaitTermination()
     val pid = process.pid()
     println(pid + "!!!!!!!!!!!!!!!!!!!!!")
+    process.awaitTermination()
     spark.close()
   }
 }

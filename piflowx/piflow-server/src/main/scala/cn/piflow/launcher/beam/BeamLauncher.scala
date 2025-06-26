@@ -23,7 +23,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
 
 object BeamLauncher {
 
-  def launchYarnSession[DataType](flow: Flow[DataType]): StreamExecutionEnvironment = {
+  def launchYarnSession[StreamingContext, DataType, DStream](flow: Flow[StreamingContext, DataType, DStream]): StreamExecutionEnvironment = {
 
     val env = StreamExecutionEnvironment.createRemoteEnvironment(
       PropertyUtil.getPropertyValue("flink.host"),
@@ -33,7 +33,7 @@ object BeamLauncher {
     env
   }
 
-  def launchYarnCluster[DataType](flow: Flow[DataType]): String = {
+  def launchYarnCluster[StreamingContext, DataType, DStream](flow: Flow[StreamingContext, DataType, DStream]): String = {
     val appId = BeamYarnClusterLauncher.launch(flow)
     appId
   }

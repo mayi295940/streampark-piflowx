@@ -25,7 +25,7 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.flink.table.api.Table
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
 
-class Insert extends ConfigurableStop[Table] {
+class Insert extends ConfigurableStop[Null, Table, Null] {
 
   override val authorEmail: String = ""
   override val description: String = "从上游流或已注册的输入表向已注册的输出表插入数据。已注册表的schema必须与查询中的schema相匹配"
@@ -41,9 +41,9 @@ class Insert extends ConfigurableStop[Table] {
   }
 
   override def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     val tableEnv = pec.get[StreamTableEnvironment]()
 
@@ -92,7 +92,7 @@ class Insert extends ConfigurableStop[Table] {
     List(StopGroup.CommonGroup)
   }
 
-  override def initialize(ctx: ProcessContext[Table]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_FLINK
 }

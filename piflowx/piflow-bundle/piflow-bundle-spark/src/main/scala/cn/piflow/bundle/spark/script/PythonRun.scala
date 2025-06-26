@@ -17,14 +17,14 @@
 
 package cn.piflow.bundle.spark.script
 
-import cn.piflow.{Constants, JobContext, JobInputStream, JobOutputStream, ProcessContext}
+import cn.piflow._
 import cn.piflow.conf.{ConfigurableStop, Port, StopGroup}
 import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.deploy.PythonRunner
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class PythonRun extends ConfigurableStop[DataFrame] {
+class PythonRun extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = ""
   override val description: String = ""
@@ -63,12 +63,12 @@ class PythonRun extends ConfigurableStop[DataFrame] {
     List(StopGroup.ScriptGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val ID = spark.sparkContext.applicationId

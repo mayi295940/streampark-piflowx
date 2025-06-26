@@ -24,7 +24,7 @@ import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class EmailClean extends ConfigurableStop[DataFrame] {
+class EmailClean extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "songdongze@cnic.cn"
   val description: String = "Cleaning data in email format"
@@ -34,9 +34,9 @@ class EmailClean extends ConfigurableStop[DataFrame] {
   var columnName: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val sqlContext = spark.sqlContext
@@ -76,7 +76,7 @@ class EmailClean extends ConfigurableStop[DataFrame] {
     out.write(dfNew1)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     columnName = MapUtil.get(map, key = "columnName").asInstanceOf[String]

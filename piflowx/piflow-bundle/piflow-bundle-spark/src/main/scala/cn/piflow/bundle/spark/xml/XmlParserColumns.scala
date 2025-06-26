@@ -25,7 +25,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class XmlParserColumns extends ConfigurableStop[DataFrame] {
+class XmlParserColumns extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "ygang@cnic.cn"
   val description: String = "Parse xml data in columns in upstream data"
@@ -35,9 +35,9 @@ class XmlParserColumns extends ConfigurableStop[DataFrame] {
   var xmlColumns: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
 
@@ -77,7 +77,7 @@ class XmlParserColumns extends ConfigurableStop[DataFrame] {
     out.write(outDF)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]) = {
     xmlColumns = MapUtil.get(map, "xmlColumns").asInstanceOf[String]

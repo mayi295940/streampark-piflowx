@@ -22,6 +22,8 @@ import cn.piflow.conf.bean.FlowBean
 import cn.piflow.conf.util.FileUtil
 import cn.piflow.util.{JsonUtil, PropertyUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.streaming.StreamingContext
+import org.apache.spark.streaming.dstream.DStream
 
 object SparkStartTestMain {
 
@@ -33,7 +35,7 @@ object SparkStartTestMain {
     println(map)
 
     // create flow
-    val flowBean = FlowBean[DataFrame](map)
+    val flowBean = FlowBean[StreamingContext, DataFrame, DStream[_]](map)
     val flow = flowBean.constructFlow(false)
 
     // execute flow
@@ -50,17 +52,18 @@ object SparkStartTestMain {
       .master("local[*]")
 
     val spark = sparkSessionBuilder.getOrCreate()
+    val applicationId = spark.sparkContext.applicationId
 
     val process = Runner
-      .create[DataFrame]()
+      .create[StreamingContext, DataFrame, DStream[_]]()
       .bind(classOf[SparkSession].getName, spark)
       // .bind("checkpoint.path", ConfigureUtil.getCheckpointPath())
       // .bind("debug.path", ConfigureUtil.getDebugPath())
       .bind("environmentVariable", flowBean.environmentVariable)
+      .bind("applicationId", applicationId)
       .start(flow)
 
-    val applicationId = spark.sparkContext.applicationId
-    // process.awaitTermination()
+    process.awaitTermination()
     spark.close()
 
     /*new Thread( new WaitProcessTerminateRunnable(spark, process)).start()

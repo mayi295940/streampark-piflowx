@@ -28,7 +28,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import java.util.Properties
 
-class WriteToKafka extends ConfigurableStop[DataFrame] {
+class WriteToKafka extends ConfigurableStop[Null, DataFrame, Null] {
 
   val description: String = "Write data to kafka"
   val inportList: List[String] = List(Port.DefaultPort)
@@ -37,9 +37,9 @@ class WriteToKafka extends ConfigurableStop[DataFrame] {
   var topic: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val df = in.read()
@@ -72,7 +72,7 @@ class WriteToKafka extends ConfigurableStop[DataFrame] {
     producer.close()
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     kafka_host = MapUtil.get(map, key = "kafka_host").asInstanceOf[String]

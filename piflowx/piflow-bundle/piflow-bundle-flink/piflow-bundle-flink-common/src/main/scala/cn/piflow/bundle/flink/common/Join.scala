@@ -25,7 +25,7 @@ import cn.piflow.util.IdGenerator
 import org.apache.flink.table.api.Table
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
 
-class Join extends ConfigurableStop[Table] {
+class Join extends ConfigurableStop[Null, Table, Null] {
 
   override val authorEmail: String = ""
   override val description: String =
@@ -38,9 +38,9 @@ class Join extends ConfigurableStop[Table] {
 
   // todo 1.查询的列  2.多节点join
   override def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     val tableEnv = pec.get[StreamTableEnvironment]()
 
@@ -122,7 +122,7 @@ class Join extends ConfigurableStop[Table] {
     List(StopGroup.CommonGroup)
   }
 
-  override def initialize(ctx: ProcessContext[Table]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_FLINK
 }

@@ -23,7 +23,7 @@ import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.DataFrame
 
-class ConvertSchema extends ConfigurableStop[DataFrame] {
+class ConvertSchema extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "yangqidong@cnic.cn"
   val description: String = "Change field name"
@@ -33,9 +33,9 @@ class ConvertSchema extends ConfigurableStop[DataFrame] {
   var schema: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     var df = in.read()
 
@@ -50,7 +50,7 @@ class ConvertSchema extends ConfigurableStop[DataFrame] {
 
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     schema = MapUtil.get(map, "schema").asInstanceOf[String]

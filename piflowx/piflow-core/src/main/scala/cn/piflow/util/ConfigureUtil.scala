@@ -36,12 +36,12 @@ object ConfigureUtil {
     val hdfsFS = PropertyUtil.getPropertyValue("fs.defaultFS")
     val visualizationPath = hdfsFS + "/user/piflow/visualization/"
 
-    val isCheckPointPathExist = H2Util.getFlag(item)
+    val isCheckPointPathExist = DataBaseUtil.getFlag(item)
     if (isCheckPointPathExist == NOT_EXIST_FLAG) {
       if (!HdfsUtil.exists(hdfsFS, visualizationPath)) {
         HdfsUtil.mkdir(hdfsFS, visualizationPath)
       }
-      H2Util.addFlag(item, EXIST_FLAG)
+      DataBaseUtil.addFlag(item, EXIST_FLAG)
     } else {
       visualizationPath
     }
@@ -54,12 +54,12 @@ object ConfigureUtil {
     val hdfsFS = PropertyUtil.getPropertyValue("fs.defaultFS")
     val checkpointPath = hdfsFS + "/user/piflow/checkpoints/"
 
-    val isCheckPointPathExist = H2Util.getFlag(item)
+    val isCheckPointPathExist = DataBaseUtil.getFlag(item)
     if (isCheckPointPathExist == NOT_EXIST_FLAG) {
       if (!HdfsUtil.exists(hdfsFS, checkpointPath)) {
         HdfsUtil.mkdir(hdfsFS, checkpointPath)
       }
-      H2Util.addFlag(item, EXIST_FLAG)
+      DataBaseUtil.addFlag(item, EXIST_FLAG)
     } else {
       checkpointPath
     }
@@ -71,12 +71,12 @@ object ConfigureUtil {
     val item = "debugPath"
     val hdfsFS = PropertyUtil.getPropertyValue("fs.defaultFS")
     val debugPath = hdfsFS + "/user/piflow/debug/"
-    val isDebugPathExist = H2Util.getFlag(item)
+    val isDebugPathExist = DataBaseUtil.getFlag(item)
     if (isDebugPathExist == NOT_EXIST_FLAG) {
       if (!HdfsUtil.exists(hdfsFS, debugPath)) {
         HdfsUtil.mkdir(hdfsFS, debugPath)
       }
-      H2Util.addFlag(item, EXIST_FLAG)
+      DataBaseUtil.addFlag(item, EXIST_FLAG)
     } else {
       debugPath
     }
@@ -88,12 +88,12 @@ object ConfigureUtil {
     val hdfsFS = PropertyUtil.getPropertyValue("fs.defaultFS")
     val incrementPath = hdfsFS + "/user/piflow/increment/"
 
-    val isIncrementPathExist = H2Util.getFlag(item)
+    val isIncrementPathExist = DataBaseUtil.getFlag(item)
     if (isIncrementPathExist == NOT_EXIST_FLAG) {
       if (!HdfsUtil.exists(hdfsFS, incrementPath)) {
         HdfsUtil.mkdir(hdfsFS, incrementPath)
       }
-      H2Util.addFlag(item, EXIST_FLAG)
+      DataBaseUtil.addFlag(item, EXIST_FLAG)
     } else {
       incrementPath
     }
@@ -141,12 +141,12 @@ object ConfigureUtil {
     val hdfsFS = PropertyUtil.getPropertyValue("fs.defaultFS")
     val testDataPath = hdfsFS + "/user/piflow/testData/"
 
-    val isCheckPointPathExist = H2Util.getFlag(item)
+    val isCheckPointPathExist = DataBaseUtil.getFlag(item)
     if (isCheckPointPathExist == NOT_EXIST_FLAG) {
       if (!HdfsUtil.exists(hdfsFS, testDataPath)) {
         HdfsUtil.mkdir(hdfsFS, testDataPath)
       }
-      H2Util.addFlag(item, EXIST_FLAG)
+      DataBaseUtil.addFlag(item, EXIST_FLAG)
     } else {
       testDataPath
     }

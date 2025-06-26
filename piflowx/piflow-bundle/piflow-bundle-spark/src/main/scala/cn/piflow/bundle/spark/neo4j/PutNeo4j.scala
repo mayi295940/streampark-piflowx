@@ -24,7 +24,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.neo4j.driver.v1._
 
-class PutNeo4j extends ConfigurableStop[DataFrame] {
+class PutNeo4j extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "yangqidong@cnic.cn"
   override val description: String = "Write DataFrame to neo4j,automatically get the fields name"
@@ -37,9 +37,9 @@ class PutNeo4j extends ConfigurableStop[DataFrame] {
   var labelName: String = ""
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark: SparkSession = pec.get[SparkSession]()
     val inDf: DataFrame = in.read()
@@ -145,7 +145,7 @@ class PutNeo4j extends ConfigurableStop[DataFrame] {
     List(StopGroup.Neo4jGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 

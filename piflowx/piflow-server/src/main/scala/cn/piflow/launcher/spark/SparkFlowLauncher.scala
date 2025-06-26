@@ -26,6 +26,8 @@ import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils
 import org.apache.spark.launcher.SparkLauncher
 import org.apache.spark.sql.DataFrame
+import org.apache.spark.streaming.StreamingContext
+import org.apache.spark.streaming.dstream.DStream
 
 import java.io.File
 import java.util.Date
@@ -33,7 +35,7 @@ import java.util.Date
 /** Created by xjzhu@cnic.cn on 4/30/19 */
 object SparkFlowLauncher {
 
-  def launch(flow: Flow[DataFrame], isDebug: Boolean = false): SparkLauncher = {
+  def launch(flow: Flow[StreamingContext, DataFrame, DStream[_]], isDebug: Boolean = false): SparkLauncher = {
 
     val flowJson = flow.getFlowJson
     println("FlowLauncher json:" + flowJson)
@@ -126,7 +128,7 @@ object SparkFlowLauncher {
     }
 
     // add plugin jars for application
-    val pluginOnList = H2Util.getPluginOn()
+    val pluginOnList = DataBaseUtil.getPluginOn()
     val classPath = PropertyUtil.getClassPath()
     val classPathFile = new File(classPath)
     if (classPathFile.exists()) {
@@ -143,7 +145,7 @@ object SparkFlowLauncher {
     }
 
     // add sparkJar to spark cluster
-    val sparkJarList = H2Util.getSparkJarOn()
+    val sparkJarList = DataBaseUtil.getSparkJarOn()
     val sparkJarPath = PropertyUtil.getSpartJarPath()
     val sparkJarPathFile = new File(sparkJarPath)
     if (sparkJarPathFile.exists()) {
@@ -198,8 +200,8 @@ object SparkFlowLauncher {
 
     // update db
     println("Update flow state after Stop Flow !!!!!!!!!!!!!!!!!!!!!!!!!!")
-    H2Util.updateFlowState(appID, FlowState.KILLED)
-    H2Util.updateFlowFinishedTime(appID, new Date().toString)
+    DataBaseUtil.updateFlowState(appID, FlowState.KILLED)
+    DataBaseUtil.updateFlowFinishedTime(appID, new Date().toString)
 
     "ok"
   }

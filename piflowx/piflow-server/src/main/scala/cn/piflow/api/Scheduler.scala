@@ -18,7 +18,7 @@
 package cn.piflow.api
 
 import akka.actor.Actor
-import cn.piflow.util.H2Util
+import cn.piflow.util.DataBaseUtil
 
 /** Created by xjzhu@cnic.cn on 5/21/19 */
 
@@ -34,11 +34,11 @@ class ExecutionActor(id: String, scheduleType: String) extends Actor {
       scheduleType match {
         case ScheduleType.FLOW => {
           val (appId, process) = API.startFlow(json)
-          H2Util.addScheduleEntry(id, appId, ScheduleType.FLOW)
+          DataBaseUtil.addScheduleEntry(id, appId, ScheduleType.FLOW)
         }
         case ScheduleType.GROUP =>
           val groupExecution = API.startGroup(json)
-          H2Util.addScheduleEntry(id, groupExecution.getGroupId, ScheduleType.GROUP)
+          DataBaseUtil.addScheduleEntry(id, groupExecution.getGroupId, ScheduleType.GROUP)
       }
     }
     case _ => println("error type!")

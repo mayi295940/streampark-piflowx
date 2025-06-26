@@ -27,7 +27,7 @@ import java.util.Properties
 
 import scala.beans.BeanProperty
 
-class MysqlWrite extends ConfigurableStop[DataFrame] {
+class MysqlWrite extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "xjzhu@cnic.cn"
   val description: String = "Write data to mysql database with jdbc"
@@ -42,9 +42,9 @@ class MysqlWrite extends ConfigurableStop[DataFrame] {
   var saveMode: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val jdbcDF = in.read()
@@ -56,7 +56,7 @@ class MysqlWrite extends ConfigurableStop[DataFrame] {
     out.write(jdbcDF)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def setProperties(map: Map[String, Any]): Unit = {
     url = MapUtil.get(map, "url").asInstanceOf[String]

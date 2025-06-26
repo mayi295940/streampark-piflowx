@@ -17,7 +17,7 @@
 
 package cn.piflow.bundle.spark.rdf
 
-import cn.piflow.{Constants, JobContext, JobInputStream, JobOutputStream, ProcessContext}
+import cn.piflow._
 import cn.piflow.bundle.spark.util.Entity
 import cn.piflow.conf.{ConfigurableStop, Port, StopGroup}
 import cn.piflow.conf.bean.PropertyDescriptor
@@ -28,7 +28,7 @@ import org.apache.spark.sql.types.{DataTypes, StringType, StructField, StructTyp
 
 import java.util.regex.{Matcher, Pattern}
 
-class RdfToDF extends ConfigurableStop[DataFrame] {
+class RdfToDF extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "xiaomeng7890@gmail.com"
   override val description: String = "convert *.n3 RDF file to CSV(DataFrame) file"
@@ -171,12 +171,12 @@ class RdfToDF extends ConfigurableStop[DataFrame] {
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val entityRegexPattern: Pattern = Pattern.compile(ERegex)
     val relationRegexPattern: Pattern = Pattern.compile(RRegex)

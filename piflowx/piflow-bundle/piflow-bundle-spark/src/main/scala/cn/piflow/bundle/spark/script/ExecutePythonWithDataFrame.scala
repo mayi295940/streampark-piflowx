@@ -32,7 +32,7 @@ import java.util.UUID
 import scala.collection.JavaConversions._
 
 /** Created by xjzhu@cnic.cn on 2/24/20 */
-class ExecutePythonWithDataFrame extends ConfigurableStop[DataFrame] {
+class ExecutePythonWithDataFrame extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "xjzhu@cnic.cn"
   override val description: String = "Execute python script with dataframe"
@@ -75,12 +75,12 @@ class ExecutePythonWithDataFrame extends ConfigurableStop[DataFrame] {
     List(StopGroup.ScriptGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
 

@@ -23,7 +23,7 @@ import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.ImageUtil
 import org.apache.flink.table.api.Table
 
-class Intersect extends ConfigurableStop[Table] {
+class Intersect extends ConfigurableStop[Null, Table, Null] {
 
   override val authorEmail: String = ""
 
@@ -35,9 +35,9 @@ class Intersect extends ConfigurableStop[Table] {
   override val outportList: List[String] = List(Port.DefaultPort)
 
   override def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     val leftTable = in.read(Port.LeftPort)
     val rightTable = in.read(Port.RightPort)
@@ -61,7 +61,7 @@ class Intersect extends ConfigurableStop[Table] {
     List(StopGroup.CommonGroup)
   }
 
-  override def initialize(ctx: ProcessContext[Table]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_FLINK
 }

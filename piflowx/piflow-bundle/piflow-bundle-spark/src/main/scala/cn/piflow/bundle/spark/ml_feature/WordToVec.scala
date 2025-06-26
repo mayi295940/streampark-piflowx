@@ -25,7 +25,7 @@ import org.apache.spark.ml.feature.Word2Vec
 import org.apache.spark.ml.feature.Word2VecModel
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class WordToVec extends ConfigurableStop[DataFrame] {
+class WordToVec extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "06whuxx@163.com"
   val description: String = "Transfer word to vector"
@@ -41,9 +41,9 @@ class WordToVec extends ConfigurableStop[DataFrame] {
   var outputCol: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val sqlContext = spark.sqlContext
@@ -110,7 +110,7 @@ class WordToVec extends ConfigurableStop[DataFrame] {
     out.write(dfOut)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     maxIter = MapUtil.get(map, key = "maxIter").asInstanceOf[String]

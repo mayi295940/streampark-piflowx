@@ -25,7 +25,7 @@ import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 
 import java.util.Properties
 
-class TDengineWrite extends ConfigurableStop[DataFrame] {
+class TDengineWrite extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "llei@cnic.com"
   override val description: String = "Write data to TDengine"
@@ -39,9 +39,9 @@ class TDengineWrite extends ConfigurableStop[DataFrame] {
   var password: String = _
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val sc = spark.sparkContext
@@ -121,7 +121,7 @@ class TDengineWrite extends ConfigurableStop[DataFrame] {
     List(StopGroup.JdbcGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 

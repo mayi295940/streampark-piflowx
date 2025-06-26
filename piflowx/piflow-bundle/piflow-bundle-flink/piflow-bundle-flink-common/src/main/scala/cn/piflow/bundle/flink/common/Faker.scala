@@ -28,7 +28,7 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
 
 import scala.collection.mutable.{Map => MMap}
 
-class Faker extends ConfigurableStop[Table] with FlinkConfigurableStop {
+class Faker extends ConfigurableStop[Null, Table, Null] with FlinkConfigurableStop {
 
   override val authorEmail: String = ""
   override val description: String = "根据每列提供的Data Faker表达式生成模拟数据。"
@@ -107,12 +107,12 @@ class Faker extends ConfigurableStop[Table] with FlinkConfigurableStop {
     List(StopGroup.CommonGroup)
   }
 
-  override def initialize(ctx: ProcessContext[Table]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   override def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     val tableEnv = pec.get[StreamTableEnvironment]()
 

@@ -24,7 +24,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import cn.piflow.util.HdfsUtil
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class PutHiveQL extends ConfigurableStop[DataFrame] {
+class PutHiveQL extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "xiaoxiao@cnic.cn"
   val description: String = "Execute hiveQL script"
@@ -35,9 +35,9 @@ class PutHiveQL extends ConfigurableStop[DataFrame] {
   private var hiveQL_Path: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
 
@@ -53,7 +53,7 @@ class PutHiveQL extends ConfigurableStop[DataFrame] {
       })
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     hiveQL_Path = MapUtil.get(map, "hiveQL_Path").asInstanceOf[String]

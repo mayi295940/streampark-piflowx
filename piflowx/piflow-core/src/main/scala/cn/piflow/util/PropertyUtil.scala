@@ -22,7 +22,6 @@ import java.util.Properties
 
 object PropertyUtil {
   private val prop: Properties = new Properties()
-  var fis: InputStream = null
   var path: String = ""
   var classPath: String = ""
   var scalaPath: String = ""
@@ -32,8 +31,8 @@ object PropertyUtil {
   val EXIST_FLAG = 1
 
   try {
-    // val path = Thread.currentThread().getContextClassLoader.getResource("config.properties").getPath
     val userDir = System.getProperty("user.dir")
+    // path = Thread.currentThread().getContextClassLoader.getResource("config.properties").getPath
     path = userDir + "/config.properties"
     prop.load(new FileInputStream(path))
     classPath = userDir + "/classpath/"
@@ -64,12 +63,12 @@ object PropertyUtil {
     val hdfsFS = PropertyUtil.getPropertyValue("fs.defaultFS")
     val visualDataDirectoryHdfsPath = hdfsFS + "/user/piflow/visualDataDirectoryPath/"
 
-    val isPluginHdfsPathExist = H2Util.getFlag(item)
+    val isPluginHdfsPathExist = DataBaseUtil.getFlag(item)
     if (isPluginHdfsPathExist == NOT_EXIST_FLAG) {
       if (!HdfsUtil.exists(hdfsFS, visualDataDirectoryHdfsPath)) {
         HdfsUtil.mkdir(hdfsFS, visualDataDirectoryHdfsPath)
       }
-      H2Util.addFlag(item, EXIST_FLAG)
+      DataBaseUtil.addFlag(item, EXIST_FLAG)
     }
     visualDataDirectoryHdfsPath
   }

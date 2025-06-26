@@ -24,7 +24,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 /** Created by xjzhu@cnic.cn on 7/23/19 */
-class OracleRead extends ConfigurableStop[DataFrame] {
+class OracleRead extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "xjzhu@cnic.cn"
   override val description: String = "Read data From oracle"
@@ -37,9 +37,9 @@ class OracleRead extends ConfigurableStop[DataFrame] {
   var sql: String = _
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val dbtable = "( " + sql + ")temp"
@@ -115,7 +115,7 @@ class OracleRead extends ConfigurableStop[DataFrame] {
     List(StopGroup.JdbcGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 

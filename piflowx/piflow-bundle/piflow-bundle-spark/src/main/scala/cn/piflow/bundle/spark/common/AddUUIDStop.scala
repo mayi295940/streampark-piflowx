@@ -25,7 +25,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import java.util.UUID
 
-class AddUUIDStop extends ConfigurableStop[DataFrame] {
+class AddUUIDStop extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "ygang@cnic.cn"
   override val description: String = "Add UUID column"
@@ -35,9 +35,9 @@ class AddUUIDStop extends ConfigurableStop[DataFrame] {
   var column: String = _
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     var df = in.read()
@@ -78,7 +78,7 @@ class AddUUIDStop extends ConfigurableStop[DataFrame] {
     List(StopGroup.CommonGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 

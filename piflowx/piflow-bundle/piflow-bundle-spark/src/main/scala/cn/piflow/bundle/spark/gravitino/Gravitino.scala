@@ -23,7 +23,7 @@ import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class Gravitino extends ConfigurableStop[DataFrame] {
+class Gravitino extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = ""
   override val description: String = "Apache Gravitino Spark连接器。(注：该连接器会停止初始化的sparkSession,重新创建)"
@@ -35,9 +35,9 @@ class Gravitino extends ConfigurableStop[DataFrame] {
   private var enableLineage: Boolean = _
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val appName = spark.sparkContext.appName
@@ -116,7 +116,7 @@ class Gravitino extends ConfigurableStop[DataFrame] {
     List(StopGroup.CatalogGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 

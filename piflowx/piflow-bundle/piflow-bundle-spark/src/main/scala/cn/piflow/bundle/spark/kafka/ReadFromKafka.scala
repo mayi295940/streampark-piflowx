@@ -29,7 +29,7 @@ import org.apache.spark.sql.types.{StructField, StructType}
 
 import java.util.Properties
 
-class ReadFromKafka extends ConfigurableStop[DataFrame] {
+class ReadFromKafka extends ConfigurableStop[Null, DataFrame, Null] {
 
   val description: String = "Read data from kafka"
   val inportList: List[String] = List(Port.DefaultPort)
@@ -39,9 +39,9 @@ class ReadFromKafka extends ConfigurableStop[DataFrame] {
   var schema: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
 
@@ -90,7 +90,7 @@ class ReadFromKafka extends ConfigurableStop[DataFrame] {
     out.write(df)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     kafka_host = MapUtil.get(map, key = "kafka_host").asInstanceOf[String]

@@ -37,7 +37,7 @@ object FlinkLocalRunner {
     println(map)
 
     // create flow
-    val flowBean = FlowBean.apply[Table](map)
+    val flowBean = FlowBean.apply[Null, Table, Null](map)
     val flow = flowBean.constructFlow()
     println(flow)
 
@@ -77,10 +77,11 @@ object FlinkLocalRunner {
     val tableEnv = StreamTableEnvironment.create(env)
 
     val process = Runner
-      .create[Table]()
+      .create[Null, Table, Null]()
       .bind(classOf[StreamExecutionEnvironment].getName, env)
       .bind(classOf[StreamTableEnvironment].getName, tableEnv)
       .bind("checkpoint.path", "")
+      .bind("debug.path", "")
       .bind("debug.path", "")
       .start(flow)
 
@@ -88,9 +89,9 @@ object FlinkLocalRunner {
 
     val pid = process.pid()
     println(pid + "!!!!!!!!!!!!!!!!!!!!!")
+    process.awaitTermination()
     pid
 
-    // process.awaitTermination()
   }
 
 }

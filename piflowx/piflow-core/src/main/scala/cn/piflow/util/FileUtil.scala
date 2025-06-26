@@ -18,6 +18,8 @@
 package cn.piflow.util
 
 import java.io.{File, PrintWriter}
+import java.net.URI
+import java.nio.file.{Files, Paths}
 
 import scala.io.Source
 
@@ -31,16 +33,27 @@ object FileUtil {
     files ++ file.listFiles().filter(_.isDirectory).flatMap(getJarFile)
   }
 
-  def writeFile(text: String, path: String) = {
-
-    val file = new File(path)
+  def writeFile(text: String, path: String): Unit = {
+    val newPath = convertUriToLocalPath(path)
+    val file = new File(newPath)
     if (!file.exists()) {
       file.createNewFile()
     }
-    val writer = new PrintWriter(new File(path))
+    val writer = new PrintWriter(new File(newPath))
     writer.write(text)
     writer.close()
   }
+
+  // 转换URI路径为本地路径
+  def convertUriToLocalPath(uriPath: String): String =
+    try {
+      if (uriPath.startsWith("file://")) return Paths.get(new URI(uriPath)).toString
+      uriPath
+    } catch {
+      case e: Exception =>
+        // 简单替换作为后备方案
+        uriPath.replace("file:///", "").replace("file://", "").replace('/', File.separatorChar)
+    }
 
   def readFile(path: String): String = {
     Source.fromFile(path).mkString("")

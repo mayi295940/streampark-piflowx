@@ -24,7 +24,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.ml.clustering.LDA
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class LDATraining extends ConfigurableStop[DataFrame] {
+class LDATraining extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "06whuxx@163.com"
   val description: String = "LDA clustering"
@@ -40,9 +40,9 @@ class LDATraining extends ConfigurableStop[DataFrame] {
   var topicConcentration: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
 
@@ -99,7 +99,7 @@ class LDATraining extends ConfigurableStop[DataFrame] {
     out.write(dfOut)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     training_data_path = MapUtil.get(map, key = "training_data_path").asInstanceOf[String]

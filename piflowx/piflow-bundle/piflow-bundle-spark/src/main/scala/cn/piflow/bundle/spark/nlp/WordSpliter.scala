@@ -30,7 +30,7 @@ import org.apache.spark.sql.types.{StringType, StructField, StructType}
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 
-class WordSpliter extends ConfigurableStop[DataFrame] {
+class WordSpliter extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "huchuan0901@163.com"
   val description: String = "Word segmentation"
@@ -54,9 +54,9 @@ class WordSpliter extends ConfigurableStop[DataFrame] {
   }
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val session: SparkSession = pec.get[SparkSession]()
 
@@ -81,7 +81,7 @@ class WordSpliter extends ConfigurableStop[DataFrame] {
     out.write(df)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]) = {
     path = MapUtil.get(map, "path").asInstanceOf[String]

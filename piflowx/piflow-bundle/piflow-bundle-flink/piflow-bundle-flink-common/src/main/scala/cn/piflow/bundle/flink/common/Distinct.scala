@@ -23,7 +23,7 @@ import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.flink.table.api.Table
 
-class Distinct extends ConfigurableStop[Table] {
+class Distinct extends ConfigurableStop[Null, Table, Null] {
 
   override val authorEmail: String = ""
   override val description: String =
@@ -34,9 +34,9 @@ class Distinct extends ConfigurableStop[Table] {
   private var columnNames: String = _
 
   override def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     val inputTable = in.read()
     val distinctTable = inputTable.distinct()
@@ -72,7 +72,7 @@ class Distinct extends ConfigurableStop[Table] {
     List(StopGroup.CommonGroup)
   }
 
-  override def initialize(ctx: ProcessContext[Table]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_FLINK
 

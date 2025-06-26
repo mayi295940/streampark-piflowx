@@ -28,7 +28,7 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.flink.table.api.Table
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
 
-class PostgresCdc extends ConfigurableStop[Table] {
+class PostgresCdc extends ConfigurableStop[Null, Table, Null] {
 
   val authorEmail: String = ""
   val description: String = "Postgres CDC连接器允许从PostgreSQL数据库读取快照数据和增量数据。"
@@ -47,9 +47,9 @@ class PostgresCdc extends ConfigurableStop[Table] {
   private var properties: Map[String, Any] = _
 
   def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     val tableEnv = pec.get[StreamTableEnvironment]()
 
@@ -107,7 +107,7 @@ class PostgresCdc extends ConfigurableStop[Table] {
     result.mkString("")
   }
 
-  def initialize(ctx: ProcessContext[Table]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   override def setProperties(map: Map[String, Any]): Unit = {
     hostname = MapUtil.get(map, "hostname").asInstanceOf[String]

@@ -17,8 +17,8 @@
 
 package cn.piflow.conf.util
 
-import cn.piflow.Constants
-import cn.piflow.conf.ConfigurableStop
+import cn.piflow.{Constants, VisualizationStop}
+import cn.piflow.conf.{ConfigurableStop, ConfigurableVisualizationStop}
 import cn.piflow.conf.bean.PropertyDescriptor
 import javassist.Modifier
 import net.liftweb.json.{compactRender, JValue}
@@ -32,14 +32,15 @@ object ClassUtil {
   val configurableStopClass: String = "cn.piflow.conf.ConfigurableStop"
   val configurableIncrementalStop: String = "cn.piflow.conf.ConfigurableIncrementalStop"
 
-  def findAllConfigurableStop[DataType](
-      packagePrefix: String = ""): List[ConfigurableStop[DataType]] = {
+  def findAllConfigurableStop[StreamingContext, DataType, DStream](
+      packagePrefix: String = ""): List[ConfigurableStop[StreamingContext, DataType, DStream]] = {
 
-    var stopList: List[ConfigurableStop[DataType]] = List()
+    var stopList: List[ConfigurableStop[StreamingContext, DataType, DStream]] = List()
 
     // find internal stop
     val reflections = new Reflections(packagePrefix)
-    val allClasses = reflections.getSubTypesOf(classOf[ConfigurableStop[DataType]])
+    val allClasses = reflections.getSubTypesOf(classOf[ConfigurableStop[StreamingContext, DataType, DStream]])
+    allClasses.addAll(reflections.getSubTypesOf(classOf[ConfigurableVisualizationStop[StreamingContext, DataType, DStream]]))
     val it = allClasses.iterator()
     while (it.hasNext) {
       breakable {
@@ -52,7 +53,7 @@ object ClassUtil {
           break
         } else {
           val plugin = stopClass.newInstance()
-          val stop = plugin.asInstanceOf[ConfigurableStop[DataType]]
+          val stop = plugin.asInstanceOf[ConfigurableStop[StreamingContext, DataType, DStream]]
           println("Find ConfigurableStop: " + stopName)
           stopList = stop +: stopList
         }
@@ -61,15 +62,15 @@ object ClassUtil {
 
     // find external stop
     val pluginManager = PluginManager.getInstance
-    val externalStopList = findAllConfigurableStopInClasspath[DataType]()
+    val externalStopList = findAllConfigurableStopInClasspath[StreamingContext, DataType, DStream]()
 
     stopList ::: externalStopList
   }
 
-  private def findAllConfigurableStopInClasspath[DataType](): List[ConfigurableStop[DataType]] = {
+  private def findAllConfigurableStopInClasspath[StreamingContext, DataType, DStream](): List[ConfigurableStop[StreamingContext, DataType, DStream]] = {
 
     val pluginManager = PluginManager.getInstance
-    val stopList = pluginManager.getPluginConfigurableStops[DataType]
+    val stopList = pluginManager.getPluginConfigurableStops[StreamingContext, DataType, DStream]
     stopList
 
     /*val pluginManager = PluginManager.getInstance()
@@ -133,12 +134,12 @@ object ClassUtil {
     groupList
   }
 
-  private def findConfigurableStopInClasspath[DataType](
-      bundle: String): Option[ConfigurableStop[DataType]] = {
+  private def findConfigurableStopInClasspath[StreamingContext, DataType, DStream](
+      bundle: String): Option[ConfigurableStop[StreamingContext, DataType, DStream]] = {
 
     val pluginManager = PluginManager.getInstance
     val stopInstance = pluginManager.getConfigurableStop(bundle)
-    val stop = Some(stopInstance.asInstanceOf[ConfigurableStop[DataType]])
+    val stop = Some(stopInstance.asInstanceOf[ConfigurableStop[StreamingContext, DataType, DStream]])
     stop
 
     /*val pluginManager = PluginManager.getInstance
@@ -166,17 +167,17 @@ object ClassUtil {
     stop*/
   }
 
-  def findConfigurableStop[DataType](bundle: String): ConfigurableStop[DataType] = {
+  def findConfigurableStop[StreamingContext, DataType, DStream](bundle: String): ConfigurableStop[StreamingContext, DataType, DStream] = {
     try {
       println("find ConfigurableStop by Class.forName: " + bundle)
       val stop = Class.forName(bundle).newInstance()
-      stop.asInstanceOf[ConfigurableStop[DataType]]
+      stop.asInstanceOf[ConfigurableStop[StreamingContext, DataType, DStream]]
     } catch {
       case classNotFoundException: ClassNotFoundException =>
         val pluginManager = PluginManager.getInstance
         if (pluginManager != null) {
           println("find ConfigurableStop in Classpath: " + bundle)
-          val stop: Option[ConfigurableStop[DataType]] =
+          val stop: Option[ConfigurableStop[StreamingContext, DataType, DStream]] =
             ClassUtil.findConfigurableStopInClasspath(bundle)
           stop match {
             case Some(s) => s
@@ -197,9 +198,9 @@ object ClassUtil {
     stopPropertyDesc.getPropertyDescriptor()
   }
 
-  private def constructStopInfoJValue[DataType](
+  private def constructStopInfoJValue[StreamingContext, DataType, DStream](
       bundle: String,
-      stop: ConfigurableStop[DataType]): JValue = {
+      stop: ConfigurableStop[StreamingContext, DataType, DStream]): JValue = {
     val stopName = bundle.split("\\.").last
     val propertyDescriptorList: List[PropertyDescriptor] = stop.getPropertyDescriptor()
     propertyDescriptorList.foreach(p => if (p.allowableValues == null || p.allowableValues == None) p.allowableValues = List(""))
@@ -212,11 +213,12 @@ object ClassUtil {
       case ex: NoSuchMethodError => println(ex)
     }
 
-    // TODO: add properties for visualization stop
-    //    var visualizationType = ""
-    //    if (stop.isInstanceOf[VisualizationStop]){
-    //      visualizationType = stop.asInstanceOf[VisualizationStop].visualizationType.toString()
-    //    }
+    var visualizationType = ""
+    stop match {
+      case value: VisualizationStop[_, _, _] =>
+        visualizationType = value.visualizationType
+      case _ =>
+    }
 
     val jsonValue =
       "StopInfo" ->
@@ -228,10 +230,10 @@ object ClassUtil {
         ("outports" -> stop.outportList.mkString(Constants.COMMA)) ~
         ("groups" -> stop.getGroup().mkString(Constants.COMMA)) ~
         ("isCustomized" -> stop.getCustomized().toString) ~
-        // ("isDataSource" -> stop.getIsDataSource().toString) ~
+        ("isDataSource" -> stop.getIsDataSource().toString) ~
         /*("customizedAllowKey" -> "") ~
-          ("customizedAllowValue" -> "")*/
-        // ("visualizationType" -> visualizationType) ~
+                  ("customizedAllowValue" -> "")*/
+        ("visualizationType" -> visualizationType) ~
         ("description" -> stop.description) ~
         ("icon" -> base64Encoder.encodeToString(iconArrayByte)) ~
         ("properties" ->

@@ -24,7 +24,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.DataFrame
 import org.neo4j.driver.v1._
 
-class RunCypher extends ConfigurableStop[DataFrame] {
+class RunCypher extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "anhong12@cnic.cn"
   override val description: String = "Run cql on neo4j"
@@ -37,9 +37,9 @@ class RunCypher extends ConfigurableStop[DataFrame] {
   var cql: String = ""
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val driver: Driver = GraphDatabase.driver(url, AuthTokens.basic(userName, password))
     var session: Session = null
@@ -111,7 +111,7 @@ class RunCypher extends ConfigurableStop[DataFrame] {
     List(StopGroup.Neo4jGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 

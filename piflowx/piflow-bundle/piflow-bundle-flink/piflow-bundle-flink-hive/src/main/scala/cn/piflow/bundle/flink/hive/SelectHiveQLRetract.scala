@@ -25,7 +25,7 @@ import org.apache.flink.table.api.{SqlDialect, Table}
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
 import org.apache.flink.table.catalog.hive.HiveCatalog
 
-class SelectHiveQLRetract extends ConfigurableStop[Table] {
+class SelectHiveQLRetract extends ConfigurableStop[Null, Table, Null] {
 
   override val authorEmail: String = ""
   override val description: String = "Execute select clause of hiveQL with RetractStream"
@@ -40,9 +40,9 @@ class SelectHiveQLRetract extends ConfigurableStop[Table] {
   val hiveConfDir = "/piflow-configure/hive-conf"
 
   override def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     val tableEnv = pec.get[StreamTableEnvironment]()
 
@@ -102,7 +102,7 @@ class SelectHiveQLRetract extends ConfigurableStop[Table] {
     List(StopGroup.HiveGroup)
   }
 
-  override def initialize(ctx: ProcessContext[Table]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_FLINK
 

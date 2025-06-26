@@ -23,7 +23,7 @@ import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.flink.table.api.Table
 
-class Fork extends ConfigurableStop[Table] {
+class Fork extends ConfigurableStop[Null, Table, Null] {
 
   val authorEmail: String = ""
   val description: String = "Forking data to different stops"
@@ -37,12 +37,12 @@ class Fork extends ConfigurableStop[Table] {
     outports = outPortStr.split(Constants.COMMA).map(x => x.trim).toList
   }
 
-  override def initialize(ctx: ProcessContext[Table]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   override def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
     // todo val df = in.read().cache()
     val df = in.read()
     outports.foreach(out.write(_, df));

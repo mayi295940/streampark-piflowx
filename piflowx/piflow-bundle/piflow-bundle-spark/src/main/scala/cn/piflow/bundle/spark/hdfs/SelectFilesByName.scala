@@ -31,7 +31,7 @@ import java.util.regex.Pattern
 
 import scala.collection.mutable.ArrayBuffer
 
-class SelectFilesByName extends ConfigurableStop[DataFrame] {
+class SelectFilesByName extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "yangqidong@cnic.cn"
   override val description: String = "Select files by file name"
@@ -67,9 +67,9 @@ class SelectFilesByName extends ConfigurableStop[DataFrame] {
   }
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val session: SparkSession = pec.get[SparkSession]()
 
@@ -142,7 +142,7 @@ class SelectFilesByName extends ConfigurableStop[DataFrame] {
     List(StopGroup.HdfsGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 

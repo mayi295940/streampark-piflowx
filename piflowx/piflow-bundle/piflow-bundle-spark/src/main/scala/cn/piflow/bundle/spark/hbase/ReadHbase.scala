@@ -17,7 +17,7 @@
 
 package cn.piflow.bundle.spark.hbase
 
-import cn.piflow.{Constants, JobContext, JobInputStream, JobOutputStream, ProcessContext}
+import cn.piflow._
 import cn.piflow.conf.{ConfigurableStop, Port, StopGroup}
 import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
@@ -49,7 +49,8 @@ import scala.collection.mutable.ArrayBuffer
  *
  * Copyright (c) 2022 πFlow. All rights reserved.
  */
-class ReadHbase extends ConfigurableStop[DataFrame] {
+
+class ReadHbase extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "ygang@cnic.cn"
   override val description: String = "Read data from Hbase"
@@ -64,9 +65,9 @@ class ReadHbase extends ConfigurableStop[DataFrame] {
   var columnQualifier: String = _
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val sc = spark.sparkContext
@@ -202,7 +203,7 @@ class ReadHbase extends ConfigurableStop[DataFrame] {
     List(StopGroup.HbaseGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 

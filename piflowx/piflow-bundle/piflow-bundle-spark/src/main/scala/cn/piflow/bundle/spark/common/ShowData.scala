@@ -17,13 +17,13 @@
 
 package cn.piflow.bundle.spark.common
 
-import cn.piflow.{Constants, JobContext, JobInputStream, JobOutputStream, ProcessContext}
+import cn.piflow._
 import cn.piflow.conf.{ConfigurableStop, Port, StopGroup}
 import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.DataFrame
 
-class ShowData extends ConfigurableStop[DataFrame] {
+class ShowData extends ConfigurableStop[Null, DataFrame, Null] {
 
   // the email of author
   val authorEmail: String = "xjzhu@cnic.cn"
@@ -40,14 +40,14 @@ class ShowData extends ConfigurableStop[DataFrame] {
   // core logic function of Stop
   // read data by "in.read(inPortName)", the default port is ""
   // write data by "out.write(data, outportName)", the default port is ""
-  def perform(in: JobInputStream[DataFrame], out: JobOutputStream[DataFrame], pec: JobContext[DataFrame]): Unit = {
+  def perform(in: JobInputStream[Null, DataFrame, Null], out: JobOutputStream[Null, DataFrame, Null], pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val df = in.read()
     df.show(showNumber.toInt)
     out.write(df)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   // set customized properties of your Stop
   def setProperties(map: Map[String, Any]): Unit = {

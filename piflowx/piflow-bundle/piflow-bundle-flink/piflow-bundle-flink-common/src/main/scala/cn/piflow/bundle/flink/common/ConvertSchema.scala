@@ -24,7 +24,7 @@ import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.flink.table.api.{ApiExpression, Table}
 import org.apache.flink.table.api.Expressions.$
 
-class ConvertSchema extends ConfigurableStop[Table] {
+class ConvertSchema extends ConfigurableStop[Null, Table, Null] {
 
   val authorEmail: String = ""
   val description: String = "Change field name"
@@ -34,9 +34,9 @@ class ConvertSchema extends ConfigurableStop[Table] {
   var schema: String = _
 
   def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     val inputTable = in.read()
 
@@ -54,7 +54,7 @@ class ConvertSchema extends ConfigurableStop[Table] {
     out.write(resultTable)
   }
 
-  def initialize(ctx: ProcessContext[Table]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     schema = MapUtil.get(map, "schema").asInstanceOf[String]

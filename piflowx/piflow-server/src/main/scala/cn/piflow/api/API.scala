@@ -38,6 +38,8 @@ import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils
 import org.apache.spark.launcher.SparkAppHandle
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.streaming.StreamingContext
+import org.apache.spark.streaming.dstream.DStream
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, File}
 import java.text.SimpleDateFormat
@@ -58,7 +60,7 @@ object API {
     breakable {
       jarFile.foreach(i => {
         if (i.getName.equals(addSparkJarName)) {
-          id = H2Util.addSparkJar(addSparkJarName)
+          id = DataBaseUtil.addSparkJar(addSparkJarName)
           break
         }
       })
@@ -67,7 +69,7 @@ object API {
   }
 
   def removeSparkJar(sparkJarId: String): Boolean = {
-    val sparkJarState = H2Util.removeSparkJar(sparkJarId)
+    val sparkJarState = DataBaseUtil.removeSparkJar(sparkJarId)
     if (sparkJarState == SparkJarState.ON) {
       false
     } else {
@@ -91,7 +93,7 @@ object API {
 
           pluginManager.unloadPlugin(i.getAbsolutePath)
           pluginManager.loadPlugin(i.getAbsolutePath)
-          id = H2Util.addPlugin(pluginName)
+          id = DataBaseUtil.addPlugin(pluginName)
           break
         }
       })
@@ -101,7 +103,7 @@ object API {
 
   def removePlugin(pluginManager: PluginManager, pluginId: String): Boolean = {
     var result = false
-    val pluginName = H2Util.getPluginInfoMap(pluginId).getOrElse("name", "")
+    val pluginName = DataBaseUtil.getPluginInfoMap(pluginId).getOrElse("name", "")
     if (pluginName != "") {
       val classpathFile = new File(pluginManager.getPluginPath)
       val jarFile = FileUtil.getJarFile(classpathFile)
@@ -110,7 +112,7 @@ object API {
           println(i.getAbsolutePath)
           if (i.getName.equals(pluginName)) {
             pluginManager.unloadPlugin(i.getAbsolutePath)
-            H2Util.removePlugin(pluginName)
+            DataBaseUtil.removePlugin(pluginName)
             result = true
             break
           }
@@ -122,7 +124,7 @@ object API {
   }
 
   def getPluginInfo(pluginId: String): String = {
-    val pluginInfo = H2Util.getPluginInfo(pluginId)
+    val pluginInfo = DataBaseUtil.getPluginInfo(pluginId)
     pluginInfo
   }
 
@@ -189,7 +191,7 @@ object API {
 
   def getScheduleInfo(scheduleId: String): String = {
 
-    val scheduleInfo = H2Util.getScheduleInfo(scheduleId)
+    val scheduleInfo = DataBaseUtil.getScheduleInfo(scheduleId)
     scheduleInfo
   }
 
@@ -219,12 +221,12 @@ object API {
   }
 
   def getFlowGroupInfo(groupId: String): String = {
-    val flowGroupInfo = H2Util.getFlowGroupInfo(groupId)
+    val flowGroupInfo = DataBaseUtil.getFlowGroupInfo(groupId)
     flowGroupInfo
   }
 
   def getFlowGroupProgress(flowGroupID: String): String = {
-    val progress = H2Util.getGroupProgressPercent(flowGroupID)
+    val progress = DataBaseUtil.getGroupProgressPercent(flowGroupID)
     progress
   }
 
@@ -255,7 +257,7 @@ object API {
     var appId: String = null
 
     // create flow
-    val flowBean = FlowBean[DataFrame](flowMap)
+    val flowBean = FlowBean[StreamingContext, DataFrame, DStream[_]](flowMap)
     val flow = flowBean.constructFlow()
 
     val uuid = flow.getUUID
@@ -291,7 +293,7 @@ object API {
       Thread.sleep(100)
     }
 
-    while (!H2Util.isFlowExist(handle.getAppId)) {
+    while (!DataBaseUtil.isFlowExist(handle.getAppId)) {
       Thread.sleep(1000)
     }
 
@@ -306,7 +308,7 @@ object API {
     var appId: String = null
 
     // create flow
-    val flowBean = FlowBean[Table](flowMap)
+    val flowBean = FlowBean[Null, Table, Null](flowMap)
     val flow = flowBean.constructFlow()
 
     val uuid = flow.getUUID
@@ -324,7 +326,7 @@ object API {
     var appId: String = null
 
     // create flow
-    val flowBean = FlowBean[PCollection[Row]](flowMap)
+    val flowBean = FlowBean[Null, PCollection[Row], Null](flowMap)
     val flow = flowBean.constructFlow()
 
     val uuid = flow.getUUID
@@ -349,8 +351,8 @@ object API {
     }
 
     // update db
-    H2Util.updateFlowState(appID, FlowState.KILLED)
-    H2Util.updateFlowFinishedTime(appID, new Date().toString)
+    DataBaseUtil.updateFlowState(appID, FlowState.KILLED)
+    DataBaseUtil.updateFlowFinishedTime(appID, new Date().toString)
 
     "ok"
   }
@@ -370,12 +372,12 @@ object API {
   }
 
   def getFlowInfo(appID: String): String = {
-    val flowInfo = H2Util.getFlowInfo(appID)
+    val flowInfo = DataBaseUtil.getFlowInfo(appID)
     flowInfo
   }
 
   def getFlowProgress(appID: String): String = {
-    val progress = H2Util.getFlowProgress(appID)
+    val progress = DataBaseUtil.getFlowProgress(appID)
     progress
   }
 
@@ -416,14 +418,14 @@ object API {
       visualizationType: String): String = {
 
     var dimensionMap = Map[String, List[String]]()
-    val visuanlizationPath: String = ConfigureUtil
+    val visualizationPath: String = ConfigureUtil
       .getVisualizationPath()
       .stripSuffix(
         Constants.SINGLE_SLASH) + Constants.SINGLE_SLASH + appId + Constants.SINGLE_SLASH + stopName + Constants.SINGLE_SLASH
 
-    val visualizationSchema = getLine(visuanlizationPath + "/schema")
+    val visualizationSchema = getLine(visualizationPath + "/schema")
     val schemaArray = visualizationSchema.split(",")
-    val jsonMapList = getJsonMapList(visuanlizationPath + "/data")
+    val jsonMapList = getJsonMapList(visualizationPath + "/data")
 
     if (VisualizationType.LineChart == visualizationType ||
       VisualizationType.Histogram == visualizationType) {
@@ -528,7 +530,7 @@ object API {
       var legend = List[String]()
       val schemaArray = visualizationSchema.split(",")
       val schemaReplaceMap = Map(schemaArray(1) -> "value", schemaArray(0) -> "name")
-      val jsonMapList = getJsonMapList(visuanlizationPath + "/data")
+      val jsonMapList = getJsonMapList(visualizationPath + "/data")
 
       var pieChartList = List[Map[String, Any]]()
       jsonMapList.foreach(map => {
@@ -589,17 +591,17 @@ object API {
     var configurableStopList: List[Any] = null
 
     if (Constants.ENGIN_SPARK.equalsIgnoreCase(engineType)) {
-      configurableStopList = ClassUtil.findAllConfigurableStop[DataFrame]("cn.piflow.bundle.spark")
+      configurableStopList = ClassUtil.findAllConfigurableStop[StreamingContext, DataFrame, DStream[_]]("cn.piflow.bundle.spark")
     } else if (Constants.ENGIN_FLINK.equalsIgnoreCase(engineType)) {
-      configurableStopList = ClassUtil.findAllConfigurableStop[Table]("cn.piflow.bundle.flink")
+      configurableStopList = ClassUtil.findAllConfigurableStop[Null, Table, Null]("cn.piflow.bundle.flink")
     } else if (Constants.ENGIN_BEAM.equalsIgnoreCase(engineType)) {
       configurableStopList =
-        ClassUtil.findAllConfigurableStop[PCollection[Row]]("cn.piflow.bundle.beam")
+        ClassUtil.findAllConfigurableStop[Null, PCollection[Row], Null]("cn.piflow.bundle.beam")
     }
 
     configurableStopList.foreach(s => {
       // generate (group,bundle) pair and put into stops
-      val configurableStop = s.asInstanceOf[ConfigurableStop[Any]]
+      val configurableStop = s.asInstanceOf[ConfigurableStop[_, _, _]]
       val groupList = configurableStop.getGroup()
       groupList.foreach(group => {
         val tuple = (group, configurableStop.getClass.getName)
@@ -646,12 +648,12 @@ object API {
     println(map)
 
     // create flow
-    val flowBean = FlowBean.apply[Table](map)
+    val flowBean = FlowBean.apply[Null, Table, Null](map)
     val flow = flowBean.constructFlow(false)
     val env = FlinkLauncher.launchYarnSession(flow)
 
     val process = Runner
-      .create[Table]()
+      .create[Null, Table, Null]()
       .bind(classOf[StreamExecutionEnvironment].getName, env)
       .start(flow)
     env.execute(flow.getFlowName)
@@ -701,7 +703,7 @@ object API {
 
 }
 
-class WaitProcessTerminateRunnable(spark: SparkSession, process: Process[DataFrame])
+class WaitProcessTerminateRunnable(spark: SparkSession, process: Process[StreamingContext, DataFrame, DStream[_]])
   extends Runnable {
   override def run(): Unit = {
     process.awaitTermination()

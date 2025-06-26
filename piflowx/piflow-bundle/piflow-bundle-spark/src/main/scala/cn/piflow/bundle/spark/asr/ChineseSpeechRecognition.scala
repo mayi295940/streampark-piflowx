@@ -32,7 +32,7 @@ import java.io.{File, FileNotFoundException}
 
 import scala.collection.mutable.ArrayBuffer
 
-class ChineseSpeechRecognition extends ConfigurableStop[DataFrame] {
+class ChineseSpeechRecognition extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "huchuan0901@163.com"
   val description: String = "Speech recognition"
@@ -42,9 +42,9 @@ class ChineseSpeechRecognition extends ConfigurableStop[DataFrame] {
   var url: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val session: SparkSession = pec.get[SparkSession]()
 
@@ -119,7 +119,7 @@ class ChineseSpeechRecognition extends ConfigurableStop[DataFrame] {
     out.write(df)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]) = {
     audioPath = MapUtil.get(map, "audioPath").asInstanceOf[String]

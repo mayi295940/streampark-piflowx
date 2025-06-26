@@ -27,7 +27,7 @@ import org.apache.flink.table.api.Table
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
 import org.apache.flink.types.Row
 
-class CsvStringParser extends ConfigurableStop[Table] {
+class CsvStringParser extends ConfigurableStop[Null, Table, Null] {
 
   override val authorEmail: String = ""
   val inportList: List[String] = List(Port.DefaultPort)
@@ -39,9 +39,9 @@ class CsvStringParser extends ConfigurableStop[Table] {
   var schema: String = _
 
   override def perform(
-      in: JobInputStream[Table],
-      out: JobOutputStream[Table],
-      pec: JobContext[Table]): Unit = {
+      in: JobInputStream[Null, Table, Null],
+      out: JobOutputStream[Null, Table, Null],
+      pec: JobContext[Null, Table, Null]): Unit = {
 
     val tableEnv = pec.get[StreamTableEnvironment]()
 
@@ -133,7 +133,7 @@ class CsvStringParser extends ConfigurableStop[Table] {
     List(StopGroup.CsvGroup)
   }
 
-  override def initialize(ctx: ProcessContext[Table]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, Table, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_FLINK
 

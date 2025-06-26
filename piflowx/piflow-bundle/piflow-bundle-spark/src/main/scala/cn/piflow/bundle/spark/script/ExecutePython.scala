@@ -17,7 +17,7 @@
 
 package cn.piflow.bundle.spark.script
 
-import cn.piflow.{Constants, JobContext, JobInputStream, JobOutputStream, ProcessContext}
+import cn.piflow._
 import cn.piflow.conf.{ConfigurableStop, Language, Port, StopGroup}
 import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
@@ -28,7 +28,7 @@ import org.apache.spark.sql.DataFrame
 import java.util.UUID
 
 /** Created by xjzhu@cnic.cn on 2/24/20 */
-class ExecutePython extends ConfigurableStop[DataFrame] {
+class ExecutePython extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "xjzhu@cnic.cn"
   override val description: String = "Execute python script"
@@ -63,12 +63,12 @@ class ExecutePython extends ConfigurableStop[DataFrame] {
     List(StopGroup.ScriptGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val jep = new Jep()
     val scriptPath = "/tmp/pythonExcutor-" + UUID.randomUUID() + ".py"

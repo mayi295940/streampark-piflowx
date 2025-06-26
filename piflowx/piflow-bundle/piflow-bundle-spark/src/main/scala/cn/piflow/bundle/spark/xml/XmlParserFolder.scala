@@ -31,7 +31,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.control.Breaks._
 
 /** Created by admin on 2018/8/27. */
-class XmlParserFolder extends ConfigurableStop[DataFrame] {
+class XmlParserFolder extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "lijie"
   val description: String = "Parse xml folder"
@@ -42,9 +42,9 @@ class XmlParserFolder extends ConfigurableStop[DataFrame] {
   var xmlpath: String = _
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
     val pathArr = getFileName(xmlpath)
@@ -87,7 +87,7 @@ class XmlParserFolder extends ConfigurableStop[DataFrame] {
     List(StopGroup.XmlGroup.toString)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   // 获取.xml所有文件路径
   private def getFileName(path: String): ArrayBuffer[String] = {

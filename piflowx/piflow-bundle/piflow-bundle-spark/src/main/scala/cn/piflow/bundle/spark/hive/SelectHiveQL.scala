@@ -25,7 +25,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import scala.beans.BeanProperty
 
-class SelectHiveQL extends ConfigurableStop[DataFrame] {
+class SelectHiveQL extends ConfigurableStop[Null, DataFrame, Null] {
 
   val authorEmail: String = "xjzhu@cnic.cn"
   val description: String = "Execute select clause of hiveQL"
@@ -35,9 +35,9 @@ class SelectHiveQL extends ConfigurableStop[DataFrame] {
   var hiveQL: String = _
 
   def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark = pec.get[SparkSession]()
 
@@ -46,7 +46,7 @@ class SelectHiveQL extends ConfigurableStop[DataFrame] {
     out.write(df)
   }
 
-  def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   def setProperties(map: Map[String, Any]): Unit = {
     hiveQL = MapUtil.get(map, "hiveQL").asInstanceOf[String]

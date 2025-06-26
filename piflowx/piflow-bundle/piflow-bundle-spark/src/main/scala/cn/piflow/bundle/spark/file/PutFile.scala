@@ -24,7 +24,7 @@ import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class PutFile extends ConfigurableStop[DataFrame] {
+class PutFile extends ConfigurableStop[Null, DataFrame, Null] {
 
   override val authorEmail: String = "ygang@cnic.cn"
   override val description: String = "Upload local files to hdfs"
@@ -38,9 +38,9 @@ class PutFile extends ConfigurableStop[DataFrame] {
   var hdfsPath: String = _
 
   override def perform(
-      in: JobInputStream[DataFrame],
-      out: JobOutputStream[DataFrame],
-      pec: JobContext[DataFrame]): Unit = {
+      in: JobInputStream[Null, DataFrame, Null],
+      out: JobOutputStream[Null, DataFrame, Null],
+      pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val spark: SparkSession = pec.get[SparkSession]()
     val executor: RemoteShellExecutor = new RemoteShellExecutor(IP, User, PassWord)
@@ -114,7 +114,7 @@ class PutFile extends ConfigurableStop[DataFrame] {
     List(StopGroup.FileGroup)
   }
 
-  override def initialize(ctx: ProcessContext[DataFrame]): Unit = {}
+  override def initialize(ctx: ProcessContext[Null, DataFrame, Null]): Unit = {}
 
   override def getEngineType: String = Constants.ENGIN_SPARK
 

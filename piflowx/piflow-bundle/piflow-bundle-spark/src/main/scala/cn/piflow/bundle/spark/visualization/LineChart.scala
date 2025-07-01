@@ -18,7 +18,8 @@
 package cn.piflow.bundle.spark.visualization
 
 import cn.piflow.{Constants, JobContext, JobInputStream, JobOutputStream, ProcessContext}
-import cn.piflow.conf.{ConfigurableVisualizationStop, Port, StopGroup, VisualizationType}
+import cn.piflow.bundle.spark.util.DataHandler
+import cn.piflow.conf.{ConfigurableVisualizationStop, Language, Port, StopGroup, VisualizationType}
 import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -56,6 +57,17 @@ class LineChart extends ConfigurableVisualizationStop[Null, DataFrame, Null] {
       .required(true)
 
     descriptor = abscissa :: descriptor
+
+    val customizedProperties = new PropertyDescriptor()
+      .name("customizedProperties")
+      .displayName("customizedProperties")
+      .description("custom properties")
+      .defaultValue("")
+      .language(Language.CustomProperties)
+      .required(false)
+      .example("\"age\": \"COUNT\",\"id\": \"SUM\"")
+    descriptor = customizedProperties :: descriptor
+
     descriptor
   }
 
@@ -96,7 +108,14 @@ class LineChart extends ConfigurableVisualizationStop[Null, DataFrame, Null] {
         ",") + " from LineChart group by " + abscissa;
       println("LineChart Sql: " + sqlText)
       val lineChartDF = spark.sql(sqlText)
-      out.write(lineChartDF.repartition(1))
+
+      val result = lineChartDF.repartition(1)
+
+      val visualizationPath = s"${System.getProperty("java.io.tmpdir")}/visualization/" +
+        s"${pec.getProcessContext.getProcess.pid()}/${pec.getStopJob.getStopName}"
+      DataHandler.saveVisualizationData(visualizationPath, result)
+
+      out.write(result)
     } else {
       out.write(dataFrame)
     }

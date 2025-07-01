@@ -1,0 +1,47 @@
+{
+  "flow": {
+    "engineType": "flink",
+    "environment": {
+      "applicationId": "1751330378661_84",
+      "jobId": "84"
+    },
+    "name": "flink_demo",
+    "paths": [
+      {
+        "from": "DataGen_nC8Gk",
+        "inport": "",
+        "outport": "",
+        "to": "LineChart_EPqeu"
+      }
+    ],
+    "runMode": "DEBUG",
+    "stops": [
+      {
+        "bundle": "cn.piflow.bundle.flink.common.DataGen",
+        "name": "DataGen_nC8Gk",
+        "properties": {
+          "count": "100",
+          "ratio": "50",
+          "schema": "[{\"id\":\"936826\",\"filedName\":\"id\",\"filedType\":\"INT\",\"kind\":\"sequence\",\"min\":\"\",\"max\":\"\",\"index\":1,\"start\":\"1\",\"end\":\"200\"},{\"id\":\"377991\",\"filedName\":\"name\",\"filedType\":\"STRING\",\"kind\":\"random\",\"length\":\"5\"}]"
+        },
+        "uuid": "DataGen_nC8Gk"
+      },
+      {
+        "bundle": "cn.piflow.bundle.flink.visualization.LineChart",
+        "customizedProperties": {
+          "name": "COUNT"
+        },
+        "name": "LineChart_EPqeu",
+        "properties": {
+          "abscissa": "id",
+          "customizedProperties": "{\"name\":\"COUNT\"}",
+          "timeField": "",
+          "timeType": "PROCESSING_TIME",
+          "windowSize": "2"
+        },
+        "uuid": "LineChart_EPqeu"
+      }
+    ],
+    "uuid": "84"
+  }
+}

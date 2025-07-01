@@ -18,16 +18,26 @@
 package cn.piflow.bundle.flink.visualization
 
 import cn.piflow._
-import cn.piflow.bundle.flink.util.RowTypeUtil
 import cn.piflow.conf.{ConfigurableVisualizationStop, Port, StopGroup, VisualizationType}
 import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import cn.piflow.util.{FileUtil, IdGenerator}
 import org.apache.commons.lang3.StringUtils
+import org.apache.flink.api.common.functions.MapFunction
+import org.apache.flink.api.common.serialization.SimpleStringEncoder
+import org.apache.flink.configuration.MemorySize
+import org.apache.flink.connector.file.sink.FileSink
+import org.apache.flink.core.fs.Path
+import org.apache.flink.core.io.SimpleVersionedSerializer
+import org.apache.flink.streaming.api.functions.sink.filesystem.{BucketAssigner, OutputFileConfig}
+import org.apache.flink.streaming.api.functions.sink.filesystem.bucketassigners.SimpleVersionedStringSerializer
+import org.apache.flink.streaming.api.functions.sink.filesystem.rollingpolicies.DefaultRollingPolicy
 import org.apache.flink.table.api.Table
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
+import org.apache.flink.types.Row
 
 import java.nio.file.{Files, Paths}
+import java.time.{Duration, LocalDateTime}
 
 class TableShow extends ConfigurableVisualizationStop[Null, Table, Null] {
 
@@ -38,9 +48,11 @@ class TableShow extends ConfigurableVisualizationStop[Null, Table, Null] {
   override val outportList: List[String] = List(Port.DefaultPort)
 
   private var showField: String = _
+  private var showNumber: Int = _
 
   override def setProperties(map: Map[String, Any]): Unit = {
     showField = MapUtil.get(map, key = "showField", "").asInstanceOf[String]
+    showNumber = MapUtil.get(map, "showNumber", "-1").asInstanceOf[String].toInt
   }
 
   override def getPropertyDescriptor(): List[PropertyDescriptor] = {
@@ -54,6 +66,15 @@ class TableShow extends ConfigurableVisualizationStop[Null, Table, Null] {
       .required(false)
 
     descriptor = showField :: descriptor
+
+    val showNumber = new PropertyDescriptor()
+      .name("showNumber")
+      .displayName("showNumber")
+      .description("The count to show.")
+      .required(false)
+      .example("10")
+    descriptor = showNumber :: descriptor
+
     descriptor
   }
 
@@ -81,55 +102,89 @@ class TableShow extends ConfigurableVisualizationStop[Null, Table, Null] {
     val portSchemaPath = visualizationPath + "/schema"
     Files.createDirectories(Paths.get(FileUtil.convertUriToLocalPath(visualizationPath)))
 
-    val inputTempViewName = this.getClass.getSimpleName
-      .stripSuffix("$") + Constants.UNDERLINE_SIGN + IdGenerator.uuidWithoutSplit
+    val inputTempViewName = s"${getClass.getSimpleName.stripSuffix("$")}_${IdGenerator.uuidWithoutSplit}"
 
-    tableEnv.createTemporaryView(inputTempViewName, inputTable)
+    if (showNumber > 0) {
+      tableEnv.createTemporaryView(inputTempViewName, inputTable.limit(showNumber))
+    } else {
+      tableEnv.createTemporaryView(inputTempViewName, inputTable)
+    }
 
     val schema = inputTable.getResolvedSchema
-    var columns = ""
     var selectColumns = ""
 
     if (StringUtils.isEmpty(showField) || "*".equals(showField)) {
-      columns = RowTypeUtil.getTableSchema(inputTable)
       selectColumns = String.join(",", schema.getColumnNames)
     } else {
-      showField.split(",").foreach(fieldName => {
-        val columnOption = schema.getColumn(fieldName)
-        if (columnOption.isPresent) {
-          val column = columnOption.get()
-          columns += s"  $fieldName ${column.getDataType},"
-        }
-      })
-      columns = s"( ${columns.stripMargin.dropRight(1)} )"
       selectColumns = showField
     }
 
-    // 创建临时视图
-    val tmpViewName = this.getClass.getSimpleName
-      .stripSuffix("$") + Constants.UNDERLINE_SIGN + IdGenerator.uuidWithoutSplit
+    val resultTable = tableEnv.sqlQuery(s"select $selectColumns from $inputTempViewName")
 
-    val ddl =
-      s""" CREATE TABLE $tmpViewName
-         | $columns
-         | WITH (
-         |'connector' = 'filesystem',
-         |'path' = '$portDataPath',
-         |'format' = 'json'
-         |)
-         |""".stripMargin
-        .replaceAll("\r\n", " ")
-        .replaceAll(Constants.LINE_SPLIT_N, " ")
+    // 配置文件Sink
+    val outputConfig = OutputFileConfig.builder()
+      .withPartPrefix("table_show")
+      .withPartSuffix(".json")
+      .build()
 
-    println(ddl)
+    val sink: FileSink[String] = FileSink
+      .forRowFormat(
+        new Path(s"$visualizationPath"),
+        new SimpleStringEncoder[String]("UTF-8"))
+      .withOutputFileConfig(outputConfig)
+      // 固定桶名
+      .withBucketAssigner(new FixedBucketAssigner())
+      .withRollingPolicy(
+        DefaultRollingPolicy.builder()
+          .withRolloverInterval(Duration.ofMinutes(10))
+          .withInactivityInterval(Duration.ofMinutes(5))
+          .withMaxPartSize(MemorySize.ofMebiBytes(128))
+          .build())
+      .build()
 
-    tableEnv.executeSql(ddl)
-    tableEnv.executeSql(s"INSERT INTO $tmpViewName SELECT $selectColumns FROM $inputTempViewName")
-    tableEnv.toDataStream(inputTable.limit(1)).print()
+    // 转换为DataStream并转换为JSON格式
+    val resultDs = tableEnv.toDataStream(resultTable)
+    // 使用可序列化的MapFunction替代Lambda表达式
+    val jsonDs = resultDs.map(new RowToJsonMapper(schema.getColumnNames.toArray(Array[String]())))
+    jsonDs.sinkTo(sink).name("TableShowSink").uid("table-show-sink").setParallelism(1)
 
     // HdfsUtil.saveLine(portSchemaPath, String.join(",", fieldNames))
     FileUtil.writeFile(selectColumns, portSchemaPath)
 
+    out.write(inputTable)
+  }
+
+  // 可序列化的MapFunction实现
+  private class RowToJsonMapper(fieldNames: Array[String]) extends MapFunction[Row, String] {
+    override def map(row: Row): String = {
+      val sb = new StringBuilder("{")
+      for (i <- 0 until row.getArity) {
+        if (i > 0) sb.append(",")
+        sb.append(s""""${fieldNames(i)}":""")
+
+        val value = row.getField(i)
+        value match {
+          case null => sb.append("null")
+          case s: String => sb.append(s""""${s.replace("\"", "\\\"")}"""")
+          case d: java.util.Date => sb.append(s""""${d.toString}"""")
+          case d: LocalDateTime => sb.append(s""""${d.toString}"""")
+          case _ => sb.append(value)
+        }
+      }
+      sb.append("}")
+      sb.toString
+    }
+  }
+
+  private class FixedBucketAssigner extends BucketAssigner[String, String] {
+    override def getBucketId(element: String, context: BucketAssigner.Context): String = {
+      // 所有数据都写入到 "data" 子目录
+      "data"
+    }
+
+    override def getSerializer: SimpleVersionedSerializer[String] = {
+      SimpleVersionedStringSerializer.INSTANCE
+    }
   }
 
   override def getEngineType: String = Constants.ENGIN_FLINK

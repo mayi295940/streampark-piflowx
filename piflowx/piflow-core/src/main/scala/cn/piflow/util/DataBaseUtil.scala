@@ -61,7 +61,7 @@ object DataBaseUtil {
   private val CREATE_PLUGIN_TABLE = "create table if not exists plugin (id varchar(255), " +
     "name varchar(255), state varchar(255), createTime varchar(255), updateTime varchar(255))"
 
-  private val dbType = PropertyUtil.getPropertyValue("server.db.type")
+  private val dbType = Option(PropertyUtil.getPropertyValue("server.db.type")).getOrElse("h2")
 
   private var connection: Connection = _
 
@@ -85,17 +85,22 @@ object DataBaseUtil {
     if (connection == null) {
       dbType match {
         case "mysql" =>
-          Class.forName(PropertyUtil.getPropertyValue("server.db.driver"))
+          Class.forName(Option(PropertyUtil.getPropertyValue("server.db.driver")).getOrElse("com.mysql.cj.jdbc.Driver"))
           connection = DriverManager.getConnection(
             PropertyUtil.getPropertyValue("server.db.url"),
             PropertyUtil.getPropertyValue("server.db.username"),
             PropertyUtil.getPropertyValue("server.db.password"))
         case "h2" =>
-          val serverIP = ServerIpUtil.getServerIp() + ":" + PropertyUtil.getPropertyValue("server.db.port")
+          val serverIP = ServerIpUtil.getServerIp() + ":" + Option(PropertyUtil.getPropertyValue("server.db.port")).getOrElse("50001")
           val CONNECTION_URL = "jdbc:h2:tcp://" + serverIP + "/~/piflow;AUTO_SERVER=true"
-          Class.forName(PropertyUtil.getPropertyValue("server.db.driver"))
+          Class.forName(Option(PropertyUtil.getPropertyValue("server.db.driver")).getOrElse("org.h2.Driver"))
           println(CONNECTION_URL)
-          connection = DriverManager.getConnection(CONNECTION_URL)
+          try {
+            connection = DriverManager.getConnection(CONNECTION_URL)
+          } catch {
+            // just for test
+            case _: Exception => println("connect to h2 server failed, try to start h2 server")
+          }
         case _ => throw new Exception("Database type is not supported")
       }
     }
@@ -151,14 +156,22 @@ object DataBaseUtil {
   }*/
 
   def addFlow(appId: String, pId: String, name: String, jobId: String): Unit = {
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     statement.executeUpdate("insert into flow(id, pid, name, job_id) values('" + appId + "','" + pId + "','" + name + "','" + jobId + "')")
     statement.close()
   }
 
   def updateFlowState(appId: String, state: String): Unit = {
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     val updateSql = "update flow set state='" + state + "' where id='" + appId + "'"
     println(updateSql)
@@ -176,7 +189,11 @@ object DataBaseUtil {
   }
 
   def updateFlowStartTime(appId: String, startTime: String): Unit = {
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     val updateSql = "update flow set startTime='" + startTime + "' where id='" + appId + "'"
     // println(updateSql)
@@ -185,7 +202,11 @@ object DataBaseUtil {
   }
 
   def updateFlowFinishedTime(appId: String, endTime: String): Unit = {
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     val updateSql = "update flow set endTime='" + endTime + "' where id='" + appId + "'"
     println(updateSql)
@@ -194,7 +215,11 @@ object DataBaseUtil {
   }
 
   def updateFlowGroupId(appId: String, groupId: String): Unit = {
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     val updateSql = "update flow set groupId='" + groupId + "' where id='" + appId + "'"
     println(updateSql)
@@ -203,7 +228,11 @@ object DataBaseUtil {
   }
 
   /*def updateFlowProjectId(appId:String, ProjectId:String) = {
-    val statement = getConnectionInstance().createStatement()
+  val connection = getConnectionInstance()
+    if (connection == null) {
+       return
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     val updateSql = "update flow set projectId='" + ProjectId + "' where id='" + appId + "'"
     println(updateSql)
@@ -213,7 +242,11 @@ object DataBaseUtil {
 
   def isFlowExist(appId: String): Boolean = {
     var isExist = false
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return isExist
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     val rs: ResultSet = statement.executeQuery("select * from flow where id='" + appId + "'")
     while (rs.next()) {
@@ -228,7 +261,11 @@ object DataBaseUtil {
 
   def getFlowState(appId: String): String = {
     var state = ""
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return state
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     val rs: ResultSet = statement.executeQuery("select * from flow where id='" + appId + "'")
     while (rs.next()) {
@@ -241,7 +278,11 @@ object DataBaseUtil {
 
   def getFlowProcessId(appId: String): String = {
     var pid = ""
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return ""
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     val rs: ResultSet = statement.executeQuery("select pid from flow where id='" + appId + "'")
     while (rs.next()) {
@@ -253,7 +294,11 @@ object DataBaseUtil {
   }
 
   def getFlowInfo(appId: String): String = {
-    /*val statement = getConnectionInstance().createStatement()
+    /*  val connection = getConnectionInstance()
+    if (connection == null) {
+       return
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     var flowInfo = ""
 
@@ -292,8 +337,12 @@ object DataBaseUtil {
     JsonUtil.format(JsonUtil.toJson(flowInfoMap))
   }
 
-  def getFlowInfoMap(appId: String): Map[String, Any] = {
-    val statement = getConnectionInstance().createStatement()
+  private def getFlowInfoMap(appId: String): Map[String, Any] = {
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return null
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
 
     var flowInfoMap = Map[String, Any]()
@@ -335,14 +384,17 @@ object DataBaseUtil {
     Map[String, Any]("flow" -> flowInfoMap)
   }
 
-  def getFlowProgressPercent(appId: String): String = {
-    val statement = getConnectionInstance().createStatement()
+  private def getFlowProgressPercent(appId: String): String = {
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return ""
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
 
     var stopCount = 0
     var completedStopCount = 0
-    val totalRS: ResultSet =
-      statement.executeQuery("select count(*) as stopCount from stop where flowId='" + appId + "'")
+    val totalRS: ResultSet = statement.executeQuery("select count(*) as stopCount from stop where flowId='" + appId + "'")
     while (totalRS.next()) {
       stopCount = totalRS.getInt("stopCount")
       // println("stopCount:" + stopCount)
@@ -375,9 +427,12 @@ object DataBaseUtil {
   }
 
   def getFlowProgress(appId: String): String = {
-
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return ""
+    }
+    val statement = connection.createStatement()
     val progress = getFlowProgressPercent(appId)
-    val statement = getConnectionInstance().createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     val flowRS: ResultSet = statement.executeQuery("select * from flow where id='" + appId + "'")
     var id = ""
@@ -401,45 +456,58 @@ object DataBaseUtil {
   }
 
   // Stop related API
-  def addStop(appId: String, name: String) = {
-    val statement = getConnectionInstance().createStatement()
-    statement.setQueryTimeout(QUERY_TIME)
-    statement.executeUpdate("insert into stop(flowId, name) values('" + appId + "','" + name + "')")
-    statement.close()
+  def addStop(appId: String, name: String): Unit = {
+    val connection = getConnectionInstance()
+    if (connection != null) {
+      val statement = connection.createStatement()
+      statement.setQueryTimeout(QUERY_TIME)
+      statement.executeUpdate("insert into stop(flowId, name) values('" + appId + "','" + name + "')")
+      statement.close()
+    }
   }
 
   def updateStopState(appId: String, name: String, state: String) = {
-    val statement = getConnectionInstance().createStatement()
-    statement.setQueryTimeout(QUERY_TIME)
-    val updateSql =
-      "update stop set state='" + state + "' where flowId='" + appId + "' and name='" + name + "'"
-    // println(updateSql)
-    statement.executeUpdate(updateSql)
-    statement.close()
+    val connection = getConnectionInstance()
+    if (connection != null) {
+      val statement = connection.createStatement()
+      statement.setQueryTimeout(QUERY_TIME)
+      val updateSql = "update stop set state='" + state + "' where flowId='" + appId + "' and name='" + name + "'"
+      // println(updateSql)
+      statement.executeUpdate(updateSql)
+      statement.close()
+    }
   }
 
-  def updateStopStartTime(appId: String, name: String, startTime: String) = {
-    val statement = getConnectionInstance().createStatement()
-    statement.setQueryTimeout(QUERY_TIME)
-    val updateSql =
-      "update stop set startTime='" + startTime + "' where flowId='" + appId + "' and name='" + name + "'"
-    // println(updateSql)
-    statement.executeUpdate(updateSql)
-    statement.close()
+  def updateStopStartTime(appId: String, name: String, startTime: String): Unit = {
+    val connection = getConnectionInstance()
+    if (connection != null) {
+      val statement = connection.createStatement()
+      statement.setQueryTimeout(QUERY_TIME)
+      val updateSql = "update stop set startTime='" + startTime + "' where flowId='" + appId + "' and name='" + name + "'"
+      // println(updateSql)
+      statement.executeUpdate(updateSql)
+      statement.close()
+    }
   }
 
-  def updateStopFinishedTime(appId: String, name: String, endTime: String) = {
-    val statement = getConnectionInstance().createStatement()
-    statement.setQueryTimeout(QUERY_TIME)
-    val updateSql =
-      "update stop set endTime='" + endTime + "' where flowId='" + appId + "' and name='" + name + "'"
-    // println(updateSql)
-    statement.executeUpdate(updateSql)
-    statement.close()
+  def updateStopFinishedTime(appId: String, name: String, endTime: String): Unit = {
+    val connection = getConnectionInstance()
+    if (connection != null) {
+      val statement = connection.createStatement()
+      statement.setQueryTimeout(QUERY_TIME)
+      val updateSql = "update stop set endTime='" + endTime + "' where flowId='" + appId + "' and name='" + name + "'"
+      // println(updateSql)
+      statement.executeUpdate(updateSql)
+      statement.close()
+    }
   }
 
   def getStartedStop(appId: String): List[String] = {
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return List()
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
 
     var stopList: List[String] = List()
@@ -455,17 +523,25 @@ object DataBaseUtil {
   }
 
   // Throughput related API
-  def addThroughput(appId: String, stopName: String, portName: String, count: Long) = {
-    val statement = getConnectionInstance().createStatement()
+  def addThroughput(appId: String, stopName: String, portName: String, count: Long): Unit = {
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     statement.executeUpdate(
       "insert into thoughput(flowId, stopName, portName, count) values('" + appId + "','" + stopName + "','" + portName + "','" + count + "')")
     statement.close()
   }
 
-  def getThroughput(appId: String, stopName: String, portName: String) = {
+  def getThroughput(appId: String, stopName: String, portName: String): String = {
     var count = ""
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return count
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     val rs: ResultSet = statement.executeQuery(
       "select count from thoughput where flowId='" + appId + "' and stopName = '" + stopName + "' and portName = '" + portName + "'")
@@ -477,8 +553,12 @@ object DataBaseUtil {
     count
   }
 
-  def updateThroughput(appId: String, stopName: String, portName: String, count: Long) = {
-    val statement = getConnectionInstance().createStatement()
+  def updateThroughput(appId: String, stopName: String, portName: String, count: Long): Unit = {
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     val updateSql =
       "update thoughput set count='" + count + "' where flowId='" + appId + "' and stopName='" + stopName + "' and portName='" + portName + "'"
@@ -487,17 +567,24 @@ object DataBaseUtil {
   }
 
   // Group related api
-  def addGroup(groupId: String, name: String, childCount: Int) = {
-    val startTime = new Date().toString
-    val statement = getConnectionInstance().createStatement()
+  def addGroup(groupId: String, name: String, childCount: Int): Unit = {
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     statement.executeUpdate(
       "insert into flowGroup(id, name, childCount) values('" + groupId + "','" + name + "','" + childCount + "')")
     statement.close()
   }
 
-  def updateGroupState(groupId: String, state: String) = {
-    val statement = getConnectionInstance().createStatement()
+  def updateGroupState(groupId: String, state: String): Unit = {
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     val updateSql = "update flowGroup set state='" + state + "' where id='" + groupId + "'"
 
@@ -514,8 +601,12 @@ object DataBaseUtil {
     statement.close()
   }
 
-  def updateGroupStartTime(groupId: String, startTime: String) = {
-    val statement = getConnectionInstance().createStatement()
+  def updateGroupStartTime(groupId: String, startTime: String): Unit = {
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     val updateSql = "update flowGroup set startTime='" + startTime + "' where id='" + groupId + "'"
     println(updateSql)
@@ -523,8 +614,12 @@ object DataBaseUtil {
     statement.close()
   }
 
-  def updateGroupFinishedTime(groupId: String, endTime: String) = {
-    val statement = getConnectionInstance().createStatement()
+  def updateGroupFinishedTime(groupId: String, endTime: String): Unit = {
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     val updateSql = "update flowGroup set endTime='" + endTime + "' where id='" + groupId + "'"
     println(updateSql)
@@ -532,8 +627,12 @@ object DataBaseUtil {
     statement.close()
   }
 
-  def updateGroupParent(groupId: String, parentId: String) = {
-    val statement = getConnectionInstance().createStatement()
+  def updateGroupParent(groupId: String, parentId: String): Unit = {
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     val updateSql = "update flowGroup set parentId='" + parentId + "' where id='" + groupId + "'"
     // println(updateSql)
@@ -542,7 +641,11 @@ object DataBaseUtil {
   }
 
   def getGroupState(groupId: String): String = {
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return ""
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     var groupState = ""
 
@@ -552,37 +655,41 @@ object DataBaseUtil {
 
       groupState = groupRS.getString("state")
     }
-    return groupState
+    groupState
   }
 
   def isGroupChildError(groupId: String): Boolean = {
 
-    if (getGroupChildByStatus(groupId, GroupState.FAILED).size > 0 || getGroupChildByStatus(
+    if (getGroupChildByStatus(groupId, GroupState.FAILED).nonEmpty || getGroupChildByStatus(
         groupId,
-        GroupState.KILLED).size > 0)
-      return true
-    else if (getFlowChildByStatus(groupId, FlowState.FAILED).size > 0 || getFlowChildByStatus(
+        GroupState.KILLED).nonEmpty)
+      true
+    else if (getFlowChildByStatus(groupId, FlowState.FAILED).nonEmpty || getFlowChildByStatus(
         groupId,
-        FlowState.KILLED).size > 0)
-      return true
+        FlowState.KILLED).nonEmpty)
+      true
     else
-      return false
+      false
   }
 
   def isGroupChildRunning(groupId: String): Boolean = {
 
-    if (getGroupChildByStatus(groupId, GroupState.STARTED).size > 0)
-      return true
-    else if (getFlowChildByStatus(groupId, FlowState.STARTED).size > 0)
-      return true
+    if (getGroupChildByStatus(groupId, GroupState.STARTED).nonEmpty)
+      true
+    else if (getFlowChildByStatus(groupId, FlowState.STARTED).nonEmpty)
+      true
     else
-      return false
+      false
   }
 
-  def getGroupChildByStatus(groupId: String, status: String): List[String] = {
-    val statement = getConnectionInstance().createStatement()
-    statement.setQueryTimeout(QUERY_TIME)
+  private def getGroupChildByStatus(groupId: String, status: String): List[String] = {
     var failedList = List[String]()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return failedList
+    }
+    val statement = connection.createStatement()
+    statement.setQueryTimeout(QUERY_TIME)
 
     // group children state
     val groupRS: ResultSet =
@@ -598,13 +705,17 @@ object DataBaseUtil {
     }
     groupRS.close()
     statement.close()
-    return failedList
+    failedList
   }
 
-  def getFlowChildByStatus(groupId: String, status: String): List[String] = {
-    val statement = getConnectionInstance().createStatement()
-    statement.setQueryTimeout(QUERY_TIME)
+  private def getFlowChildByStatus(groupId: String, status: String): List[String] = {
     var failedList = List[String]()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return failedList
+    }
+    val statement = connection.createStatement()
+    statement.setQueryTimeout(QUERY_TIME)
 
     // flow children state
     val rs: ResultSet = statement.executeQuery("select * from flow where groupId='" + groupId + "'")
@@ -620,19 +731,22 @@ object DataBaseUtil {
 
     rs.close()
     statement.close()
-    return failedList
+    failedList
   }
 
   def getFlowGroupInfo(groupId: String): String = {
-
     val flowGroupInfoMap = getGroupInfoMap(groupId)
     JsonUtil.format(JsonUtil.toJson(flowGroupInfoMap))
-
   }
 
   // TODO need to get group
-  def getGroupInfoMap(groupId: String): Map[String, Any] = {
-    val statement = getConnectionInstance().createStatement()
+  private def getGroupInfoMap(groupId: String): Map[String, Any] = {
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return Map[String, Any]()
+    }
+    val statement = connection.createStatement()
+
     statement.setQueryTimeout(QUERY_TIME)
 
     var flowGroupInfoMap = Map[String, Any]()
@@ -676,7 +790,11 @@ object DataBaseUtil {
   }
 
   def getGroupProgressPercent(groupId: String): String = {
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return ""
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
 
     var childCount = 0;
@@ -719,7 +837,7 @@ object DataBaseUtil {
       val progress: Double =
         (completedFlowCount.asInstanceOf[Double] + completedGroupCount
           .asInstanceOf[Double]) / childCount * 100
-      return progress.toString
+      progress.toString
     }
 
   }
@@ -818,7 +936,11 @@ object DataBaseUtil {
 
   def addFlag(item: String, flag: Int): Unit = {
     val createTime = new Date().toString
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     statement.executeUpdate(
       "insert into configFlag(item, flag, createTime) values('" + item + "','" + flag + "','" + createTime + "')")
@@ -826,7 +948,11 @@ object DataBaseUtil {
   }
 
   def getFlag(item: String): Int = {
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return 0
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     var flag = 0
 
@@ -836,7 +962,7 @@ object DataBaseUtil {
 
       flag = flowGroupRS.getInt("flag")
     }
-    return flag
+    flag
   }
 
   def addScheduleInstance(
@@ -845,7 +971,11 @@ object DataBaseUtil {
       startDate: String,
       endDate: String,
       state: String): Unit = {
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     val time = new Date().toString
     statement.executeUpdate(
@@ -853,8 +983,12 @@ object DataBaseUtil {
     statement.close()
   }
 
-  def updateScheduleInstanceStatus(scheduleId: String, state: String) = {
-    val statement = getConnectionInstance().createStatement()
+  def updateScheduleInstanceStatus(scheduleId: String, state: String): Unit = {
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     val time = new Date().toString
     val updateSql =
@@ -866,12 +1000,15 @@ object DataBaseUtil {
 
   def getNeedStopSchedule(): List[String] = {
     var resultList: List[String] = List()
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return resultList
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     val nowDate: String = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
     val updateSql =
       "select id from scheduleInstance where state = '" + ScheduleState.STARTED + "' and endDate != '' and endDate <= '" + nowDate + "'"
-    // println(updateSql)
 
     val scheduleRS: ResultSet = statement.executeQuery(updateSql)
     while (scheduleRS.next()) {
@@ -888,8 +1025,11 @@ object DataBaseUtil {
       scheduleId: String,
       scheduleEntryId: String,
       scheduleEntryType: String): Unit = {
-    val createTime = new Date().toString
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     statement.executeUpdate(
       "insert into schedule(scheduleId, scheduleEntryId, scheduleEntryType) values('" + scheduleId + "','" + scheduleEntryId + "','" + scheduleEntryType + "')")
@@ -898,7 +1038,11 @@ object DataBaseUtil {
 
   def getScheduleInfo(scheduleId: String): String = {
 
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return ""
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
 
     var scheduleInfoMap = Map[String, Any]()
@@ -938,7 +1082,11 @@ object DataBaseUtil {
   def getStartedSchedule(): List[String] = {
 
     var scheduleList = List[String]()
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return scheduleList
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
 
     var scheduleInfoMap = Map[String, Any]()
@@ -953,11 +1101,15 @@ object DataBaseUtil {
     scheduleList
   }
 
-  def addPlugin(name: String) = {
+  def addPlugin(name: String): String = {
 
     var id = ""
     var state = ""
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return id
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     val rs: ResultSet = statement.executeQuery("select * from plugin where name='" + name + "'")
     if (!rs.isBeforeFirst) {
@@ -981,7 +1133,6 @@ object DataBaseUtil {
             break
           }
         }
-
       }
     }
     rs.close()
@@ -989,10 +1140,13 @@ object DataBaseUtil {
     id
   }
 
-  def removePlugin(name: String) = {
-
+  def removePlugin(name: String): String = {
     var state = ""
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return state
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     val rs: ResultSet = statement.executeQuery("select * from plugin where name='" + name + "'")
     if (!rs.isBeforeFirst) {
@@ -1027,7 +1181,11 @@ object DataBaseUtil {
   def getPluginInfoMap(pluginId: String): Map[String, String] = {
 
     var pluginMap = Map[String, String]()
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return pluginMap
+    }
+    val statement = connection.createStatement()
     val rs: ResultSet = statement.executeQuery("select * from plugin where id='" + pluginId + "'")
     while (rs.next()) {
 
@@ -1047,7 +1205,11 @@ object DataBaseUtil {
   def getPluginOn(): List[String] = {
 
     var pluginList = List[String]()
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return pluginList
+    }
+    val statement = connection.createStatement()
     val rs: ResultSet =
       statement.executeQuery("select * from plugin where state='" + PluginState.ON + "'")
     while (rs.next()) {
@@ -1058,11 +1220,15 @@ object DataBaseUtil {
     pluginList
   }
 
-  def addSparkJar(sparkJarName: String) = {
+  def addSparkJar(sparkJarName: String): String = {
 
     var id = ""
     var state = ""
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return id
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     val rs: ResultSet =
       statement.executeQuery("select * from sparkJar where name='" + sparkJarName + "'")
@@ -1073,7 +1239,6 @@ object DataBaseUtil {
         "insert into sparkJar(id, name, state, createTime, updateTime) values('" + id + "','" + sparkJarName + "','" + PluginState.ON + "','" + time + "','" + time + "')")
       state = SparkJarState.ON
     } else {
-
       breakable {
         while (rs.next()) {
           id = rs.getString("id")
@@ -1098,7 +1263,11 @@ object DataBaseUtil {
   def removeSparkJar(sparkJarId: String): String = {
 
     var state = ""
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return state
+    }
+    val statement = connection.createStatement()
     statement.setQueryTimeout(QUERY_TIME)
     val rs: ResultSet =
       statement.executeQuery("select * from sparkJar where id='" + sparkJarId + "'")
@@ -1126,7 +1295,6 @@ object DataBaseUtil {
   }
 
   def getSparkJarInfo(sparkJarId: String): String = {
-
     val sparkJarMap = getSparkJarInfoMap(sparkJarId)
     JsonUtil.format(JsonUtil.toJson(sparkJarMap))
   }
@@ -1134,7 +1302,12 @@ object DataBaseUtil {
   def getSparkJarInfoMap(sparkJarId: String): Map[String, String] = {
 
     var sparkJarMap = Map[String, String]()
-    val statement = getConnectionInstance().createStatement()
+    val connection = getConnectionInstance()
+    if (connection == null) {
+      return sparkJarMap
+    }
+
+    val statement = connection.createStatement()
     val rs: ResultSet =
       statement.executeQuery("select * from sparkJar where id='" + sparkJarId + "'")
     while (rs.next()) {
@@ -1164,49 +1337,6 @@ object DataBaseUtil {
     rs.close()
     statement.close()
     pluginList
-  }
-
-  def main(args: Array[String]): Unit = {
-
-    /*try{
-
-      val appId = "111"
-      addFlow(appId,"xjzhu")
-      updateFlowState(appId,"running")
-      val state2 = getFlowState(appId)
-
-      val stop1 = "stop1"
-      val stop2 = "stop2"
-      addStop(appId, stop1)
-      updateStopState(appId,stop1,StopState.COMPLETED)
-      addStop(appId, stop2)
-      updateStopState(appId,stop2,StopState.STARTED)
-
-
-      val process = getFlowProgress(appId)
-      println("appId=" + appId + "'s process is " + process + "%")
-
-    }catch {
-      case ex => println(ex)
-    }*/
-    val needStopSchedule = DataBaseUtil.getNeedStopSchedule()
-    if (args.size != 1) {
-      println("Error args!!! Please enter Clean or UpdateToVersion6")
-    }
-    /*val operation =  args(0)
-    if(operation == "Clean"){
-      cleanDatabase()
-    }else if( operation == "UpdateToVersion6"){
-      updateToVersion6()
-    }else{
-      println("Error args!!! Please enter Clean or UpdateToVersion6")
-    }*/
-
-    // println(getFlowGroupInfo("group_9b41bab2-7c3a-46ec-b716-93b636545e5e"))
-
-    // val flowInfoMap = getFlowInfoMap("application_1544066083705_0864")
-    // val flowJsonObject = JsonUtil.toJson(flowInfoMap)
-    // println(JsonUtil.format(flowJsonObject))
   }
 
 }

@@ -18,7 +18,8 @@
 package cn.piflow.bundle.spark.visualization
 
 import cn.piflow.{Constants, JobContext, JobInputStream, JobOutputStream, ProcessContext}
-import cn.piflow.conf.{ConfigurableVisualizationStop, Port, StopGroup, VisualizationType}
+import cn.piflow.bundle.spark.util.DataHandler
+import cn.piflow.conf.{ConfigurableVisualizationStop, Language, Port, StopGroup, VisualizationType}
 import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -38,7 +39,6 @@ class ScatterPlotChart extends ConfigurableVisualizationStop[Null, DataFrame, Nu
   override var visualizationType: String = VisualizationType.ScatterPlot
   override val isCustomized: Boolean = true
 
-  // override val customizedAllowValue: List[String] = List("COUNT","SUM","AVG","MAX","MIN")
   override def setProperties(map: Map[String, Any]): Unit = {
     legend = MapUtil.get(map, key = "legend").asInstanceOf[String]
   }
@@ -54,6 +54,17 @@ class ScatterPlotChart extends ConfigurableVisualizationStop[Null, DataFrame, Nu
       .required(true)
 
     descriptor = abscissa :: descriptor
+
+    val customizedProperties = new PropertyDescriptor()
+      .name("customizedProperties")
+      .displayName("customizedProperties")
+      .description("custom properties")
+      .defaultValue("")
+      .language(Language.CustomProperties)
+      .required(false)
+      .example("\"age\": \"COUNT\",\"id\": \"SUM\"")
+    descriptor = customizedProperties :: descriptor
+
     descriptor
   }
 
@@ -84,10 +95,14 @@ class ScatterPlotChart extends ConfigurableVisualizationStop[Null, DataFrame, Nu
       println("ordered dimension is " + dimensionArray.mkString(",") + "!!!!!!!!!!!!!!!")
 
       val sqlText = "select " + legend + "," + dimensionArray.mkString(
-        ",") + " from ScatterPlot order by " + legend + "," + dimensionArray(0);
+        ",") + " from ScatterPlot order by " + legend + "," + dimensionArray.head;
       println("ScatterPlot Sql: " + sqlText)
       val scatterPlottDF = spark.sql(sqlText)
-      out.write(scatterPlottDF.repartition(1))
+
+      val result = scatterPlottDF.repartition(1)
+      val visualizationPath = s"${System.getProperty("java.io.tmpdir")}/visualization/" +
+        s"${pec.getProcessContext.getProcess.pid()}/${pec.getStopJob.getStopName}"
+      DataHandler.saveVisualizationData(visualizationPath, result)
     } else {
       out.write(dataFrame)
     }

@@ -16,11 +16,14 @@
       {
         "uuid": "2222",
         "name": "TableShow1",
-        "bundle": "cn.piflow.bundle.flink.visualization.TableShow",
+        "bundle": "cn.piflow.bundle.flink.visualization.LineChart",
         "properties": {
-          "showField": "id,age",
-          "showNumber": "10"
-        }
+          "abscissa": "id",
+          "timeField": "",
+          "timeType": "PROCESSING_TIME",
+          "windowSize": "2"
+        },
+        "customizedProperties": {"age": "COUNT","id": "SUM"}
       }
     ],
     "paths": [

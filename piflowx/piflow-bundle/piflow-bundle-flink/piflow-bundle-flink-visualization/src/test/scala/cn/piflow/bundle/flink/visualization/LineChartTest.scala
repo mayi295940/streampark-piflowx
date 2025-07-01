@@ -15,29 +15,17 @@
  * limitations under the License.
  */
 
-package cn.piflow.bundle.spark.util
+package cn.piflow.bundle.flink.visualization
 
-import org.apache.spark.sql.{DataFrame, SaveMode}
+import cn.piflow.bundle.flink.test.BaseTest
+import org.junit.Test
 
-import java.nio.file.{Files, Paths}
+class LineChartTest {
 
-object DataHandler {
-
-  def saveVisualizationData(visualizationPath: String, jsonDF: DataFrame): Unit = {
-    val dataPath = visualizationPath + "/data"
-    val schemaPath = visualizationPath + "/schema"
-
-    var schemaStr = ""
-    jsonDF.schema.foreach(f => {
-      schemaStr = schemaStr + "," + f.name
-    })
-    schemaStr = schemaStr.stripPrefix(",")
-
-    // HdfsUtil.saveLine(schemaPath, schemaStr)
-
-    jsonDF.write.mode(SaveMode.Overwrite).json(dataPath)
-
-    Files.write(Paths.get(schemaPath), schemaStr.getBytes)
+  @Test
+  def testFlow(): Unit = {
+    val file = "src/test/resources/file/LineChart3.json"
+    BaseTest.testFlow(file)
   }
 
 }

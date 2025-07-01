@@ -1,0 +1,40 @@
+{
+  "flow": {
+    "name": "TableShowTest",
+    "uuid": "1234",
+    "stops": [
+      {
+        "uuid": "1111",
+        "name": "DataGen1",
+        "bundle": "cn.piflow.bundle.flink.common.DataGen",
+        "properties": {
+          "schema": "[{\"filedName\":\"event_time\",\"filedType\":\"TIMESTAMP\",\"kind\":\"random\"},{\"filedName\":\"id\",\"filedType\":\"INT\",\"kind\":\"sequence\",\"start\":1,\"end\":10000},{\"filedName\":\"name\",\"filedType\":\"STRING\",\"kind\":\"random\",\"length\":15},{\"filedName\":\"value\",\"filedType\":\"DOUBLE\",\"kind\":\"random\",\"max\":100,\"min\":1}]",
+          "count": "10000",
+          "ratio": "50"
+        }
+      },
+      {
+        "uuid": "2222",
+        "name": "TableShow1",
+        "bundle": "cn.piflow.bundle.flink.visualization.LineChart",
+        "properties": {
+          "abscissa": "name",
+          "timeField": "event_time",
+          "timeType": "EVENT_TIME",
+          "windowSize": "5"
+        },
+        "customizedProperties": {
+          "value": "AVG"
+        }
+      }
+    ],
+    "paths": [
+      {
+        "from": "DataGen1",
+        "outport": "",
+        "inport": "",
+        "to": "TableShow1"
+      }
+    ]
+  }
+}

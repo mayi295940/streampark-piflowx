@@ -17,10 +17,12 @@
 
 package cn.piflow.bundle.spark.visualization
 
-import cn.piflow.{Constants, JobContext, JobInputStream, JobOutputStream, ProcessContext}
+import cn.piflow._
+import cn.piflow.bundle.spark.util.DataHandler
 import cn.piflow.conf.{ConfigurableVisualizationStop, Port, StopGroup, VisualizationType}
 import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
+import cn.piflow.util.IdGenerator
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 class TableShow extends ConfigurableVisualizationStop[Null, DataFrame, Null] {
@@ -31,10 +33,12 @@ class TableShow extends ConfigurableVisualizationStop[Null, DataFrame, Null] {
   override val inportList: List[String] = List(Port.DefaultPort)
   override val outportList: List[String] = List(Port.DefaultPort)
 
-  var showField: String = _
+  private var showField: String = _
+  private var showNumber: Int = _
 
   override def setProperties(map: Map[String, Any]): Unit = {
     showField = MapUtil.get(map, key = "showField").asInstanceOf[String]
+    showNumber = MapUtil.get(map, "showNumber", "-1").asInstanceOf[String].toInt
   }
 
   override def getPropertyDescriptor(): List[PropertyDescriptor] = {
@@ -48,6 +52,15 @@ class TableShow extends ConfigurableVisualizationStop[Null, DataFrame, Null] {
       .required(true)
 
     descriptor = showField :: descriptor
+
+    val showNumber = new PropertyDescriptor()
+      .name("showNumber")
+      .displayName("showNumber")
+      .description("The count to show.")
+      .required(false)
+      .example("10")
+    descriptor = showNumber :: descriptor
+
     descriptor
   }
 
@@ -70,11 +83,25 @@ class TableShow extends ConfigurableVisualizationStop[Null, DataFrame, Null] {
 
     val spark = pec.get[SparkSession]()
     val dataFrame = in.read()
-    dataFrame.createOrReplaceTempView("TableShow")
-    val sqlText = "select " + showField + " from TableShow"
+
+    val inputTempViewName = s"${getClass.getSimpleName.stripSuffix("$")}_${IdGenerator.uuidWithoutSplit}"
+
+    dataFrame.createOrReplaceTempView(inputTempViewName)
+
+    var sqlText = s"select $showField from $inputTempViewName"
+    if (showNumber > 0) {
+      sqlText = sqlText + " limit " + showNumber
+    }
+
     println("TableShow Sql: " + sqlText)
     val tableShowDF = spark.sql(sqlText)
-    out.write(tableShowDF.repartition(1))
+    val result = tableShowDF.repartition(1)
+
+    val visualizationPath = s"${System.getProperty("java.io.tmpdir")}/visualization/" +
+      s"${pec.getProcessContext.getProcess.pid()}/${pec.getStopJob.getStopName}"
+    DataHandler.saveVisualizationData(visualizationPath, result)
+
+    out.write(result)
   }
 
   override def getEngineType: String = Constants.ENGIN_SPARK

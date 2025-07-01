@@ -32,7 +32,6 @@ object PropertyUtil {
 
   try {
     val userDir = System.getProperty("user.dir")
-    // path = Thread.currentThread().getContextClassLoader.getResource("config.properties").getPath
     path = userDir + "/config.properties"
     prop.load(new FileInputStream(path))
     classPath = userDir + "/classpath/"

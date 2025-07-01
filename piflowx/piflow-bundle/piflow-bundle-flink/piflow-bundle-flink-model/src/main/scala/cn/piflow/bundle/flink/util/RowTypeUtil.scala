@@ -143,21 +143,7 @@ object RowTypeUtil {
 
   /** 生成table Schema */
   def getTableSchema(table: Table): String = {
-
-    val schema = table.getResolvedSchema
-
-    var tableSchema = ""
-
-    val types = schema.getColumnDataTypes
-    val fieldNum = schema.getColumnCount
-    val fieldNames = schema.getColumnNames
-
-    for (i <- 0 until fieldNum) {
-      val columnName = fieldNames.get(i)
-      val columnType = types.get(i).toString.toLowerCase
-      tableSchema += s"  $columnName ${getDataTypeByType(columnType)},"
-    }
-    s"( ${tableSchema.stripMargin.dropRight(1)} )"
+    s"${table.getResolvedSchema.toString.replace("ROW<", "").replace(">", "")}"
   }
 
   /**

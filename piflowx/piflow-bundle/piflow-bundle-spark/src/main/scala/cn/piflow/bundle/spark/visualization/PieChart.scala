@@ -18,7 +18,8 @@
 package cn.piflow.bundle.spark.visualization
 
 import cn.piflow.{Constants, JobContext, JobInputStream, JobOutputStream, ProcessContext}
-import cn.piflow.conf.{ConfigurableVisualizationStop, Port, StopGroup, VisualizationType}
+import cn.piflow.bundle.spark.util.DataHandler
+import cn.piflow.conf.{ConfigurableVisualizationStop, Language, Port, StopGroup, VisualizationType}
 import cn.piflow.conf.bean.PropertyDescriptor
 import cn.piflow.conf.util.{ImageUtil, MapUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -75,6 +76,17 @@ class PieChart extends ConfigurableVisualizationStop[Null, DataFrame, Null] {
     descriptor = dimension :: descriptor
     descriptor = indicator :: descriptor
     descriptor = indicatorOption :: descriptor
+
+    val customizedProperties = new PropertyDescriptor()
+      .name("customizedProperties")
+      .displayName("customizedProperties")
+      .description("custom properties")
+      .defaultValue("")
+      .language(Language.CustomProperties)
+      .required(false)
+      .example("\"age\": \"COUNT\",\"id\": \"SUM\"")
+    descriptor = customizedProperties :: descriptor
+
     descriptor
   }
 
@@ -100,7 +112,14 @@ class PieChart extends ConfigurableVisualizationStop[Null, DataFrame, Null] {
       "select " + dimension + "," + indicatorOption + "(" + indicator + ") from PieChart group by " + dimension;
     println("PieChart Sql: " + sqlText)
     val pieChartDF = spark.sql(sqlText)
-    out.write(pieChartDF.repartition(1))
+
+    val result = pieChartDF.repartition(1)
+
+    val visualizationPath = s"${System.getProperty("java.io.tmpdir")}/visualization/" +
+      s"${pec.getProcessContext.getProcess.pid()}/${pec.getStopJob.getStopName}"
+    DataHandler.saveVisualizationData(visualizationPath, result)
+
+    out.write(result)
   }
 
   override def getEngineType: String = Constants.ENGIN_SPARK

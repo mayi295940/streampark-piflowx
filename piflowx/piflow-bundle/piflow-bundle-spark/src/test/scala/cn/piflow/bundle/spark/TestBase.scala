@@ -24,7 +24,6 @@ import cn.piflow.util.{JsonUtil, PropertyUtil}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
-import org.h2.tools.Server
 
 object TestBase {
 
@@ -38,7 +37,7 @@ object TestBase {
     val flowBean = FlowBean.apply[StreamingContext, DataFrame, DStream[_]](map)
     val flow = flowBean.constructFlow()
 
-    Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "50001").start()
+    // Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "50001").start()
 
     val sparkSessionBuilder = SparkSession.builder().appName(flowBean.name)
     if (PropertyUtil.getPropertyValue("hive.metastore.uris") != null) {

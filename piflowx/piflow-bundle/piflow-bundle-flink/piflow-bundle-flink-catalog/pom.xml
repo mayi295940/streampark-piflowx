@@ -48,6 +48,26 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.gravitino</groupId>
+            <artifactId>gravitino-flink-connector-runtime-1.18_2.12</artifactId>
+            <version>0.9.0-incubating</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.streampark</groupId>
             <artifactId>piflow-bundle-flink-common</artifactId>
             <version>${project.version}</version>

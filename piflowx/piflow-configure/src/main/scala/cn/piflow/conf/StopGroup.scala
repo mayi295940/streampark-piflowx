@@ -57,4 +57,5 @@ object StopGroup {
   val Visualization = "Visualization"
   val CephGroup = "ceph"
   val NormalizationGroup = "Normalization"
+  val Dqc = "Dqc"
 }

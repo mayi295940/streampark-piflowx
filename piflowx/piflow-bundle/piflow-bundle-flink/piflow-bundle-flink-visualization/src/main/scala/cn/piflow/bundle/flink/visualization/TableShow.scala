@@ -52,7 +52,19 @@ class TableShow extends ConfigurableVisualizationStop[Null, Table, Null] {
 
   override def setProperties(map: Map[String, Any]): Unit = {
     showField = MapUtil.get(map, key = "showField", "").asInstanceOf[String]
-    showNumber = MapUtil.get(map, "showNumber", "-1").asInstanceOf[String].toInt
+    MapUtil.get(map, "showNumber", "-1") match {
+      case str: String =>
+        try {
+          showNumber = str.toInt
+        } catch {
+          case _: NumberFormatException =>
+            showNumber = -1
+            println("Failed to convert showNumber to Int. Using default value -1.")
+        }
+      case _ =>
+        showNumber = -1
+        println("showNumber is not a String. Using default value -1.")
+    }
   }
 
   override def getPropertyDescriptor(): List[PropertyDescriptor] = {
@@ -72,6 +84,7 @@ class TableShow extends ConfigurableVisualizationStop[Null, Table, Null] {
       .displayName("showNumber")
       .description("The count to show.")
       .required(false)
+      .defaultValue("")
       .example("10")
     descriptor = showNumber :: descriptor
 

@@ -35,7 +35,7 @@ class ShowData extends ConfigurableStop[Null, DataFrame, Null] {
   val outportList: List[String] = List(Port.DefaultPort)
 
   // the customized properties of your Stop
-  private var showNumber: String = _
+  private var showNumber: Int = _
 
   // core logic function of Stop
   // read data by "in.read(inPortName)", the default port is ""
@@ -43,7 +43,7 @@ class ShowData extends ConfigurableStop[Null, DataFrame, Null] {
   def perform(in: JobInputStream[Null, DataFrame, Null], out: JobOutputStream[Null, DataFrame, Null], pec: JobContext[Null, DataFrame, Null]): Unit = {
 
     val df = in.read()
-    df.show(showNumber.toInt)
+    df.show(showNumber)
     out.write(df)
   }
 
@@ -51,7 +51,19 @@ class ShowData extends ConfigurableStop[Null, DataFrame, Null] {
 
   // set customized properties of your Stop
   def setProperties(map: Map[String, Any]): Unit = {
-    showNumber = MapUtil.get(map, "showNumber").asInstanceOf[String]
+    MapUtil.get(map, "showNumber", "-1") match {
+      case str: String =>
+        try {
+          showNumber = str.toInt
+        } catch {
+          case _: NumberFormatException =>
+            showNumber = -1
+            println("Failed to convert showNumber to Int. Using default value -1.")
+        }
+      case _ =>
+        showNumber = -1
+        println("showNumber is not a String. Using default value -1.")
+    }
   }
 
   // get descriptor of customized properties

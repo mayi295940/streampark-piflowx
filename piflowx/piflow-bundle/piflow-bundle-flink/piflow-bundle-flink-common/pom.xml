@@ -64,22 +64,6 @@
             <version>0.5.3</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.gravitino</groupId>
-            <artifactId>gravitino-flink-connector-runtime-1.18_2.12</artifactId>
-            <version>0.9.0-incubating</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-databind</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-annotations</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
     </dependencies>
 
     <build>

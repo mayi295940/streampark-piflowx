@@ -451,6 +451,12 @@
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-server</artifactId>
             <version>2.5.5-hadoop3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -548,7 +554,7 @@
 
         <dependency>
             <groupId>org.apache.gravitino</groupId>
-            <artifactId>gravitino-spark-connector-runtime-3.4_${scala.binary.version}</artifactId>
+            <artifactId>gravitino-spark-connector-runtime-3.5_${scala.binary.version}</artifactId>
             <version>0.9.0-incubating</version>
             <exclusions>
                 <exclusion>
@@ -559,7 +565,24 @@
                     <groupId>com.fasterxml.jackson.core</groupId>
                     <artifactId>jackson-annotations</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.amazon.deequ</groupId>
+            <artifactId>deequ</artifactId>
+            <version>2.0.11-spark-3.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <!-- <version>${jackson.version}</version>-->
+            <version>2.15.0</version>
         </dependency>
 
     </dependencies>

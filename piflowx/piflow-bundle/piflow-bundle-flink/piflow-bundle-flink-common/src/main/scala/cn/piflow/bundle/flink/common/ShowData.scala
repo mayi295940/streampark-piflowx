@@ -64,8 +64,20 @@ class ShowData extends ConfigurableStop[Null, Table, Null] {
 
   // set customized properties of your Stop
   def setProperties(map: Map[String, Any]): Unit = {
-    showNumber = MapUtil.get(map, "showNumber", "10").asInstanceOf[String].toInt
     changeLog = MapUtil.get(map, "changeLog", "false").asInstanceOf[String].toBoolean
+    MapUtil.get(map, "showNumber", "-1") match {
+      case str: String =>
+        try {
+          showNumber = str.toInt
+        } catch {
+          case _: NumberFormatException =>
+            showNumber = -1
+            println("Failed to convert showNumber to Int. Using default value -1.")
+        }
+      case _ =>
+        showNumber = -1
+        println("showNumber is not a String. Using default value -1.")
+    }
   }
 
   // get descriptor of customized properties

@@ -1,0 +1,39 @@
+{
+  "flow": {
+    "environment": {
+      "jobId": "93",
+      "applicationId": "1751715679748_93"
+    },
+    "paths": [
+      {
+        "inport": "",
+        "from": "MockData_64VGQ",
+        "to": "Deequ_PsPHI",
+        "outport": ""
+      }
+    ],
+    "name": "spark",
+    "engineType": "spark",
+    "stops": [
+      {
+        "name": "MockData_64VGQ",
+        "uuid": "MockData_64VGQ",
+        "bundle": "cn.piflow.bundle.spark.common.MockData",
+        "properties": {
+          "schema": "[{\"id\":\"317974\",\"filedName\":\"id\",\"filedType\":\"STRING\",\"index\":0,\"isNullable\":false},{\"id\":\"808911\",\"filedName\":\"age\",\"filedType\":\"INT\",\"isNullable\":true}]",
+          "count": "50"
+        }
+      },
+      {
+        "name": "Deequ_PsPHI",
+        "uuid": "Deequ_PsPHI",
+        "bundle": "cn.piflow.bundle.spark.dqc.Deequ",
+        "properties": {
+          "deequRule": "{\"checkLevel\":\"Error\",\"description\":\"integrity checks\",\"constraints\":[{\"id\":1,\"constraintType\":\"hasSize\",\"params\":{\"operator\":\"==\",\"value\":200}},{\"id\":2,\"constraintType\":\"isComplete\",\"params\":{\"column\":\"age\"}},{\"id\":3,\"constraintType\":\"isContainedIn\",\"params\":{\"column\":\"name\",\"values\":[\"1\",\"2\"]}},{\"id\":4,\"constraintType\":\"hasMin\",\"params\":{\"column\":\"age\",\"operator\":\"==\",\"value\":\"12\"}},{\"id\":5,\"constraintType\":\"hasMean\",\"params\":{\"column\":\"age\",\"operator\":\"!=\",\"value\":\"24\"}}]}"
+        }
+      }
+    ],
+    "uuid": "93",
+    "runMode": "DEBUG"
+  }
+}

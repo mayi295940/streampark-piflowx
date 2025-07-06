@@ -15,19 +15,17 @@
  * limitations under the License.
  */
 
-package cn.piflow.conf
+package cn.piflow.bundle.spark.dqc
 
-object Language {
+import cn.piflow.bundle.spark.TestBase
+import org.junit.Test
 
-  val Text = "Text"
-  val Scala = "Scala"
-  val Python = "Python"
-  val Shell = "Shell"
-  val Sql = "Sql"
-  val DataGenSchema = "DataGenSchema"
-  val MockDataSchema = "MockDataSchema"
-  val DataFakerSchema = "DataFakerSchema"
-  val FlinkTableSchema = "FlinkTableSchema"
-  val CustomProperties = "CustomProperties"
-  val DeequRule = "DeequRule"
+class DeequTest {
+
+  @Test
+  def testFlow(): Unit = {
+    val file = "src/test/resources/dqc/Deequ.json"
+    TestBase.testFlow(file)
+  }
+
 }

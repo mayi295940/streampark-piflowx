@@ -15,19 +15,39 @@
  * limitations under the License.
  */
 
-package cn.piflow.conf
+package cn.piflow.bundle.spark.entity.deequ;
 
-object Language {
+public class ConstraintConfig {
 
-  val Text = "Text"
-  val Scala = "Scala"
-  val Python = "Python"
-  val Shell = "Shell"
-  val Sql = "Sql"
-  val DataGenSchema = "DataGenSchema"
-  val MockDataSchema = "MockDataSchema"
-  val DataFakerSchema = "DataFakerSchema"
-  val FlinkTableSchema = "FlinkTableSchema"
-  val CustomProperties = "CustomProperties"
-  val DeequRule = "DeequRule"
+    private int id;
+    private String constraintType;
+    private ConstraintParams params;
+
+    public ConstraintConfig() {
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getConstraintType() {
+        return constraintType;
+    }
+
+    public ConstraintParams getParams() {
+        return params;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setConstraintType(String constraintType) {
+        this.constraintType = constraintType;
+    }
+
+    public void setParams(ConstraintParams params) {
+        this.params = params;
+    }
+
 }

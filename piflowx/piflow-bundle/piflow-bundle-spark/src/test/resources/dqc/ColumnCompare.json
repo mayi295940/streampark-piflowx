@@ -1,0 +1,59 @@
+{
+  "flow": {
+    "environment": {
+      "jobId": "93",
+      "applicationId": "1751715679748_93"
+    },
+    "paths": [
+      {
+        "inport": "Left",
+        "from": "MockData1",
+        "to": "DataCompare",
+        "outport": ""
+      },
+      {
+        "inport": "Right",
+        "from": "MockData2",
+        "to": "DataCompare",
+        "outport": ""
+      }
+    ],
+    "name": "spark",
+    "engineType": "spark",
+    "stops": [
+      {
+        "name": "MockData1",
+        "uuid": "MockData1",
+        "bundle": "cn.piflow.bundle.spark.common.MockData",
+        "properties": {
+          "schema": "[{\"id\":\"317974\",\"filedName\":\"id\",\"filedType\":\"STRING\",\"index\":0,\"isNullable\":false},{\"id\":\"808911\",\"filedName\":\"age\",\"filedType\":\"INT\",\"isNullable\":true}]",
+          "count": "50"
+        }
+      },
+      {
+        "name": "MockData2",
+        "uuid": "MockData2",
+        "bundle": "cn.piflow.bundle.spark.common.MockData",
+        "properties": {
+          "schema": "[{\"id\":\"317974\",\"filedName\":\"id\",\"filedType\":\"STRING\",\"index\":0,\"isNullable\":false},{\"id\":\"808911\",\"filedName\":\"age\",\"filedType\":\"INT\",\"isNullable\":true}]",
+          "count": "50"
+        }
+      },
+      {
+        "name": "DataCompare",
+        "uuid": "DataCompare",
+        "bundle": "cn.piflow.bundle.spark.dqc.ColumnCompare",
+        "properties": {
+          "originTablePrimary": "id",
+          "originTableFields": "id,age",
+          "originTableFilter": "",
+          "toTablePrimary": "id",
+          "toTableFields": "id,age",
+          "toTableFilter": ""
+        }
+      }
+    ],
+    "uuid": "93",
+    "runMode": "DEBUG"
+  }
+}
